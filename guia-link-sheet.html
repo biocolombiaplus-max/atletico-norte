@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Guía — Polla Mundialista CEISCOL 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@page { size:A4; margin:14mm 14mm 14mm 14mm; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',Arial,sans-serif;font-size:10pt;color:#1a1a2e;background:#fff;}
+
+/* ---- CABECERA ---- */
+.hd{
+  background:linear-gradient(135deg,#003087,#001a5e);
+  border-radius:10px;
+  padding:16px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.hd-left{display:flex;align-items:center;gap:14px;}
+.hd-icon{font-size:36px;}
+.hd h1{font-size:15pt;font-weight:700;color:#FFD700;line-height:1.2;}
+.hd p{font-size:8.5pt;color:rgba(255,255,255,.65);margin-top:3px;}
+.hd-right{text-align:right;}
+.hd-right .steps-lbl{font-size:7.5pt;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;}
+.hd-right .steps-val{font-size:20pt;font-weight:700;color:#FFD700;line-height:1;}
+
+/* ---- INTRO ---- */
+.intro{
+  background:#f0f4ff;
+  border-left:4px solid #003087;
+  border-radius:0 6px 6px 0;
+  padding:9px 13px;
+  font-size:9.5pt;
+  color:#334;
+  margin-bottom:14px;
+  line-height:1.55;
+}
+.intro b{color:#003087;}
+
+/* ---- PASOS ---- */
+.paso{
+  border:1.5px solid #dde4f5;
+  border-radius:10px;
+  margin-bottom:12px;
+  overflow:hidden;
+  page-break-inside:avoid;
+}
+.paso-hd{
+  background:#003087;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:9px 16px;
+}
+.paso-num{
+  background:#FFD700;
+  color:#003087;
+  font-weight:700;
+  font-size:11pt;
+  width:28px;height:28px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.paso-title{font-size:11pt;font-weight:600;color:#fff;}
+.paso-icon{margin-left:auto;font-size:16px;}
+.paso-body{padding:12px 16px;background:#fff;}
+
+/* ---- FILAS ---- */
+.fila{
+  display:flex;
+  gap:10px;
+  margin-bottom:9px;
+  align-items:flex-start;
+}
+.fila:last-child{margin-bottom:0;}
+.bala{
+  background:#003087;
+  color:#FFD700;
+  font-weight:700;
+  font-size:8pt;
+  width:20px;height:20px;
+  min-width:20px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
+}
+.txt{font-size:9.5pt;color:#2a2a4a;line-height:1.55;}
+.txt b{color:#003087;}
+.txt i{color:#555;}
+
+/* URL box */
+.url{
+  background:#f5f7ff;
+  border:1px solid #c5d0ea;
+  border-radius:5px;
+  padding:6px 11px;
+  font-family:'Courier New',monospace;
+  font-size:9pt;
+  color:#003087;
+  margin:5px 0 2px;
+  word-break:break-all;
+  line-height:1.45;
+}
+.url .hi{color:#c0392b;font-weight:700;}
+.url .ok{color:#1a7a3a;font-weight:700;}
+
+/* tabla config */
+.tbl{width:100%;border-collapse:collapse;margin-top:8px;font-size:9pt;}
+.tbl th{background:#eef2fb;color:#003087;font-weight:600;padding:6px 11px;text-align:left;border:1px solid #d0daf0;}
+.tbl td{padding:6px 11px;border:1px solid #dde4f5;}
+.tbl tr:nth-child(even) td{background:#f8f9ff;}
+.tag{display:inline-block;background:#003087;color:#FFD700;border-radius:4px;padding:1px 8px;font-size:8pt;font-weight:600;}
+
+/* tip */
+.tip{
+  background:#fffbea;
+  border:1px solid #ffe066;
+  border-radius:6px;
+  padding:8px 12px;
+  font-size:9pt;
+  color:#5a4700;
+  margin-top:9px;
+  display:flex;gap:7px;align-items:flex-start;
+  line-height:1.5;
+}
+.succ{
+  background:#eafaf2;
+  border:1px solid #7dcea0;
+  border-radius:6px;
+  padding:8px 12px;
+  font-size:9pt;
+  color:#145a32;
+  margin-top:9px;
+  display:flex;gap:7px;align-items:flex-start;
+  line-height:1.5;
+}
+
+/* ---- RESULTADO VISUAL ---- */
+.res{
+  border:2px solid #FFD700;
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:12px;
+  page-break-inside:avoid;
+}
+.res-hd{
+  background:linear-gradient(90deg,#FFD700,#ffb300);
+  padding:9px 16px;
+  font-size:10.5pt;
+  font-weight:700;
+  color:#003087;
+}
+.res-body{
+  padding:12px 16px;
+  background:#fff;
+}
+.flujo{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.flujo-item{
+  flex:1;
+  min-width:90px;
+  background:#f0f4ff;
+  border-radius:8px;
+  padding:10px 8px;
+  text-align:center;
+}
+.flujo-item .fi{font-size:22px;}
+.flujo-item .ft{font-size:7.5pt;color:#667;margin-top:4px;line-height:1.4;}
+.flujo-item .fv{font-size:8.5pt;font-weight:600;color:#003087;margin-top:2px;}
+.arrow{font-size:16px;color:#aab;flex-shrink:0;}
+
+/* ---- WHATSAPP ---- */
+.wa{
+  background:#eafaf0;
+  border:1.5px solid #a9dfbf;
+  border-radius:10px;
+  padding:12px 16px;
+  page-break-inside:avoid;
+}
+.wa h3{font-size:10pt;font-weight:600;color:#1b5e20;margin-bottom:8px;}
+.wa-msg{
+  background:#fff;
+  border:1px solid #c8e6c9;
+  border-radius:7px;
+  padding:10px 13px;
+  font-family:'Courier New',monospace;
+  font-size:9pt;
+  white-space:pre-line;
+  color:#1a3a1a;
+  line-height:1.6;
+}
+
+/* ---- FOOTER ---- */
+.foot{
+  margin-top:12px;
+  padding-top:8px;
+  border-top:1px solid #e0e6f0;
+  display:flex;
+  justify-content:space-between;
+  font-size:7.5pt;
+  color:#aaa;
+}
+.foot strong{color:#003087;}
+
+/* boton imprimir */
+.print-btn{
+  position:fixed;bottom:20px;right:20px;
+  background:linear-gradient(135deg,#003087,#001a5e);
+  color:#FFD700;border:none;border-radius:50px;
+  padding:11px 22px;font-size:12px;font-weight:600;
+  cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);
+  display:flex;align-items:center;gap:7px;
+  font-family:'Inter',sans-serif;
+}
+.print-btn:hover{transform:translateY(-1px);}
+@media print{.print-btn{display:none;}}
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">&#128438; Guardar PDF</button>
+
+<!-- CABECERA -->
+<div class="hd">
+  <div class="hd-left">
+    <div class="hd-icon">&#9917;</div>
+    <div>
+      <h1>Cómo activar el formulario y el Sheet<br>Polla Mundialista CEISCOL 2026</h1>
+      <p>&#127464;&#127476; Colombia vs Portugal &nbsp;&bull;&nbsp; Guía rápida para el equipo encargado</p>
+    </div>
+  </div>
+  <div class="hd-right">
+    <div class="steps-lbl">pasos</div>
+    <div class="steps-val">4</div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div class="intro">
+  Esta guía explica cómo dejar activo el formulario de registro y la hoja de Google Sheets donde llegan los datos. Solo necesitas <b>una cuenta Gmail</b> (ceiscol.asistente@gmail.com) y acceso a internet. <b>No se requieren conocimientos técnicos avanzados.</b>
+</div>
+
+<!-- PASO 1 -->
+<div class="paso">
+  <div class="paso-hd">
+    <div class="paso-num">1</div>
+    <div class="paso-title">Crear la hoja de Google Sheets donde llegarán los registros</div>
+    <div class="paso-icon">&#128202;</div>
+  </div>
+  <div class="paso-body">
+    <div class="fila">
+      <div class="bala">1</div>
+      <div class="txt">Ingresa a <b>sheets.google.com</b> con la cuenta <b>ceiscol.asistente@gmail.com</b> y crea una hoja en blanco.</div>
+    </div>
+    <div class="fila">
+      <div class="bala">2</div>
+      <div class="txt">Ponle el nombre: <b>Polla Mundialista CEISCOL 2026</b></div>
+    </div>
+    <div class="fila">
+      <div class="bala">3</div>
+      <div class="txt">
+        Copia el <b>ID</b> de la URL del navegador. Está entre <i>/d/</i> y <i>/edit</i>:
+        <div class="url">https://docs.google.com/spreadsheets/d/<span class="hi">1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</span>/edit</div>
+        <i>Ese código largo es tu ID. Guárdalo, lo necesitas en el siguiente paso.</i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 2 -->
+<div class="paso">
+  <div class="paso-hd">
+    <div class="paso-num">2</div>
+    <div class="paso-title">Pegar el código en Google Apps Script</div>
+    <div class="paso-icon">&#128187;</div>
+  </div>
+  <div class="paso-body">
+    <div class="fila">
+      <div class="bala">1</div>
+      <div class="txt">Ve a <b>script.google.com</b> (misma cuenta) &rarr; clic en <b>Nuevo proyecto</b>.</div>
+    </div>
+    <div class="fila">
+      <div class="bala">2</div>
+      <div class="txt">Selecciona todo el texto que aparece <b>(Ctrl+A)</b> y bórralo. Luego pega el contenido del archivo <b>CEISCOL_Polla_Code.gs</b>.</div>
+    </div>
+    <div class="fila">
+      <div class="bala">3</div>
+      <div class="txt">
+        Busca esta línea al inicio del código y reemplaza el texto entre comillas con el ID del Paso 1:
+        <div class="url">const SHEET_ID = '<span class="hi">TU_SHEET_ID_AQUI</span>';</div>
+        Debe quedar así (con tu ID real):
+        <div class="url">const SHEET_ID = '<span class="ok">1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</span>';</div>
+      </div>
+    </div>
+    <div class="fila">
+      <div class="bala">4</div>
+      <div class="txt">Guarda con <b>Ctrl+S</b> y ponle el nombre: <b>CEISCOL Polla 2026</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 3 -->
+<div class="paso">
+  <div class="paso-hd">
+    <div class="paso-num">3</div>
+    <div class="paso-title">Publicar y obtener el link del formulario</div>
+    <div class="paso-icon">&#127760;</div>
+  </div>
+  <div class="paso-body">
+    <div class="fila">
+      <div class="bala">1</div>
+      <div class="txt">Haz clic en el botón azul <b>"Implementar"</b> (arriba a la derecha) &rarr; <b>"Nueva implementación"</b>.</div>
+    </div>
+    <div class="fila">
+      <div class="bala">2</div>
+      <div class="txt">Haz clic en el engranaje <b>&#9881;</b> junto a "Seleccionar tipo" y elige <b>Aplicación web</b>. Configura así:
+        <table class="tbl">
+          <tr><th>Campo</th><th>Valor exacto</th></tr>
+          <tr><td>Ejecutar como</td><td><span class="tag">Yo (ceiscol.asistente@gmail.com)</span></td></tr>
+          <tr><td>Quién tiene acceso</td><td><span class="tag">Cualquier persona</span> &nbsp;&#9888; No elegir "con cuenta Google"</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="fila">
+      <div class="bala">3</div>
+      <div class="txt">Clic en <b>"Implementar"</b>. Cuando pida autorizar permisos, clic en <b>"Autorizar acceso"</b> &rarr; elige la cuenta CEISCOL &rarr; <b>"Permitir"</b>.</div>
+    </div>
+    <div class="fila">
+      <div class="bala">4</div>
+      <div class="txt">
+        Aparecerá la <b>URL de tu formulario</b>. Cópiala y guárdala.
+        <div class="succ"><span>&#10003;</span><span><b>¡Formulario activo!</b> Cualquier persona puede abrirlo con ese link, sin necesidad de correo ni contraseña.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 4 -->
+<div class="paso">
+  <div class="paso-hd">
+    <div class="paso-num">4</div>
+    <div class="paso-title">Crear el link corto para compartir (bit.ly)</div>
+    <div class="paso-icon">&#128279;</div>
+  </div>
+  <div class="paso-body">
+    <div class="fila">
+      <div class="bala">1</div>
+      <div class="txt">Ve a <b>bitly.com</b> &rarr; pega la URL larga del paso anterior &rarr; clic en <b>"Shorten"</b>.</div>
+    </div>
+    <div class="fila">
+      <div class="bala">2</div>
+      <div class="txt">(Opcional) Con cuenta gratuita puedes personalizar el link:
+        <div class="url"><span class="ok">bit.ly/pollaceiscol2026</span></div>
+      </div>
+    </div>
+    <div class="fila">
+      <div class="bala">3</div>
+      <div class="txt">Prueba el link en modo incógnito, llena el formulario y verifica que el registro llegue a tu <b>Google Sheet</b> y al correo <b>ceiscol.asistente@gmail.com</b>.</div>
+    </div>
+    <div class="tip"><span>&#128161;</span><span><b>Importante:</b> Cada vez que hagas cambios en el código debes volver a <b>Implementar &rarr; Gestionar implementaciones &rarr; Nueva versión</b> para que los cambios se apliquen.</span></div>
+  </div>
+</div>
+
+<!-- FLUJO RESULTADO -->
+<div class="res">
+  <div class="res-hd">&#127882; Qué pasa automáticamente cuando alguien se registra</div>
+  <div class="res-body">
+    <div class="flujo">
+      <div class="flujo-item"><div class="fi">&#9997;</div><div class="ft">Bacterólogo llena el formulario</div><div class="fv">Link compartido</div></div>
+      <div class="arrow">&#10140;</div>
+      <div class="flujo-item"><div class="fi">&#128202;</div><div class="ft">Datos guardados en</div><div class="fv">Google Sheet CEISCOL</div></div>
+      <div class="arrow">&#10140;</div>
+      <div class="flujo-item"><div class="fi">&#128231;</div><div class="ft">Notificación enviada a</div><div class="fv">ceiscol.asistente&#64;gmail.com</div></div>
+      <div class="arrow">&#10140;</div>
+      <div class="flujo-item"><div class="fi">&#9989;</div><div class="ft">Confirmación al correo del</div><div class="fv">bacterólogo</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WHATSAPP -->
+<div class="wa">
+  <h3>&#128241; Mensaje para enviar a los laboratorios clientes</h3>
+  <div class="wa-msg">&#9917;&#127464;&#127476; ¡POLLA MUNDIALISTA CEISCOL 2026!
+
+¿Cuánto va a quedar Colombia vs Portugal?
+Registra el pronóstico de cada bacterólogo. ¡Gratis y en 2 minutos!
+
+&#128071; Entra aquí:
+bit.ly/pollaceiscol2026
+
+&#128203; Solo necesitas: nombre del lab, correo personal y tu marcador 🎯
+
+¡Vamos Colombia! 💛💛💙❤️</div>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <div><strong>CEISCOL</strong> &bull; Guía interna &bull; Polla Mundialista 2026</div>
+  <div>Solo para el equipo encargado de la implementación</div>
+</div>
+
+</body>
+</html>
