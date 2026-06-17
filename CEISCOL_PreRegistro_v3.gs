@@ -151,9 +151,8 @@ function enviarConfirmacion(d) {
   +'<p style="font-size:15px;color:#1a1a2e;">Hola <b style="color:#003087;">'+nombre+'</b>,</p>'
   +'<p style="font-size:14px;color:#555;line-height:1.7;margin-top:10px;">Tu inscripción fue registrada con éxito. 🎉</p>'
   +'<div style="background:#fffbea;border:2px solid #FFD700;border-radius:12px;padding:22px;margin:22px 0;text-align:center;">'
-  +'<div style="font-size:36px;">📲</div>'
-  +'<p style="font-size:16px;font-weight:700;color:#003087;margin-top:10px;">Próximamente recibirás el link</p>'
-  +'<p style="font-size:13px;color:#666;line-height:1.6;margin-top:8px;">Te enviaremos el link exclusivo para registrar tu marcador. <b>¡Mantente atento!</b></p></div>'
+  +'<p style="font-size:16px;font-weight:700;color:#003087;">📲 Próximamente recibirás el link</p>'
+  +'<p style="font-size:13px;color:#666;line-height:1.6;margin-top:8px;">Te enviaremos el link para registrar tu marcador. <b>¡Mantente atento!</b></p></div>'
   +'<table style="width:100%;border-collapse:collapse;font-size:13px;">'
   +'<tr><th colspan="2" style="background:#003087;color:#FFD700;padding:10px 14px;text-align:left;">📋 TUS DATOS</th></tr>'
   +'<tr style="background:#f8f9ff;"><td style="padding:9px 14px;color:#888;width:40%;">🏥 Laboratorio</td><td style="padding:9px 14px;font-weight:700;color:#003087;">'+d.laboratorio+'</td></tr>'
@@ -186,388 +185,401 @@ var HTML_FORM = `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#0a0e1a"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Pre-Registro · Polla Mundialista CEISCOL 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --gold:#FFD700;
-  --blue:#003087;
-  --red:#CE1126;
-  --bg:#0a0e1a;
-  --surface:#111827;
-  --surface2:#1a2236;
-  --border:rgba(255,215,0,.18);
-  --text:#f0f2f8;
-  --sub:rgba(255,255,255,.45);
-  --inp:rgba(255,255,255,.06);
-  --inp-b:rgba(255,255,255,.14);
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{
-  width:100%;min-height:100%;
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  -webkit-tap-highlight-color:transparent;
-  -webkit-font-smoothing:antialiased;
+/* ── RESET TOTAL ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* BARRA TRICOLOR */
-.tc{position:fixed;top:0;left:0;right:0;height:5px;display:flex;z-index:999;}
-.tc i{flex:1;}
-.tc .y{background:var(--gold);}
-.tc .b{background:var(--blue);}
-.tc .r{background:var(--red);}
-
-/* HERO */
-.hero{
-  width:100%;
-  padding:56px 24px 80px;
-  text-align:center;
-  background:linear-gradient(170deg,#000820 0%,#001a5e 40%,#5a0010 75%,#CE1126 100%);
-  position:relative;
-  overflow:hidden;
-}
-.hero::before{
-  content:'';
-  position:absolute;inset:0;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-.hero-ball{font-size:52px;line-height:1;margin-bottom:12px;animation:bounce 2s ease-in-out infinite;}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.hero-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,215,0,.12);
-  border:1px solid rgba(255,215,0,.3);
-  border-radius:100px;
-  padding:5px 18px;
-  font-size:10px;font-weight:700;
-  color:var(--gold);letter-spacing:2.5px;
-  text-transform:uppercase;
-  margin-bottom:16px;
-}
-.hero h1{
-  font-family:'Oswald',sans-serif;
-  font-size:clamp(32px,9vw,56px);
-  font-weight:700;
-  line-height:1.05;
-  color:#fff;
-  text-shadow:0 2px 20px rgba(0,0,0,.5);
-}
-.hero h1 .g{color:var(--gold);}
-.hero h1 .r2{color:#ff6b6b;}
-.hero-match{
-  margin-top:14px;
-  display:inline-flex;align-items:center;gap:10px;
-  background:rgba(0,0,0,.3);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:100px;
-  padding:8px 20px;
-  font-size:14px;font-weight:600;
-  color:rgba(255,255,255,.85);
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0b0f1e;
+  color: #eef0f8;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  /* SIN position:fixed en ningún lado */
 }
 
-/* CONTENIDO */
-.wrap{
-  width:100%;
-  max-width:640px;
-  margin:0 auto;
-  padding:0 16px 60px;
+/* ── BARRA TRICOLOR — sticky, no fixed ── */
+.tc {
+  width: 100%;
+  height: 5px;
+  display: flex;
+  /* sticky para que no cause salto en iOS */
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
-@media(min-width:640px){.wrap{padding:0 28px 60px;}}
+.tc span { flex: 1; }
+.tc .y { background: #FFD700; }
+.tc .b { background: #003087; }
+.tc .r { background: #CE1126; }
 
-/* AVISO */
-.aviso{
-  margin:-36px auto 0;
-  position:relative;z-index:10;
-  background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(0,48,135,.2));
-  border:1.5px solid rgba(255,215,0,.25);
-  border-radius:16px;
-  padding:16px 18px;
-  display:flex;gap:14px;align-items:center;
+/* ── HERO ── */
+.hero {
+  width: 100%;
+  padding: 44px 20px 70px;
+  text-align: center;
+  background: linear-gradient(160deg, #000a20 0%, #001550 45%, #520010 80%, #CE1126 100%);
 }
-.aviso-ico{font-size:28px;flex-shrink:0;}
-.aviso p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;}
-.aviso b{color:var(--gold);}
+.hero-flags { font-size: 36px; margin-bottom: 10px; }
+.badge {
+  display: inline-block;
+  background: rgba(255,215,0,.12);
+  border: 1px solid rgba(255,215,0,.35);
+  border-radius: 100px;
+  padding: 5px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFD700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(30px, 8.5vw, 54px);
+  font-weight: 700;
+  line-height: 1.08;
+  color: #fff;
+}
+.hero h1 .g { color: #FFD700; }
+.hero h1 .r { color: #ff7070; }
+.hero-vs {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 100px;
+  padding: 9px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,.9);
+}
 
-/* CARD */
-.card{
-  background:var(--surface);
-  border:1px solid rgba(255,215,0,.1);
-  border-radius:20px;
-  padding:24px 18px;
-  margin-top:16px;
-  box-shadow:0 32px 80px rgba(0,0,0,.6);
+/* ── CONTENEDOR PRINCIPAL ── */
+.main {
+  width: 100%;
+  padding: 0 14px 56px;
 }
-@media(min-width:480px){.card{padding:28px 26px;}}
+@media (min-width: 600px) {
+  .main { max-width: 620px; margin: 0 auto; padding: 0 24px 56px; }
+}
 
-/* SECCIÓN */
-.sec{
-  display:flex;align-items:center;gap:10px;
-  font-family:'Oswald',sans-serif;
-  font-size:11px;font-weight:600;
-  letter-spacing:3px;color:var(--gold);
-  text-transform:uppercase;
-  margin-bottom:16px;
+/* ── AVISO ── */
+.aviso {
+  background: linear-gradient(135deg, rgba(255,215,0,.08), rgba(0,48,135,.18));
+  border: 1.5px solid rgba(255,215,0,.22);
+  border-radius: 14px;
+  padding: 15px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: -32px;
+  position: relative;
+  z-index: 2;
 }
-.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,0,.4),transparent);}
-.sep{height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.15),transparent);margin:22px 0;}
+.aviso-i { font-size: 26px; flex-shrink: 0; }
+.aviso p { font-size: 13px; color: rgba(255,255,255,.58); line-height: 1.6; }
+.aviso b { color: #FFD700; }
 
-/* GRID */
-.col{display:flex;flex-direction:column;gap:14px;}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-@media(max-width:400px){.row{grid-template-columns:1fr;}}
+/* ── TARJETA FORMULARIO ── */
+.card {
+  background: #141b2d;
+  border: 1px solid rgba(255,215,0,.1);
+  border-radius: 18px;
+  padding: 22px 16px;
+  margin-top: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  width: 100%;
+}
+@media (min-width: 480px) { .card { padding: 26px 22px; } }
 
-/* CAMPO */
-.fld{display:flex;flex-direction:column;gap:7px;}
-.lbl{
-  font-size:11px;font-weight:600;
-  color:rgba(255,255,255,.4);
-  letter-spacing:1.2px;
-  text-transform:uppercase;
+/* ── SECCIÓN ── */
+.sec {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: #FFD700;
+  text-transform: uppercase;
+  margin-bottom: 16px;
 }
-.req{color:var(--gold);margin-left:2px;}
+.sec::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,215,0,.35), transparent);
+}
+.line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,.15), transparent);
+  margin: 22px 0;
+}
 
-/* INPUTS */
-input,select{
-  width:100%;
-  background:var(--inp);
-  border:1.5px solid var(--inp-b);
-  border-radius:12px;
-  color:var(--text);
-  font-family:'Inter',sans-serif;
-  font-size:16px;
-  font-weight:500;
-  padding:15px 16px;
-  transition:border-color .2s,background .2s,box-shadow .2s;
-  -webkit-appearance:none;
-  appearance:none;
-  outline:none;
-}
-select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23FFD700'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 16px center;
-  padding-right:44px;
-  cursor:pointer;
-}
-select option{background:#1a2236;color:var(--text);}
-input::placeholder{color:rgba(255,255,255,.18);}
-input:focus,select:focus{
-  border-color:rgba(255,215,0,.6);
-  background:rgba(255,255,255,.08);
-  box-shadow:0 0 0 3px rgba(255,215,0,.08);
-}
-input.err,select.err{
-  border-color:var(--red)!important;
-  box-shadow:0 0 0 3px rgba(206,17,38,.1)!important;
-}
-/* Icono dentro de laboratorio */
-.ico-wrap{position:relative;}
-.ico-wrap input{padding-left:48px;}
-.ico-wrap .ico{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none;}
+/* ── LAYOUT CAMPOS ── */
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 380px) { .duo { grid-template-columns: 1fr; } }
 
-/* PROFESIÓN PILLS */
-.pills{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
+/* ── LABEL + INPUT ── */
+.fld { display: flex; flex-direction: column; gap: 7px; }
+.lbl {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,.38);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
-@media(min-width:420px){
-  .pills{grid-template-columns:repeat(4,1fr);}
-}
-.pill-inp{display:none;}
-.pill{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;padding:14px 8px;
-  background:var(--inp);
-  border:1.5px solid var(--inp-b);
-  border-radius:14px;
-  cursor:pointer;
-  transition:all .18s;
-  text-align:center;
-  user-select:none;
-  -webkit-user-select:none;
-}
-.pill em{font-size:26px;line-height:1;font-style:normal;}
-.pill span{font-size:11px;font-weight:600;color:var(--sub);line-height:1.3;}
-.pill-inp:checked + .pill{
-  background:rgba(255,215,0,.12);
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(255,215,0,.07),inset 0 0 0 1px rgba(255,215,0,.15);
-}
-.pill-inp:checked + .pill span{color:var(--gold);}
-.pw.err .pill{border-color:rgba(206,17,38,.4);}
-.perr{font-size:12px;color:#ff7070;margin-top:6px;display:none;}
-.pw.err .perr{display:block;}
+.req { color: #FFD700; }
 
-/* FECHA */
-.dob{display:grid;grid-template-columns:1fr 1.8fr 1fr;gap:10px;}
-.dob-f{display:flex;flex-direction:column;gap:5px;}
-.dob-sub{font-size:9.5px;color:rgba(255,255,255,.2);text-align:center;letter-spacing:.5px;text-transform:uppercase;}
+input, select {
+  width: 100%;
+  background: rgba(255,255,255,.055);
+  border: 1.5px solid rgba(255,255,255,.13);
+  border-radius: 12px;
+  color: #eef0f8;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;        /* 16px evita zoom en iOS al hacer focus */
+  font-weight: 500;
+  padding: 14px 16px;
+  transition: border-color .2s, background .2s;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  /* Sin transform, sin box-shadow pesado que cause relayout */
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M0 0l5.5 7L11 0z' fill='%23FFD700'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 42px;
+  cursor: pointer;
+}
+select option { background: #1a2236; color: #eef0f8; }
+input::placeholder { color: rgba(255,255,255,.2); }
+input:focus, select:focus {
+  border-color: rgba(255,215,0,.55);
+  background: rgba(255,255,255,.08);
+}
+input.err, select.err {
+  border-color: #CE1126 !important;
+}
+.lab-w { position: relative; }
+.lab-w .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; }
+.lab-w input { padding-left: 46px; }
 
-/* TÉRMINOS */
-.terms{
-  display:flex;align-items:flex-start;gap:12px;
-  padding:16px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:12px;
+/* ── PASTILLAS PROFESIÓN ── */
+.pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
-.terms input[type=checkbox]{
-  width:20px;height:20px;min-width:20px;
-  accent-color:var(--gold);
-  cursor:pointer;margin-top:1px;
+@media (min-width: 400px) { .pills { grid-template-columns: repeat(4, 1fr); } }
+.pi { display: none; }
+.pl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 6px;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.12);
+  border-radius: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.terms p{font-size:12px;color:rgba(255,255,255,.3);line-height:1.65;}
+.pl em { font-size: 24px; line-height: 1; font-style: normal; }
+.pl span { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.4); line-height: 1.3; }
+.pi:checked + .pl {
+  background: rgba(255,215,0,.11);
+  border-color: #FFD700;
+}
+.pi:checked + .pl span { color: #FFD700; }
+.pw-err { font-size: 11.5px; color: #ff7070; margin-top: 6px; display: none; }
+.pw.e .pl { border-color: rgba(206,17,38,.4); }
+.pw.e .pw-err { display: block; }
 
-/* ALERTAS */
-.alert{
-  border-radius:12px;padding:16px 18px;
-  font-size:14px;line-height:1.55;
-  margin-top:16px;display:none;
-}
-.ok-a{background:rgba(40,167,69,.12);border:1px solid rgba(40,167,69,.3);color:#6fcf97;}
-.er-a{background:rgba(206,17,38,.12);border:1px solid rgba(206,17,38,.3);color:#ff8080;}
+/* ── FECHA NACIMIENTO ── */
+.dob { display: grid; grid-template-columns: 1fr 1.9fr 1fr; gap: 10px; }
+.dob-f { display: flex; flex-direction: column; gap: 5px; }
+.dob-s { font-size: 9px; color: rgba(255,255,255,.2); text-align: center; letter-spacing: .5px; text-transform: uppercase; }
 
-/* BOTÓN */
-.btn{
-  width:100%;margin-top:20px;
-  padding:18px;
-  border:none;border-radius:14px;
-  font-family:'Oswald',sans-serif;
-  font-size:18px;font-weight:700;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  cursor:pointer;
-  background:linear-gradient(90deg,#e6c200,#FF8800 50%,#CE1126);
-  color:#fff;
-  text-shadow:0 1px 4px rgba(0,0,0,.35);
-  box-shadow:0 6px 28px rgba(206,17,38,.35),0 2px 8px rgba(0,0,0,.3);
-  transition:transform .18s,box-shadow .18s;
-  position:relative;overflow:hidden;
+/* ── TÉRMINOS ── */
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
 }
-.btn::after{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
-  transform:translateX(-200%);
-  transition:transform .6s;
+.terms input[type=checkbox] {
+  width: 20px; height: 20px; min-width: 20px;
+  accent-color: #FFD700;
+  cursor: pointer;
+  margin-top: 1px;
 }
-.btn:hover::after{transform:translateX(200%);}
-.btn:active{transform:scale(.98);}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.spin{
-  display:none;width:24px;height:24px;
-  border:3px solid rgba(255,255,255,.25);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:sp .7s linear infinite;
-  margin:0 auto;
-}
-@keyframes sp{to{transform:rotate(360deg)}}
+.terms p { font-size: 12px; color: rgba(255,255,255,.3); line-height: 1.65; }
 
-/* FOOTER */
-footer{
-  text-align:center;
-  padding:24px 16px 40px;
-  font-size:11px;
-  color:rgba(255,255,255,.14);
-  letter-spacing:1px;
+/* ── ALERTAS ── */
+.al {
+  border-radius: 12px;
+  padding: 15px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  margin-top: 14px;
+  display: none;
 }
-footer b{color:rgba(255,215,0,.3);}
+.ok { background: rgba(40,167,69,.11); border: 1px solid rgba(40,167,69,.3); color: #6fcf97; }
+.er { background: rgba(206,17,38,.11); border: 1px solid rgba(206,17,38,.3); color: #ff8888; }
+
+/* ── BOTÓN ── */
+.btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 17px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: linear-gradient(90deg, #d4b000, #e87800 50%, #CE1126);
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.4);
+  box-shadow: 0 4px 20px rgba(206,17,38,.3);
+  -webkit-appearance: none;
+}
+.btn:active { opacity: .88; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.sp {
+  display: none;
+  width: 24px; height: 24px;
+  border: 3px solid rgba(255,255,255,.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: sp .7s linear infinite;
+  margin: 0 auto;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+
+/* ── FOOTER ── */
+.foot {
+  text-align: center;
+  padding: 22px 16px 36px;
+  font-size: 11px;
+  color: rgba(255,255,255,.13);
+  letter-spacing: 1px;
+}
+.foot b { color: rgba(255,215,0,.28); }
 </style>
 </head>
 <body>
 
-<div class="tc"><i class="y"></i><i class="b"></i><i class="r"></i></div>
+<!-- Barra tricolor sticky -->
+<div class="tc">
+  <span class="y"></span><span class="b"></span><span class="r"></span>
+</div>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-ball">⚽</div>
-  <div class="hero-badge">🏆 Copa Mundo 2026 &middot; CEISCOL</div>
-  <h1>
-    PRE-REGISTRO<br>
-    <span class="g">POLLA MUNDIALISTA</span><br>
-    <span class="r2">CEISCOL 2026</span>
-  </h1>
-  <div class="hero-match">🇨🇴 Colombia &nbsp;&bull;&nbsp; Portugal 🇵🇹</div>
+  <div class="hero-flags">🇨🇴 ⚽ 🇵🇹</div>
+  <div class="badge">🏆 Copa Mundo 2026 · CEISCOL</div>
+  <h1>PRE-REGISTRO<br><span class="g">POLLA MUNDIALISTA</span><br><span class="r">CEISCOL 2026</span></h1>
+  <div class="hero-vs">🇨🇴 Colombia &nbsp;•&nbsp; Portugal 🇵🇹</div>
 </div>
 
-<div class="wrap">
+<!-- CONTENIDO -->
+<div class="main">
 
-  <!-- AVISO -->
+  <!-- Aviso -->
   <div class="aviso">
-    <div class="aviso-ico">📲</div>
+    <div class="aviso-i">📲</div>
     <p>Regístrate y <b>recibe el link exclusivo</b> para ingresar tu marcador. ¡Este formulario reserva tu cupo!</p>
   </div>
 
-  <!-- FORMULARIO -->
+  <!-- Formulario -->
   <div class="card">
-  <form id="frm" novalidate>
+  <form id="F" novalidate>
 
     <!-- LABORATORIO -->
     <div class="sec">🏥 Laboratorio / Cliente</div>
-    <div class="col">
+    <div class="stack">
       <div class="fld">
-        <label class="lbl">Nombre del Laboratorio o Cliente<span class="req">*</span></label>
-        <div class="ico-wrap">
+        <label class="lbl">Nombre del Laboratorio o Cliente <span class="req">*</span></label>
+        <div class="lab-w">
           <span class="ico">🏥</span>
-          <input type="text" id="lab" placeholder="Lab. Clínico San Rafael" required/>
+          <input type="text" id="lab" placeholder="Lab. Clínico San Rafael" autocomplete="organization"/>
         </div>
       </div>
-      <div class="row">
+      <div class="duo">
         <div class="fld">
-          <label class="lbl">Ciudad<span class="req">*</span></label>
-          <input type="text" id="ciu" placeholder="Bogotá, Cali..." required/>
+          <label class="lbl">Ciudad <span class="req">*</span></label>
+          <input type="text" id="ciu" placeholder="Bogotá, Cali..."/>
         </div>
         <div class="fld">
-          <label class="lbl">Departamento<span class="req">*</span></label>
-          <input type="text" id="dpto" placeholder="Cundinamarca..." required/>
+          <label class="lbl">Departamento <span class="req">*</span></label>
+          <input type="text" id="dpto" placeholder="Cundinamarca..."/>
         </div>
       </div>
     </div>
 
-    <div class="sep"></div>
+    <div class="line"></div>
 
     <!-- PROFESIÓN -->
-    <div class="sec">🔬 Profesión<span class="req">*</span></div>
+    <div class="sec">🔬 Profesión <span class="req">*</span></div>
     <div class="pw" id="pw">
       <div class="pills">
-        <input class="pill-inp" type="radio" name="prof" id="p1" value="Bacteriólogo/a"/>
-        <label class="pill" for="p1"><em>🔬</em><span>Bacteriólogo/a</span></label>
-        <input class="pill-inp" type="radio" name="prof" id="p2" value="Auxiliar de Laboratorio"/>
-        <label class="pill" for="p2"><em>🧪</em><span>Auxiliar de Lab.</span></label>
-        <input class="pill-inp" type="radio" name="prof" id="p3" value="Administrativo/a"/>
-        <label class="pill" for="p3"><em>💼</em><span>Administrativo/a</span></label>
-        <input class="pill-inp" type="radio" name="prof" id="p4" value="Otro"/>
-        <label class="pill" for="p4"><em>👤</em><span>Otro</span></label>
+        <input class="pi" type="radio" name="prof" id="p1" value="Bacteriólogo/a"/>
+        <label class="pl" for="p1"><em>🔬</em><span>Bacteriólogo/a</span></label>
+        <input class="pi" type="radio" name="prof" id="p2" value="Auxiliar de Laboratorio"/>
+        <label class="pl" for="p2"><em>🧪</em><span>Auxiliar de Lab.</span></label>
+        <input class="pi" type="radio" name="prof" id="p3" value="Administrativo/a"/>
+        <label class="pl" for="p3"><em>💼</em><span>Administrativo/a</span></label>
+        <input class="pi" type="radio" name="prof" id="p4" value="Otro"/>
+        <label class="pl" for="p4"><em>👤</em><span>Otro</span></label>
       </div>
-      <div class="perr">⚠️ Selecciona tu profesión</div>
+      <div class="pw-err">⚠ Selecciona tu profesión</div>
     </div>
 
-    <div class="sep"></div>
+    <div class="line"></div>
 
     <!-- DATOS PERSONALES -->
     <div class="sec">👤 Datos Personales</div>
-    <div class="col">
-      <div class="row">
+    <div class="stack">
+      <div class="duo">
         <div class="fld">
-          <label class="lbl">Nombres<span class="req">*</span></label>
-          <input type="text" id="nom" placeholder="Tu(s) nombre(s)" autocomplete="given-name" required/>
+          <label class="lbl">Nombres <span class="req">*</span></label>
+          <input type="text" id="nom" placeholder="Tu(s) nombre(s)" autocomplete="given-name"/>
         </div>
         <div class="fld">
-          <label class="lbl">Apellidos<span class="req">*</span></label>
-          <input type="text" id="ape" placeholder="Tu(s) apellido(s)" autocomplete="family-name" required/>
+          <label class="lbl">Apellidos <span class="req">*</span></label>
+          <input type="text" id="ape" placeholder="Tu(s) apellido(s)" autocomplete="family-name"/>
         </div>
       </div>
-      <div class="row">
+      <div class="duo">
         <div class="fld">
-          <label class="lbl">Tipo de Documento<span class="req">*</span></label>
+          <label class="lbl">Tipo Documento <span class="req">*</span></label>
           <select id="tdoc">
             <option value="">Selecciona...</option>
             <option>Cédula de Ciudadanía</option>
@@ -577,20 +589,20 @@ footer b{color:rgba(255,215,0,.3);}
           </select>
         </div>
         <div class="fld">
-          <label class="lbl">N° Documento<span class="req">*</span></label>
-          <input type="text" id="ndoc" placeholder="Número" inputmode="numeric" required/>
+          <label class="lbl">N° Documento <span class="req">*</span></label>
+          <input type="text" id="ndoc" placeholder="Número" inputmode="numeric"/>
         </div>
       </div>
       <div class="fld">
-        <label class="lbl">Celular<span class="req">*</span></label>
-        <input type="tel" id="cel" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel" required/>
+        <label class="lbl">Celular <span class="req">*</span></label>
+        <input type="tel" id="cel" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel"/>
       </div>
       <div class="fld">
-        <label class="lbl">🎂 Fecha de Nacimiento<span class="req">*</span></label>
+        <label class="lbl">🎂 Fecha de Nacimiento <span class="req">*</span></label>
         <div class="dob">
           <div class="dob-f">
             <select id="dd"><option value="">Día</option></select>
-            <span class="dob-sub">Día</span>
+            <div class="dob-s">Día</div>
           </div>
           <div class="dob-f">
             <select id="dm">
@@ -602,25 +614,25 @@ footer b{color:rgba(255,215,0,.3);}
               <option value="09">Septiembre</option><option value="10">Octubre</option>
               <option value="11">Noviembre</option><option value="12">Diciembre</option>
             </select>
-            <span class="dob-sub">Mes</span>
+            <div class="dob-s">Mes</div>
           </div>
           <div class="dob-f">
             <select id="dy"><option value="">Año</option></select>
-            <span class="dob-sub">Año</span>
+            <div class="dob-s">Año</div>
           </div>
         </div>
       </div>
       <div class="fld">
-        <label class="lbl">Correo Personal<span class="req">*</span></label>
-        <input type="email" id="mail" placeholder="ejemplo@gmail.com" autocomplete="email" inputmode="email" required/>
+        <label class="lbl">Correo Personal <span class="req">*</span></label>
+        <input type="email" id="mail" placeholder="ejemplo@gmail.com" inputmode="email" autocomplete="email"/>
       </div>
       <div class="fld">
-        <label class="lbl">Confirmar Correo<span class="req">*</span></label>
-        <input type="email" id="mail2" placeholder="Repite tu correo" required/>
+        <label class="lbl">Confirmar Correo <span class="req">*</span></label>
+        <input type="email" id="mail2" placeholder="Repite tu correo"/>
       </div>
     </div>
 
-    <div class="sep"></div>
+    <div class="line"></div>
 
     <!-- TÉRMINOS -->
     <div class="terms">
@@ -628,12 +640,12 @@ footer b{color:rgba(255,215,0,.3);}
       <p>Autorizo el uso de mis datos personales exclusivamente para la Polla Mundialista CEISCOL 2026, conforme a la Ley 1581 de 2012.</p>
     </div>
 
-    <div class="alert ok-a" id="ok">✅ &nbsp;<strong>¡Pre-registro exitoso!</strong> Revisa tu correo, pronto recibes el link. ¡Vamos Colombia! 🇨🇴</div>
-    <div class="alert er-a" id="er"><span id="etxt"></span></div>
+    <div class="al ok" id="ok">✅ &nbsp;<strong>¡Pre-registro exitoso!</strong> Revisa tu correo — pronto recibes el link. ¡Vamos Colombia! 🇨🇴</div>
+    <div class="al er" id="er"><span id="em"></span></div>
 
     <button type="submit" class="btn" id="btn">
-      <span id="btxt">⚽ REGISTRARME AHORA</span>
-      <div class="spin" id="spn"></div>
+      <span id="bt">⚽ REGISTRARME AHORA</span>
+      <div class="sp" id="sp"></div>
     </button>
 
   </form>
@@ -641,73 +653,103 @@ footer b{color:rgba(255,215,0,.3);}
 
 </div>
 
-<footer><b>CEISCOL</b> · Polla Mundialista 2026 · Colombia 🇨🇴 vs Portugal 🇵🇹</footer>
+<div class="foot"><b>CEISCOL</b> · Polla Mundialista 2026 · 🇨🇴 Colombia vs Portugal 🇵🇹</div>
 
 <script>
-// Llenar días y años
+// Poblar días y años
 (function(){
-  var dd=document.getElementById('dd');
-  for(var i=1;i<=31;i++){var o=document.createElement('option');o.value=o.text=(i<10?'0':'')+i;dd.add(o);}
-  var dy=document.getElementById('dy'),ay=new Date().getFullYear();
-  for(var j=ay-16;j>=ay-85;j--){var o2=document.createElement('option');o2.value=o2.text=j;dy.add(o2);}
+  var dd = document.getElementById('dd');
+  for (var i = 1; i <= 31; i++) {
+    var o = document.createElement('option');
+    o.value = o.text = (i < 10 ? '0' : '') + i;
+    dd.add(o);
+  }
+  var dy = document.getElementById('dy'), y = new Date().getFullYear();
+  for (var j = y - 16; j >= y - 85; j--) {
+    var o2 = document.createElement('option');
+    o2.value = o2.text = j;
+    dy.add(o2);
+  }
 })();
 
-var SELF=window.location.href.split('?')[0];
+var URL = window.location.href.split('?')[0];
 
-document.getElementById('frm').addEventListener('submit',function(e){
+document.getElementById('F').addEventListener('submit', function(e) {
   e.preventDefault();
-  hide();
-  var lab=g('lab'),ciu=g('ciu'),dpto=g('dpto');
-  var nom=g('nom'),ape=g('ape'),tdoc=g('tdoc'),ndoc=g('ndoc'),cel=g('cel');
-  var mail=g('mail'),mail2=g('mail2');
-  var dd=g('dd'),dm=g('dm'),dy=g('dy');
-  var prof='';
-  document.querySelectorAll('input[name=prof]').forEach(function(r){if(r.checked)prof=r.value;});
+  ocultar();
 
-  var ok=true;
+  var lab  = v('lab'),  ciu  = v('ciu'),  dpto = v('dpto');
+  var nom  = v('nom'),  ape  = v('ape'),  tdoc = v('tdoc'), ndoc = v('ndoc'), cel = v('cel');
+  var mail = v('mail'), mail2= v('mail2');
+  var dd   = v('dd'),   dm   = v('dm'),   dy   = v('dy');
+  var prof = '';
+  document.querySelectorAll('input[name=prof]').forEach(function(r){ if(r.checked) prof = r.value; });
+
+  var ok = true;
   ['lab','ciu','dpto','nom','ape','tdoc','ndoc','cel','mail','mail2'].forEach(function(id){
-    if(!g(id)){document.getElementById(id).classList.add('err');ok=false;}
+    if (!v(id)) { document.getElementById(id).classList.add('err'); ok = false; }
   });
-  if(!prof){document.getElementById('pw').classList.add('err');ok=false;}
-  if(!dd||!dm||!dy){['dd','dm','dy'].forEach(function(id){if(!g(id))document.getElementById(id).classList.add('err');});ok=false;}
-  if(!ok)return show_err('Por favor completa todos los campos.');
-  if(!mail.includes('@'))return show_err('El correo no es válido.');
-  if(mail!==mail2)return show_err('Los correos no coinciden.');
-  if(cel.replace(/\D/g,'').length<7)return show_err('El celular no es válido.');
-  if(!document.getElementById('trm').checked)return show_err('Debes aceptar la autorización de datos.');
+  if (!prof) { document.getElementById('pw').classList.add('e'); ok = false; }
+  if (!dd || !dm || !dy) {
+    ['dd','dm','dy'].forEach(function(id){ if (!v(id)) document.getElementById(id).classList.add('err'); });
+    ok = false;
+  }
+  if (!ok)    return error('Por favor completa todos los campos.');
+  if (!mail.includes('@')) return error('El correo no es válido.');
+  if (mail !== mail2)      return error('Los correos no coinciden.');
+  if (cel.replace(/\D/g,'').length < 7) return error('El celular no es válido.');
+  if (!document.getElementById('trm').checked) return error('Debes aceptar la autorización de datos.');
 
-  load(true);
-  fetch(SELF,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({laboratorio:lab,ciudad:ciu,dpto:dpto,nombres:nom,apellidos:ape,
-      profesion:prof,tipo_doc:tdoc,num_doc:ndoc,celular:cel,email:mail,fecha_nac:dy+'-'+dm+'-'+dd})
+  cargando(true);
+  fetch(URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      laboratorio: lab, ciudad: ciu, dpto: dpto,
+      nombres: nom, apellidos: ape, profesion: prof,
+      tipo_doc: tdoc, num_doc: ndoc, celular: cel,
+      email: mail, fecha_nac: dy + '-' + dm + '-' + dd
+    })
   })
-  .then(function(r){return r.json();})
+  .then(function(r){ return r.json(); })
   .then(function(r){
-    if(r.ok){
-      document.getElementById('ok').style.display='block';
-      document.getElementById('frm').reset();
-      window.scrollTo({top:0,behavior:'smooth'});
-    } else { show_err('Error del servidor. Intenta de nuevo.'); }
+    if (r.ok) {
+      document.getElementById('ok').style.display = 'block';
+      document.getElementById('F').reset();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      error('Error del servidor. Intenta de nuevo.');
+    }
   })
-  .catch(function(){show_err('Sin conexión. Verifica tu internet.');})
-  .finally(function(){load(false);});
+  .catch(function(){ error('Sin conexión. Verifica tu internet.'); })
+  .finally(function(){ cargando(false); });
 });
 
-document.querySelectorAll('input,select').forEach(function(el){
+// Limpiar errores al escribir
+document.querySelectorAll('input, select').forEach(function(el){
   ['input','change'].forEach(function(ev){
-    el.addEventListener(ev,function(){el.classList.remove('err');});
+    el.addEventListener(ev, function(){ el.classList.remove('err'); });
   });
 });
 document.querySelectorAll('input[name=prof]').forEach(function(r){
-  r.addEventListener('change',function(){document.getElementById('pw').classList.remove('err');});
+  r.addEventListener('change', function(){ document.getElementById('pw').classList.remove('e'); });
 });
 
-function g(id){return document.getElementById(id).value.trim();}
-function hide(){document.getElementById('ok').style.display='none';document.getElementById('er').style.display='none';}
-function show_err(m){document.getElementById('etxt').textContent=m;document.getElementById('er').style.display='block';document.getElementById('er').scrollIntoView({behavior:'smooth',block:'center'});}
-function load(on){document.getElementById('btn').disabled=on;document.getElementById('btxt').style.display=on?'none':'inline';document.getElementById('spn').style.display=on?'block':'none';}
+function v(id) { return document.getElementById(id).value.trim(); }
+function ocultar() {
+  document.getElementById('ok').style.display = 'none';
+  document.getElementById('er').style.display = 'none';
+}
+function error(m) {
+  document.getElementById('em').textContent = m;
+  document.getElementById('er').style.display = 'block';
+  document.getElementById('er').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function cargando(on) {
+  document.getElementById('btn').disabled = on;
+  document.getElementById('bt').style.display = on ? 'none' : 'inline';
+  document.getElementById('sp').style.display = on ? 'block' : 'none';
+}
 </script>
 </body>
 </html>`;
