@@ -1,6 +1,5 @@
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  POLLA MUNDIALISTA CEISCOL 2026 — PRE-REGISTRO v3              ║
-// ║  Diseño pro mobile/PC · Profesión compacta · Fecha fácil      ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
 var REMITENTE_NOMBRE = 'CEISCOL Polla Mundialista 2026';
@@ -81,8 +80,6 @@ function darFormatoRegistros(h) {
     h.newConditionalFormatRule().whenTextEqualTo('Confirmado').setBackground('#D4EDDA').setFontColor('#155724').setRanges([h.getRange(3,16,1000,1)]).build(),
     h.newConditionalFormatRule().whenTextEqualTo('No responde').setBackground('#F8D7DA').setFontColor('#721C24').setRanges([h.getRange(3,16,1000,1)]).build()
   ]);
-  h.getRange(2,1,1,H.length)
-    .setBorder(true,true,true,true,true,true,'#FFD700',SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 }
 
 function crearHojaMensajes(ss) {
@@ -132,8 +129,6 @@ function crearHojaDashboard(ss) {
       .setFontWeight('bold').setFontSize(24).setHorizontalAlignment('center').setVerticalAlignment('middle');
   });
   h.setColumnWidth(1,20); h.setColumnWidth(2,210); h.setColumnWidth(3,130);
-  h.getRange(3,2,rows.length,2)
-    .setBorder(true,true,true,true,true,true,'#ddd',SpreadsheetApp.BorderStyle.SOLID);
 }
 
 function guardarRegistro(ss, d) {
@@ -207,7 +202,7 @@ function enviarConfirmacion(d) {
   +'<div style="background:linear-gradient(135deg,#fffbea,#fff3cd);border:2px solid #FFD700;border-radius:12px;padding:22px;margin:22px 0;text-align:center;">'
   +'<div style="font-size:36px;">📲</div>'
   +'<p style="font-size:16px;font-weight:700;color:#003087;margin-top:10px;">Próximamente recibirás el link</p>'
-  +'<p style="font-size:13px;color:#666;line-height:1.6;margin-top:8px;">Te enviaremos el <b>link exclusivo</b> para ingresar tu marcador y participar oficialmente. <b>¡Mantente atento!</b></p>'
+  +'<p style="font-size:13px;color:#666;line-height:1.6;margin-top:8px;">Te enviaremos el <b>link exclusivo</b> para ingresar tu marcador. <b>¡Mantente atento!</b></p>'
   +'</div>'
   +'<table style="width:100%;border-collapse:collapse;font-size:13px;">'
   +'<tr><th colspan="2" style="background:#003087;color:#FFD700;padding:10px 14px;text-align:left;font-size:11px;letter-spacing:1.5px;">📋 TUS DATOS</th></tr>'
@@ -246,618 +241,223 @@ function enviarConfirmacion(d) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-var HTML_FORM = `<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<meta name="theme-color" content="#0d1117"/>
-<title>Pre-Registro · Polla Mundialista CEISCOL 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --gold:#FFD700;
-  --blue:#003087;
-  --red:#CE1126;
-  --dark:#0d1117;
-  --card:rgba(20,27,46,.95);
-  --border:rgba(255,215,0,.14);
-  --input-bg:rgba(255,255,255,.05);
-  --input-border:rgba(255,255,255,.12);
-  --text:#e8eaf0;
-  --muted:rgba(255,255,255,.35);
-  --r:12px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;}
-body{
-  font-family:'Inter',sans-serif;
-  background:var(--dark);
-  color:var(--text);
-  min-height:100vh;
-  background-image:
-    radial-gradient(ellipse at 0% 0%,rgba(0,48,135,.25) 0%,transparent 55%),
-    radial-gradient(ellipse at 100% 100%,rgba(206,17,38,.18) 0%,transparent 55%);
-}
-
-/* ── TRICOLOR FIJA ── */
-.tc{position:fixed;top:0;left:0;right:0;height:4px;display:flex;z-index:999;}
-.tc span{flex:1;}
-.tc .y{background:var(--gold);}
-.tc .b{background:var(--blue);}
-.tc .r{background:var(--red);}
-
-/* ── HERO ── */
-.hero{
-  padding:52px 20px 64px;
-  text-align:center;
-  background:linear-gradient(160deg,#001233 0%,#002570 38%,#4a0010 72%,#CE1126 100%);
-  position:relative;
-  overflow:hidden;
-}
-.hero::after{
-  content:'';
-  position:absolute;inset:0;
-  background:repeating-linear-gradient(
-    -45deg,
-    rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,
-    transparent 1px,transparent 22px
-  );
-  pointer-events:none;
-}
-.orb{
-  position:absolute;border-radius:50%;
-  border:1px solid rgba(255,215,0,.1);
-  animation:orb 5s ease-in-out infinite;
-  pointer-events:none;
-}
-.orb1{width:260px;height:260px;top:-80px;left:-80px;animation-delay:0s;}
-.orb2{width:180px;height:180px;bottom:-50px;right:-50px;animation-delay:2s;border-color:rgba(206,17,38,.14);}
-@keyframes orb{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.08);opacity:.6}}
-.hero-in{position:relative;z-index:1;}
-.hero-flags{font-size:40px;margin-bottom:10px;line-height:1;}
-.chip{
-  display:inline-block;
-  background:rgba(255,215,0,.1);
-  border:1px solid rgba(255,215,0,.28);
-  border-radius:100px;
-  padding:4px 16px;
-  font-size:10px;font-weight:600;
-  color:var(--gold);letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:14px;
-}
-.hero h1{
-  font-family:'Oswald',sans-serif;
-  font-weight:700;
-  font-size:clamp(28px,8vw,52px);
-  line-height:1.1;
-  color:#fff;
-}
-.hero h1 .g{color:var(--gold);}
-.hero h1 .r2{color:#FF5A5A;}
-.hero-sub{
-  margin-top:8px;
-  font-size:11px;
-  color:rgba(255,255,255,.45);
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-}
-
-/* ── INFO BANNER ── */
-.page{max-width:560px;margin:0 auto;padding:0 14px;}
-.banner{
-  margin:-28px auto 0;
-  background:linear-gradient(135deg,rgba(255,215,0,.09),rgba(0,48,135,.18));
-  border:1.5px solid rgba(255,215,0,.22);
-  border-radius:var(--r);
-  padding:14px 16px;
-  display:flex;gap:12px;align-items:flex-start;
-  position:relative;z-index:10;
-}
-.banner-ico{font-size:26px;flex-shrink:0;margin-top:1px;}
-.banner-txt p{font-size:12px;color:rgba(255,255,255,.58);line-height:1.65;}
-.banner-txt b{color:var(--gold);}
-
-/* ── FORM CARD ── */
-.form-wrap{padding:18px 0 48px;}
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:22px 18px;
-  box-shadow:0 24px 60px rgba(0,0,0,.5);
-}
-@media(min-width:420px){.card{padding:26px 24px;}}
-
-/* ── SECCIÓN TÍTULO ── */
-.sec{
-  display:flex;align-items:center;gap:8px;
-  font-family:'Oswald',sans-serif;
-  font-size:10.5px;font-weight:500;
-  letter-spacing:3px;color:var(--gold);
-  text-transform:uppercase;
-  margin-bottom:14px;
-}
-.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,0,.35),transparent);}
-.div{height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.18),transparent);margin:20px 0;}
-
-/* ── GRID ── */
-.g1{display:flex;flex-direction:column;gap:12px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.full{grid-column:1/-1;}
-@media(max-width:420px){.g2{grid-template-columns:1fr;}}
-
-/* ── CAMPO ── */
-.f{display:flex;flex-direction:column;gap:5px;}
-.lbl{
-  font-size:10px;font-weight:600;
-  color:var(--muted);
-  letter-spacing:1px;
-  text-transform:uppercase;
-}
-.lbl .r{color:var(--gold);margin-left:2px;}
-
-/* ── INPUTS / SELECTS ── */
-input,select{
-  width:100%;
-  background:var(--input-bg);
-  border:1.5px solid var(--input-border);
-  border-radius:10px;
-  color:var(--text);
-  font-family:'Inter',sans-serif;
-  font-size:15px;
-  padding:13px 14px;
-  transition:border-color .18s,box-shadow .18s,background .18s;
-  -webkit-appearance:none;
-  appearance:none;
-}
-select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23FFD700'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 14px center;
-  padding-right:38px;
-  cursor:pointer;
-}
-select option{background:#1a2236;color:var(--text);}
-input::placeholder{color:rgba(255,255,255,.2);font-size:14px;}
-input:focus,select:focus{
-  outline:none;
-  border-color:rgba(255,215,0,.55);
-  box-shadow:0 0 0 3px rgba(255,215,0,.08);
-  background:rgba(255,255,255,.07);
-}
-input.err,select.err{
-  border-color:var(--red)!important;
-  box-shadow:0 0 0 3px rgba(206,17,38,.12)!important;
-}
-
-/* ── LAB INPUT ESPECIAL ── */
-.lab-wrap{position:relative;}
-.lab-wrap input{padding-left:44px;font-size:15px;font-weight:500;border-color:rgba(255,215,0,.22);}
-.lab-ico{
-  position:absolute;left:13px;top:50%;
-  transform:translateY(-50%);
-  font-size:18px;pointer-events:none;
-}
-
-/* ── PROFESIÓN: PILLS HORIZONTALES ── */
-.prof-pills{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:9px;
-}
-@media(min-width:400px){
-  .prof-pills{grid-template-columns:repeat(4,1fr);}
-}
-.prof-opt{display:none;}
-.prof-pill{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:5px;
-  padding:12px 6px;
-  background:var(--input-bg);
-  border:1.5px solid var(--input-border);
-  border-radius:10px;
-  cursor:pointer;
-  transition:all .16s;
-  text-align:center;
-  user-select:none;
-}
-.prof-pill .pi{font-size:22px;line-height:1;}
-.prof-pill .pt{
-  font-size:10.5px;
-  font-weight:600;
-  color:var(--muted);
-  letter-spacing:.2px;
-  line-height:1.3;
-}
-.prof-opt:checked + .prof-pill{
-  background:rgba(255,215,0,.11);
-  border-color:var(--gold);
-  box-shadow:0 0 0 2px rgba(255,215,0,.08);
-}
-.prof-opt:checked + .prof-pill .pt{color:var(--gold);}
-.prof-wrap.err .prof-pill{border-color:rgba(206,17,38,.35);}
-.prof-err{font-size:11px;color:#ff7070;margin-top:5px;display:none;}
-.prof-wrap.err .prof-err{display:block;}
-
-/* ── FECHA NACIMIENTO ── */
-.dob{
-  display:grid;
-  grid-template-columns:1fr 1.7fr 1fr;
-  gap:9px;
-}
-.dob-item{display:flex;flex-direction:column;gap:4px;}
-.dob-sub{
-  font-size:9px;
-  color:rgba(255,255,255,.22);
-  text-align:center;
-  letter-spacing:.5px;
-  text-transform:uppercase;
-}
-
-/* ── TERMS ── */
-.terms{
-  display:flex;
-  align-items:flex-start;
-  gap:11px;
-  padding:14px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:10px;
-}
-.terms input[type=checkbox]{
-  width:18px;height:18px;min-width:18px;
-  accent-color:var(--gold);
-  cursor:pointer;margin-top:1px;
-}
-.terms p{
-  font-size:11.5px;
-  color:rgba(255,255,255,.35);
-  line-height:1.6;
-}
-
-/* ── ALERTAS ── */
-.alert{
-  border-radius:10px;
-  padding:14px 16px;
-  font-size:13.5px;
-  line-height:1.55;
-  margin-top:14px;
-  display:none;
-}
-.ok-a{background:rgba(40,167,69,.1);border:1px solid rgba(40,167,69,.3);color:#6fcf97;}
-.er-a{background:rgba(206,17,38,.1);border:1px solid rgba(206,17,38,.3);color:#ff8080;}
-
-/* ── BOTÓN ── */
-.btn{
-  width:100%;margin-top:18px;
-  padding:17px 20px;
-  border:none;border-radius:12px;
-  font-family:'Oswald',sans-serif;
-  font-size:17px;font-weight:700;
-  letter-spacing:1.8px;
-  text-transform:uppercase;
-  cursor:pointer;
-  background:linear-gradient(90deg,#FFD700,#FF8800,#CE1126);
-  color:#fff;
-  text-shadow:0 1px 3px rgba(0,0,0,.3);
-  box-shadow:0 4px 20px rgba(206,17,38,.3);
-  transition:transform .18s,box-shadow .18s;
-  position:relative;overflow:hidden;
-}
-.btn::after{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
-  transform:translateX(-120%);
-  transition:transform .5s;
-}
-.btn:hover::after{transform:translateX(120%);}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(206,17,38,.45);}
-.btn:active{transform:translateY(0);}
-.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
-.spin{
-  display:none;width:22px;height:22px;
-  border:3px solid rgba(255,255,255,.25);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:sp .7s linear infinite;
-  margin:0 auto;
-}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-/* ── FOOTER ── */
-footer{
-  text-align:center;
-  padding:20px 16px 30px;
-  font-size:10px;
-  color:rgba(255,255,255,.16);
-  letter-spacing:1px;
-}
-footer b{color:rgba(255,215,0,.35);}
-</style>
-</head>
-<body>
-
-<div class="tc"><span class="y"></span><span class="b"></span><span class="r"></span></div>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="hero-in">
-    <div class="hero-flags">🇨🇴 ⚽ 🇵🇹</div>
-    <div class="chip">🏆 Copa Mundo 2026 · CEISCOL</div>
-    <h1>
-      PRE-REGISTRO<br>
-      <span class="g">POLLA MUNDIALISTA</span><br>
-      <span class="r2">CEISCOL 2026</span>
-    </h1>
-    <p class="hero-sub">Colombia 🇨🇴 vs Portugal 🇵🇹 · Solo para bacteriólogos</p>
-  </div>
-</div>
-
-<div class="page">
-
-  <!-- BANNER -->
-  <div class="banner">
-    <div class="banner-ico">📲</div>
-    <div class="banner-txt">
-      <p>Regístrate aquí. <b>Próximamente recibirás el link exclusivo</b> para ingresar tu marcador y participar. Este formulario reserva tu cupo. <b>¡Mantente atento!</b></p>
-    </div>
-  </div>
-
-  <!-- FORMULARIO -->
-  <div class="form-wrap">
-  <div class="card">
-  <form id="frm" novalidate>
-
-    <!-- LABORATORIO -->
-    <div class="sec">🏥 Laboratorio / Cliente</div>
-    <div class="g1">
-      <div class="f">
-        <label class="lbl">Nombre del Laboratorio o Cliente <span class="r">*</span></label>
-        <div class="lab-wrap">
-          <span class="lab-ico">🏥</span>
-          <input type="text" id="lab" placeholder="Laboratorio Clínico San Rafael" required/>
-        </div>
-      </div>
-      <div class="g2">
-        <div class="f">
-          <label class="lbl">Ciudad / Municipio <span class="r">*</span></label>
-          <input type="text" id="ciu" placeholder="Bogotá, Cali..." required/>
-        </div>
-        <div class="f">
-          <label class="lbl">Departamento <span class="r">*</span></label>
-          <input type="text" id="dpto" placeholder="Cundinamarca..." required/>
-        </div>
-      </div>
-    </div>
-
-    <div class="div"></div>
-
-    <!-- PROFESIÓN -->
-    <div class="sec">🔬 Profesión <span class="r">*</span></div>
-    <div class="prof-wrap" id="pw">
-      <div class="prof-pills">
-        <div>
-          <input class="prof-opt" type="radio" name="prof" id="p1" value="Bacteriólogo/a"/>
-          <label class="prof-pill" for="p1">
-            <span class="pi">🔬</span>
-            <span class="pt">Bacteriólogo/a</span>
-          </label>
-        </div>
-        <div>
-          <input class="prof-opt" type="radio" name="prof" id="p2" value="Auxiliar de Laboratorio"/>
-          <label class="prof-pill" for="p2">
-            <span class="pi">🧪</span>
-            <span class="pt">Auxiliar de Lab.</span>
-          </label>
-        </div>
-        <div>
-          <input class="prof-opt" type="radio" name="prof" id="p3" value="Administrativo/a"/>
-          <label class="prof-pill" for="p3">
-            <span class="pi">💼</span>
-            <span class="pt">Administrativo/a</span>
-          </label>
-        </div>
-        <div>
-          <input class="prof-opt" type="radio" name="prof" id="p4" value="Otro"/>
-          <label class="prof-pill" for="p4">
-            <span class="pi">👤</span>
-            <span class="pt">Otro</span>
-          </label>
-        </div>
-      </div>
-      <div class="prof-err">⚠ Selecciona tu profesión</div>
-    </div>
-
-    <div class="div"></div>
-
-    <!-- DATOS PERSONALES -->
-    <div class="sec">👤 Datos Personales</div>
-    <div class="g1">
-      <div class="g2">
-        <div class="f">
-          <label class="lbl">Nombres <span class="r">*</span></label>
-          <input type="text" id="nom" placeholder="Tu(s) nombre(s)" autocomplete="given-name" required/>
-        </div>
-        <div class="f">
-          <label class="lbl">Apellidos <span class="r">*</span></label>
-          <input type="text" id="ape" placeholder="Tu(s) apellido(s)" autocomplete="family-name" required/>
-        </div>
-        <div class="f">
-          <label class="lbl">Tipo de Documento <span class="r">*</span></label>
-          <select id="tdoc">
-            <option value="">Selecciona...</option>
-            <option>Cédula de Ciudadanía</option>
-            <option>Cédula de Extranjería</option>
-            <option>Pasaporte</option>
-            <option>Tarjeta de Identidad</option>
-          </select>
-        </div>
-        <div class="f">
-          <label class="lbl">Número de Documento <span class="r">*</span></label>
-          <input type="text" id="ndoc" placeholder="Número" inputmode="numeric" required/>
-        </div>
-        <div class="f">
-          <label class="lbl">Celular <span class="r">*</span></label>
-          <input type="tel" id="cel" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel" required/>
-        </div>
-        <div class="f">
-          <label class="lbl">🎂 Fecha de Nacimiento <span class="r">*</span></label>
-          <div class="dob">
-            <div class="dob-item">
-              <select id="dd"><option value="">Día</option></select>
-              <span class="dob-sub">Día</span>
-            </div>
-            <div class="dob-item">
-              <select id="dm">
-                <option value="">Mes</option>
-                <option value="01">Enero</option>
-                <option value="02">Febrero</option>
-                <option value="03">Marzo</option>
-                <option value="04">Abril</option>
-                <option value="05">Mayo</option>
-                <option value="06">Junio</option>
-                <option value="07">Julio</option>
-                <option value="08">Agosto</option>
-                <option value="09">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
-              <span class="dob-sub">Mes</span>
-            </div>
-            <div class="dob-item">
-              <select id="dy"><option value="">Año</option></select>
-              <span class="dob-sub">Año</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="f">
-        <label class="lbl">Correo Personal <span class="r">*</span></label>
-        <input type="email" id="mail" placeholder="ejemplo@gmail.com" autocomplete="email" inputmode="email" required/>
-      </div>
-      <div class="f">
-        <label class="lbl">Confirmar Correo <span class="r">*</span></label>
-        <input type="email" id="mail2" placeholder="Repite tu correo" required/>
-      </div>
-    </div>
-
-    <div class="div"></div>
-
-    <!-- TÉRMINOS -->
-    <div class="terms">
-      <input type="checkbox" id="trm"/>
-      <p>Autorizo el uso de mis datos personales exclusivamente para la Polla Mundialista CEISCOL 2026, conforme a la Ley 1581 de 2012 de protección de datos personales.</p>
-    </div>
-
-    <div class="alert ok-a" id="ok">✅ &nbsp;<strong>¡Pre-registro exitoso!</strong> Revisa tu correo. Pronto recibirás el link. ¡Vamos Colombia! 🇨🇴</div>
-    <div class="alert er-a" id="er"><span id="etxt">Error.</span></div>
-
-    <button type="submit" class="btn" id="btn">
-      <span id="btxt">⚽ REGISTRARME PARA LA POLLA</span>
-      <div class="spin" id="spn"></div>
-    </button>
-
-  </form>
-  </div>
-  </div>
-
-</div><!-- /page -->
-
-<footer><b>CEISCOL</b> · Polla Mundialista 2026 · Colombia 🇨🇴 vs Portugal 🇵🇹</footer>
-
-<script>
-// Días y años
-(function(){
-  var dd=document.getElementById('dd');
-  for(var i=1;i<=31;i++){var o=document.createElement('option');o.value=o.text=(i<10?'0':'')+i;dd.add(o);}
-  var dy=document.getElementById('dy'),ay=new Date().getFullYear();
-  for(var j=ay-16;j>=ay-85;j--){var o2=document.createElement('option');o2.value=o2.text=j;dy.add(o2);}
-})();
-
-var SELF=window.location.href.split('?')[0];
-
-document.getElementById('frm').addEventListener('submit',function(e){
-  e.preventDefault();
-  hide();
-
-  var lab=v('lab'),ciu=v('ciu'),dpto=v('dpto');
-  var nom=v('nom'),ape=v('ape'),tdoc=v('tdoc'),ndoc=v('ndoc'),cel=v('cel');
-  var mail=v('mail'),mail2=v('mail2');
-  var dd=v('dd'),dm=v('dm'),dy=v('dy');
-  var prof='';
-  document.querySelectorAll('input[name=prof]').forEach(function(r){if(r.checked)prof=r.value;});
-
-  var ok=true;
-  ['lab','ciu','dpto','nom','ape','tdoc','ndoc','cel','mail','mail2'].forEach(function(id){
-    if(!v(id)){document.getElementById(id).classList.add('err');ok=false;}
-  });
-  if(!prof){document.getElementById('pw').classList.add('err');ok=false;}
-  if(!dd||!dm||!dy){
-    ['dd','dm','dy'].forEach(function(id){if(!v(id))document.getElementById(id).classList.add('err');});
-    ok=false;
-  }
-  if(!ok){return err('Por favor completa todos los campos.');}
-  if(!mail.includes('@')){return err('El correo no es válido.');}
-  if(mail!==mail2){return err('Los correos no coinciden.');}
-  if(cel.replace(/\D/g,'').length<7){return err('El celular no es válido.');}
-  if(!document.getElementById('trm').checked){return err('Debes aceptar la autorización de datos.');}
-
-  load(true);
-  fetch(SELF,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      laboratorio:lab,ciudad:ciu,dpto:dpto,
-      nombres:nom,apellidos:ape,profesion:prof,
-      tipo_doc:tdoc,num_doc:ndoc,celular:cel,email:mail,
-      fecha_nac:dy+'-'+dm+'-'+dd
-    })
-  })
-  .then(function(r){return r.json();})
-  .then(function(r){
-    if(r.ok){
-      document.getElementById('ok').style.display='block';
-      document.getElementById('frm').reset();
-      document.querySelectorAll('input[name=prof]').forEach(function(r){r.checked=false;});
-      window.scrollTo({top:0,behavior:'smooth'});
-    } else { err('Error del servidor. Intenta de nuevo.'); }
-  })
-  .catch(function(){err('Sin conexión. Verifica tu internet.');})
-  .finally(function(){load(false);});
-});
-
-document.querySelectorAll('input,select').forEach(function(el){
-  ['input','change'].forEach(function(ev){
-    el.addEventListener(ev,function(){el.classList.remove('err');});
-  });
-});
-document.querySelectorAll('input[name=prof]').forEach(function(r){
-  r.addEventListener('change',function(){document.getElementById('pw').classList.remove('err');});
-});
-
-function v(id){return document.getElementById(id).value.trim();}
-function hide(){
-  document.getElementById('ok').style.display='none';
-  document.getElementById('er').style.display='none';
-}
-function err(m){
-  document.getElementById('etxt').textContent=m;
-  document.getElementById('er').style.display='block';
-  document.getElementById('er').scrollIntoView({behavior:'smooth',block:'center'});
-}
-function load(on){
-  document.getElementById('btn').disabled=on;
-  document.getElementById('btxt').style.display=on?'none':'inline';
-  document.getElementById('spn').style.display=on?'block':'none';
-}
-</script>
-</body>
-</html>`;
+var HTML_FORM = '<!DOCTYPE html>\n'
++'<html lang="es">\n'
++'<head>\n'
++'<meta charset="UTF-8"/>\n'
++'<meta name="viewport" content="width=device-width,initial-scale=1.0"/>\n'
++'<title>Pre-Registro · Polla Mundialista CEISCOL 2026</title>\n'
++'<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>\n'
++'<style>\n'
++':root{\n'
++'  --gold:#FFD700;\n'
++'  --blue:#003087;\n'
++'  --red:#CE1126;\n'
++'  --dark:#0d1117;\n'
++'  --card:rgba(20,27,46,.95);\n'
++'  --border:rgba(255,215,0,.14);\n'
++'  --input-bg:rgba(255,255,255,.05);\n'
++'  --input-border:rgba(255,255,255,.12);\n'
++'  --text:#e8eaf0;\n'
++'  --muted:rgba(255,255,255,.35);\n'
++'}\n'
++'*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}\n'
++'html{-webkit-tap-highlight-color:transparent;}\n'
++'body{font-family:Inter,sans-serif;background:var(--dark);color:var(--text);min-height:100vh;\n'
++'  background-image:radial-gradient(ellipse at 0% 0%,rgba(0,48,135,.25) 0%,transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(206,17,38,.18) 0%,transparent 55%);}\n'
++'.tc{position:fixed;top:0;left:0;right:0;height:4px;display:flex;z-index:999;}\n'
++'.tc span{flex:1;}\n'
++'.tc .y{background:var(--gold);} .tc .b{background:var(--blue);} .tc .r{background:var(--red);}\n'
++'.hero{padding:52px 20px 64px;text-align:center;background:linear-gradient(160deg,#001233 0%,#002570 38%,#4a0010 72%,#CE1126 100%);position:relative;overflow:hidden;}\n'
++'.hero-flags{font-size:40px;margin-bottom:10px;}\n'
++'.chip{display:inline-block;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.28);border-radius:100px;padding:4px 16px;font-size:10px;font-weight:600;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}\n'
++'.hero h1{font-family:Oswald,sans-serif;font-weight:700;font-size:clamp(28px,8vw,52px);line-height:1.1;color:#fff;}\n'
++'.hero h1 .g{color:var(--gold);} .hero h1 .r2{color:#FF5A5A;}\n'
++'.hero-sub{margin-top:8px;font-size:11px;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;}\n'
++'.page{max-width:560px;margin:0 auto;padding:0 14px;}\n'
++'.banner{margin:-28px auto 0;background:linear-gradient(135deg,rgba(255,215,0,.09),rgba(0,48,135,.18));border:1.5px solid rgba(255,215,0,.22);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;position:relative;z-index:10;}\n'
++'.banner-ico{font-size:26px;flex-shrink:0;}\n'
++'.banner-txt p{font-size:12px;color:rgba(255,255,255,.58);line-height:1.65;}\n'
++'.banner-txt b{color:var(--gold);}\n'
++'.form-wrap{padding:18px 0 48px;}\n'
++'.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 18px;box-shadow:0 24px 60px rgba(0,0,0,.5);}\n'
++'@media(min-width:420px){.card{padding:26px 24px;}}\n'
++'.sec{display:flex;align-items:center;gap:8px;font-family:Oswald,sans-serif;font-size:10.5px;font-weight:500;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;}\n'
++'.sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,0,.35),transparent);}\n'
++'.div{height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.18),transparent);margin:20px 0;}\n'
++'.g1{display:flex;flex-direction:column;gap:12px;}\n'
++'.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}\n'
++'@media(max-width:420px){.g2{grid-template-columns:1fr;}}\n'
++'.f{display:flex;flex-direction:column;gap:5px;}\n'
++'.lbl{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}\n'
++'.lbl .r{color:var(--gold);margin-left:2px;}\n'
++'input,select{width:100%;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:10px;color:var(--text);font-family:Inter,sans-serif;font-size:15px;padding:13px 14px;transition:border-color .18s,background .18s;-webkit-appearance:none;appearance:none;}\n'
++'select{background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%23FFD700\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;cursor:pointer;}\n'
++'select option{background:#1a2236;color:var(--text);}\n'
++'input::placeholder{color:rgba(255,255,255,.2);font-size:14px;}\n'
++'input:focus,select:focus{outline:none;border-color:rgba(255,215,0,.55);box-shadow:0 0 0 3px rgba(255,215,0,.08);background:rgba(255,255,255,.07);}\n'
++'input.err,select.err{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(206,17,38,.12)!important;}\n'
++'.lab-wrap{position:relative;}\n'
++'.lab-wrap input{padding-left:44px;}\n'
++'.lab-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;}\n'
++'/* PROFESION PILLS */\n'
++'.prof-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}\n'
++'@media(min-width:400px){.prof-pills{grid-template-columns:repeat(4,1fr);}}\n'
++'.prof-opt{display:none;}\n'
++'.prof-pill{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 6px;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:10px;cursor:pointer;transition:all .16s;text-align:center;user-select:none;}\n'
++'.prof-pill .pi{font-size:22px;line-height:1;}\n'
++'.prof-pill .pt{font-size:10.5px;font-weight:600;color:var(--muted);line-height:1.3;}\n'
++'.prof-opt:checked + .prof-pill{background:rgba(255,215,0,.11);border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,215,0,.08);}\n'
++'.prof-opt:checked + .prof-pill .pt{color:var(--gold);}\n'
++'.prof-wrap.err .prof-pill{border-color:rgba(206,17,38,.35);}\n'
++'.prof-err{font-size:11px;color:#ff7070;margin-top:5px;display:none;}\n'
++'.prof-wrap.err .prof-err{display:block;}\n'
++'.dob{display:grid;grid-template-columns:1fr 1.7fr 1fr;gap:9px;}\n'
++'.dob-item{display:flex;flex-direction:column;gap:4px;}\n'
++'.dob-sub{font-size:9px;color:rgba(255,255,255,.22);text-align:center;letter-spacing:.5px;text-transform:uppercase;}\n'
++'.terms{display:flex;align-items:flex-start;gap:11px;padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;}\n'
++'.terms input[type=checkbox]{width:18px;height:18px;min-width:18px;accent-color:var(--gold);cursor:pointer;margin-top:1px;}\n'
++'.terms p{font-size:11.5px;color:rgba(255,255,255,.35);line-height:1.6;}\n'
++'.alert{border-radius:10px;padding:14px 16px;font-size:13.5px;line-height:1.55;margin-top:14px;display:none;}\n'
++'.ok-a{background:rgba(40,167,69,.1);border:1px solid rgba(40,167,69,.3);color:#6fcf97;}\n'
++'.er-a{background:rgba(206,17,38,.1);border:1px solid rgba(206,17,38,.3);color:#ff8080;}\n'
++'.btn{width:100%;margin-top:18px;padding:17px 20px;border:none;border-radius:12px;font-family:Oswald,sans-serif;font-size:17px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;cursor:pointer;background:linear-gradient(90deg,#FFD700,#FF8800,#CE1126);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 4px 20px rgba(206,17,38,.3);transition:transform .18s;}\n'
++'.btn:hover{transform:translateY(-2px);}\n'
++'.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}\n'
++'.spin{display:none;width:22px;height:22px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;margin:0 auto;}\n'
++'@keyframes sp{to{transform:rotate(360deg)}}\n'
++'footer{text-align:center;padding:20px 16px 30px;font-size:10px;color:rgba(255,255,255,.16);letter-spacing:1px;}\n'
++'footer b{color:rgba(255,215,0,.35);}\n'
++'</style>\n'
++'</head>\n'
++'<body>\n'
++'<div class="tc"><span class="y"></span><span class="b"></span><span class="r"></span></div>\n'
++'<div class="hero">\n'
++'  <div class="hero-flags">🇨🇴 ⚽ 🇵🇹</div>\n'
++'  <div class="chip">🏆 Copa Mundo 2026 · CEISCOL</div>\n'
++'  <h1>PRE-REGISTRO<br><span class="g">POLLA MUNDIALISTA</span><br><span class="r2">CEISCOL 2026</span></h1>\n'
++'  <p class="hero-sub">Colombia 🇨🇴 vs Portugal 🇵🇹 · Solo para bacteriólogos</p>\n'
++'</div>\n'
++'<div class="page">\n'
++'<div class="banner">\n'
++'  <div class="banner-ico">📲</div>\n'
++'  <div class="banner-txt"><p>Regístrate aquí. <b>Próximamente recibirás el link exclusivo</b> para ingresar tu marcador. Este formulario reserva tu cupo. <b>¡Mantente atento!</b></p></div>\n'
++'</div>\n'
++'<div class="form-wrap"><div class="card">\n'
++'<form id="frm" novalidate>\n'
++'<div class="sec">🏥 Laboratorio / Cliente</div>\n'
++'<div class="g1">\n'
++'  <div class="f">\n'
++'    <label class="lbl">Nombre del Laboratorio o Cliente <span class="r">*</span></label>\n'
++'    <div class="lab-wrap"><span class="lab-ico">🏥</span><input type="text" id="lab" placeholder="Laboratorio Clínico San Rafael" required/></div>\n'
++'  </div>\n'
++'  <div class="g2">\n'
++'    <div class="f"><label class="lbl">Ciudad / Municipio <span class="r">*</span></label><input type="text" id="ciu" placeholder="Bogotá, Cali..." required/></div>\n'
++'    <div class="f"><label class="lbl">Departamento <span class="r">*</span></label><input type="text" id="dpto" placeholder="Cundinamarca..." required/></div>\n'
++'  </div>\n'
++'</div>\n'
++'<div class="div"></div>\n'
++'<div class="sec">🔬 Profesión <span class="r">*</span></div>\n'
++'<div class="prof-wrap" id="pw">\n'
++'  <div class="prof-pills">\n'
++'    <input class="prof-opt" type="radio" name="prof" id="p1" value="Bacteriólogo/a"/>\n'
++'    <label class="prof-pill" for="p1"><span class="pi">🔬</span><span class="pt">Bacteriólogo/a</span></label>\n'
++'    <input class="prof-opt" type="radio" name="prof" id="p2" value="Auxiliar de Laboratorio"/>\n'
++'    <label class="prof-pill" for="p2"><span class="pi">🧪</span><span class="pt">Auxiliar de Lab.</span></label>\n'
++'    <input class="prof-opt" type="radio" name="prof" id="p3" value="Administrativo/a"/>\n'
++'    <label class="prof-pill" for="p3"><span class="pi">💼</span><span class="pt">Administrativo/a</span></label>\n'
++'    <input class="prof-opt" type="radio" name="prof" id="p4" value="Otro"/>\n'
++'    <label class="prof-pill" for="p4"><span class="pi">👤</span><span class="pt">Otro</span></label>\n'
++'  </div>\n'
++'  <div class="prof-err">⚠ Selecciona tu profesión</div>\n'
++'</div>\n'
++'<div class="div"></div>\n'
++'<div class="sec">👤 Datos Personales</div>\n'
++'<div class="g1">\n'
++'  <div class="g2">\n'
++'    <div class="f"><label class="lbl">Nombres <span class="r">*</span></label><input type="text" id="nom" placeholder="Tu(s) nombre(s)" autocomplete="given-name" required/></div>\n'
++'    <div class="f"><label class="lbl">Apellidos <span class="r">*</span></label><input type="text" id="ape" placeholder="Tu(s) apellido(s)" autocomplete="family-name" required/></div>\n'
++'    <div class="f"><label class="lbl">Tipo de Documento <span class="r">*</span></label>\n'
++'      <select id="tdoc"><option value="">Selecciona...</option><option>Cédula de Ciudadanía</option><option>Cédula de Extranjería</option><option>Pasaporte</option><option>Tarjeta de Identidad</option></select>\n'
++'    </div>\n'
++'    <div class="f"><label class="lbl">N° Documento <span class="r">*</span></label><input type="text" id="ndoc" placeholder="Número" inputmode="numeric" required/></div>\n'
++'    <div class="f"><label class="lbl">Celular <span class="r">*</span></label><input type="tel" id="cel" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel" required/></div>\n'
++'    <div class="f">\n'
++'      <label class="lbl">🎂 Fecha de Nacimiento <span class="r">*</span></label>\n'
++'      <div class="dob">\n'
++'        <div class="dob-item"><select id="dd"><option value="">Día</option></select><span class="dob-sub">Día</span></div>\n'
++'        <div class="dob-item">\n'
++'          <select id="dm"><option value="">Mes</option><option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option></select>\n'
++'          <span class="dob-sub">Mes</span>\n'
++'        </div>\n'
++'        <div class="dob-item"><select id="dy"><option value="">Año</option></select><span class="dob-sub">Año</span></div>\n'
++'      </div>\n'
++'    </div>\n'
++'  </div>\n'
++'  <div class="f"><label class="lbl">Correo Personal <span class="r">*</span></label><input type="email" id="mail" placeholder="ejemplo@gmail.com" autocomplete="email" inputmode="email" required/></div>\n'
++'  <div class="f"><label class="lbl">Confirmar Correo <span class="r">*</span></label><input type="email" id="mail2" placeholder="Repite tu correo" required/></div>\n'
++'</div>\n'
++'<div class="div"></div>\n'
++'<div class="terms">\n'
++'  <input type="checkbox" id="trm"/>\n'
++'  <p>Autorizo el uso de mis datos personales exclusivamente para la Polla Mundialista CEISCOL 2026, conforme a la Ley 1581 de 2012.</p>\n'
++'</div>\n'
++'<div class="alert ok-a" id="ok">✅ &nbsp;<strong>¡Pre-registro exitoso!</strong> Revisa tu correo. Pronto recibirás el link. ¡Vamos Colombia! 🇨🇴</div>\n'
++'<div class="alert er-a" id="er"><span id="etxt">Error.</span></div>\n'
++'<button type="submit" class="btn" id="btn"><span id="btxt">⚽ REGISTRARME PARA LA POLLA</span><div class="spin" id="spn"></div></button>\n'
++'</form></div></div>\n'
++'</div>\n'
++'<footer><b>CEISCOL</b> · Polla Mundialista 2026 · Colombia 🇨🇴 vs Portugal 🇵🇹</footer>\n'
++'<script>\n'
++'(function(){\n'
++'  var dd=document.getElementById("dd");\n'
++'  for(var i=1;i<=31;i++){var o=document.createElement("option");o.value=o.text=(i<10?"0":"")+i;dd.add(o);}\n'
++'  var dy=document.getElementById("dy"),ay=new Date().getFullYear();\n'
++'  for(var j=ay-16;j>=ay-85;j--){var o2=document.createElement("option");o2.value=o2.text=j;dy.add(o2);}\n'
++'})();\n'
++'var SELF=window.location.href.split("?")[0];\n'
++'document.getElementById("frm").addEventListener("submit",function(e){\n'
++'  e.preventDefault(); hide();\n'
++'  var lab=v("lab"),ciu=v("ciu"),dpto=v("dpto");\n'
++'  var nom=v("nom"),ape=v("ape"),tdoc=v("tdoc"),ndoc=v("ndoc"),cel=v("cel");\n'
++'  var mail=v("mail"),mail2=v("mail2");\n'
++'  var dd=v("dd"),dm=v("dm"),dy=v("dy");\n'
++'  var prof="";\n'
++'  document.querySelectorAll("input[name=prof]").forEach(function(r){if(r.checked)prof=r.value;});\n'
++'  var ok=true;\n'
++'  ["lab","ciu","dpto","nom","ape","tdoc","ndoc","cel","mail","mail2"].forEach(function(id){\n'
++'    if(!v(id)){document.getElementById(id).classList.add("err");ok=false;}\n'
++'  });\n'
++'  if(!prof){document.getElementById("pw").classList.add("err");ok=false;}\n'
++'  if(!dd||!dm||!dy){["dd","dm","dy"].forEach(function(id){if(!v(id))document.getElementById(id).classList.add("err");});ok=false;}\n'
++'  if(!ok){return err("Por favor completa todos los campos.");}\n'
++'  if(!mail.includes("@")){return err("El correo no es válido.");}\n'
++'  if(mail!==mail2){return err("Los correos no coinciden.");}\n'
++'  if(cel.replace(/\\D/g,"").length<7){return err("El celular no es válido.");}\n'
++'  if(!document.getElementById("trm").checked){return err("Debes aceptar la autorización de datos.");}\n'
++'  load(true);\n'
++'  fetch(SELF,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({laboratorio:lab,ciudad:ciu,dpto:dpto,nombres:nom,apellidos:ape,profesion:prof,tipo_doc:tdoc,num_doc:ndoc,celular:cel,email:mail,fecha_nac:dy+"-"+dm+"-"+dd})})\n'
++'  .then(function(r){return r.json();})\n'
++'  .then(function(r){\n'
++'    if(r.ok){\n'
++'      document.getElementById("ok").style.display="block";\n'
++'      document.getElementById("frm").reset();\n'
++'      window.scrollTo({top:0,behavior:"smooth"});\n'
++'    } else { err("Error del servidor. Intenta de nuevo."); }\n'
++'  })\n'
++'  .catch(function(){err("Sin conexión. Verifica tu internet.");})\n'
++'  .finally(function(){load(false);});\n'
++'});\n'
++'document.querySelectorAll("input,select").forEach(function(el){\n'
++'  ["input","change"].forEach(function(ev){el.addEventListener(ev,function(){el.classList.remove("err");});});\n'
++'});\n'
++'document.querySelectorAll("input[name=prof]").forEach(function(r){\n'
++'  r.addEventListener("change",function(){document.getElementById("pw").classList.remove("err");});\n'
++'});\n'
++'function v(id){return document.getElementById(id).value.trim();}\n'
++'function hide(){document.getElementById("ok").style.display="none";document.getElementById("er").style.display="none";}\n'
++'function err(m){document.getElementById("etxt").textContent=m;document.getElementById("er").style.display="block";document.getElementById("er").scrollIntoView({behavior:"smooth",block:"center"});}\n'
++'function load(on){document.getElementById("btn").disabled=on;document.getElementById("btxt").style.display=on?"none":"inline";document.getElementById("spn").style.display=on?"block":"none";}\n'
++'<\/script>\n'
++'</body>\n'
++'</html>';
