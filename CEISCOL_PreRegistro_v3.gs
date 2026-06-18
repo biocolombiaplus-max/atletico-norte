@@ -185,286 +185,314 @@ var HTML_FORM = `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>Pre-Registro · Polla Mundialista CEISCOL 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
+/* ===== RESET TOTAL ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
 html{
-  font-size:16px;
   -webkit-text-size-adjust:100%;
   overflow-x:hidden;
+  height:100%;
 }
 
 body{
   font-family:'Inter',sans-serif;
-  background:#f4f6fb;
+  background:#f0f3fa;
   color:#1a2036;
   width:100%;
-  min-height:100vh;
+  min-height:100%;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
+  font-size:16px;
 }
 
+/* ===== BARRA TRICOLOR ===== */
 .tc{
   width:100%;
-  height:6px;
+  height:5px;
   display:flex;
   position:sticky;
   top:0;
-  z-index:10;
+  z-index:99;
 }
 .tc span{flex:1;}
 .tc .y{background:#FFD700;}
 .tc .b{background:#003087;}
 .tc .r{background:#CE1126;}
 
+/* ===== HERO ===== */
 .hero{
   width:100%;
-  padding:36px 20px 64px;
+  padding:40px 20px 72px;
   text-align:center;
-  background:linear-gradient(160deg,#002266 0%,#003087 50%,#8b0000 80%,#CE1126 100%);
+  background:linear-gradient(170deg,#001a55 0%,#003087 45%,#7a0010 78%,#CE1126 100%);
 }
-.hero-flags{font-size:38px;margin-bottom:10px;}
+.hero-ico{font-size:44px;margin-bottom:8px;line-height:1;}
 .badge{
-  display:inline-block;
-  background:rgba(255,215,0,.18);
-  border:1.5px solid rgba(255,215,0,.5);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(255,215,0,.15);
+  border:1.5px solid rgba(255,215,0,.45);
   border-radius:100px;
-  padding:5px 18px;
-  font-size:10px;
+  padding:6px 18px;
+  font-size:11px;
   font-weight:700;
   color:#FFD700;
   letter-spacing:2px;
   text-transform:uppercase;
-  margin-bottom:14px;
+  margin-bottom:16px;
 }
 .hero h1{
   font-family:'Oswald',sans-serif;
-  font-size:clamp(28px,9vw,52px);
+  font-size:clamp(32px,10vw,58px);
   font-weight:700;
-  line-height:1.08;
+  line-height:1.05;
   color:#fff;
+  text-shadow:0 2px 12px rgba(0,0,0,.35);
 }
-.hero h1 .gold{color:#FFD700;}
-.hero h1 .red{color:#ffaaaa;}
+.hero h1 .g{color:#FFD700;}
+.hero h1 .r{color:#ff9999;}
 .hero-vs{
-  margin-top:16px;
+  margin-top:18px;
   display:inline-flex;
   align-items:center;
-  gap:10px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.2);
+  gap:8px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.22);
   border-radius:100px;
-  padding:9px 22px;
-  font-size:15px;
+  padding:10px 24px;
+  font-size:16px;
   font-weight:600;
   color:#fff;
+  letter-spacing:.5px;
 }
 
-.main{
+/* ===== CONTENEDOR ===== */
+.wrap{
   width:100%;
-  padding:0 12px 56px;
+  padding-bottom:60px;
 }
-@media(min-width:600px){
-  .main{max-width:620px;margin:0 auto;padding:0 20px 56px;}
+@media(min-width:640px){
+  .wrap{max-width:640px;margin:0 auto;}
 }
 
+/* ===== AVISO ===== */
 .aviso{
+  margin:-30px 16px 0;
   background:#fff;
   border-left:5px solid #FFD700;
-  border-radius:12px;
-  padding:14px 16px;
+  border-radius:14px;
+  padding:15px 18px;
   display:flex;
-  gap:12px;
-  align-items:center;
-  margin-top:-28px;
+  gap:14px;
+  align-items:flex-start;
+  box-shadow:0 6px 24px rgba(0,48,135,.12);
   position:relative;
   z-index:2;
-  box-shadow:0 4px 18px rgba(0,48,135,.1);
 }
-.aviso-i{font-size:26px;flex-shrink:0;}
-.aviso p{font-size:13px;color:#444;line-height:1.6;}
-.aviso b{color:#003087;}
+.aviso-ico{font-size:28px;line-height:1;flex-shrink:0;margin-top:2px;}
+.aviso p{font-size:14px;color:#333;line-height:1.6;}
+.aviso b{color:#003087;font-weight:700;}
 
-.card{
+/* ===== SECCIONES ===== */
+.blk{
   background:#fff;
-  border:1.5px solid #e8ecf4;
-  border-radius:18px;
-  padding:22px 14px;
-  margin-top:14px;
-  box-shadow:0 8px 32px rgba(0,48,135,.08);
-  width:100%;
+  margin:14px 0 0;
+  padding:22px 20px 26px;
+  /* sin border-radius en móvil — full bleed */
+  border-top:1px solid #e8edf5;
+  border-bottom:1px solid #e8edf5;
 }
-@media(min-width:480px){.card{padding:26px 22px;}}
+@media(min-width:640px){
+  .blk{margin:14px 16px 0;border-radius:16px;border:1.5px solid #e8edf5;box-shadow:0 6px 24px rgba(0,48,135,.07);}
+}
 
-.sec{
+.sh{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:10px;
   font-family:'Oswald',sans-serif;
-  font-size:11px;
+  font-size:13px;
   font-weight:600;
   letter-spacing:3px;
   color:#003087;
   text-transform:uppercase;
-  margin-bottom:16px;
+  margin-bottom:20px;
+  padding-bottom:12px;
+  border-bottom:2px solid #f0f3fa;
 }
-.sec::after{
+.sh::after{
   content:'';
   flex:1;
   height:2px;
-  background:linear-gradient(90deg,#003087,#FFD700,transparent);
+  background:linear-gradient(90deg,#003087 0%,#FFD700 60%,transparent 100%);
   border-radius:2px;
-}
-.line{
-  height:1px;
-  background:linear-gradient(90deg,transparent,#e0e6f0,transparent);
-  margin:22px 0;
+  margin-left:6px;
 }
 
-.stack{display:flex;flex-direction:column;gap:14px;}
-.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:360px){.duo{grid-template-columns:1fr;}}
+/* ===== CAMPOS ===== */
+.stack{display:flex;flex-direction:column;gap:16px;}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:380px){.duo{grid-template-columns:1fr;}}
 
-.fld{display:flex;flex-direction:column;gap:6px;}
+.fld{display:flex;flex-direction:column;gap:7px;}
 .lbl{
-  font-size:10.5px;
+  font-size:11px;
   font-weight:700;
-  color:#6b7a9b;
-  letter-spacing:1px;
+  color:#7080a0;
+  letter-spacing:1.2px;
   text-transform:uppercase;
 }
 .req{color:#CE1126;}
 
+/* INPUTS — font-size 16px obligatorio para evitar zoom iOS */
 input,select{
   width:100%;
-  background:#f7f9ff;
-  border:1.5px solid #dde3f0;
+  background:#f5f8ff;
+  border:2px solid #dde5f5;
   border-radius:12px;
   color:#1a2036;
   font-family:'Inter',sans-serif;
   font-size:16px;
   font-weight:500;
-  padding:14px 16px;
-  transition:border-color .2s,background .2s,box-shadow .2s;
+  padding:16px 18px;
   -webkit-appearance:none;
   appearance:none;
   outline:none;
+  transition:border-color .18s,box-shadow .18s,background .18s;
+  line-height:1.3;
 }
 select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M0 0l5.5 7L11 0z' fill='%23003087'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23003087'/%3E%3C/svg%3E");
   background-repeat:no-repeat;
-  background-position:right 15px center;
-  background-color:#f7f9ff;
-  padding-right:42px;
+  background-position:right 16px center;
+  background-color:#f5f8ff;
+  padding-right:46px;
   cursor:pointer;
 }
-select option{background:#fff;color:#1a2036;}
-input::placeholder{color:#b0b8cc;}
+select option{background:#fff;color:#1a2036;font-size:16px;}
+input::placeholder{color:#bcc6de;}
 input:focus,select:focus{
   border-color:#003087;
   background:#fff;
-  box-shadow:0 0 0 3px rgba(0,48,135,.1);
+  box-shadow:0 0 0 4px rgba(0,48,135,.1);
 }
-input.err,select.err{
-  border-color:#CE1126!important;
-  background:#fff5f5!important;
-}
-.lab-w{position:relative;}
-.lab-w .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;}
-.lab-w input{padding-left:46px;}
+input.err,select.err{border-color:#CE1126!important;background:#fff4f4!important;}
 
+.ico-w{position:relative;}
+.ico-w .fi{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none;line-height:1;}
+.ico-w input{padding-left:50px;}
+
+/* ===== PASTILLAS PROFESIÓN ===== */
 .pills{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:12px;
 }
-@media(min-width:400px){.pills{grid-template-columns:repeat(4,1fr);}}
+@media(min-width:420px){.pills{grid-template-columns:repeat(4,1fr);}}
 .pi{display:none;}
 .pl{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:6px;
-  padding:14px 6px;
-  background:#f7f9ff;
-  border:2px solid #dde3f0;
+  justify-content:center;
+  gap:8px;
+  padding:18px 8px;
+  background:#f5f8ff;
+  border:2px solid #dde5f5;
   border-radius:14px;
   cursor:pointer;
   text-align:center;
   transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
   user-select:none;
   -webkit-user-select:none;
+  min-height:80px;
 }
-.pl em{font-size:24px;line-height:1;font-style:normal;}
-.pl span{font-size:11px;font-weight:600;color:#8896b3;line-height:1.3;}
+.pl em{font-size:28px;line-height:1;font-style:normal;}
+.pl span{font-size:12px;font-weight:600;color:#8090b0;line-height:1.3;}
 .pi:checked + .pl{
-  background:#e8f0ff;
+  background:#eaf0ff;
   border-color:#003087;
+  box-shadow:0 0 0 3px rgba(0,48,135,.12);
 }
 .pi:checked + .pl span{color:#003087;font-weight:700;}
-.pw-err{font-size:11.5px;color:#CE1126;margin-top:6px;display:none;}
-.pw.e .pl{border-color:rgba(206,17,38,.35);}
+.pi:checked + .pl em{transform:scale(1.12);display:inline-block;}
+.pw-err{font-size:12px;color:#CE1126;margin-top:8px;display:none;}
+.pw.e .pl{border-color:rgba(206,17,38,.3);}
 .pw.e .pw-err{display:block;}
 
-.dob{display:grid;grid-template-columns:1fr 1.9fr 1fr;gap:10px;}
-.dob-f{display:flex;flex-direction:column;gap:5px;}
-.dob-s{font-size:9px;color:#a0aabf;text-align:center;letter-spacing:.5px;text-transform:uppercase;}
+/* ===== FECHA NACIMIENTO ===== */
+.dob{display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px;}
+.dob-g{display:flex;flex-direction:column;gap:5px;}
+.dob-lb{font-size:10px;color:#aab;text-align:center;letter-spacing:.5px;text-transform:uppercase;font-weight:600;}
 
+/* ===== TÉRMINOS ===== */
 .terms{
   display:flex;
   align-items:flex-start;
-  gap:12px;
-  padding:15px;
-  background:#fffbea;
-  border:1.5px solid #FFD700;
-  border-radius:12px;
+  gap:14px;
+  padding:18px;
+  background:#fffce8;
+  border:2px solid #FFD700;
+  border-radius:14px;
 }
 .terms input[type=checkbox]{
-  width:20px;height:20px;min-width:20px;
+  width:22px;height:22px;min-width:22px;
   accent-color:#003087;
   cursor:pointer;
-  margin-top:1px;
+  margin-top:2px;
+  border-radius:6px;
 }
-.terms p{font-size:12px;color:#666;line-height:1.65;}
+.terms p{font-size:13px;color:#555;line-height:1.7;}
 
+/* ===== ALERTAS ===== */
 .al{
-  border-radius:12px;
-  padding:15px 16px;
-  font-size:14px;
+  margin:16px 20px 0;
+  border-radius:14px;
+  padding:16px 18px;
+  font-size:15px;
   line-height:1.55;
-  margin-top:14px;
   display:none;
 }
-.ok{background:#e6f9ee;border:1.5px solid #28a745;color:#155724;}
-.er{background:#fdecea;border:1.5px solid #CE1126;color:#7a1020;}
+@media(min-width:640px){.al{margin:16px 0 0;}}
+.ok{background:#e8f9ef;border:2px solid #28a745;color:#145a28;}
+.er{background:#fdeaea;border:2px solid #CE1126;color:#7a0f1c;}
 
+/* ===== BOTÓN ===== */
+.btn-w{
+  padding:20px 16px 10px;
+}
+@media(min-width:640px){.btn-w{padding:20px 0 10px;}}
 .btn{
   width:100%;
-  margin-top:18px;
-  padding:17px;
+  padding:20px;
   border:none;
-  border-radius:14px;
+  border-radius:16px;
   font-family:'Oswald',sans-serif;
-  font-size:18px;
+  font-size:20px;
   font-weight:700;
-  letter-spacing:2px;
+  letter-spacing:2.5px;
   text-transform:uppercase;
   cursor:pointer;
-  background:linear-gradient(90deg,#FFD700,#e88b00 40%,#CE1126);
+  background:linear-gradient(90deg,#FFD700 0%,#e07800 45%,#CE1126 100%);
   color:#fff;
-  text-shadow:0 1px 4px rgba(0,0,0,.3);
-  box-shadow:0 6px 24px rgba(206,17,38,.25);
+  text-shadow:0 1px 6px rgba(0,0,0,.3);
+  box-shadow:0 8px 28px rgba(206,17,38,.3);
   -webkit-appearance:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:opacity .15s;
 }
-.btn:active{opacity:.88;}
-.btn:disabled{opacity:.55;cursor:not-allowed;}
+.btn:active{opacity:.85;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
 .sp{
   display:none;
-  width:24px;height:24px;
-  border:3px solid rgba(255,255,255,.35);
+  width:26px;height:26px;
+  border:3px solid rgba(255,255,255,.3);
   border-top-color:#fff;
   border-radius:50%;
   animation:sp .7s linear infinite;
@@ -472,167 +500,181 @@ input.err,select.err{
 }
 @keyframes sp{to{transform:rotate(360deg);}}
 
+/* ===== FOOTER ===== */
 .foot{
   text-align:center;
-  padding:20px 16px 36px;
-  font-size:11px;
-  color:#a0aabf;
-  letter-spacing:1px;
+  padding:24px 20px 40px;
+  font-size:12px;
+  color:#aab;
+  letter-spacing:.8px;
 }
 .foot b{color:#003087;}
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,#dde5f5,transparent);
+  margin:20px 20px 0;
+}
 </style>
 </head>
 <body>
 
-<div class="tc">
-  <span class="y"></span><span class="b"></span><span class="r"></span>
-</div>
+<!-- TRICOLOR -->
+<div class="tc"><span class="y"></span><span class="b"></span><span class="r"></span></div>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-flags">🇨🇴 ⚽ 🇵🇹</div>
+  <div class="hero-ico">🇨🇴 ⚽ 🇵🇹</div>
   <div class="badge">🏆 Copa Mundo 2026 · CEISCOL</div>
-  <h1>PRE-REGISTRO<br><span class="gold">POLLA MUNDIALISTA</span><br><span class="red">CEISCOL 2026</span></h1>
+  <h1>PRE-REGISTRO<br><span class="g">POLLA MUNDIALISTA</span><br><span class="r">CEISCOL 2026</span></h1>
   <div class="hero-vs">🇨🇴 Colombia &nbsp;•&nbsp; Portugal 🇵🇹</div>
 </div>
 
-<div class="main">
+<div class="wrap">
 
-  <div class="aviso">
-    <div class="aviso-i">📲</div>
-    <p>Regístrate y <b>recibe el link exclusivo</b> para ingresar tu marcador. ¡Este formulario reserva tu cupo!</p>
-  </div>
-
-  <div class="card">
-  <form id="F" novalidate>
-
-    <div class="sec">🏥 Laboratorio / Cliente</div>
-    <div class="stack">
-      <div class="fld">
-        <label class="lbl">Nombre del Laboratorio o Cliente <span class="req">*</span></label>
-        <div class="lab-w">
-          <span class="ico">🏥</span>
-          <input type="text" id="lab" placeholder="Lab. Clínico San Rafael" autocomplete="organization"/>
-        </div>
-      </div>
-      <div class="duo">
-        <div class="fld">
-          <label class="lbl">Ciudad <span class="req">*</span></label>
-          <input type="text" id="ciu" placeholder="Bogotá, Cali..."/>
-        </div>
-        <div class="fld">
-          <label class="lbl">Departamento <span class="req">*</span></label>
-          <input type="text" id="dpto" placeholder="Cundinamarca..."/>
-        </div>
-      </div>
-    </div>
-
-    <div class="line"></div>
-
-    <div class="sec">🔬 Profesión <span class="req">*</span></div>
-    <div class="pw" id="pw">
-      <div class="pills">
-        <input class="pi" type="radio" name="prof" id="p1" value="Bacteriólogo/a"/>
-        <label class="pl" for="p1"><em>🔬</em><span>Bacteriólogo/a</span></label>
-        <input class="pi" type="radio" name="prof" id="p2" value="Auxiliar de Laboratorio"/>
-        <label class="pl" for="p2"><em>🧪</em><span>Auxiliar de Lab.</span></label>
-        <input class="pi" type="radio" name="prof" id="p3" value="Administrativo/a"/>
-        <label class="pl" for="p3"><em>💼</em><span>Administrativo/a</span></label>
-        <input class="pi" type="radio" name="prof" id="p4" value="Otro"/>
-        <label class="pl" for="p4"><em>👤</em><span>Otro</span></label>
-      </div>
-      <div class="pw-err">⚠ Selecciona tu profesión</div>
-    </div>
-
-    <div class="line"></div>
-
-    <div class="sec">👤 Datos Personales</div>
-    <div class="stack">
-      <div class="duo">
-        <div class="fld">
-          <label class="lbl">Nombres <span class="req">*</span></label>
-          <input type="text" id="nom" placeholder="Tu(s) nombre(s)" autocomplete="given-name"/>
-        </div>
-        <div class="fld">
-          <label class="lbl">Apellidos <span class="req">*</span></label>
-          <input type="text" id="ape" placeholder="Tu(s) apellido(s)" autocomplete="family-name"/>
-        </div>
-      </div>
-      <div class="duo">
-        <div class="fld">
-          <label class="lbl">Tipo Documento <span class="req">*</span></label>
-          <select id="tdoc">
-            <option value="">Selecciona...</option>
-            <option>Cédula de Ciudadanía</option>
-            <option>Cédula de Extranjería</option>
-            <option>Pasaporte</option>
-            <option>Tarjeta de Identidad</option>
-          </select>
-        </div>
-        <div class="fld">
-          <label class="lbl">N° Documento <span class="req">*</span></label>
-          <input type="text" id="ndoc" placeholder="Número" inputmode="numeric"/>
-        </div>
-      </div>
-      <div class="fld">
-        <label class="lbl">Celular <span class="req">*</span></label>
-        <input type="tel" id="cel" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel"/>
-      </div>
-      <div class="fld">
-        <label class="lbl">🎂 Fecha de Nacimiento <span class="req">*</span></label>
-        <div class="dob">
-          <div class="dob-f">
-            <select id="dd"><option value="">Día</option></select>
-            <div class="dob-s">Día</div>
-          </div>
-          <div class="dob-f">
-            <select id="dm">
-              <option value="">Mes</option>
-              <option value="01">Enero</option><option value="02">Febrero</option>
-              <option value="03">Marzo</option><option value="04">Abril</option>
-              <option value="05">Mayo</option><option value="06">Junio</option>
-              <option value="07">Julio</option><option value="08">Agosto</option>
-              <option value="09">Septiembre</option><option value="10">Octubre</option>
-              <option value="11">Noviembre</option><option value="12">Diciembre</option>
-            </select>
-            <div class="dob-s">Mes</div>
-          </div>
-          <div class="dob-f">
-            <select id="dy"><option value="">Año</option></select>
-            <div class="dob-s">Año</div>
-          </div>
-        </div>
-      </div>
-      <div class="fld">
-        <label class="lbl">Correo Personal <span class="req">*</span></label>
-        <input type="email" id="mail" placeholder="ejemplo@gmail.com" inputmode="email" autocomplete="email"/>
-      </div>
-      <div class="fld">
-        <label class="lbl">Confirmar Correo <span class="req">*</span></label>
-        <input type="email" id="mail2" placeholder="Repite tu correo"/>
-      </div>
-    </div>
-
-    <div class="line"></div>
-
-    <div class="terms">
-      <input type="checkbox" id="trm"/>
-      <p>Autorizo el uso de mis datos personales exclusivamente para la Polla Mundialista CEISCOL 2026, conforme a la Ley 1581 de 2012.</p>
-    </div>
-
-    <div class="al ok" id="ok">✅ &nbsp;<strong>¡Pre-registro exitoso!</strong> Revisa tu correo — pronto recibes el link. ¡Vamos Colombia! 🇨🇴</div>
-    <div class="al er" id="er"><span id="em"></span></div>
-
-    <button type="submit" class="btn" id="btn">
-      <span id="bt">⚽ REGISTRARME AHORA</span>
-      <div class="sp" id="sp"></div>
-    </button>
-
-  </form>
-  </div>
-
+<!-- AVISO -->
+<div class="aviso">
+  <div class="aviso-ico">📲</div>
+  <p>Regístrate y <b>recibe el link exclusivo</b> para registrar tu marcador. ¡Reserva tu cupo ahora!</p>
 </div>
 
+<form id="F" novalidate>
+
+<!-- BLOQUE 1: LABORATORIO -->
+<div class="blk">
+  <div class="sh">🏥 Laboratorio / Cliente</div>
+  <div class="stack">
+    <div class="fld">
+      <label class="lbl">Nombre del Laboratorio o Cliente <span class="req">*</span></label>
+      <div class="ico-w">
+        <span class="fi">🏥</span>
+        <input type="text" id="lab" placeholder="Lab. Clínico San Rafael" autocomplete="organization"/>
+      </div>
+    </div>
+    <div class="duo">
+      <div class="fld">
+        <label class="lbl">Ciudad <span class="req">*</span></label>
+        <input type="text" id="ciu" placeholder="Bogotá..."/>
+      </div>
+      <div class="fld">
+        <label class="lbl">Departamento <span class="req">*</span></label>
+        <input type="text" id="dpto" placeholder="Cundinamarca..."/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOQUE 2: PROFESIÓN -->
+<div class="blk">
+  <div class="sh">🔬 Profesión <span class="req">*</span></div>
+  <div id="pw" class="pw">
+    <div class="pills">
+      <input class="pi" type="radio" name="prof" id="p1" value="Bacteriólogo/a"/>
+      <label class="pl" for="p1"><em>🔬</em><span>Bacteriólogo/a</span></label>
+      <input class="pi" type="radio" name="prof" id="p2" value="Auxiliar de Laboratorio"/>
+      <label class="pl" for="p2"><em>🧪</em><span>Auxiliar de Lab.</span></label>
+      <input class="pi" type="radio" name="prof" id="p3" value="Administrativo/a"/>
+      <label class="pl" for="p3"><em>💼</em><span>Administrativo/a</span></label>
+      <input class="pi" type="radio" name="prof" id="p4" value="Otro"/>
+      <label class="pl" for="p4"><em>👤</em><span>Otro</span></label>
+    </div>
+    <div class="pw-err">⚠️ Selecciona tu profesión para continuar</div>
+  </div>
+</div>
+
+<!-- BLOQUE 3: DATOS PERSONALES -->
+<div class="blk">
+  <div class="sh">👤 Datos Personales</div>
+  <div class="stack">
+    <div class="duo">
+      <div class="fld">
+        <label class="lbl">Nombres <span class="req">*</span></label>
+        <input type="text" id="nom" placeholder="Nombre(s)" autocomplete="given-name"/>
+      </div>
+      <div class="fld">
+        <label class="lbl">Apellidos <span class="req">*</span></label>
+        <input type="text" id="ape" placeholder="Apellido(s)" autocomplete="family-name"/>
+      </div>
+    </div>
+    <div class="duo">
+      <div class="fld">
+        <label class="lbl">Tipo Doc. <span class="req">*</span></label>
+        <select id="tdoc">
+          <option value="">Selecciona...</option>
+          <option>Cédula de Ciudadanía</option>
+          <option>Cédula de Extranjería</option>
+          <option>Pasaporte</option>
+          <option>Tarjeta de Identidad</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label class="lbl">N° Documento <span class="req">*</span></label>
+        <input type="text" id="ndoc" placeholder="Número" inputmode="numeric"/>
+      </div>
+    </div>
+    <div class="fld">
+      <label class="lbl">Celular <span class="req">*</span></label>
+      <input type="tel" id="cel" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel"/>
+    </div>
+    <div class="fld">
+      <label class="lbl">🎂 Fecha de Nacimiento <span class="req">*</span></label>
+      <div class="dob">
+        <div class="dob-g">
+          <select id="dd"><option value="">Día</option></select>
+          <div class="dob-lb">Día</div>
+        </div>
+        <div class="dob-g">
+          <select id="dm">
+            <option value="">Mes</option>
+            <option value="01">Enero</option><option value="02">Febrero</option>
+            <option value="03">Marzo</option><option value="04">Abril</option>
+            <option value="05">Mayo</option><option value="06">Junio</option>
+            <option value="07">Julio</option><option value="08">Agosto</option>
+            <option value="09">Septiembre</option><option value="10">Octubre</option>
+            <option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+          <div class="dob-lb">Mes</div>
+        </div>
+        <div class="dob-g">
+          <select id="dy"><option value="">Año</option></select>
+          <div class="dob-lb">Año</div>
+        </div>
+      </div>
+    </div>
+    <div class="fld">
+      <label class="lbl">Correo Personal <span class="req">*</span></label>
+      <input type="email" id="mail" placeholder="ejemplo@gmail.com" inputmode="email" autocomplete="email"/>
+    </div>
+    <div class="fld">
+      <label class="lbl">Confirmar Correo <span class="req">*</span></label>
+      <input type="email" id="mail2" placeholder="Repite tu correo"/>
+    </div>
+  </div>
+</div>
+
+<!-- BLOQUE 4: TÉRMINOS -->
+<div class="blk">
+  <div class="terms">
+    <input type="checkbox" id="trm"/>
+    <p>Autorizo el uso de mis datos personales exclusivamente para la <strong>Polla Mundialista CEISCOL 2026</strong>, conforme a la Ley 1581 de 2012 de protección de datos personales.</p>
+  </div>
+</div>
+
+<div class="al ok" id="ok">✅ <strong>¡Pre-registro exitoso!</strong> Revisa tu correo — pronto llega el link. ¡Vamos Colombia! 🇨🇴⚽</div>
+<div class="al er" id="er"><span id="em"></span></div>
+
+<div class="btn-w">
+  <button type="submit" class="btn" id="btn">
+    <span id="bt">⚽ REGISTRARME AHORA</span>
+    <div class="sp" id="sp"></div>
+  </button>
+</div>
+
+</form>
+
+<div class="divider"></div>
 <div class="foot"><b>CEISCOL</b> · Polla Mundialista 2026 · 🇨🇴 Colombia vs Portugal 🇵🇹</div>
+
+</div><!-- /wrap -->
 
 <script>
 (function(){
@@ -650,33 +692,34 @@ input.err,select.err{
   }
 })();
 
-var URL=window.location.href.split('?')[0];
+var FORM_URL=window.location.href.split('?')[0];
 
 document.getElementById('F').addEventListener('submit',function(e){
   e.preventDefault();
-  ocultar();
-  var lab=v('lab'),ciu=v('ciu'),dpto=v('dpto');
-  var nom=v('nom'),ape=v('ape'),tdoc=v('tdoc'),ndoc=v('ndoc'),cel=v('cel');
-  var mail=v('mail'),mail2=v('mail2');
-  var dd=v('dd'),dm=v('dm'),dy=v('dy');
+  hideAlerts();
+  var lab=g('lab'),ciu=g('ciu'),dpto=g('dpto');
+  var nom=g('nom'),ape=g('ape'),tdoc=g('tdoc'),ndoc=g('ndoc'),cel=g('cel');
+  var mail=g('mail'),mail2=g('mail2');
+  var dd=g('dd'),dm=g('dm'),dy=g('dy');
   var prof='';
   document.querySelectorAll('input[name=prof]').forEach(function(r){if(r.checked)prof=r.value;});
-  var ok=true;
+
+  var valid=true;
   ['lab','ciu','dpto','nom','ape','tdoc','ndoc','cel','mail','mail2'].forEach(function(id){
-    if(!v(id)){document.getElementById(id).classList.add('err');ok=false;}
+    if(!g(id)){document.getElementById(id).classList.add('err');valid=false;}
   });
-  if(!prof){document.getElementById('pw').classList.add('e');ok=false;}
-  if(!dd||!dm||!dy){
-    ['dd','dm','dy'].forEach(function(id){if(!v(id))document.getElementById(id).classList.add('err');});
-    ok=false;
-  }
-  if(!ok) return error('Por favor completa todos los campos.');
-  if(!mail.includes('@')) return error('El correo no es válido.');
-  if(mail!==mail2) return error('Los correos no coinciden.');
-  if(cel.replace(/\D/g,'').length<7) return error('El celular no es válido.');
-  if(!document.getElementById('trm').checked) return error('Debes aceptar la autorización de datos.');
-  cargando(true);
-  fetch(URL,{
+  if(!prof){document.getElementById('pw').classList.add('e');valid=false;}
+  ['dd','dm','dy'].forEach(function(id){
+    if(!g(id)){document.getElementById(id).classList.add('err');valid=false;}
+  });
+  if(!valid) return showErr('Por favor completa todos los campos obligatorios.');
+  if(!mail.includes('@')) return showErr('El correo electrónico no es válido.');
+  if(mail!==mail2) return showErr('Los correos no coinciden. Veriÿficalos.');
+  if(cel.replace(/\D/g,'').length<7) return showErr('El número de celular no es válido.');
+  if(!document.getElementById('trm').checked) return showErr('Debes aceptar la autorización de datos personales.');
+
+  loading(true);
+  fetch(FORM_URL,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
@@ -693,11 +736,11 @@ document.getElementById('F').addEventListener('submit',function(e){
       document.getElementById('F').reset();
       window.scrollTo({top:0,behavior:'smooth'});
     } else {
-      error('Error del servidor. Intenta de nuevo.');
+      showErr('Error del servidor: '+( r.msg||'intenta de nuevo.'));
     }
   })
-  .catch(function(){error('Sin conexión. Verifica tu internet.');})
-  .finally(function(){cargando(false);});
+  .catch(function(){showErr('Sin conexión a internet. Verifica y vuelve a intentar.');})
+  .finally(function(){loading(false);});
 });
 
 document.querySelectorAll('input,select').forEach(function(el){
@@ -709,17 +752,18 @@ document.querySelectorAll('input[name=prof]').forEach(function(r){
   r.addEventListener('change',function(){document.getElementById('pw').classList.remove('e');});
 });
 
-function v(id){return document.getElementById(id).value.trim();}
-function ocultar(){
+function g(id){return document.getElementById(id).value.trim();}
+function hideAlerts(){
   document.getElementById('ok').style.display='none';
   document.getElementById('er').style.display='none';
 }
-function error(m){
-  document.getElementById('em').textContent=m;
-  document.getElementById('er').style.display='block';
-  document.getElementById('er').scrollIntoView({behavior:'smooth',block:'center'});
+function showErr(m){
+  var el=document.getElementById('er');
+  document.getElementById('em').textContent='⚠️ '+m;
+  el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'center'});
 }
-function cargando(on){
+function loading(on){
   document.getElementById('btn').disabled=on;
   document.getElementById('bt').style.display=on?'none':'inline';
   document.getElementById('sp').style.display=on?'block':'none';
