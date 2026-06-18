@@ -1,5 +1,5 @@
 var REMITENTE_NOMBRE = 'CEISCOL Polla Mundialista 2026';
-var EMAIL_CEISCOL    = 'ceiscol.asistente@gmail.com';
+var EMAIL_CEISCOL    = 'ceiscol.concurso@gmail.com';
 
 function doGet() {
   return HtmlService
@@ -207,7 +207,6 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ── BARRA TRICOLOR sticky ── */
 .tc{
   width:100%;
   height:6px;
@@ -221,7 +220,6 @@ body{
 .tc .b{background:#003087;}
 .tc .r{background:#CE1126;}
 
-/* ── HERO ── */
 .hero{
   width:100%;
   padding:36px 20px 64px;
@@ -265,7 +263,6 @@ body{
   color:#fff;
 }
 
-/* ── CONTENEDOR PRINCIPAL ── */
 .main{
   width:100%;
   padding:0 12px 56px;
@@ -274,7 +271,6 @@ body{
   .main{max-width:620px;margin:0 auto;padding:0 20px 56px;}
 }
 
-/* ── AVISO ── */
 .aviso{
   background:#fff;
   border-left:5px solid #FFD700;
@@ -292,7 +288,6 @@ body{
 .aviso p{font-size:13px;color:#444;line-height:1.6;}
 .aviso b{color:#003087;}
 
-/* ── TARJETA FORMULARIO ── */
 .card{
   background:#fff;
   border:1.5px solid #e8ecf4;
@@ -304,7 +299,6 @@ body{
 }
 @media(min-width:480px){.card{padding:26px 22px;}}
 
-/* ── SECCIÓN ── */
 .sec{
   display:flex;
   align-items:center;
@@ -330,12 +324,10 @@ body{
   margin:22px 0;
 }
 
-/* ── LAYOUT CAMPOS ── */
 .stack{display:flex;flex-direction:column;gap:14px;}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:360px){.duo{grid-template-columns:1fr;}}
 
-/* ── LABEL + INPUT ── */
 .fld{display:flex;flex-direction:column;gap:6px;}
 .lbl{
   font-size:10.5px;
@@ -384,7 +376,6 @@ input.err,select.err{
 .lab-w .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;}
 .lab-w input{padding-left:46px;}
 
-/* ── PASTILLAS PROFESIÓN ── */
 .pills{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -418,12 +409,10 @@ input.err,select.err{
 .pw.e .pl{border-color:rgba(206,17,38,.35);}
 .pw.e .pw-err{display:block;}
 
-/* ── FECHA NACIMIENTO ── */
 .dob{display:grid;grid-template-columns:1fr 1.9fr 1fr;gap:10px;}
 .dob-f{display:flex;flex-direction:column;gap:5px;}
 .dob-s{font-size:9px;color:#a0aabf;text-align:center;letter-spacing:.5px;text-transform:uppercase;}
 
-/* ── TÉRMINOS ── */
 .terms{
   display:flex;
   align-items:flex-start;
@@ -441,7 +430,6 @@ input.err,select.err{
 }
 .terms p{font-size:12px;color:#666;line-height:1.65;}
 
-/* ── ALERTAS ── */
 .al{
   border-radius:12px;
   padding:15px 16px;
@@ -453,7 +441,6 @@ input.err,select.err{
 .ok{background:#e6f9ee;border:1.5px solid #28a745;color:#155724;}
 .er{background:#fdecea;border:1.5px solid #CE1126;color:#7a1020;}
 
-/* ── BOTÓN ── */
 .btn{
   width:100%;
   margin-top:18px;
@@ -485,7 +472,6 @@ input.err,select.err{
 }
 @keyframes sp{to{transform:rotate(360deg);}}
 
-/* ── FOOTER ── */
 .foot{
   text-align:center;
   padding:20px 16px 36px;
@@ -498,12 +484,10 @@ input.err,select.err{
 </head>
 <body>
 
-<!-- Barra tricolor sticky -->
 <div class="tc">
   <span class="y"></span><span class="b"></span><span class="r"></span>
 </div>
 
-<!-- HERO -->
 <div class="hero">
   <div class="hero-flags">🇨🇴 ⚽ 🇵🇹</div>
   <div class="badge">🏆 Copa Mundo 2026 · CEISCOL</div>
@@ -511,20 +495,16 @@ input.err,select.err{
   <div class="hero-vs">🇨🇴 Colombia &nbsp;•&nbsp; Portugal 🇵🇹</div>
 </div>
 
-<!-- CONTENIDO -->
 <div class="main">
 
-  <!-- Aviso -->
   <div class="aviso">
     <div class="aviso-i">📲</div>
     <p>Regístrate y <b>recibe el link exclusivo</b> para ingresar tu marcador. ¡Este formulario reserva tu cupo!</p>
   </div>
 
-  <!-- Formulario -->
   <div class="card">
   <form id="F" novalidate>
 
-    <!-- LABORATORIO -->
     <div class="sec">🏥 Laboratorio / Cliente</div>
     <div class="stack">
       <div class="fld">
@@ -548,7 +528,6 @@ input.err,select.err{
 
     <div class="line"></div>
 
-    <!-- PROFESIÓN -->
     <div class="sec">🔬 Profesión <span class="req">*</span></div>
     <div class="pw" id="pw">
       <div class="pills">
@@ -566,7 +545,6 @@ input.err,select.err{
 
     <div class="line"></div>
 
-    <!-- DATOS PERSONALES -->
     <div class="sec">👤 Datos Personales</div>
     <div class="stack">
       <div class="duo">
@@ -636,7 +614,6 @@ input.err,select.err{
 
     <div class="line"></div>
 
-    <!-- TÉRMINOS -->
     <div class="terms">
       <input type="checkbox" id="trm"/>
       <p>Autorizo el uso de mis datos personales exclusivamente para la Polla Mundialista CEISCOL 2026, conforme a la Ley 1581 de 2012.</p>
