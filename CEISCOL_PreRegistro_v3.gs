@@ -1,5 +1,5 @@
 var REMITENTE_NOMBRE = 'CEISCOL Polla Mundialista 2026';
-var EMAIL_CEISCOL    = 'ceiscol.concurso@gmail.com';
+var EMAIL_CEISCOL    = 'ceiscol.concursos@gmail.com';
 
 function doGet() {
   return HtmlService
@@ -303,7 +303,6 @@ body{
   background:#fff;
   margin:14px 0 0;
   padding:22px 20px 26px;
-  /* sin border-radius en móvil — full bleed */
   border-top:1px solid #e8edf5;
   border-bottom:1px solid #e8edf5;
 }
@@ -349,7 +348,6 @@ body{
 }
 .req{color:#CE1126;}
 
-/* INPUTS — font-size 16px obligatorio para evitar zoom iOS */
 input,select{
   width:100%;
   background:#f5f8ff;
@@ -714,7 +712,7 @@ document.getElementById('F').addEventListener('submit',function(e){
   });
   if(!valid) return showErr('Por favor completa todos los campos obligatorios.');
   if(!mail.includes('@')) return showErr('El correo electrónico no es válido.');
-  if(mail!==mail2) return showErr('Los correos no coinciden. Veriÿficalos.');
+  if(mail!==mail2) return showErr('Los correos no coinciden. Verifícalos.');
   if(cel.replace(/\D/g,'').length<7) return showErr('El número de celular no es válido.');
   if(!document.getElementById('trm').checked) return showErr('Debes aceptar la autorización de datos personales.');
 
