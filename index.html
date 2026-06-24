@@ -276,6 +276,35 @@ select:focus{outline:none;border-color:var(--acc)}
 .eq-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;color:var(--gold);margin:14px 0 8px;display:flex;align-items:center;gap:7px}
 .eq-badge{font-size:8px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--g)18;color:var(--g);border:1px solid var(--g)44}
 
+/* ── HEATMAP ── */
+.hm-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px}
+.hm-table{border-collapse:collapse;width:100%;min-width:500px;font-size:9px}
+.hm-table th{background:#0a1220;color:var(--m);padding:5px 4px;text-align:center;font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--bdr);white-space:nowrap}
+.hm-table th.team-col{text-align:left;padding-left:8px;min-width:100px}
+.hm-table td{border:1px solid #10182800;text-align:center;padding:3px 2px;position:relative}
+.hm-table td.team-name{text-align:left;padding:4px 8px;background:#0a1220;border:1px solid var(--bdr);font-weight:700;font-size:9px;white-space:nowrap}
+.hm-cell{border-radius:6px;padding:5px 2px;min-width:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.hm-v{font-size:13px;font-weight:800;line-height:1}
+.hm-ideal{font-size:7px;font-weight:600;opacity:.7;line-height:1}
+.hm-g{background:#10b98128;color:#10b981;border:1px solid #10b98144}
+.hm-y{background:#f5a00028;color:#f5a000;border:1px solid #f5a00044}
+.hm-r{background:#c8000a28;color:#ef4444;border:1px solid #ef444444}
+.hm-0{background:#ffffff08;color:#566480;border:1px solid #ffffff10}
+.hm-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:8px;color:var(--m)}
+.hm-leg-item{display:flex;align-items:center;gap:4px}
+.hm-leg-dot{width:10px;height:10px;border-radius:3px}
+.hm-fase-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--t);margin:14px 0 6px;border-left:3px solid var(--acc);padding-left:10px}
+.hm-slot-hdr{background:#060e1a;color:var(--b);border:1px solid var(--bdr)!important}
+.radar-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.radar-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:10px 12px}
+.radar-card h4{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.bar-chart{display:flex;flex-direction:column;gap:5px}
+.bc-row{display:flex;align-items:center;gap:6px}
+.bc-label{font-size:8px;color:var(--m);width:70px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-bar-wrap{flex:1;background:#182040;border-radius:3px;height:10px;overflow:hidden}
+.bc-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.bc-val{font-size:8px;font-weight:700;color:var(--t);width:18px;flex-shrink:0;text-align:right}
+
 /* PIN modal */
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .pin-btn{background:#0f1a2e;border:1px solid var(--bdr);color:var(--t);font-size:18px;font-weight:700;padding:14px;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;-webkit-user-select:none;user-select:none}
@@ -532,6 +561,12 @@ select:focus{outline:none;border-color:var(--acc)}
   <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
     <div class="sh"><h2>📊 Equidad del Fixture</h2><span class="tag green">Verificado</span></div>
     <div id="eq-content"></div>
+  </div>
+
+  <!-- MAPA DE EQUIDAD (HEATMAP) -->
+  <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="sh"><h2>🗺️ Mapas de Equidad</h2><span class="tag blue">Heatmap</span></div>
+    <div id="eq-mapa-content"></div>
   </div>
 
   <!-- DATOS + ACCIONES -->
@@ -805,7 +840,7 @@ function nav(id,el,isTop){
   if(id==='tabla')renderTabla();
   if(id==='goles')renderGoles();
   if(id==='llave')renderLlave();
-  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();}
+  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();}
   window.scrollTo(0,0);
 }
 
@@ -1514,7 +1549,7 @@ function enableAdminMode(){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById('sec-admin');if(sec)sec.classList.add('active');
   document.querySelectorAll('.bnav a,.tnav-in a').forEach(a=>a.classList.remove('active'));
-  buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();
+  buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();
   window.scrollTo(0,0);
   showToast('🔐 Admin activado');
 }
@@ -1649,6 +1684,290 @@ function renderEquidad(){
   html+='<div class="alert green"><span class="alert-ico">✅</span><div>'
     +'<div class="at">Fixture Verificado — Distribución Equitativa</div>'
     +'<div class="ab">Cada equipo juega exactamente 18 partidos (9 local · 9 visitante). La distribución de canchas, días y horarios es balanceada entre todos los equipos.</div>'
+    +'</div></div>';
+
+  el.innerHTML=html;
+}
+
+// ── MAPA DE EQUIDAD (HEATMAP) ─────────────────────────────────────────
+function renderEquidadMapa(){
+  const el=document.getElementById('eq-mapa-content');
+  if(!el)return;
+
+  // Define slot key → label for F1
+  const FESTIVOS_F1=['2026-07-20','2026-08-17','2026-10-12'];
+  function slotKeyF1(m){
+    const isFest=FESTIVOS_F1.includes(m.fecha)||(m.dia==='Lunes'&&['16:00','18:00','20:00'].includes(m.hora));
+    if(isFest){
+      if(m.hora==='16:00')return 'f16';
+      if(m.hora==='18:00')return 'f18';
+      if(m.hora==='20:00')return 'f20';
+    }
+    if(m.dia==='Lunes'&&m.hora==='19:00')return 'l19';
+    if(m.dia==='Lunes'&&m.hora==='21:00')return 'l21';
+    if(m.dia==='Jueves'&&m.hora==='19:00')return 'j19';
+    if(m.dia==='Jueves'&&m.hora==='21:00')return 'j21';
+    if(m.dia==='Sábado'&&m.cancha==='Coveadse')return 'sc';
+    if(m.dia==='Sábado'&&m.cancha==='Villa Silvania')return 'sv';
+    return 'otro';
+  }
+  const F1_SLOTS=[
+    {k:'l19',lbl:'Lun 19h'},
+    {k:'l21',lbl:'Lun 21h'},
+    {k:'j19',lbl:'Jue 19h'},
+    {k:'j21',lbl:'Jue 21h'},
+    {k:'sc',lbl:'Sáb COV'},
+    {k:'sv',lbl:'Sáb VIL'},
+    {k:'f16',lbl:'Fest 16h'},
+    {k:'f18',lbl:'Fest 18h'},
+    {k:'f20',lbl:'Fest 20h'}
+  ];
+
+  // F1 heatmap data
+  const f1Data={};
+  for(let i=1;i<=10;i++){f1Data[i]={}; F1_SLOTS.forEach(s=>{f1Data[i][s.k]=0;});}
+  MF1.forEach(m=>{
+    const sk=slotKeyF1(m);
+    [m.l,m.v].forEach(tid=>{if(f1Data[tid]&&f1Data[tid][sk]!==undefined)f1Data[tid][sk]++;});
+  });
+
+  // F2 slot key
+  const FESTIVOS_F2=['2026-11-16'];
+  function slotKeyF2(m){
+    const isFest=FESTIVOS_F2.includes(m.fecha);
+    if(m.dia==='Sábado'&&m.cancha==='Coveadse')return 'sc';
+    if(m.dia==='Sábado'&&m.cancha==='Villa Silvania')return 'sv';
+    if(isFest&&m.hora==='19:00')return 'fl19';
+    if(isFest&&m.hora==='21:00')return 'fl21';
+    if(m.dia==='Lunes'&&m.hora==='19:00')return 'l19';
+    if(m.dia==='Lunes'&&m.hora==='21:00')return 'l21';
+    if(m.dia==='Jueves'&&m.hora==='19:00')return 'j19';
+    if(m.dia==='Jueves'&&m.hora==='21:00')return 'j21';
+    return 'otro';
+  }
+  const F2_SLOTS=[
+    {k:'sc',lbl:'Sáb COV'},
+    {k:'sv',lbl:'Sáb VIL'},
+    {k:'l19',lbl:'Lun 19h'},
+    {k:'l21',lbl:'Lun 21h'},
+    {k:'j19',lbl:'Jue 19h'},
+    {k:'j21',lbl:'Jue 21h'},
+    {k:'fl19',lbl:'Fest 19h'},
+    {k:'fl21',lbl:'Fest 21h'}
+  ];
+
+  const f2Ms=genF2();
+  const f2TeamIds={};
+  const{A,B}=f2Groups();
+  [...A,...B].forEach(tid=>{if(tid)f2TeamIds[tid]=true;});
+  const allF2Teams=[...A,...B].filter(Boolean);
+  const f2Data={};
+  allF2Teams.forEach(tid=>{f2Data[tid]={};F2_SLOTS.forEach(s=>{f2Data[tid][s.k]=0;});});
+  f2Ms.forEach(m=>{
+    const sk=slotKeyF2(m);
+    [m.l,m.v].forEach(tid=>{if(tid&&f2Data[tid]&&f2Data[tid][sk]!==undefined)f2Data[tid][sk]++;});
+  });
+
+  // Compute ideal per slot = total appearances / numTeams
+  function slotTotals(data,slots,teams){
+    const tot={};
+    slots.forEach(s=>{tot[s.k]=0;teams.forEach(tid=>{tot[s.k]+=(data[tid]?data[tid][s.k]||0:0);});});
+    return tot;
+  }
+  function heatCell(v,ideal){
+    const diff=Math.abs(v-ideal);
+    const cls=v===0?'hm-0':diff<=0.6?'hm-g':diff<=1.2?'hm-y':'hm-r';
+    const idStr=ideal%1===0?ideal.toFixed(0):ideal.toFixed(1);
+    return '<div class="hm-cell '+cls+'"><div class="hm-v">'+v+'</div><div class="hm-ideal">~'+idStr+'</div></div>';
+  }
+  function buildHeatmap(slots,data,teams){
+    const tots=slotTotals(data,slots,teams);
+    const ideals={};
+    slots.forEach(s=>{ideals[s.k]=teams.length?tots[s.k]/teams.length:0;});
+    let h='<div class="hm-wrap"><table class="hm-table"><thead><tr><th class="team-col">Equipo</th>';
+    slots.forEach(s=>{h+='<th class="hm-slot-hdr">'+s.lbl+'</th>';});
+    h+='<th style="background:#0a1220;color:var(--m);border:1px solid var(--bdr);padding:5px 4px;font-size:8px">Total</th>';
+    h+='</tr></thead><tbody>';
+    teams.forEach(tid=>{
+      const d=data[tid]||{};
+      h+='<tr><td class="team-name"><div style="display:flex;align-items:center;gap:5px"><div style="width:16px;height:18px;flex-shrink:0">'+cSVG(tid)+'</div>'+tName(tid)+'</div></td>';
+      let rowTotal=0;
+      slots.forEach(s=>{const v=d[s.k]||0;rowTotal+=v;h+='<td>'+heatCell(v,ideals[s.k])+'</td>';});
+      h+='<td><div class="hm-cell" style="background:#ffffff08;border:1px solid #ffffff18"><div class="hm-v" style="color:var(--gold)">'+rowTotal+'</div></div></td>';
+      h+='</tr>';
+    });
+    h+='<tr style="background:#060e1a"><td class="team-name" style="color:var(--m);font-size:8px">IDEAL/EQ</td>';
+    slots.forEach(s=>{
+      const iv=ideals[s.k];
+      const iStr=iv%1===0?iv.toFixed(0):iv.toFixed(1);
+      h+='<td><div style="text-align:center;font-size:9px;font-weight:700;color:var(--b);padding:4px">'+iStr+'</div></td>';
+    });
+    h+='<td></td></tr>';
+    h+='</tbody></table></div>';
+    return h;
+  }
+
+  // Bar chart helper
+  function barChart(data,colors){
+    const maxV=Math.max(...data.map(d=>d.v),1);
+    let h='<div class="bar-chart">';
+    data.forEach((d,i)=>{
+      const pct=Math.round(d.v/maxV*100);
+      const col=colors?colors[i]:'#3b82f6';
+      h+='<div class="bc-row"><div class="bc-label">'+d.lbl+'</div><div class="bc-bar-wrap"><div class="bc-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div><div class="bc-val">'+d.v+'</div></div>';
+    });
+    h+='</div>';
+    return h;
+  }
+
+  const allTeams=[1,2,3,4,5,6,7,8,9,10];
+
+  // F1 per-team day distribution for radar cards
+  const f1ByDay={lun:{},jue:{},sab:{},fest:{}};
+  MF1.forEach(m=>{
+    const isFest=FESTIVOS_F1.includes(m.fecha)||(m.dia==='Lunes'&&['16:00','18:00','20:00'].includes(m.hora));
+    [m.l,m.v].forEach(tid=>{
+      if(isFest){f1ByDay.fest[tid]=(f1ByDay.fest[tid]||0)+1;}
+      else if(m.dia==='Lunes'){f1ByDay.lun[tid]=(f1ByDay.lun[tid]||0)+1;}
+      else if(m.dia==='Jueves'){f1ByDay.jue[tid]=(f1ByDay.jue[tid]||0)+1;}
+      else{f1ByDay.sab[tid]=(f1ByDay.sab[tid]||0)+1;}
+    });
+  });
+
+  // Venue distribution F1
+  const f1Cov={},f1Vil={};
+  MF1.forEach(m=>{
+    [m.l,m.v].forEach(tid=>{
+      if(m.cancha==='Coveadse')f1Cov[tid]=(f1Cov[tid]||0)+1;
+      else f1Vil[tid]=(f1Vil[tid]||0)+1;
+    });
+  });
+
+  // Local/visitante F1
+  const f1Loc={},f1Vis={};
+  MF1.forEach(m=>{
+    f1Loc[m.l]=(f1Loc[m.l]||0)+1;
+    f1Vis[m.v]=(f1Vis[m.v]||0)+1;
+  });
+
+  let html='';
+
+  // Legend
+  html+='<div class="hm-legend">'
+    +'<div class="hm-leg-item"><div class="hm-leg-dot" style="background:#10b98144;border:1px solid #10b98166"></div>Ideal (±0.6)</div>'
+    +'<div class="hm-leg-item"><div class="hm-leg-dot" style="background:#f5a00044;border:1px solid #f5a00066"></div>Leve desviación (±1.2)</div>'
+    +'<div class="hm-leg-item"><div class="hm-leg-dot" style="background:#c8000a44;border:1px solid #ef444466"></div>Alta desviación (&gt;1.2)</div>'
+    +'<div class="hm-leg-item"><div class="hm-leg-dot" style="background:#ffffff10;border:1px solid #ffffff18"></div>Sin partidos</div>'
+    +'</div>';
+
+  // F1 HEATMAP
+  html+='<div class="hm-fase-title">FASE 1 — Todos Contra Todos (90 partidos)</div>';
+  html+=buildHeatmap(F1_SLOTS,f1Data,allTeams);
+
+  // F1 RADAR CARDS
+  html+='<div class="eq-section-title">📊 Mapas Estadísticos — Fase 1</div>';
+  html+='<div class="radar-wrap">';
+
+  // Card 1: día distribución por equipo (total partidos lun/jue/sab/fest)
+  html+='<div class="radar-card"><h4>Días de juego por equipo (F1)</h4>';
+  const DAY_COLORS=['#60a5fa','#a78bfa','#34d399','#f5a000'];
+  const DAY_LABELS=['Lunes','Jueves','Sábado','Festivo'];
+  // Show stacked for team 1 as example? Actually show per-day totals across all teams
+  const dayTotF1=[
+    {lbl:'Lunes',v:Object.values(f1ByDay.lun).reduce((a,b)=>a+b,0)},
+    {lbl:'Jueves',v:Object.values(f1ByDay.jue).reduce((a,b)=>a+b,0)},
+    {lbl:'Sábado',v:Object.values(f1ByDay.sab).reduce((a,b)=>a+b,0)},
+    {lbl:'Festivo',v:Object.values(f1ByDay.fest).reduce((a,b)=>a+b,0)}
+  ];
+  html+=barChart(dayTotF1,DAY_COLORS)+'</div>';
+
+  // Card 2: cancha distribución F1
+  html+='<div class="radar-card"><h4>Canchas por equipo (F1)</h4>';
+  html+=barChart(
+    allTeams.map(tid=>({lbl:tName(tid).substring(0,10),v:(f1Cov[tid]||0)})),
+    allTeams.map(()=>'#3b82f6')
+  );
+  html+='<div style="font-size:7px;color:var(--m);margin-top:4px">Barras = partidos en Coveadse por equipo</div>';
+  html+='</div>';
+
+  // Card 3: local vs visitante F1
+  html+='<div class="radar-card"><h4>Local vs Visitante (F1)</h4>';
+  html+=barChart(
+    allTeams.map(tid=>({lbl:tName(tid).substring(0,10),v:(f1Loc[tid]||0)})),
+    allTeams.map(()=>'#10b981')
+  );
+  html+='<div style="font-size:7px;color:var(--m);margin-top:4px">Barras = partidos como local (ideal: 9 cada uno)</div>';
+  html+='</div>';
+
+  // Card 4: horario slot totales F1
+  const slotTotF1=slotTotals(f1Data,F1_SLOTS,allTeams);
+  html+='<div class="radar-card"><h4>Apariciones por horario (F1 total)</h4>';
+  html+=barChart(
+    F1_SLOTS.map(s=>({lbl:s.lbl,v:slotTotF1[s.k]})),
+    ['#60a5fa','#60a5fa','#a78bfa','#a78bfa','#34d399','#34d399','#f5a000','#f59e0b','#f97316']
+  )+'</div>';
+
+  html+='</div>'; // end radar-wrap F1
+
+  // F2 HEATMAP
+  html+='<div class="hm-fase-title">FASE 2 — Grupos (20 partidos)</div>';
+  html+='<div class="eq-section-title" style="font-size:12px;color:var(--m)">Grupo A — Equipos Pares</div>';
+  html+=buildHeatmap(F2_SLOTS,f2Data,A.filter(Boolean));
+  html+='<div class="eq-section-title" style="font-size:12px;color:var(--m)">Grupo B — Equipos Impares</div>';
+  html+=buildHeatmap(F2_SLOTS,f2Data,B.filter(Boolean));
+
+  // F2 RADAR CARDS
+  html+='<div class="eq-section-title">📊 Mapas Estadísticos — Fase 2</div>';
+  html+='<div class="radar-wrap">';
+
+  // F2 day distribution
+  const f2ByDay={sc:0,sv:0,l19:0,l21:0,j19:0,j21:0,fl19:0,fl21:0};
+  f2Ms.forEach(m=>{const k=slotKeyF2(m);if(f2ByDay[k]!==undefined)f2ByDay[k]+=2;});
+  html+='<div class="radar-card"><h4>Apariciones por slot (F2 total)</h4>';
+  html+=barChart(
+    F2_SLOTS.map(s=>({lbl:s.lbl,v:f2ByDay[s.k]||0})),
+    ['#34d399','#34d399','#60a5fa','#60a5fa','#a78bfa','#a78bfa','#f5a000','#f5a000']
+  )+'</div>';
+
+  // F2 descansa count per team
+  const f2Descansos={};
+  allF2Teams.forEach(tid=>{f2Descansos[tid]=0;});
+  f2Ms.forEach(m=>{if(m.bye)f2Descansos[m.bye]=(f2Descansos[m.bye]||0)+1;});
+  html+='<div class="radar-card"><h4>Descansos por equipo (F2)</h4>';
+  html+=barChart(
+    allF2Teams.filter(Boolean).map(tid=>({lbl:tName(tid).substring(0,10),v:f2Descansos[tid]||0})),
+    allF2Teams.filter(Boolean).map(()=>'#f5a000')
+  );
+  html+='<div style="font-size:7px;color:var(--m);margin-top:4px">Ideal: 1 descanso por equipo</div>';
+  html+='</div>';
+
+  // F2 local/visitante
+  const f2Loc={},f2Vis={};
+  f2Ms.forEach(m=>{if(m.l)f2Loc[m.l]=(f2Loc[m.l]||0)+1;if(m.v)f2Vis[m.v]=(f2Vis[m.v]||0)+1;});
+  html+='<div class="radar-card"><h4>Local vs Visitante (F2)</h4>';
+  html+=barChart(
+    allF2Teams.filter(Boolean).map(tid=>({lbl:tName(tid).substring(0,10),v:f2Loc[tid]||0})),
+    allF2Teams.filter(Boolean).map(()=>'#10b981')
+  );
+  html+='<div style="font-size:7px;color:var(--m);margin-top:4px">Barras = partidos como local (ideal: 2 c/u)</div>';
+  html+='</div>';
+
+  // Combined venue (F1+F2)
+  const combCov={},combVil={};
+  allTeams.forEach(tid=>{combCov[tid]=(f1Cov[tid]||0)+(f2Data[tid]?[...F2_SLOTS].filter(s=>s.k==='sc').reduce((a,s)=>a+(f2Data[tid][s.k]||0),0):0);});
+  allTeams.forEach(tid=>{combVil[tid]=(f1Vil[tid]||0)+(f2Data[tid]?[...F2_SLOTS].filter(s=>s.k==='sv').reduce((a,s)=>a+(f2Data[tid][s.k]||0),0):0);});
+  html+='<div class="radar-card"><h4>Coveadse total (F1+F2)</h4>';
+  html+=barChart(
+    allTeams.map(tid=>({lbl:tName(tid).substring(0,10),v:combCov[tid]||0})),
+    allTeams.map(()=>'#3b82f6')
+  )+'</div>';
+
+  html+='</div>'; // end radar-wrap F2
+
+  // Summary alert
+  html+='<div class="alert green"><span class="alert-ico">🗺️</span><div>'
+    +'<div class="at">Análisis de Equidad Completo</div>'
+    +'<div class="ab">Las celdas verdes indican distribución ideal (±0.6 del promedio). F1: 90 partidos, 18 por equipo. F2: 20 partidos, 4 por equipo (1 descanso). El fixture está diseñado para maximizar la equidad en canchas, horarios y roles.</div>'
     +'</div></div>';
 
   el.innerHTML=html;
