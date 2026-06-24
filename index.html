@@ -982,7 +982,7 @@ function assignDel(di){
   const assigned=new Set(Object.values(s.nm).filter(v=>v!=null));
   const freeT=TEAMS.map((_,i)=>i).filter(i=>!assigned.has(i));
   const freeS=[];for(let i=1;i<=10;i++)if(s.nm[i]==null)freeS.push(i);
-  if(!freeS.length||!freeT.length){alert('Todos asignados.');return;}
+  if(!freeS.length||!freeT.length){showToast('Todos los equipos ya están asignados');return;}
   const ri=freeT[Math.floor(Math.random()*freeT.length)];
   s.nm[freeS[0]]=ri;setS(s);buildSlotBoard();buildDelGrid();populateTeamFilter();
 }
@@ -1088,7 +1088,8 @@ function handlePinDigit(n){
     const s=getS();
     if(pinVal===s.pin){
       document.getElementById('mo-pin').classList.remove('open');
-      enableAdminMode();
+      pinVal='';
+      setTimeout(()=>enableAdminMode(),120);
     } else {
       const d=document.getElementById('pin-display');
       d.textContent='✕ ✕ ✕ ✕';d.classList.add('error');
@@ -1103,9 +1104,19 @@ function handleNewPinDigit(n){
   if(pinVal.length===4){
     const s=getS();s.pin=pinVal;setS(s);
     document.getElementById('mo-chpin').classList.remove('open');
-    pinVal='';
-    alert('✅ PIN actualizado a: '+s.pin+'. Guárdelo en un lugar seguro.');
+    const savedPin=pinVal;pinVal='';
+    showToast('🔑 PIN cambiado a: '+savedPin);
   }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────
+function showToast(msg){
+  let t=document.getElementById('toast-el');
+  if(!t){t=document.createElement('div');t.id='toast-el';
+    t.style.cssText='position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%);background:#10b981;color:#fff;font-size:11px;font-weight:700;padding:10px 18px;border-radius:100px;z-index:999;white-space:nowrap;box-shadow:0 4px 20px #00000066;transition:opacity .3s';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';},2800);
 }
 
 // ── ADMIN MODE ────────────────────────────────────────────────────────
@@ -1113,8 +1124,13 @@ function enableAdminMode(){
   adminMode=true;
   const badge=document.getElementById('admin-badge');if(badge)badge.style.display='flex';
   const at=document.getElementById('tnav-admin');if(at)at.style.display='inline';
-  renderFixture();renderInicio();
-  alert('✅ Modo Admin activado. Solo usted puede ver y editar esta sección.');
+  // Navigate to admin section automatically
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  const sec=document.getElementById('sec-admin');if(sec)sec.classList.add('active');
+  document.querySelectorAll('.bnav a,.tnav-in a').forEach(a=>a.classList.remove('active'));
+  buildSlotBoard();buildDelGrid();renderEquidad();
+  window.scrollTo(0,0);
+  showToast('🔐 Admin activado');
 }
 function exitAdmin(){
   adminMode=false;
@@ -1132,13 +1148,13 @@ function importS(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
   inp.onchange=e=>{
     const fr=new FileReader();
-    fr.onload=ev=>{try{setS(JSON.parse(ev.target.result));buildSlotBoard();buildDelGrid();populateTeamFilter();renderInicio();alert('✅ Datos importados');}catch(err){alert('❌ Error: '+err.message);}};
+    fr.onload=ev=>{try{setS(JSON.parse(ev.target.result));buildSlotBoard();buildDelGrid();populateTeamFilter();renderInicio();showToast('✅ Datos importados');}catch(err){showToast('❌ Error: '+err.message);}};
     fr.readAsText(e.target.files[0]);
   };inp.click();
 }
 function clearAll(){
   if(!confirm('¿Borrar TODOS los datos? Esto no se puede deshacer.'))return;
-  setS(dfS());buildSlotBoard();buildDelGrid();populateTeamFilter();renderInicio();alert('✅ Datos borrados');
+  setS(dfS());buildSlotBoard();buildDelGrid();populateTeamFilter();renderInicio();showToast('✅ Datos borrados');
 }
 
 // ── EQUIDAD ───────────────────────────────────────────────────────────
