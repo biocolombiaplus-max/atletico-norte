@@ -822,6 +822,8 @@ function getScorers(){
 
 // ── DATE HELPERS ──────────────────────────────────────────────────────
 function fmtD(d){const[y,m,day]=d.split('-');const ms=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return day+' '+ms[+m-1]+' '+y;}
+function fmtDFull(d,dia){const[,m,day]=d.split('-');const ms=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];const dias={Lunes:'Lunes',Martes:'Martes',Miércoles:'Miércoles',Jueves:'Jueves','Viernes':'Viernes','Sábado':'Sábado','Domingo':'Domingo'};return (dias[dia]||dia)+' '+parseInt(day)+' de '+ms[+m-1];}
+function fmtDShort(d,dia){const[,m,day]=d.split('-');const ms=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];const abr={Lunes:'Lun',Martes:'Mar',Miércoles:'Mié',Jueves:'Jue','Sábado':'Sáb','Domingo':'Dom'};return (abr[dia]||dia.substring(0,3))+' '+parseInt(day)+' '+ms[+m-1];}
 function diaC(dia){if(dia==='Lunes')return 'dc-lun';if(dia==='Jueves')return 'dc-jue';if(dia==='Sábado')return 'dc-sab';return 'dc-fest';}
 function diaL(dia,hora){if(dia==='Lunes'&&['14:00','16:00','18:00','20:00'].includes(hora))return 'Festivo';return dia;}
 
@@ -978,7 +980,7 @@ function renderFixture(){
         const anyDone=rnd.ms.some(m=>s2.r2[m.id]!=null);
         const dot=allDone?'var(--g)':anyDone?'var(--gold)':'var(--bdr)';
         // Get dates for this round
-        const dates=rnd.ms.map(m=>m.fecha?fmtD(m.fecha)+' '+m.hora:'').filter(Boolean).join(' · ');
+        const dates=rnd.ms.map(m=>m.fecha?fmtDShort(m.fecha,m.dia)+' '+m.hora+' · '+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.'):'').filter(Boolean).join('  |  ');
         let rows='';
         // Bye strip
         rows+='<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:#ff980010;border-bottom:1px solid var(--bdr)">'
@@ -995,8 +997,8 @@ function renderFixture(){
             +'<div class="mc">'
             +'<div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'--:--')+'</div>'
             +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
-            +'<div style="font-size:7px;color:var(--m)">'+(m.fecha?fmtD(m.fecha):'')+'</div>'
-            +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div>'
+            +'<div style="font-size:7px;color:var(--m)">'+(m.fecha?fmtDShort(m.fecha,m.dia):'')+'</div>'
+            +'<div style="font-size:7px;color:var(--b);font-weight:700">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div>'
             +'</div>'
             +'<div class="tside right"><div><div class="tname">'+(m.v?tShort(m.v):'?')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
             +'</div>';
@@ -1065,7 +1067,7 @@ function renderFixture(){
         rows+='</div>';
       }
     });
-    html+='<div class="jcard"><div class="jhead"><div class="jdate">📅 '+fmtD(fecha)+'</div>'
+    html+='<div class="jcard"><div class="jhead"><div class="jdate">📅 '+fmtDFull(fecha,gms[0].dia)+'</div>'
       +'<div class="jmeta"><span class="dc '+diaC(dia)+'">'+dlbl+'</span><span style="font-size:7px;color:var(--m)">V'+gms[0].vu+'</span>'
       +(adminMode?'<span style="font-size:7px;color:var(--acc);margin-left:4px">✏️</span>':'')+'</div></div>'
       +rows+'</div>';
