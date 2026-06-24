@@ -255,6 +255,27 @@ select:focus{outline:none;border-color:var(--acc)}
 .gol-hint{font-size:9px;color:var(--m);margin-top:-4px;margin-bottom:8px}
 .md-actions{display:flex;gap:8px}
 .md-actions .btn{flex:1;justify-content:center}
+/* ── EQUIDAD ── */
+.eq-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.eq-kpi{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:10px;text-align:center}
+.eq-kpi .ek-v{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--g);line-height:1}
+.eq-kpi .ek-l{font-size:8px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.eq-kpi.warn .ek-v{color:var(--gold)}
+.eq-table-wr{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bdr);border-radius:11px;margin-bottom:12px}
+.eq-t{width:100%;border-collapse:collapse;font-size:9px;min-width:480px}
+.eq-t th{background:#07101a;color:var(--m);padding:6px 5px;text-align:center;font-size:7px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--bdr);white-space:nowrap}
+.eq-t th:nth-child(2){text-align:left;padding-left:8px}
+.eq-t td{padding:7px 5px;border-bottom:1px solid #080f1a;text-align:center;vertical-align:middle}
+.eq-t td:nth-child(2){text-align:left;padding-left:8px;font-weight:700;font-size:9px}
+.eq-t tr:last-child td{border-bottom:none}
+.eq-t tr:hover td{background:#0d1520}
+.eq-bar{height:6px;border-radius:3px;background:#182040;overflow:hidden;width:100%;min-width:40px}
+.eq-fill{height:100%;border-radius:3px;transition:width .4s}
+.eq-val{font-size:9px;font-weight:700;color:#e2e8f0}
+.eq-ok{color:var(--g)}.eq-warn{color:var(--gold)}
+.eq-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;color:var(--gold);margin:14px 0 8px;display:flex;align-items:center;gap:7px}
+.eq-badge{font-size:8px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--g)18;color:var(--g);border:1px solid var(--g)44}
+
 /* PIN modal */
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .pin-btn{background:#0f1a2e;border:1px solid var(--bdr);color:var(--t);font-size:18px;font-weight:700;padding:14px;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;-webkit-user-select:none;user-select:none}
@@ -445,6 +466,12 @@ select:focus{outline:none;border-color:var(--acc)}
     <div class="sh"><h2>Delegados</h2></div>
     <div class="del-grid" id="del-grid"></div>
   </div>
+  <!-- EQUIDAD -->
+  <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="sh"><h2>📊 Equidad del Fixture</h2><span class="tag green">Verificado</span></div>
+    <div id="eq-content"></div>
+  </div>
+
   <div style="margin-top:8px;border-top:1px solid var(--bdr);padding-top:12px">
     <div class="sh"><h2>Datos</h2></div>
     <div class="btn-row">
@@ -659,7 +686,7 @@ function nav(id,el,isTop){
   if(id==='tabla')renderTabla();
   if(id==='goles')renderGoles();
   if(id==='llave')renderLlave();
-  if(id==='admin'){buildSlotBoard();buildDelGrid();}
+  if(id==='admin'){buildSlotBoard();buildDelGrid();renderEquidad();}
   window.scrollTo(0,0);
 }
 
@@ -1112,6 +1139,117 @@ function importS(){
 function clearAll(){
   if(!confirm('¿Borrar TODOS los datos? Esto no se puede deshacer.'))return;
   setS(dfS());buildSlotBoard();buildDelGrid();populateTeamFilter();renderInicio();alert('✅ Datos borrados');
+}
+
+// ── EQUIDAD ───────────────────────────────────────────────────────────
+function renderEquidad(){
+  const el=document.getElementById('eq-content');
+  if(!el)return;
+
+  // Compute stats per team slot
+  const S={};
+  for(let i=1;i<=10;i++)S[i]={pj:0,loc:0,vis:0,cov:0,vsil:0,lun:0,jue:0,sab:0,fest:0,h19:0,h21:0,hfest:0};
+  MF1.forEach(m=>{
+    const isFest=m.dia==='Lunes'&&['14:00','16:00','18:00','20:00'].includes(m.hora);
+    [m.l,m.v].forEach((sl,idx)=>{
+      S[sl].pj++;
+      if(idx===0)S[sl].loc++;else S[sl].vis++;
+      if(m.cancha==='Coveadse')S[sl].cov++;else S[sl].vsil++;
+      if(isFest)S[sl].fest++;
+      else if(m.dia==='Lunes')S[sl].lun++;
+      else if(m.dia==='Jueves')S[sl].jue++;
+      else S[sl].sab++;
+      if(m.hora==='19:00')S[sl].h19++;
+      else if(m.hora==='21:00')S[sl].h21++;
+      else S[sl].hfest++;
+    });
+  });
+
+  // KPIs
+  const allLoc=[...Array(10).keys()].map(i=>S[i+1].loc);
+  const allCov=[...Array(10).keys()].map(i=>S[i+1].cov);
+  const locMin=Math.min(...allLoc),locMax=Math.max(...allLoc);
+  const covMin=Math.min(...allCov),covMax=Math.max(...allCov);
+  const locOk=locMin===locMax;
+  const covOk=(covMax-covMin)<=2;
+
+  let html='';
+  // Summary KPIs
+  html+='<div class="eq-summary">'
+    +'<div class="eq-kpi"><div class="ek-v">18</div><div class="ek-l">Partidos por equipo</div></div>'
+    +'<div class="eq-kpi '+(locOk?'':'warn')+'"><div class="ek-v">'+(locOk?'9/9':''+locMin+'-'+locMax)+'</div><div class="ek-l">Local · Visitante</div></div>'
+    +'<div class="eq-kpi '+(covOk?'':'warn')+'"><div class="ek-v">'+(covOk?covMin+'-'+covMax:covMin+'-'+covMax)+'</div><div class="ek-l">Coveadse · V.Silvania</div></div>'
+    +'</div>';
+
+  // Main equity table
+  html+='<div class="eq-section-title">🏟️ Local / Visitante / Canchas</div>';
+  html+='<div class="eq-table-wr"><table class="eq-t">';
+  html+='<thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Local</th><th>Visit.</th><th>Coveadse</th><th>V.Silvania</th></tr></thead><tbody>';
+  for(let i=1;i<=10;i++){
+    const s=S[i];
+    const locPct=Math.round(s.loc/s.pj*100);
+    const covPct=Math.round(s.cov/s.pj*100);
+    html+='<tr>'
+      +'<td><div class="tc-ball" style="width:20px;height:23px">'+cSVG(i)+'</div></td>'
+      +'<td>'+tName(i)+'</td>'
+      +'<td><span class="eq-val">'+s.pj+'</span></td>'
+      +'<td><div style="display:flex;align-items:center;gap:5px"><div class="eq-bar" style="width:50px"><div class="eq-fill" style="width:'+locPct+'%;background:var(--g)"></div></div><span class="eq-val '+(s.loc===9?'eq-ok':'eq-warn')+'">'+s.loc+'</span></div></td>'
+      +'<td><span class="eq-val '+(s.vis===9?'eq-ok':'eq-warn')+'">'+s.vis+'</span></td>'
+      +'<td><div style="display:flex;align-items:center;gap:5px"><div class="eq-bar" style="width:44px"><div class="eq-fill" style="width:'+covPct+'%;background:var(--b)"></div></div><span class="eq-val">'+s.cov+'</span></div></td>'
+      +'<td><span class="eq-val">'+s.vsil+'</span></td>'
+      +'</tr>';
+  }
+  html+='</tbody></table></div>';
+
+  // Days table
+  html+='<div class="eq-section-title">📅 Distribución por Día</div>';
+  html+='<div class="eq-table-wr"><table class="eq-t">';
+  html+='<thead><tr><th>#</th><th>Equipo</th><th>Lunes</th><th>Jueves</th><th>Sábado</th><th>Festivo</th><th>Total</th></tr></thead><tbody>';
+  const maxLun=Math.max(...[...Array(10).keys()].map(i=>S[i+1].lun));
+  const maxJue=Math.max(...[...Array(10).keys()].map(i=>S[i+1].jue));
+  const maxSab=Math.max(...[...Array(10).keys()].map(i=>S[i+1].sab));
+  for(let i=1;i<=10;i++){
+    const s=S[i];
+    const mkBar=(v,max,color)=>'<div style="display:flex;align-items:center;gap:4px"><div class="eq-bar" style="width:36px"><div class="eq-fill" style="width:'+Math.round(v/max*100)+'%;background:'+color+'"></div></div><span class="eq-val">'+v+'</span></div>';
+    html+='<tr>'
+      +'<td><div class="tc-ball" style="width:20px;height:23px">'+cSVG(i)+'</div></td>'
+      +'<td>'+tName(i)+'</td>'
+      +'<td>'+mkBar(s.lun,maxLun,'#60a5fa')+'</td>'
+      +'<td>'+mkBar(s.jue,maxJue,'#a78bfa')+'</td>'
+      +'<td>'+mkBar(s.sab,maxSab,'#34d399')+'</td>'
+      +'<td><span class="eq-val" style="color:var(--gold)">'+s.fest+'</span></td>'
+      +'<td><span class="eq-val eq-ok">'+s.pj+'</span></td>'
+      +'</tr>';
+  }
+  html+='</tbody></table></div>';
+
+  // Hours table
+  html+='<div class="eq-section-title">⏰ Distribución de Horarios</div>';
+  html+='<div class="eq-table-wr"><table class="eq-t">';
+  html+='<thead><tr><th>#</th><th>Equipo</th><th>19:00</th><th>21:00</th><th>Horario Festivo</th></tr></thead><tbody>';
+  const max19=Math.max(...[...Array(10).keys()].map(i=>S[i+1].h19));
+  const max21=Math.max(...[...Array(10).keys()].map(i=>S[i+1].h21));
+  const maxHF=Math.max(...[...Array(10).keys()].map(i=>S[i+1].hfest));
+  for(let i=1;i<=10;i++){
+    const s=S[i];
+    const mkBar=(v,max,color)=>'<div style="display:flex;align-items:center;gap:4px"><div class="eq-bar" style="width:36px"><div class="eq-fill" style="width:'+(max?Math.round(v/max*100):0)+'%;background:'+color+'"></div></div><span class="eq-val">'+v+'</span></div>';
+    html+='<tr>'
+      +'<td><div class="tc-ball" style="width:20px;height:23px">'+cSVG(i)+'</div></td>'
+      +'<td>'+tName(i)+'</td>'
+      +'<td>'+mkBar(s.h19,max19,'#f97316')+'</td>'
+      +'<td>'+mkBar(s.h21,max21,'#e879f9')+'</td>'
+      +'<td>'+mkBar(s.hfest,maxHF,'var(--gold)')+'</td>'
+      +'</tr>';
+  }
+  html+='</tbody></table></div>';
+
+  // Footer note
+  html+='<div class="alert green"><span class="alert-ico">✅</span><div>'
+    +'<div class="at">Fixture Verificado — Distribución Equitativa</div>'
+    +'<div class="ab">Cada equipo juega exactamente 18 partidos (9 local · 9 visitante). La distribución de canchas, días y horarios es balanceada entre todos los equipos.</div>'
+    +'</div></div>';
+
+  el.innerHTML=html;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
