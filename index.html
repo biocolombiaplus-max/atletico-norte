@@ -654,7 +654,7 @@ const F2_DATES=[
   {fecha:'2026-11-09',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
   {fecha:'2026-11-12',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
   {fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  {fecha:'2026-11-17',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  {fecha:'2026-11-16',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
   {fecha:'2026-10-24',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
   {fecha:'2026-10-26',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
   {fecha:'2026-10-29',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
@@ -664,7 +664,7 @@ const F2_DATES=[
   {fecha:'2026-11-09',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
   {fecha:'2026-11-12',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
   {fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
-  {fecha:'2026-11-17',dia:'Lunes',hora:'21:00',cancha:'Coveadse'}
+  {fecha:'2026-11-16',dia:'Lunes',hora:'21:00',cancha:'Coveadse'}
 ];
 // 5-team round-robin: [bye_index, [[pair1_i,pair1_j],[pair2_i,pair2_j]]]
 const RR5=[[0,[[1,4],[2,3]]],[1,[[0,2],[3,4]]],[2,[[1,3],[0,4]]],[3,[[2,4],[0,1]]],[4,[[0,3],[1,2]]]];
@@ -1252,14 +1252,14 @@ function renderCalendar(){
     ['Ronda 2 — Descansa: Pos. 3°','2026-10-29','19:00 Jue + 31/Oct 06:00 Sáb','V.Silv / Cov'],
     ['Ronda 3 — Descansa: Pos. 5°','2026-11-05','19:00 Jue + 7/Nov 06:00 Sáb','V.Silv / Cov'],
     ['Ronda 4 — Descansa: Pos. 7°','2026-11-09','19:00 Lun + 12/Nov 19:00 Jue','Cov / V.Silv'],
-    ['Ronda 5 — Descansa: Pos. 9°','2026-11-14','06:00 Sáb + 17/Nov 19:00 Lun','Cov / Cov']
+    ['Ronda 5 — Descansa: Pos. 9°','2026-11-14','06:00 Sáb + 16/Nov 19:00 Lun (Fest)','Cov / Cov']
   ];
   const f2calB=[
     ['Ronda 1 — Descansa: Pos. 2°','2026-10-24','06:00 Sáb + 26/Oct 21:00 Lun','V.Silv / Cov'],
     ['Ronda 2 — Descansa: Pos. 4°','2026-10-29','21:00 Jue + 31/Oct 06:00 Sáb','V.Silv / V.Silv'],
     ['Ronda 3 — Descansa: Pos. 6°','2026-11-05','21:00 Jue + 7/Nov 06:00 Sáb','V.Silv / V.Silv'],
     ['Ronda 4 — Descansa: Pos. 8°','2026-11-09','21:00 Lun + 12/Nov 21:00 Jue','Cov / V.Silv'],
-    ['Ronda 5 — Descansa: Pos. 10°','2026-11-14','06:00 Sáb + 17/Nov 21:00 Lun','V.Silv / Cov']
+    ['Ronda 5 — Descansa: Pos. 10°','2026-11-14','06:00 Sáb + 16/Nov 21:00 Lun (Fest)','V.Silv / Cov']
   ];
   html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2 · Grupo Impares</h4><span class="tag gold">Pos 1°3°5°7°9°</span></div>';
   f2calA.forEach(([l,f,h,c])=>{html+=fixedRow(l,'var(--gold)',f,h,c);});
@@ -1276,7 +1276,7 @@ function renderCalendar(){
     +fixedRow('Semifinal 2','var(--acc)','2026-11-23','21:00','Coveadse','')
     +fixedRow('Gran Final','var(--gold)','2026-11-26','19:00','V. Silvania','')
     +'</div>';
-  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Sin partidos a las 2pm en festivos</div><div class="ab">F1 termina Oct 22 · F2: Oct 24 – Nov 17 · QF: Nov 19–21 · SF: Nov 23 · Final: Nov 26</div></div></div>';
+  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Sin partidos a las 2pm en festivos</div><div class="ab">F1 termina Oct 22 · F2: Oct 24 – Nov 16 · QF: Nov 19–21 · SF: Nov 23 · Final: Nov 26</div></div></div>';
   el.innerHTML=html;
 }
 
