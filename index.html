@@ -680,25 +680,27 @@ const DELS=[
 ];
 
 const F2_DATES=[
+  // Grupo A (Impares) — ids 0-9: 5×COV + 5×VIL, 3×19h + 3×21h + 4×06h
   {fecha:'2026-10-24',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  {fecha:'2026-10-26',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
-  {fecha:'2026-10-29',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
-  {fecha:'2026-10-31',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  {fecha:'2026-11-05',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
-  {fecha:'2026-11-07',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  {fecha:'2026-11-09',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
-  {fecha:'2026-11-12',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
-  {fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  {fecha:'2026-11-16',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
-  {fecha:'2026-10-24',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
   {fecha:'2026-10-26',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
   {fecha:'2026-10-29',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
   {fecha:'2026-10-31',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-05',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-07',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
+  {fecha:'2026-11-09',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  {fecha:'2026-11-12',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-16',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  // Grupo B (Pares) — ids 10-19: 5×COV + 5×VIL, 3×19h + 3×21h + 4×06h
+  {fecha:'2026-10-24',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-26',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  {fecha:'2026-10-29',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-31',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
   {fecha:'2026-11-05',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
   {fecha:'2026-11-07',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
   {fecha:'2026-11-09',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
-  {fecha:'2026-11-12',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
-  {fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-12',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
   {fecha:'2026-11-16',dia:'Lunes',hora:'21:00',cancha:'Coveadse'}
 ];
 // 5-team round-robin: [bye_index, [[pair1_i,pair1_j],[pair2_i,pair2_j]]]
@@ -1911,9 +1913,9 @@ function renderEquidadMapa(){
 
   // F2 HEATMAP
   html+='<div class="hm-fase-title">FASE 2 — Grupos (20 partidos)</div>';
-  html+='<div class="eq-section-title" style="font-size:12px;color:var(--m)">Grupo A — Equipos Pares</div>';
+  html+='<div class="eq-section-title" style="font-size:12px;color:var(--gold)">Grupo Impares — Pos 1°·3°·5°·7°·9°</div>';
   html+=buildHeatmap(F2_SLOTS,f2Data,A.filter(Boolean));
-  html+='<div class="eq-section-title" style="font-size:12px;color:var(--m)">Grupo B — Equipos Impares</div>';
+  html+='<div class="eq-section-title" style="font-size:12px;color:var(--b)">Grupo Pares — Pos 2°·4°·6°·8°·10°</div>';
   html+=buildHeatmap(F2_SLOTS,f2Data,B.filter(Boolean));
 
   // F2 RADAR CARDS
