@@ -907,9 +907,11 @@ function renderFixture(){
 
   if(fase==='f2'){
     const f2ms=genF2();
-    const done2=f2ms.filter(m=>s.r2[m.id]!=null).length;
+    const s2=getS();
+    const done2=f2ms.filter(m=>s2.r2[m.id]!=null).length;
     const pct=Math.round(done2/20*100);
     progEl.innerHTML='<div class="prog-bar"><div class="prog-label"><span>Progreso Fase 2</span><span style="color:var(--gold)">'+done2+'/20 · '+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
+
     // Group by (group, round)
     const byRound={};
     f2ms.forEach(m=>{
@@ -917,44 +919,69 @@ function renderFixture(){
       if(!byRound[k])byRound[k]={group:m.group,round:m.round,bye:m.bye,ms:[]};
       byRound[k].ms.push(m);
     });
-    let html='';
-    const grpOrder={'A':0,'B':1};
-    Object.keys(byRound).sort((a,b)=>{
-      const ga=a.split('|'),gb=b.split('|');
-      return (grpOrder[ga[0]]||0)-(grpOrder[gb[0]]||0)||(+ga[1])-(+gb[1]);
-    }).forEach(k=>{
-      const rnd=byRound[k];
-      const gLabel=rnd.group==='A'?'Grupo Impares':'Grupo Pares';
-      const byeSlot=rnd.bye;
-      const allDone=rnd.ms.every(m=>s.r2[m.id]!=null);
-      const anyDone=rnd.ms.some(m=>s.r2[m.id]!=null);
-      const statusDot=allDone?'var(--g)':anyDone?'var(--gold)':'var(--bdr)';
-      let rows='';
-      // Bye banner
-      rows+='<div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bdr);border-bottom:1px solid var(--bdr)">'
-        +'<div style="width:20px;height:22px;flex-shrink:0;opacity:.55">'+cSVG(byeSlot)+'</div>'
-        +'<span style="font-size:9px;color:var(--m);font-weight:700">🛌 DESCANSA esta ronda: '+(byeSlot?tName(byeSlot):'Por definir')+'</span></div>';
-      rnd.ms.forEach(m=>{
-        const r=s.r2[m.id];
-        const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
-        const lOk=m.l&&m.v;
-        const click=adminMode&&lOk?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
-        rows+='<div class="'+click+'">'
-          +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+(m.l?tShort(m.l):'Por def.')+'</div><div class="trole">Local</div></div></div>'
-          +'<div class="mc"><div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'')+'</div>'
-          +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
-          +'<div style="font-size:7px;color:var(--m)">'+(m.fecha?fmtD(m.fecha):'')+'</div>'
-          +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div></div>'
-          +'<div class="tside right"><div><div class="tname">'+(m.v?tShort(m.v):'Por def.')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
+
+    // Split into group A and B keys in order
+    const keysA=[],keysB=[];
+    for(let r=1;r<=5;r++){keysA.push('A|'+r);keysB.push('B|'+r);}
+
+    function renderGroup(keys,gLabel,gColor,gIcon,posLabel){
+      const grpMs=keys.map(k=>byRound[k]).filter(Boolean);
+      const totalDone=grpMs.reduce((a,rnd)=>a+rnd.ms.filter(m=>s2.r2[m.id]!=null).length,0);
+      let out='';
+      // Group header
+      out+='<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:'+gColor+'18;border-radius:10px;margin-bottom:8px;border:1px solid '+gColor+'44">'
+        +'<div style="font-size:20px">'+gIcon+'</div>'
+        +'<div style="flex:1"><div style="font-size:12px;font-weight:900;color:'+gColor+'">'+gLabel+'</div>'
+        +'<div style="font-size:9px;color:var(--m)">'+posLabel+' · 5 equipos · 10 partidos · 4 por equipo</div></div>'
+        +'<div style="text-align:right"><div style="font-size:11px;font-weight:900;color:'+gColor+'">'+totalDone+'/10</div><div style="font-size:8px;color:var(--m)">jugados</div></div>'
+        +'</div>';
+      grpMs.forEach(rnd=>{
+        const byeSlot=rnd.bye;
+        const allDone=rnd.ms.every(m=>s2.r2[m.id]!=null);
+        const anyDone=rnd.ms.some(m=>s2.r2[m.id]!=null);
+        const dot=allDone?'var(--g)':anyDone?'var(--gold)':'var(--bdr)';
+        // Get dates for this round
+        const dates=rnd.ms.map(m=>m.fecha?fmtD(m.fecha)+' '+m.hora:'').filter(Boolean).join(' · ');
+        let rows='';
+        // Bye strip
+        rows+='<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:#ff980010;border-bottom:1px solid var(--bdr)">'
+          +'<div style="width:24px;height:26px;flex-shrink:0;opacity:.6">'+cSVG(byeSlot)+'</div>'
+          +'<div><div style="font-size:9px;font-weight:900;color:#ff9800">🛌 DESCANSA</div>'
+          +'<div style="font-size:10px;color:var(--t);font-weight:700">'+(byeSlot?tName(byeSlot):'Por definir según tabla')+'</div></div>'
           +'</div>';
+        rnd.ms.forEach(m=>{
+          const r=s2.r2[m.id];
+          const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
+          const click=adminMode&&m.l&&m.v?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
+          rows+='<div class="'+click+'">'
+            +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+(m.l?tShort(m.l):'?')+'</div><div class="trole">Local</div></div></div>'
+            +'<div class="mc">'
+            +'<div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'--:--')+'</div>'
+            +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
+            +'<div style="font-size:7px;color:var(--m)">'+(m.fecha?fmtD(m.fecha):'')+'</div>'
+            +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div>'
+            +'</div>'
+            +'<div class="tside right"><div><div class="tname">'+(m.v?tShort(m.v):'?')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
+            +'</div>';
+        });
+        out+='<div class="jcard" style="margin-bottom:8px"><div class="jhead">'
+          +'<div class="jdate" style="font-size:10px">Jornada '+rnd.round+' de 5 · '+gLabel+'</div>'
+          +'<div class="jmeta">'
+          +'<span class="sdot" style="background:'+dot+'"></span>'
+          +(adminMode?'<span style="font-size:7px;color:var(--acc)">✏️</span>':'')
+          +'</div></div>'
+          +(dates?'<div style="font-size:8px;color:var(--m);padding:4px 12px;border-bottom:1px solid var(--bdr)">📅 '+dates+'</div>':'')
+          +rows+'</div>';
       });
-      html+='<div class="jcard"><div class="jhead">'
-        +'<div class="jdate">'+gLabel+' · Ronda '+rnd.round+'/5</div>'
-        +'<div class="jmeta"><span class="sdot" style="background:'+statusDot+'"></span>'
-        +(adminMode?'<span style="font-size:7px;color:var(--acc)">✏️</span>':'')+'</div></div>'
-        +rows+'</div>';
-    });
-    grid.innerHTML=html||'<div style="text-align:center;padding:30px;color:var(--m);font-size:11px">Sin partidos para mostrar</div>';
+      return out;
+    }
+
+    let html='';
+    html+=renderGroup(keysA,'Grupo Impares','#f5a000','⚽','Pos. 1° · 3° · 5° · 7° · 9°');
+    html+='<div style="height:16px"></div>';
+    html+=renderGroup(keysB,'Grupo Pares','#4fc3f7','🔵','Pos. 2° · 4° · 6° · 8° · 10°');
+    html+='<div class="alert blue" style="margin-top:12px"><span class="alert-ico">📊</span><div><div class="at">Los puntos de F2 suman a la tabla general</div><div class="ab">Al final de la Fase 2, los 2 equipos con menos puntos quedan eliminados. Los 8 restantes avanzan a Cuartos de Final.</div></div></div>';
+    grid.innerHTML=html;
     return;
   }
 
