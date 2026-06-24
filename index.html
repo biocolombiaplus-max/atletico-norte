@@ -430,7 +430,7 @@ select:focus{outline:none;border-color:var(--acc)}
   <div class="sh"><h2>Fixture</h2><span class="tag blue" id="fix-tag">Fase 1 · 2 Vueltas</span></div>
   <div class="fix-bar">
     <label>Fase</label>
-    <select id="flt-fase" onchange="renderFixture()"><option value="f1">Fase 1</option><option value="f2">Fase 2</option><option value="po">Playoffs</option></select>
+    <select id="flt-fase" onchange="renderFixture()"><option value="f1">Fase 1</option><option value="f2">Fase 2</option></select>
     <label id="lbl-v">Vuelta</label>
     <select id="flt-v" onchange="renderFixture()"><option value="0">Ambas</option><option value="1">1ª Vuelta</option><option value="2">2ª Vuelta</option></select>
     <label id="lbl-t">Equipo</label>
@@ -666,6 +666,8 @@ const F2_DATES=[
   {fecha:'2026-11-07',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
   {fecha:'2026-11-09',dia:'Lunes',hora:'21:00',cancha:'Coveadse'}
 ];
+// 5-team round-robin: [bye_index, [[pair1_i,pair1_j],[pair2_i,pair2_j]]]
+const RR5=[[0,[[1,4],[2,3]]],[1,[[0,2],[3,4]]],[2,[[1,3],[0,4]]],[3,[[2,4],[0,1]]],[4,[[0,3],[1,2]]]];
 const PLAYOFF_DATES={
   qf1:{fecha:'2026-11-12',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
   qf3:{fecha:'2026-11-12',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
@@ -745,10 +747,13 @@ function f2Groups(){
 function genF2(){
   const{A,B}=f2Groups();const ms=[];let id=0;
   [[A,'A'],[B,'B']].forEach(([grp,gn])=>{
-    for(let i=0;i<grp.length;i++)for(let j=i+1;j<grp.length;j++){
-      const d=F2_DATES[id]||{};
-      ms.push({id:'f2_'+id,group:gn,l:grp[i],v:grp[j],...d});id++;
-    }
+    RR5.forEach(([bi,pairs],ri)=>{
+      pairs.forEach(([i,j])=>{
+        const d=F2_DATES[id]||{};
+        ms.push({id:'f2_'+id,group:gn,round:ri+1,bye:grp[bi]||0,l:grp[i]||0,v:grp[j]||0,...d});
+        id++;
+      });
+    });
   });
   return ms;
 }
@@ -905,75 +910,51 @@ function renderFixture(){
     const done2=f2ms.filter(m=>s.r2[m.id]!=null).length;
     const pct=Math.round(done2/20*100);
     progEl.innerHTML='<div class="prog-bar"><div class="prog-label"><span>Progreso Fase 2</span><span style="color:var(--gold)">'+done2+'/20 · '+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
-    const byDate={};
+    // Group by (group, round)
+    const byRound={};
     f2ms.forEach(m=>{
-      const k=(m.fecha||'Z')+'|'+(m.group||'');
-      if(!byDate[k])byDate[k]={fecha:m.fecha,dia:m.dia,group:m.group,ms:[]};
-      byDate[k].ms.push(m);
+      const k=m.group+'|'+m.round;
+      if(!byRound[k])byRound[k]={group:m.group,round:m.round,bye:m.bye,ms:[]};
+      byRound[k].ms.push(m);
     });
     let html='';
-    Object.keys(byDate).sort().forEach(k=>{
-      const grp=byDate[k];
-      grp.ms.sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
-      const gLabel=grp.group==='A'?'Grupo Impares':'Grupo Pares';
+    const grpOrder={'A':0,'B':1};
+    Object.keys(byRound).sort((a,b)=>{
+      const ga=a.split('|'),gb=b.split('|');
+      return (grpOrder[ga[0]]||0)-(grpOrder[gb[0]]||0)||(+ga[1])-(+gb[1]);
+    }).forEach(k=>{
+      const rnd=byRound[k];
+      const gLabel=rnd.group==='A'?'Grupo Impares':'Grupo Pares';
+      const byeSlot=rnd.bye;
+      const allDone=rnd.ms.every(m=>s.r2[m.id]!=null);
+      const anyDone=rnd.ms.some(m=>s.r2[m.id]!=null);
+      const statusDot=allDone?'var(--g)':anyDone?'var(--gold)':'var(--bdr)';
       let rows='';
-      grp.ms.forEach(m=>{
+      // Bye banner
+      rows+='<div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bdr);border-bottom:1px solid var(--bdr)">'
+        +'<div style="width:20px;height:22px;flex-shrink:0;opacity:.55">'+cSVG(byeSlot)+'</div>'
+        +'<span style="font-size:9px;color:var(--m);font-weight:700">🛌 DESCANSA esta ronda: '+(byeSlot?tName(byeSlot):'Por definir')+'</span></div>';
+      rnd.ms.forEach(m=>{
         const r=s.r2[m.id];
         const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
-        const click=adminMode?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
+        const lOk=m.l&&m.v;
+        const click=adminMode&&lOk?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
         rows+='<div class="'+click+'">'
-          +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+tShort(m.l)+'</div><div class="trole">Local</div></div></div>'
+          +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+(m.l?tShort(m.l):'Por def.')+'</div><div class="trole">Local</div></div></div>'
           +'<div class="mc"><div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'')+'</div>'
           +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
+          +'<div style="font-size:7px;color:var(--m)">'+(m.fecha?fmtD(m.fecha):'')+'</div>'
           +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div></div>'
-          +'<div class="tside right"><div><div class="tname">'+tShort(m.v)+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
+          +'<div class="tside right"><div><div class="tname">'+(m.v?tShort(m.v):'Por def.')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
           +'</div>';
       });
-      html+='<div class="jcard"><div class="jhead"><div class="jdate">📅 '+(grp.fecha?fmtD(grp.fecha):'Por definir')+'</div>'
-        +'<div class="jmeta"><span class="dc '+(grp.dia?diaC(grp.dia):'')+'">'+gLabel+'</span>'
-        +(adminMode?'<span style="font-size:7px;color:var(--acc);margin-left:4px">✏️</span>':'')+'</div></div>'
+      html+='<div class="jcard"><div class="jhead">'
+        +'<div class="jdate">'+gLabel+' · Ronda '+rnd.round+'/5</div>'
+        +'<div class="jmeta"><span class="sdot" style="background:'+statusDot+'"></span>'
+        +(adminMode?'<span style="font-size:7px;color:var(--acc)">✏️</span>':'')+'</div></div>'
         +rows+'</div>';
     });
     grid.innerHTML=html||'<div style="text-align:center;padding:30px;color:var(--m);font-size:11px">Sin partidos para mostrar</div>';
-    return;
-  }
-
-  if(fase==='po'){
-    progEl.innerHTML='';
-    const qfP=getQFPairs();
-    const qfR=qfP.map(m=>{const r=s.rqf[m.id];return{...m,...(PLAYOFF_DATES[m.id]||{}),r,w:winner(r,m.l,m.v)};});
-    const sf1L=qfR[0].w||0,sf1V=qfR[1].w||0,sf2L=qfR[2].w||0,sf2V=qfR[3].w||0;
-    const sfMs=[
-      {...(PLAYOFF_DATES.sf1||{}),id:'sf1',l:sf1L,v:sf1V,r:s.rsf['sf1'],lbl:'SF1: W(1v8) vs W(4v5)'},
-      {...(PLAYOFF_DATES.sf2||{}),id:'sf2',l:sf2L,v:sf2V,r:s.rsf['sf2'],lbl:'SF2: W(2v7) vs W(3v6)'}
-    ];
-    const sfW1=winner(s.rsf['sf1'],sf1L,sf1V)||0,sfW2=winner(s.rsf['sf2'],sf2L,sf2V)||0;
-    const finM={...(PLAYOFF_DATES.final||{}),id:'final',l:sfW1,v:sfW2,r:s.rf?s.rf['final']:null,lbl:'Final'};
-    function poCard(m,phase,lblRound){
-      const r=m.r;const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
-      const lSlot=m.l||0,vSlot=m.v||0;
-      const click=adminMode&&lSlot&&vSlot?'mrow clickable" onclick="openResult(&apos;'+phase+'&apos;,&apos;'+m.id+'&apos;,'+lSlot+','+vSlot+')':'mrow';
-      return '<div class="jcard"><div class="jhead"><div class="jdate">📅 '+(m.fecha?fmtD(m.fecha):'Por definir')+'</div>'
-        +'<div class="jmeta"><span class="dc '+(m.dia?diaC(m.dia):'')+'">'+(m.dia||'')+'</span>'
-        +'<span style="font-size:7px;color:var(--gold);margin-left:4px">'+lblRound+'</span></div></div>'
-        +'<div class="'+click+'">'
-        +'<div class="tside"><div class="tball">'+cSVG(lSlot)+'</div><div><div class="tname">'+(lSlot?tShort(lSlot):'Por def.')+'</div><div class="trole">Local</div></div></div>'
-        +'<div class="mc"><div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'')+'</div>'
-        +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
-        +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div></div>'
-        +'<div class="tside right"><div><div class="tname">'+(vSlot?tShort(vSlot):'Por def.')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(vSlot)+'</div></div>'
-        +'</div></div>';
-    }
-    let html='<div style="font-size:10px;color:var(--m);font-weight:700;padding:4px 0 8px;text-transform:uppercase;letter-spacing:.06em">⚡ Cuartos de Final</div>';
-    qfR.forEach((m,i)=>{
-      const seed=[[1,8],[4,5],[2,7],[3,6]];
-      html+=poCard(m,'qf','QF: '+seed[i][0]+'° vs '+seed[i][1]+'°');
-    });
-    html+='<div style="font-size:10px;color:var(--m);font-weight:700;padding:12px 0 8px;text-transform:uppercase;letter-spacing:.06em">🔥 Semifinales</div>';
-    sfMs.forEach(m=>{html+=poCard(m,'sf',m.lbl);});
-    html+='<div style="font-size:10px;color:var(--m);font-weight:700;padding:12px 0 8px;text-transform:uppercase;letter-spacing:.06em">🏆 Gran Final</div>';
-    html+=poCard(finM,'final','Gran Final');
-    grid.innerHTML=html;
     return;
   }
 
@@ -1233,30 +1214,42 @@ function renderCalendar(){
     +'<div class="cal-row"><div class="cal-dot" style="background:var(--b)"></div><div class="cal-label">Inicio Fase 1</div><div class="cal-date" style="font-size:10px;color:var(--gold)">'+fmtD(f1Start)+'</div></div>'
     +'<div class="cal-row"><div class="cal-dot" style="background:var(--b)"></div><div class="cal-label">Fin Fase 1</div><div class="cal-date" style="font-size:10px;color:var(--gold)">'+fmtD(f1End)+'</div></div>'
     +'</div>';
-  function fixedRow(label,color,fecha,hora,cancha){
+  function fixedRow(label,color,fecha,hora,cancha,note){
     return '<div class="cal-row"><div class="cal-dot" style="background:'+color+'"></div>'
-      +'<div class="cal-label">'+label+'</div>'
-      +'<div class="cal-date" style="font-size:9px;color:var(--gold)">'+fmtD(fecha)+' '+hora+' · '+cancha+'</div></div>';
+      +'<div class="cal-label">'+label+(note?'<br><span style="font-size:8px;color:var(--m)">'+note+'</span>':'')+'</div>'
+      +'<div class="cal-date" style="font-size:9px;color:var(--gold)">'+fmtD(fecha)+'<br>'+hora+' · '+cancha+'</div></div>';
   }
-  html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2</h4><span class="tag gold">20 partidos · Oct-Nov</span></div>'
-    +fixedRow('Jornada 1 (Imp+Par)','var(--gold)','2026-10-19','19:00/21:00','Coveadse')
-    +fixedRow('Jornada 2 (Imp+Par)','var(--gold)','2026-10-22','19:00/21:00','V. Silvania')
-    +fixedRow('Jornada 3 (Imp+Par)','var(--gold)','2026-10-24','06:00','Cov+V.Silv')
-    +fixedRow('Jornada 4 (Imp+Par)','var(--gold)','2026-10-26','19:00/21:00','Coveadse')
-    +fixedRow('Jornada 5 (Imp+Par)','var(--gold)','2026-10-29','19:00/21:00','V. Silvania')
-    +fixedRow('Jornada 6 (Imp+Par)','var(--gold)','2026-10-31','06:00','Cov+V.Silv')
-    +fixedRow('Jornada 7 FESTIVO (Imp+Par)','var(--gold)','2026-11-02','14:00/16:00','Coveadse')
-    +fixedRow('Jornada 8 (Imp+Par)','var(--gold)','2026-11-05','19:00/21:00','V. Silvania')
-    +fixedRow('Jornada 9 (Imp+Par)','var(--gold)','2026-11-07','06:00','Cov+V.Silv')
-    +fixedRow('Jornada 10 - Fin F2 (Imp+Par)','var(--gold)','2026-11-09','19:00/21:00','Coveadse')
+  // F2 schedule per round
+  const f2calA=[
+    ['Ronda 1 — Descansan: Pos. 1°','2026-10-19','19:00 + 22/Oct 19:00','Cov / V.Silv'],
+    ['Ronda 2 — Descansan: Pos. 3°','2026-10-24','06:00 + 26/Oct 19:00','Cov / Cov'],
+    ['Ronda 3 — Descansan: Pos. 5°','2026-10-29','19:00 + 31/Oct 06:00','V.Silv / Cov'],
+    ['Ronda 4 — Descansan: Pos. 7°','2026-11-02','14:00 + 5/Nov 19:00','Cov / V.Silv'],
+    ['Ronda 5 — Descansan: Pos. 9°','2026-11-07','06:00 + 9/Nov 19:00','Cov / Cov']
+  ];
+  const f2calB=[
+    ['Ronda 1 — Descansan: Pos. 2°','2026-10-19','21:00 + 22/Oct 21:00','Cov / V.Silv'],
+    ['Ronda 2 — Descansan: Pos. 4°','2026-10-24','06:00 + 26/Oct 21:00','V.Silv / Cov'],
+    ['Ronda 3 — Descansan: Pos. 6°','2026-10-29','21:00 + 31/Oct 06:00','V.Silv / V.Silv'],
+    ['Ronda 4 — Descansan: Pos. 8°','2026-11-02','16:00 + 5/Nov 21:00','Cov / V.Silv'],
+    ['Ronda 5 — Descansan: Pos. 10°','2026-11-07','06:00 + 9/Nov 21:00','V.Silv / Cov']
+  ];
+  html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2 · Grupo Impares</h4><span class="tag gold">Pos 1°3°5°7°9°</span></div>';
+  f2calA.forEach(([l,f,h,c])=>{html+=fixedRow(l,'var(--gold)',f,h,c);});
+  html+='</div>';
+  html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2 · Grupo Pares</h4><span class="tag blue">Pos 2°4°6°8°10°</span></div>';
+  f2calB.forEach(([l,f,h,c])=>{html+=fixedRow(l,'var(--b)',f,h,c);});
+  html+='</div>';
+  html+='<div class="cal-round"><div class="cal-rhead"><h4>🏆 Playoffs</h4><span class="tag red">7 partidos · Nov 12–19</span></div>'
+    +fixedRow('QF: 1° vs 8°','var(--acc)','2026-11-12','19:00','V. Silvania','')
+    +fixedRow('QF: 2° vs 7°','var(--acc)','2026-11-12','21:00','V. Silvania','')
+    +fixedRow('QF: 4° vs 5°','var(--acc)','2026-11-14','06:00','Coveadse','')
+    +fixedRow('QF: 3° vs 6°','var(--acc)','2026-11-14','06:00','V. Silvania','')
+    +fixedRow('Semifinal 1','var(--acc)','2026-11-16','14:00','Coveadse','FESTIVO')
+    +fixedRow('Semifinal 2','var(--acc)','2026-11-16','16:00','Coveadse','FESTIVO')
+    +fixedRow('Gran Final','var(--gold)','2026-11-19','19:00','V. Silvania','')
     +'</div>';
-  html+='<div class="cal-round"><div class="cal-rhead"><h4>🏆 Playoffs</h4><span class="tag red">7 partidos</span></div>'
-    +fixedRow('QF: 1° vs 8° · 2° vs 7°','var(--acc)','2026-11-12','19:00/21:00','V. Silvania')
-    +fixedRow('QF: 4° vs 5° · 3° vs 6°','var(--acc)','2026-11-14','06:00','Cov + V.Silv')
-    +fixedRow('SF1 + SF2 (FESTIVO)','var(--acc)','2026-11-16','14:00/16:00','Coveadse')
-    +fixedRow('Gran Final','var(--gold)','2026-11-19','19:00','V. Silvania')
-    +'</div>';
-  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Solo el presidente las ve</div><div class="ab">Todas las fechas hasta la Final están fijas. Solo se deben agregar los equipos clasificados.</div></div></div>';
+  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Solo el presidente las ve</div><div class="ab">Todas las fechas hasta la Final están fijas. Solo agregar equipos clasificados. En F2, el equipo que descansa conserva su turno pero no suma puntos esa ronda.</div></div></div>';
   el.innerHTML=html;
 }
 
