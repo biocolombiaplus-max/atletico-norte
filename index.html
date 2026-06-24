@@ -429,11 +429,13 @@ select:focus{outline:none;border-color:var(--acc)}
 <section id="sec-fixture" class="sec">
   <div class="sh"><h2>Fixture</h2><span class="tag blue" id="fix-tag">Fase 1 · 2 Vueltas</span></div>
   <div class="fix-bar">
-    <label>Vuelta</label>
+    <label>Fase</label>
+    <select id="flt-fase" onchange="renderFixture()"><option value="f1">Fase 1</option><option value="f2">Fase 2</option><option value="po">Playoffs</option></select>
+    <label id="lbl-v">Vuelta</label>
     <select id="flt-v" onchange="renderFixture()"><option value="0">Ambas</option><option value="1">1ª Vuelta</option><option value="2">2ª Vuelta</option></select>
-    <label>Equipo</label>
+    <label id="lbl-t">Equipo</label>
     <select id="flt-t" onchange="renderFixture()"><option value="0">Todos</option></select>
-    <label>Estado</label>
+    <label id="lbl-e">Estado</label>
     <select id="flt-e" onchange="renderFixture()"><option value="0">Todos</option><option value="1">Jugados</option><option value="2">Pendientes</option></select>
   </div>
   <div id="fix-prog"></div>
@@ -642,6 +644,38 @@ const DELS=[
   {n:"Parra Maldonado Alonso",club:"Inter",cel:"320 2857869"},
 ];
 
+const F2_DATES=[
+  {fecha:'2026-10-19',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  {fecha:'2026-10-22',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-24',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
+  {fecha:'2026-10-26',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  {fecha:'2026-10-29',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-31',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
+  {fecha:'2026-11-02',dia:'Lunes',hora:'14:00',cancha:'Coveadse'},
+  {fecha:'2026-11-05',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-07',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
+  {fecha:'2026-11-09',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  {fecha:'2026-10-19',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
+  {fecha:'2026-10-22',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-24',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-26',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
+  {fecha:'2026-10-29',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  {fecha:'2026-10-31',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-02',dia:'Lunes',hora:'16:00',cancha:'Coveadse'},
+  {fecha:'2026-11-05',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-07',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  {fecha:'2026-11-09',dia:'Lunes',hora:'21:00',cancha:'Coveadse'}
+];
+const PLAYOFF_DATES={
+  qf1:{fecha:'2026-11-12',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  qf3:{fecha:'2026-11-12',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  qf2:{fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
+  qf4:{fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
+  sf1:{fecha:'2026-11-16',dia:'Lunes',hora:'14:00',cancha:'Coveadse'},
+  sf2:{fecha:'2026-11-16',dia:'Lunes',hora:'16:00',cancha:'Coveadse'},
+  final:{fecha:'2026-11-19',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'}
+};
+
 // ── STATE ─────────────────────────────────────────────────────────────
 const SK='an_v3';
 function getS(){try{return JSON.parse(localStorage.getItem(SK))||dfS()}catch(e){return dfS()}}
@@ -711,8 +745,10 @@ function f2Groups(){
 function genF2(){
   const{A,B}=f2Groups();const ms=[];let id=0;
   [[A,'A'],[B,'B']].forEach(([grp,gn])=>{
-    for(let i=0;i<grp.length;i++)for(let j=i+1;j<grp.length;j++)
-      ms.push({id:'f2_'+id++,group:gn,l:grp[i],v:grp[j]});
+    for(let i=0;i<grp.length;i++)for(let j=i+1;j<grp.length;j++){
+      const d=F2_DATES[id]||{};
+      ms.push({id:'f2_'+id,group:gn,l:grp[i],v:grp[j],...d});id++;
+    }
   });
   return ms;
 }
@@ -857,6 +893,91 @@ function populateTeamFilter(){
 
 function renderFixture(){
   const s=getS();
+  const fase=(document.getElementById('flt-fase')||{value:'f1'}).value;
+  const grid=document.getElementById('fix-grid');
+  const progEl=document.getElementById('fix-prog');
+  // show/hide f1-only filters
+  const showF1=(fase==='f1');
+  ['lbl-v','flt-v','lbl-t','flt-t','lbl-e','flt-e'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showF1?'':'none';});
+
+  if(fase==='f2'){
+    const f2ms=genF2();
+    const done2=f2ms.filter(m=>s.r2[m.id]!=null).length;
+    const pct=Math.round(done2/20*100);
+    progEl.innerHTML='<div class="prog-bar"><div class="prog-label"><span>Progreso Fase 2</span><span style="color:var(--gold)">'+done2+'/20 · '+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
+    const byDate={};
+    f2ms.forEach(m=>{
+      const k=(m.fecha||'Z')+'|'+(m.group||'');
+      if(!byDate[k])byDate[k]={fecha:m.fecha,dia:m.dia,group:m.group,ms:[]};
+      byDate[k].ms.push(m);
+    });
+    let html='';
+    Object.keys(byDate).sort().forEach(k=>{
+      const grp=byDate[k];
+      grp.ms.sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+      const gLabel=grp.group==='A'?'Grupo Impares':'Grupo Pares';
+      let rows='';
+      grp.ms.forEach(m=>{
+        const r=s.r2[m.id];
+        const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
+        const click=adminMode?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
+        rows+='<div class="'+click+'">'
+          +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+tShort(m.l)+'</div><div class="trole">Local</div></div></div>'
+          +'<div class="mc"><div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'')+'</div>'
+          +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
+          +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div></div>'
+          +'<div class="tside right"><div><div class="tname">'+tShort(m.v)+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
+          +'</div>';
+      });
+      html+='<div class="jcard"><div class="jhead"><div class="jdate">📅 '+(grp.fecha?fmtD(grp.fecha):'Por definir')+'</div>'
+        +'<div class="jmeta"><span class="dc '+(grp.dia?diaC(grp.dia):'')+'">'+gLabel+'</span>'
+        +(adminMode?'<span style="font-size:7px;color:var(--acc);margin-left:4px">✏️</span>':'')+'</div></div>'
+        +rows+'</div>';
+    });
+    grid.innerHTML=html||'<div style="text-align:center;padding:30px;color:var(--m);font-size:11px">Sin partidos para mostrar</div>';
+    return;
+  }
+
+  if(fase==='po'){
+    progEl.innerHTML='';
+    const qfP=getQFPairs();
+    const qfR=qfP.map(m=>{const r=s.rqf[m.id];return{...m,...(PLAYOFF_DATES[m.id]||{}),r,w:winner(r,m.l,m.v)};});
+    const sf1L=qfR[0].w||0,sf1V=qfR[1].w||0,sf2L=qfR[2].w||0,sf2V=qfR[3].w||0;
+    const sfMs=[
+      {...(PLAYOFF_DATES.sf1||{}),id:'sf1',l:sf1L,v:sf1V,r:s.rsf['sf1'],lbl:'SF1: W(1v8) vs W(4v5)'},
+      {...(PLAYOFF_DATES.sf2||{}),id:'sf2',l:sf2L,v:sf2V,r:s.rsf['sf2'],lbl:'SF2: W(2v7) vs W(3v6)'}
+    ];
+    const sfW1=winner(s.rsf['sf1'],sf1L,sf1V)||0,sfW2=winner(s.rsf['sf2'],sf2L,sf2V)||0;
+    const finM={...(PLAYOFF_DATES.final||{}),id:'final',l:sfW1,v:sfW2,r:s.rf?s.rf['final']:null,lbl:'Final'};
+    function poCard(m,phase,lblRound){
+      const r=m.r;const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
+      const lSlot=m.l||0,vSlot=m.v||0;
+      const click=adminMode&&lSlot&&vSlot?'mrow clickable" onclick="openResult(&apos;'+phase+'&apos;,&apos;'+m.id+'&apos;,'+lSlot+','+vSlot+')':'mrow';
+      return '<div class="jcard"><div class="jhead"><div class="jdate">📅 '+(m.fecha?fmtD(m.fecha):'Por definir')+'</div>'
+        +'<div class="jmeta"><span class="dc '+(m.dia?diaC(m.dia):'')+'">'+(m.dia||'')+'</span>'
+        +'<span style="font-size:7px;color:var(--gold);margin-left:4px">'+lblRound+'</span></div></div>'
+        +'<div class="'+click+'">'
+        +'<div class="tside"><div class="tball">'+cSVG(lSlot)+'</div><div><div class="tname">'+(lSlot?tShort(lSlot):'Por def.')+'</div><div class="trole">Local</div></div></div>'
+        +'<div class="mc"><div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'')+'</div>'
+        +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
+        +'<div style="font-size:7px;color:var(--m)">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div></div>'
+        +'<div class="tside right"><div><div class="tname">'+(vSlot?tShort(vSlot):'Por def.')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(vSlot)+'</div></div>'
+        +'</div></div>';
+    }
+    let html='<div style="font-size:10px;color:var(--m);font-weight:700;padding:4px 0 8px;text-transform:uppercase;letter-spacing:.06em">⚡ Cuartos de Final</div>';
+    qfR.forEach((m,i)=>{
+      const seed=[[1,8],[4,5],[2,7],[3,6]];
+      html+=poCard(m,'qf','QF: '+seed[i][0]+'° vs '+seed[i][1]+'°');
+    });
+    html+='<div style="font-size:10px;color:var(--m);font-weight:700;padding:12px 0 8px;text-transform:uppercase;letter-spacing:.06em">🔥 Semifinales</div>';
+    sfMs.forEach(m=>{html+=poCard(m,'sf',m.lbl);});
+    html+='<div style="font-size:10px;color:var(--m);font-weight:700;padding:12px 0 8px;text-transform:uppercase;letter-spacing:.06em">🏆 Gran Final</div>';
+    html+=poCard(finM,'final','Gran Final');
+    grid.innerHTML=html;
+    return;
+  }
+
+  // ── FASE 1 ──
   const fV=+document.getElementById('flt-v').value;
   const fT=+document.getElementById('flt-t').value;
   const fE=+document.getElementById('flt-e').value;
@@ -872,9 +993,7 @@ function renderFixture(){
   ms.forEach(m=>{(byDate[m.fecha]=byDate[m.fecha]||[]).push(m)});
   const dates=Object.keys(byDate).sort();
   const done=f1Count(),pct=Math.round(done/90*100);
-  document.getElementById('fix-prog').innerHTML=
-    '<div class="prog-bar"><div class="prog-label"><span>Progreso Fase 1</span><span style="color:var(--gold)">'+done+'/90 · '+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
-  const grid=document.getElementById('fix-grid');
+  progEl.innerHTML='<div class="prog-bar"><div class="prog-label"><span>Progreso Fase 1</span><span style="color:var(--gold)">'+done+'/90 · '+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
   let html='';
   dates.forEach(fecha=>{
     const gms=byDate[fecha].sort((a,b)=>a.hora.localeCompare(b.hora));
@@ -1006,8 +1125,10 @@ function renderLlave(){
   function bM(m,r,w,ph){
     const[gl,gv]=r?[r.gl,r.gv]:[null,null];
     const cc=adminMode&&m.l&&m.v;
+    const pd=PLAYOFF_DATES[m.id]||{};
+    const dateTag=pd.fecha?'<div style="font-size:7px;color:var(--m);text-align:center;padding:2px 0">📅 '+fmtD(pd.fecha)+' '+pd.hora+' · '+(pd.cancha||'').replace('Villa Silvania','V.S.')+'</div>':'';
     return '<div class="bm'+(w?' won':'')+(cc?' can-click':'')+(cc?'" onclick="openResult(&apos;'+ph+'&apos;,&apos;'+m.id+'&apos;,'+m.l+','+(m.v||0)+')"':'"')+'>'
-      +bT(m.l,gl,w===m.l)+bT(m.v,gv,w===m.v)+'</div>';
+      +dateTag+bT(m.l,gl,w===m.l)+bT(m.v,gv,w===m.v)+'</div>';
   }
 
   document.getElementById('bracket-wrap').innerHTML=
@@ -1112,16 +1233,30 @@ function renderCalendar(){
     +'<div class="cal-row"><div class="cal-dot" style="background:var(--b)"></div><div class="cal-label">Inicio Fase 1</div><div class="cal-date" style="font-size:10px;color:var(--gold)">'+fmtD(f1Start)+'</div></div>'
     +'<div class="cal-row"><div class="cal-dot" style="background:var(--b)"></div><div class="cal-label">Fin Fase 1</div><div class="cal-date" style="font-size:10px;color:var(--gold)">'+fmtD(f1End)+'</div></div>'
     +'</div>';
-  html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2</h4><span class="tag gold">Grupos</span></div>'
-    +row('f2_start','Inicio Fase 2','var(--gold)','')
-    +row('f2_end','Fin Fase 2','var(--gold)','')
+  function fixedRow(label,color,fecha,hora,cancha){
+    return '<div class="cal-row"><div class="cal-dot" style="background:'+color+'"></div>'
+      +'<div class="cal-label">'+label+'</div>'
+      +'<div class="cal-date" style="font-size:9px;color:var(--gold)">'+fmtD(fecha)+' '+hora+' · '+cancha+'</div></div>';
+  }
+  html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2</h4><span class="tag gold">20 partidos · Oct-Nov</span></div>'
+    +fixedRow('Jornada 1 (Imp+Par)','var(--gold)','2026-10-19','19:00/21:00','Coveadse')
+    +fixedRow('Jornada 2 (Imp+Par)','var(--gold)','2026-10-22','19:00/21:00','V. Silvania')
+    +fixedRow('Jornada 3 (Imp+Par)','var(--gold)','2026-10-24','06:00','Cov+V.Silv')
+    +fixedRow('Jornada 4 (Imp+Par)','var(--gold)','2026-10-26','19:00/21:00','Coveadse')
+    +fixedRow('Jornada 5 (Imp+Par)','var(--gold)','2026-10-29','19:00/21:00','V. Silvania')
+    +fixedRow('Jornada 6 (Imp+Par)','var(--gold)','2026-10-31','06:00','Cov+V.Silv')
+    +fixedRow('Jornada 7 FESTIVO (Imp+Par)','var(--gold)','2026-11-02','14:00/16:00','Coveadse')
+    +fixedRow('Jornada 8 (Imp+Par)','var(--gold)','2026-11-05','19:00/21:00','V. Silvania')
+    +fixedRow('Jornada 9 (Imp+Par)','var(--gold)','2026-11-07','06:00','Cov+V.Silv')
+    +fixedRow('Jornada 10 - Fin F2 (Imp+Par)','var(--gold)','2026-11-09','19:00/21:00','Coveadse')
     +'</div>';
-  html+='<div class="cal-round"><div class="cal-rhead"><h4>🏆 Playoffs</h4><span class="tag red">Mata-Mata</span></div>'
-    +row('qf_date','Cuartos de Final','var(--acc)','')
-    +row('sf_date','Semifinales','var(--acc)','')
-    +row('final_date','Gran Final','var(--gold)','')
+  html+='<div class="cal-round"><div class="cal-rhead"><h4>🏆 Playoffs</h4><span class="tag red">7 partidos</span></div>'
+    +fixedRow('QF: 1° vs 8° · 2° vs 7°','var(--acc)','2026-11-12','19:00/21:00','V. Silvania')
+    +fixedRow('QF: 4° vs 5° · 3° vs 6°','var(--acc)','2026-11-14','06:00','Cov + V.Silv')
+    +fixedRow('SF1 + SF2 (FESTIVO)','var(--acc)','2026-11-16','14:00/16:00','Coveadse')
+    +fixedRow('Gran Final','var(--gold)','2026-11-19','19:00','V. Silvania')
     +'</div>';
-  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">💡</span><div><div class="at">Las fechas de playoffs son solo para planificación</div><div class="ab">Se guardan localmente y solo el presidente las ve. Los socios ven el bracket pero no las fechas estimadas.</div></div></div>';
+  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Solo el presidente las ve</div><div class="ab">Todas las fechas hasta la Final están fijas. Solo se deben agregar los equipos clasificados.</div></div></div>';
   el.innerHTML=html;
 }
 
