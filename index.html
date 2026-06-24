@@ -764,7 +764,7 @@ function nav(id,el,isTop){
   if(id==='tabla')renderTabla();
   if(id==='goles')renderGoles();
   if(id==='llave')renderLlave();
-  if(id==='admin'){buildSlotBoard();buildDelGrid();renderEquidad();}
+  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();}
   window.scrollTo(0,0);
 }
 
@@ -1153,7 +1153,7 @@ function renderStatsResumen(){
     const topSc=sg.slice(0,2).map(g=>g.name.split(' ')[0]+'('+g.goles+')').join(', ')||'—';
     const pClass=pos===1&&r.pts>0?'pts lead':'pts';
     html+='<tr>'
-      +'<td><span style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:'+(pos<=8?'var(--gold)':'var(--acc)')+'">'+pos+'</span></td>'
+      +'<td><span class="pos-n '+(pos<=8?'top':'elim')+'" style="font-size:14px">'+pos+'</span></td>'
       +'<td><div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:20px;flex-shrink:0">'+cSVG(r.slot)+'</div>'+tName(r.slot)+'</div></td>'
       +'<td>'+r.pj+'</td><td style="color:var(--g)">'+r.g+'</td><td>'+r.e+'</td><td style="color:var(--acc)">'+r.p+'</td>'
       +'<td style="color:var(--gold)">'+r.gf+'</td><td>'+r.gc+'</td>'
