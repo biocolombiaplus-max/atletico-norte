@@ -988,17 +988,33 @@ function renderFixture(){
           +'<div><div style="font-size:9px;font-weight:900;color:#ff9800">🛌 DESCANSA</div>'
           +'<div style="font-size:10px;color:var(--t);font-weight:700">'+(byeSlot?tName(byeSlot):'Por definir según tabla')+'</div></div>'
           +'</div>';
+        function diaColor(dia,fecha){
+          const fest=['2026-11-16','2026-07-20','2026-08-17','2026-10-12'];
+          if(fest.includes(fecha))return{bg:'#f5a00022',color:'#f5a000',bdr:'#f5a00044',lbl:'FEST'};
+          if(dia==='Sábado')return{bg:'#10b98122',color:'#10b981',bdr:'#10b98144',lbl:'SÁB'};
+          if(dia==='Lunes')return{bg:'#3b82f622',color:'#60a5fa',bdr:'#3b82f644',lbl:'LUN'};
+          if(dia==='Jueves')return{bg:'#a78bfa22',color:'#a78bfa',bdr:'#a78bfa44',lbl:'JUE'};
+          return{bg:'#ffffff10',color:'#aaa',bdr:'#ffffff20',lbl:dia.substring(0,3).toUpperCase()};
+        }
         rnd.ms.forEach(m=>{
           const r=s2.r2[m.id];
           const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
           const click=adminMode&&m.l&&m.v?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
+          const dc=diaColor(m.dia,m.fecha);
+          const canShort=(m.cancha||'').replace('Villa Silvania','Villa Silvania').replace('Coveadse','Coveadse');
+          const fechaLbl=m.fecha?fmtDFull(m.fecha,m.dia):'';
+          // Date header for this match
+          rows+='<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:'+dc.bg+';border-top:1px solid '+dc.bdr+'">'
+            +'<span style="background:'+dc.bg+';color:'+dc.color+';border:1px solid '+dc.bdr+';font-size:8px;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:.06em">'+dc.lbl+'</span>'
+            +'<span style="font-size:10px;font-weight:800;color:'+dc.color+'">'+fechaLbl+'</span>'
+            +'<span style="font-size:10px;font-weight:700;color:var(--gold);margin-left:4px">'+( m.hora||'')+'</span>'
+            +'<span style="font-size:9px;color:var(--m);margin-left:auto">'+canShort+'</span>'
+            +'<span style="font-size:8px;color:'+(r?'var(--g)':'var(--m))')+'">'+(r?'✅':'⏳')+'</span>'
+            +'</div>';
           rows+='<div class="'+click+'">'
             +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+(m.l?tShort(m.l):'?')+'</div><div class="trole">Local</div></div></div>'
             +'<div class="mc">'
-            +'<div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+(m.hora||'--:--')+'</div>'
             +'<div class="mc-score"><span class="sg">'+gl+'</span><span class="sd">–</span><span class="sg">'+gv+'</span></div>'
-            +'<div style="font-size:7px;color:var(--m)">'+(m.fecha?fmtDShort(m.fecha,m.dia):'')+'</div>'
-            +'<div style="font-size:7px;color:var(--b);font-weight:700">'+(m.cancha||'').replace('Villa Silvania','V.Silv.').replace('Coveadse','Cov.')+'</div>'
             +'</div>'
             +'<div class="tside right"><div><div class="tname">'+(m.v?tShort(m.v):'?')+'</div><div class="trole">Visitante</div></div><div class="tball">'+cSVG(m.v)+'</div></div>'
             +'</div>';
@@ -1009,7 +1025,6 @@ function renderFixture(){
           +'<span class="sdot" style="background:'+dot+'"></span>'
           +(adminMode?'<span style="font-size:7px;color:var(--acc)">✏️</span>':'')
           +'</div></div>'
-          +(dates?'<div style="font-size:8px;color:var(--m);padding:4px 12px;border-bottom:1px solid var(--bdr)">📅 '+dates+'</div>':'')
           +rows+'</div>';
       });
       return out;
