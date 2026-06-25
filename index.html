@@ -717,11 +717,11 @@ const RR5=[[0,[[1,4],[2,3]]],[1,[[0,2],[3,4]]],[2,[[1,3],[0,4]]],[3,[[2,4],[0,1]
 const PLAYOFF_DATES={
   qf1:{fecha:'2026-11-19',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
   qf3:{fecha:'2026-11-19',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
-  qf2:{fecha:'2026-11-21',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  qf4:{fecha:'2026-11-21',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
-  sf1:{fecha:'2026-11-23',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
-  sf2:{fecha:'2026-11-23',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
-  final:{fecha:'2026-11-26',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'}
+  qf2:{fecha:'2026-11-23',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  qf4:{fecha:'2026-11-23',dia:'Lunes',hora:'21:00',cancha:'Villa Silvania'},
+  sf1:{fecha:'2026-11-26',dia:'Jueves',hora:'19:00',cancha:'Coveadse'},
+  sf2:{fecha:'2026-11-26',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  final:{fecha:'2026-11-29',dia:'Domingo',hora:'19:00',cancha:'Villa Silvania'}
 };
 
 // ── STATE ─────────────────────────────────────────────────────────────
@@ -1225,49 +1225,82 @@ function renderLlave(){
 }
 
 function renderBracketPreview(){
-  // Show pre-programmed dates for all playoff matches, teams as TBD
-  function pdTag(key){
-    const pd=PLAYOFF_DATES[key]||{};
-    if(!pd.fecha)return '';
-    const dc={Jueves:{bg:'#a78bfa22',color:'#a78bfa',lbl:'JUE'},Sábado:{bg:'#10b98122',color:'#10b981',lbl:'SÁB'},Lunes:{bg:'#3b82f622',color:'#60a5fa',lbl:'LUN'}};
-    const d=dc[pd.dia]||{bg:'#ffffff10',color:'#aaa',lbl:'?'};
-    return '<div style="display:flex;align-items:center;gap:5px;justify-content:center;flex-wrap:wrap;padding:5px 6px 2px">'
-      +'<span style="background:'+d.bg+';color:'+d.color+';border:1px solid '+d.color+'44;font-size:8px;font-weight:900;padding:2px 7px;border-radius:20px">'+d.lbl+'</span>'
-      +'<span style="font-size:9px;font-weight:800;color:'+d.color+'">'+fmtDFull(pd.fecha,pd.dia)+'</span>'
+  const diaStyle={
+    Jueves:{bg:'#a78bfa22',color:'#a78bfa',bdr:'#a78bfa44',lbl:'JUE'},
+    Sábado:{bg:'#10b98122',color:'#10b981',bdr:'#10b98144',lbl:'SÁB'},
+    Lunes:{bg:'#3b82f622',color:'#60a5fa',bdr:'#3b82f644',lbl:'LUN'},
+    Domingo:{bg:'#f59e0b22',color:'#f59e0b',bdr:'#f59e0b44',lbl:'DOM'}
+  };
+  function dateBar(key,accentColor){
+    const pd=PLAYOFF_DATES[key]||{};if(!pd.fecha)return '';
+    const ds=diaStyle[pd.dia]||{bg:'#ffffff10',color:'#aaa',bdr:'#ffffff20',lbl:pd.dia?pd.dia.substring(0,3).toUpperCase():'?'};
+    return '<div style="background:'+ds.bg+';border-bottom:1px solid '+ds.bdr+';padding:6px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px">'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="background:'+ds.color+';color:#000;font-size:7px;font-weight:900;padding:2px 6px;border-radius:20px;letter-spacing:.5px">'+ds.lbl+'</span>'
+      +'<span style="font-size:11px;font-weight:800;color:'+ds.color+'">'+fmtDFull(pd.fecha,pd.dia)+'</span>'
       +'</div>'
-      +'<div style="text-align:center;padding:0 6px 4px;font-size:9px;color:var(--gold);font-weight:700">'+pd.hora+'&nbsp;&nbsp;<span style="font-size:8px;color:var(--m);font-weight:400">'+( pd.cancha||'')+'</span></div>';
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="font-size:11px;font-weight:700;color:'+accentColor+'">'+pd.hora+'</span>'
+      +'<span style="font-size:9px;color:var(--m)">'+( pd.cancha||'')+'</span>'
+      +'</div>'
+      +'</div>';
   }
-  function tbdMatch(key,label){
-    return '<div class="bm" style="border:1px solid var(--bdr);border-radius:10px;overflow:hidden;margin-bottom:4px">'
-      +pdTag(key)
-      +'<div style="border-top:1px solid var(--bdr)">'
-      +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#111" stroke="#333" stroke-width="1.5"/></svg></div><span class="bn">'+label+'</span></div>'
-      +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#111" stroke="#333" stroke-width="1.5"/></svg></div><span class="bn">Por definir</span></div>'
+  function matchCard(key,teamA,teamB,accentColor){
+    const shld='<svg viewBox="0 0 60 70" style="width:22px;height:25px"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/></svg>';
+    return '<div style="border:1px solid var(--bdr);border-radius:10px;overflow:hidden;background:var(--c2)">'
+      +dateBar(key,accentColor)
+      +'<div style="padding:8px 10px;display:flex;flex-direction:column;gap:4px">'
+      +'<div style="display:flex;align-items:center;gap:8px;padding:4px 0">'+shld+'<span style="font-size:12px;font-weight:700;color:var(--t)">'+teamA+'</span></div>'
+      +'<div style="text-align:center;font-size:9px;color:var(--m);letter-spacing:1px;padding:0 0 2px">VS</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;padding:4px 0">'+shld+'<span style="font-size:12px;font-weight:700;color:var(--t)">'+teamB+'</span></div>'
+      +'</div></div>';
+  }
+  function sectionHeader(icon,title,subtitle,color){
+    return '<div style="display:flex;align-items:center;gap:10px;margin:16px 0 8px;padding:10px 12px;background:'+color+'18;border-left:3px solid '+color+';border-radius:0 8px 8px 0">'
+      +'<span style="font-size:20px">'+icon+'</span>'
+      +'<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:17px;letter-spacing:2px;color:'+color+'">'+title+'</div>'
+      +'<div style="font-size:9px;color:var(--m);margin-top:1px">'+subtitle+'</div>'
       +'</div></div>';
   }
 
   let html='';
-  // CUARTOS
-  html+='<div style="margin-bottom:16px">';
-  html+='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;color:var(--acc);margin-bottom:8px;display:flex;align-items:center;gap:8px">⚔️ Cuartos de Final <span style="font-size:10px;font-weight:400;color:var(--m);font-family:Inter,sans-serif">· 4 partidos</span></div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  html+=tbdMatch('qf1','1° vs 8°');
-  html+=tbdMatch('qf3','2° vs 7°');
-  html+=tbdMatch('qf2','4° vs 5°');
-  html+=tbdMatch('qf4','3° vs 6°');
-  html+='</div></div>';
-  // SEMIFINALES
-  html+='<div style="margin-bottom:16px">';
-  html+='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px">🥊 Semifinales <span style="font-size:10px;font-weight:400;color:var(--m);font-family:Inter,sans-serif">· 2 partidos</span></div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  html+=tbdMatch('sf1','W QF1 vs W QF2');
-  html+=tbdMatch('sf2','W QF3 vs W QF4');
-  html+='</div></div>';
-  // FINAL
-  html+='<div>';
-  html+='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;color:var(--g);margin-bottom:8px;display:flex;align-items:center;gap:8px">🏆 Gran Final <span style="font-size:10px;font-weight:400;color:var(--m);font-family:Inter,sans-serif">· 1 partido</span></div>';
-  html+=tbdMatch('final','Campeón vs Finalista');
+
+  // ── CUARTOS ──
+  html+=sectionHeader('⚔️','Cuartos de Final','4 partidos · Mata-mata · Nov 19 y 23','var(--acc)');
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">';
+  html+=matchCard('qf1','1° Clasificado','8° Clasificado','var(--acc)');
+  html+=matchCard('qf3','2° Clasificado','7° Clasificado','var(--acc)');
+  html+=matchCard('qf2','4° Clasificado','5° Clasificado','var(--acc)');
+  html+=matchCard('qf4','3° Clasificado','6° Clasificado','var(--acc)');
   html+='</div>';
+
+  // ── SEMIFINALES ──
+  html+=sectionHeader('🥊','Semifinales','2 partidos · Mata-mata · Jueves 26 Nov','var(--gold)');
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">';
+  html+=matchCard('sf1','Ganador QF1','Ganador QF2','var(--gold)');
+  html+=matchCard('sf2','Ganador QF3','Ganador QF4','var(--gold)');
+  html+='</div>';
+
+  // ── FINAL ──
+  html+=sectionHeader('🏆','Gran Final','1 partido · Domingo 29 de Noviembre','var(--g)');
+  html+='<div style="border:2px solid var(--g);border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#0f1a0f,var(--c2))">'
+    +dateBar('final','var(--g)')
+    +'<div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">'
+    +'<div style="display:flex;align-items:center;gap:10px;padding:6px 0">'
+    +'<svg viewBox="0 0 60 70" style="width:28px;height:32px"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#1a2a1a" stroke="var(--g)" stroke-width="1.5"/></svg>'
+    +'<div><div style="font-size:13px;font-weight:800;color:var(--t)">Ganador Semifinal 1</div><div style="font-size:9px;color:var(--m)">Por definir</div></div>'
+    +'</div>'
+    +'<div style="text-align:center;font-size:22px;color:var(--gold);letter-spacing:3px;padding:2px 0">🏆</div>'
+    +'<div style="display:flex;align-items:center;gap:10px;padding:6px 0">'
+    +'<svg viewBox="0 0 60 70" style="width:28px;height:32px"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#1a2a1a" stroke="var(--g)" stroke-width="1.5"/></svg>'
+    +'<div><div style="font-size:13px;font-weight:800;color:var(--t)">Ganador Semifinal 2</div><div style="font-size:9px;color:var(--m)">Por definir</div></div>'
+    +'</div>'
+    +'</div></div>';
+
+  html+='<div class="alert blue" style="margin-top:12px"><span class="alert-ico">📌</span><div>'
+    +'<div class="at">Vista previa admin · Equipos por definir al completar F2</div>'
+    +'<div class="ab">QF Jornada 1: Jueves 19 Nov · QF Jornada 2: Lunes 23 Nov · SF: Jueves 26 Nov · Final: Domingo 29 Nov</div>'
+    +'</div></div>';
 
   document.getElementById('bracket-wrap').innerHTML=html;
 }
@@ -1400,16 +1433,16 @@ function renderCalendar(){
   html+='<div class="cal-round"><div class="cal-rhead"><h4>⚔️ Fase 2 · Grupo Pares</h4><span class="tag blue">Pos 2°4°6°8°10°</span></div>';
   f2calB.forEach(([l,f,h,c])=>{html+=fixedRow(l,'var(--b)',f,h,c);});
   html+='</div>';
-  html+='<div class="cal-round"><div class="cal-rhead"><h4>🏆 Playoffs</h4><span class="tag red">7 partidos · Nov 19–26</span></div>'
+  html+='<div class="cal-round"><div class="cal-rhead"><h4>🏆 Playoffs</h4><span class="tag red">7 partidos · Nov 19–29</span></div>'
     +fixedRow('QF: 1° vs 8°','var(--acc)','2026-11-19','19:00','V. Silvania','')
     +fixedRow('QF: 2° vs 7°','var(--acc)','2026-11-19','21:00','V. Silvania','')
-    +fixedRow('QF: 4° vs 5°','var(--acc)','2026-11-21','06:00','Coveadse','')
-    +fixedRow('QF: 3° vs 6°','var(--acc)','2026-11-21','06:00','V. Silvania','')
-    +fixedRow('Semifinal 1','var(--acc)','2026-11-23','19:00','Coveadse','')
-    +fixedRow('Semifinal 2','var(--acc)','2026-11-23','21:00','Coveadse','')
-    +fixedRow('Gran Final','var(--gold)','2026-11-26','19:00','V. Silvania','')
+    +fixedRow('QF: 4° vs 5°','var(--acc)','2026-11-23','19:00','Coveadse','')
+    +fixedRow('QF: 3° vs 6°','var(--acc)','2026-11-23','21:00','Villa Silvania','')
+    +fixedRow('Semifinal 1','var(--acc)','2026-11-26','19:00','Coveadse','')
+    +fixedRow('Semifinal 2','var(--acc)','2026-11-26','21:00','Villa Silvania','')
+    +fixedRow('Gran Final','var(--gold)','2026-11-29','19:00','V. Silvania','')
     +'</div>';
-  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Sin partidos a las 2pm en festivos</div><div class="ab">F1 termina Oct 22 · F2: Oct 24 – Nov 16 · QF: Nov 19–21 · SF: Nov 23 · Final: Nov 26</div></div></div>';
+  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Sin partidos a las 2pm en festivos</div><div class="ab">F1 termina Oct 22 · F2: Oct 24 – Nov 16 · QF: Nov 19 y 23 · SF: Nov 26 · Final: Nov 29</div></div></div>';
   el.innerHTML=html;
 }
 
