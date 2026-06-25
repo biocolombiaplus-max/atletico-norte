@@ -165,37 +165,49 @@ select:focus{outline:none;border-color:var(--acc)}
 .mv-card h3{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;color:var(--b);margin-bottom:10px}
 
 /* ── LLAVE ── */
-.bracket-outer{padding:0}
-.bracket-wrap{display:block;padding:2px 0}
-/* ── Ronda header ── */
-.rnd-hdr{display:flex;align-items:center;gap:0;margin:0 0 10px;position:relative}
-.rnd-hdr-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--bdr))}
-.rnd-hdr-badge{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;border:1px solid var(--bdr);background:var(--card);font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+/* ── PLAYOFF BRACKET ── */
+.pl-rnd{display:block;width:100%;margin-bottom:6px}
+.pl-rnd-hdr{display:flex;align-items:center;gap:8px;margin:16px 0 10px}
+.pl-rnd-hdr-line{flex:1;height:1px;background:var(--bdr)}
+.pl-rnd-hdr-pill{display:flex;align-items:center;gap:6px;padding:6px 16px;border-radius:30px;border:1px solid var(--bdr);background:var(--card);white-space:nowrap}
+.pl-rnd-hdr-pill .ri{font-size:16px}
+.pl-rnd-hdr-pill .rt{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px}
+.pl-rnd-hdr-pill .rs{font-size:8px;color:var(--m);margin-top:-1px}
+.pl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.pl-grid-1{display:block;margin-bottom:8px}
+.pl-arrow{display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 0;margin-bottom:6px}
+.pl-arrow span{font-size:8px;font-weight:700;color:#1e3a52;letter-spacing:1.5px;text-transform:uppercase}
+.pl-arrow-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,#1e3a52,transparent)}
 /* ── Match card ── */
-.bm{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;transition:all .2s;margin-bottom:10px}
-.bm.can-click{cursor:pointer}.bm.can-click:active{transform:scale(.99);border-color:var(--acc)}
+.bm{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;transition:all .2s}
+.bm.can-click{cursor:pointer}.bm.can-click:active{transform:scale(.98);border-color:var(--acc)}
 .bm.won{border-color:#f5a00066}
-.bm-date{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#050d18;border-bottom:1px solid var(--bdr)07}
-.bm-date-day{font-size:8px;font-weight:800;color:var(--gold);letter-spacing:.5px}
+.bm.final-card{border:2px solid var(--g)55;background:linear-gradient(135deg,#071407,var(--card))}
+.bm-date{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#050d18;border-bottom:1px solid #0d1e33}
+.bm-date-day{font-size:9px;font-weight:800;letter-spacing:.5px}
 .bm-date-info{font-size:8px;color:var(--m)}
-.bt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #0d1e33}
+.bt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #0a1828}
 .bt:last-child{border-bottom:none}
-.bt.winner{background:linear-gradient(90deg,#f5a00012,transparent)}
+.bt.winner{background:linear-gradient(90deg,#f5a00015,transparent)}
 .bt .mc3{width:28px;height:32px;flex-shrink:0}
 .bt .mc3 svg{width:100%;height:100%}
-.bt .bn{font-size:12px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t)}
+.bt .bn{font-size:11px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t)}
 .bt .bs{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:20px;text-align:right;color:var(--m)}
-.bt.winner .bn{color:#fff}
-.bt.winner .bs{color:var(--gold)}
-.bt.tbd .mc3 svg path{stroke:#1e2e40}
-.bt.tbd .bn{color:#3a5068;font-style:italic;font-weight:500;font-size:11px}
-.bm-connector{text-align:center;padding:4px 0;font-size:8px;font-weight:700;letter-spacing:2px;color:#1e3a52;margin-bottom:10px}
+.bt.winner .bn{color:#fff}.bt.winner .bs{color:var(--gold)}
+.bt.tbd .bn{color:#2a4060;font-style:italic;font-weight:400;font-size:10px}
+.bt.tbd .mc3 svg path{stroke:#0d1e30;fill:#030810}
 /* ── Champ ── */
 .champ-card{background:linear-gradient(135deg,#1a1200,#0a0d0a);border:2px solid var(--gold);border-radius:14px;padding:16px;text-align:center;margin-bottom:12px}
 .cc-l{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin-bottom:8px}
 .cc-c{width:50px;height:58px;margin:0 auto 6px}
 .cc-c svg{width:100%;height:100%}
 .cc-n{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff}
+/* ── Trophy banner ── */
+.pl-trophy{text-align:center;padding:16px 14px;background:linear-gradient(135deg,#120e00,#0a100a);border:1px solid var(--gold)44;border-radius:14px;margin-top:4px}
+.pl-trophy-ico{font-size:36px;margin-bottom:6px}
+.pl-trophy-t{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold)}
+.pl-trophy-s{font-size:10px;color:var(--g);font-weight:700;letter-spacing:1.5px;margin-top:2px}
+.pl-trophy-sub{font-size:9px;color:var(--m);margin-top:5px}
 .champ-card{background:linear-gradient(135deg,#180e00,#0a0a00);border:2px solid var(--gold);border-radius:14px;padding:18px;text-align:center;margin-bottom:12px}
 .champ-card .cc-l{font-size:8px;color:var(--gold);text-transform:uppercase;letter-spacing:.2em;margin-bottom:7px}
 .champ-card .cc-c{width:60px;height:68px;margin:0 auto 8px}
@@ -519,7 +531,7 @@ select:focus{outline:none;border-color:var(--acc)}
   <div id="llave-alert"></div>
   <div id="champ-area"></div>
   <div id="clasif-area"></div>
-  <div class="bracket-outer"><div class="bracket-wrap" id="bracket-wrap"></div></div>
+  <div id="bracket-wrap" style="display:block;width:100%"></div>
 </section>
 
 <!-- INFO -->
@@ -1219,112 +1231,103 @@ function renderLlave(){
     +'<div style="font-size:8px;color:var(--m);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Clasificados</div>'
     +'<div class="clasif-bar">'+top8.map((r,i)=>'<div class="cbadge"><b>'+(i+1)+'°</b><div class="cm">'+cSVG(r.slot)+'</div>'+tShort(r.slot)+'</div>').join('')+'</div></div>';
 
-  const diaClr={Jueves:'#a78bfa',Sábado:'#10b981',Lunes:'#60a5fa',Domingo:'#f59e0b'};
+  const DC={Jueves:'#a78bfa',Sábado:'#10b981',Lunes:'#60a5fa',Domingo:'#f59e0b'};
   function bT(slot,sc,won){
-    if(!slot)return '<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#060f1a" stroke="#0d1e30" stroke-width="1.5"/></svg></div><span class="bn">Por definir</span><span class="bs"></span></div>';
-    return '<div class="bt'+(won?' winner':'')+'"><div class="mc3">'+cSVG(slot)+'</div><span class="bn">'+tShort(slot)+'</span><span class="bs">'+(sc!=null?sc:'—')+'</span></div>';
+    if(!slot)return '<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#030810" stroke="#0d1e30" stroke-width="1.5"/></svg></div><span class="bn">Por definir</span><span class="bs"></span></div>';
+    return '<div class="bt'+(won?' winner':'')+'"><div class="mc3">'+cSVG(slot)+'</div><span class="bn">'+tShort(slot)+'</span><span class="bs">'+(sc!=null?sc:'')+'</span></div>';
   }
-  function bM(m,r,w,ph){
+  function bM(m,r,w,ph,extra){
     const[gl,gv]=r?[r.gl,r.gv]:[null,null];
     const cc=adminMode&&m.l&&m.v;
     const pd=PLAYOFF_DATES[m.id]||{};
-    const dc=diaClr[pd.dia]||'var(--m)';
+    const dc=DC[pd.dia]||'var(--m)';
     const dateBar=pd.fecha
       ?'<div class="bm-date"><span class="bm-date-day" style="color:'+dc+'">'+fmtDShort(pd.fecha,pd.dia)+'</span><span class="bm-date-info">'+pd.hora+(pd.cancha?' · '+(pd.cancha).replace('Villa Silvania','V.S.'):'')+'</span></div>'
       :'';
-    return '<div class="bm'+(w?' won':'')+(cc?' can-click':'')+(cc?'" onclick="openResult(&apos;'+ph+'&apos;,&apos;'+m.id+'&apos;,'+m.l+','+(m.v||0)+')"':'"')+'>'
+    return '<div class="bm'+(extra?' '+extra:'')+(w?' won':'')+(cc?' can-click':'')+(cc?'" onclick="openResult(&apos;'+ph+'&apos;,&apos;'+m.id+'&apos;,'+m.l+','+(m.v||0)+')"':'"')+'>'
       +dateBar+bT(m.l,gl,w===m.l)+bT(m.v,gv,w===m.v)+'</div>';
   }
-
-  function rndHdr(icon,label,color){
-    return '<div class="rnd-hdr"><div class="rnd-hdr-line"></div>'
-      +'<div class="rnd-hdr-badge" style="color:'+color+';border-color:'+color+'33"><span>'+icon+'</span><span>'+label+'</span></div>'
-      +'<div class="rnd-hdr-line"></div></div>';
+  function plHdr(icon,label,sub,color){
+    return '<div class="pl-rnd-hdr"><div class="pl-rnd-hdr-line"></div>'
+      +'<div class="pl-rnd-hdr-pill" style="border-color:'+color+'55"><span class="ri">'+icon+'</span>'
+      +'<div><div class="rt" style="color:'+color+'">'+label+'</div>'+(sub?'<div class="rs">'+sub+'</div>':'')+'</div>'
+      +'</div><div class="pl-rnd-hdr-line"></div></div>';
   }
+  function plArrow(){return '<div class="pl-arrow"><div class="pl-arrow-line"></div><span>Ganadores avanzan</span><div class="pl-arrow-line"></div></div>';}
   let bw='';
-  bw+=rndHdr('⚔️','Cuartos de Final','var(--acc)');
-  bw+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-  bw+=bM(qfR[0],qfR[0].r,qfR[0].w,'qf')+bM(qfR[1],qfR[1].r,qfR[1].w,'qf');
-  bw+=bM(qfR[2],qfR[2].r,qfR[2].w,'qf')+bM(qfR[3],qfR[3].r,qfR[3].w,'qf');
+  bw+=plHdr('⚔️','Cuartos de Final','4 partidos · Nov 19 y 23','var(--acc)');
+  bw+='<div class="pl-grid">';
+  bw+=bM(qfR[0],qfR[0].r,qfR[0].w,'qf','')+bM(qfR[1],qfR[1].r,qfR[1].w,'qf','');
+  bw+=bM(qfR[2],qfR[2].r,qfR[2].w,'qf','')+bM(qfR[3],qfR[3].r,qfR[3].w,'qf','');
   bw+='</div>';
-  bw+='<div class="bm-connector">↓ &nbsp; Ganadores avanzan &nbsp; ↓</div>';
-  bw+=rndHdr('🥊','Semifinales','var(--gold)');
-  bw+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-  bw+=bM(sfR[0],sfR[0].r,sfR[0].w,'sf')+bM(sfR[1],sfR[1].r,sfR[1].w,'sf');
+  bw+=plArrow();
+  bw+=plHdr('🥊','Semifinales','2 partidos · Jueves 26 Nov','var(--gold)');
+  bw+='<div class="pl-grid">';
+  bw+=bM(sfR[0],sfR[0].r,sfR[0].w,'sf','')+bM(sfR[1],sfR[1].r,sfR[1].w,'sf','');
   bw+='</div>';
-  bw+='<div class="bm-connector">↓ &nbsp; Finalistas &nbsp; ↓</div>';
-  bw+=rndHdr('🏆','Gran Final','var(--g)');
-  bw+=bM(finM,finR,champ,'final');
+  bw+=plArrow();
+  bw+=plHdr('🏆','Gran Final','Domingo 29 Nov · 19:00','var(--g)');
+  bw+='<div class="pl-grid-1">'+bM(finM,finR,champ,'final','final-card')+'</div>';
+  if(champ){bw+='<div class="pl-trophy"><div class="pl-trophy-ico">🏆</div><div class="pl-trophy-t">'+tName(champ)+'</div><div class="pl-trophy-s">CAMPEÓN LIGA S2 2026</div><div class="pl-trophy-sub">Atlético Norte F.C</div></div>';}
   document.getElementById('bracket-wrap').innerHTML=bw;
 }
 
 function renderBracketPreview(){
-  const diaClr={Jueves:'#a78bfa',Sábado:'#10b981',Lunes:'#60a5fa',Domingo:'#f59e0b'};
-  function prevCard(key,nameA,nameB,borderColor){
+  const DC2={Jueves:'#a78bfa',Sábado:'#10b981',Lunes:'#60a5fa',Domingo:'#f59e0b'};
+  const shld='<svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#030810" stroke="#0d1e30" stroke-width="1.5"/></svg>';
+  function pCard(key,nameA,nameB,bc){
     const pd=PLAYOFF_DATES[key]||{};
-    const dc=diaClr[pd.dia]||'var(--m)';
-    const shld='<svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#060e1a" stroke="#0d1e30" stroke-width="1.5"/></svg>';
-    return '<div class="bm" style="border-color:'+borderColor+'33">'
-      +'<div class="bm-date"><span class="bm-date-day" style="color:'+dc+'">'+(pd.fecha?fmtDShort(pd.fecha,pd.dia):'Por definir')+'</span>'
-      +'<span class="bm-date-info">'+(pd.hora||'')+(pd.cancha?' · '+(pd.cancha).replace('Villa Silvania','V.S.'):'')+'</span></div>'
-      +'<div class="bt"><div class="mc3">'+shld+'</div><span class="bn">'+nameA+'</span></div>'
-      +'<div class="bt"><div class="mc3">'+shld+'</div><span class="bn">'+nameB+'</span></div>'
+    const dc=DC2[pd.dia]||'var(--m)';
+    return '<div class="bm" style="border-color:'+bc+'44">'
+      +'<div class="bm-date"><span class="bm-date-day" style="color:'+dc+'">'+(pd.fecha?fmtDShort(pd.fecha,pd.dia):'TBD')+'</span>'
+      +'<span class="bm-date-info">'+(pd.hora||'--:--')+(pd.cancha?' · '+(pd.cancha).replace('Villa Silvania','V.S.'):'')+'</span></div>'
+      +'<div class="bt tbd"><div class="mc3">'+shld+'</div><span class="bn">'+nameA+'</span></div>'
+      +'<div class="bt tbd"><div class="mc3">'+shld+'</div><span class="bn">'+nameB+'</span></div>'
       +'</div>';
   }
-  function rndHdr(icon,label,sub,color){
-    return '<div class="rnd-hdr"><div class="rnd-hdr-line"></div>'
-      +'<div class="rnd-hdr-badge" style="color:'+color+';border-color:'+color+'44"><span>'+icon+'</span>'
-      +'<div><div style="font-size:10px">'+label+'</div><div style="font-size:8px;color:var(--m);font-weight:400">'+sub+'</div></div>'
-      +'</div><div class="rnd-hdr-line"></div></div>';
+  function pH(icon,label,sub,color){
+    return '<div class="pl-rnd-hdr"><div class="pl-rnd-hdr-line"></div>'
+      +'<div class="pl-rnd-hdr-pill" style="border-color:'+color+'55"><span class="ri">'+icon+'</span>'
+      +'<div><div class="rt" style="color:'+color+'">'+label+'</div>'+(sub?'<div class="rs">'+sub+'</div>':'')+'</div>'
+      +'</div><div class="pl-rnd-hdr-line"></div></div>';
   }
+  function pArr(){return '<div class="pl-arrow"><div class="pl-arrow-line"></div><span>Ganadores avanzan</span><div class="pl-arrow-line"></div></div>';}
 
-  let html='';
-
-  // ── CUARTOS ──
-  html+=rndHdr('⚔️','Cuartos de Final','4 partidos · Nov 19 y 23','var(--acc)');
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
-  html+=prevCard('qf1','1° Clasificado','8° Clasificado','var(--acc)');
-  html+=prevCard('qf3','2° Clasificado','7° Clasificado','var(--acc)');
-  html+=prevCard('qf2','4° Clasificado','5° Clasificado','var(--acc)');
-  html+=prevCard('qf4','3° Clasificado','6° Clasificado','var(--acc)');
-  html+='</div>';
-
-  html+='<div class="bm-connector">↓ &nbsp; Ganadores avanzan &nbsp; ↓</div>';
-
-  // ── SEMIFINALES ──
-  html+=rndHdr('🥊','Semifinales','2 partidos · Jueves 26 Nov','var(--gold)');
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
-  html+=prevCard('sf1','Ganador QF1','Ganador QF2','var(--gold)');
-  html+=prevCard('sf2','Ganador QF3','Ganador QF4','var(--gold)');
-  html+='</div>';
-
-  html+='<div class="bm-connector">↓ &nbsp; Finalistas &nbsp; ↓</div>';
-
-  // ── GRAN FINAL ──
-  html+=rndHdr('🏆','Gran Final','Domingo 29 de Noviembre · 19:00','var(--g)');
+  let h='';
+  h+=pH('⚔️','Cuartos de Final','4 partidos · Nov 19 y 23','var(--acc)');
+  h+='<div class="pl-grid">';
+  h+=pCard('qf1','1° Clasificado','8° Clasificado','var(--acc)');
+  h+=pCard('qf3','2° Clasificado','7° Clasificado','var(--acc)');
+  h+=pCard('qf2','4° Clasificado','5° Clasificado','var(--acc)');
+  h+=pCard('qf4','3° Clasificado','6° Clasificado','var(--acc)');
+  h+='</div>';
+  h+=pArr();
+  h+=pH('🥊','Semifinales','2 partidos · Jueves 26 Nov','var(--gold)');
+  h+='<div class="pl-grid">';
+  h+=pCard('sf1','Ganador QF1','Ganador QF2','var(--gold)');
+  h+=pCard('sf2','Ganador QF3','Ganador QF4','var(--gold)');
+  h+='</div>';
+  h+=pArr();
+  h+=pH('🏆','Gran Final','Domingo 29 Nov · 19:00','var(--g)');
   const pdF=PLAYOFF_DATES['final']||{};
-  html+='<div class="bm" style="border:2px solid var(--g)44;background:linear-gradient(135deg,#071207,var(--card))">'
+  h+='<div class="pl-grid-1"><div class="bm final-card">'
     +'<div class="bm-date" style="background:linear-gradient(90deg,var(--g)15,transparent)">'
     +'<span class="bm-date-day" style="color:#f59e0b">Dom '+(pdF.fecha?pdF.fecha.slice(8):29)+' Nov</span>'
-    +'<span class="bm-date-info">19:00 · Villa Silvania</span>'
-    +'</div>'
-    +'<div class="bt"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#0a1f0a" stroke="var(--g)" stroke-width="2"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="11" font-weight="900" font-family="Arial">SF1</text></svg></div><span class="bn" style="color:#fff;font-size:12px">Campeón Semifinal 1</span></div>'
-    +'<div class="bt"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#0a1f0a" stroke="var(--g)" stroke-width="2"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="11" font-weight="900" font-family="Arial">SF2</text></svg></div><span class="bn" style="color:#fff;font-size:12px">Campeón Semifinal 2</span></div>'
-    +'</div>';
-
-  html+='<div style="text-align:center;margin-top:14px;padding:14px;background:linear-gradient(135deg,#1a1000,#0a100a);border:1px solid var(--gold)44;border-radius:14px">'
-    +'<div style="font-size:32px;margin-bottom:6px">🏆</div>'
-    +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:3px;color:var(--gold)">CAMPEÓN</div>'
-    +'<div style="font-size:10px;color:var(--g);font-weight:700;letter-spacing:1px;margin-top:2px">LIGA INTERNA · S2 2026</div>'
-    +'<div style="font-size:9px;color:var(--m);margin-top:4px">Atlético Norte F.C</div>'
-    +'</div>';
-
-  html+='<div class="alert blue" style="margin-top:12px"><span class="alert-ico">📌</span><div>'
-    +'<div class="at">Programación confirmada · Equipos por definir</div>'
+    +'<span class="bm-date-info">19:00 · Villa Silvania</span></div>'
+    +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#0a1f0a" stroke="var(--g)" stroke-width="2"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="12" font-weight="900" font-family="Arial">SF1</text></svg></div>'
+    +'<span class="bn" style="color:#c0e0c0">Campeón Semifinal 1</span></div>'
+    +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#0a1f0a" stroke="var(--g)" stroke-width="2"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="12" font-weight="900" font-family="Arial">SF2</text></svg></div>'
+    +'<span class="bn" style="color:#c0e0c0">Campeón Semifinal 2</span></div>'
+    +'</div></div>';
+  h+='<div class="pl-trophy"><div class="pl-trophy-ico">🏆</div>'
+    +'<div class="pl-trophy-t">CAMPEÓN</div>'
+    +'<div class="pl-trophy-s">LIGA INTERNA · S2 2026</div>'
+    +'<div class="pl-trophy-sub">Atlético Norte F.C</div></div>';
+  h+='<div class="alert blue" style="margin-top:10px"><span class="alert-ico">📌</span><div>'
+    +'<div class="at">Programación pre-confirmada · Equipos por definir</div>'
     +'<div class="ab">QF J1: Jue 19 Nov · QF J2: Lun 23 Nov · SF: Jue 26 Nov · Final: Dom 29 Nov</div>'
     +'</div></div>';
-
-  document.getElementById('bracket-wrap').innerHTML=html;
+  document.getElementById('bracket-wrap').innerHTML=h;
 }
 
 // ── ASIGNACIÓN MANUAL ─────────────────────────────────────────────────
