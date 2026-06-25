@@ -199,14 +199,17 @@ select:focus{outline:none;border-color:var(--acc)}
 .info-list li::before{content:'›';position:absolute;left:0;color:var(--acc);font-weight:700}
 
 /* ── ADMIN SORTEO ── */
-.slot-board{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
-.sball{background:var(--card);border:2px solid var(--bdr);border-radius:11px;padding:8px 4px;text-align:center;transition:all .3s}
-.sball.done{box-shadow:0 0 0 1px var(--acc)}
-.sball .sn{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;color:var(--acc)}
-.sball .sl{font-size:7px;color:var(--m);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-.sball .sc{width:26px;height:30px;margin:0 auto 2px}
+.slot-board{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.sball{background:var(--card);border:2px solid var(--bdr);border-radius:13px;padding:10px 4px 8px;text-align:center;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+.sball:active{transform:scale(.95)}
+.sball.done{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)33,0 4px 16px #c8000a20}
+.sball .sn{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;color:var(--acc)}
+.sball .sl{font-size:7px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.sball .sc{width:30px;height:35px;margin:0 auto 4px}
 .sball .sc svg{width:100%;height:100%}
-.sball .st{font-size:7px;font-weight:700;min-height:18px;display:flex;align-items:center;justify-content:center;color:#fff;line-height:1.2}
+.sball .st{font-size:7px;font-weight:700;min-height:16px;display:flex;align-items:center;justify-content:center;color:#fff;line-height:1.2;padding:0 2px}
+.sball .sp{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--g)}
+.sball:not(.done) .sp{display:none}
 .del-grid{display:flex;flex-direction:column;gap:6px}
 .del-card{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:9px;border-left:3px solid transparent}
 .del-num{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;flex-shrink:0}
@@ -325,13 +328,15 @@ select:focus{outline:none;border-color:var(--acc)}
 .alert.blue{background:#3b82f610;border:1px solid #3b82f630}.alert.blue .at{color:#3b82f6}
 
 /* ── TEAM PICKER ── */
-.tp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:55vh;overflow-y:auto;padding:2px}
-.tp-card{background:#0d1a2e;border:2px solid var(--bdr);border-radius:11px;padding:10px 8px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none}
-.tp-card:active{transform:scale(.96)}
-.tp-card.taken{opacity:.35;pointer-events:none}
-.tp-crest{width:28px;height:32px;flex-shrink:0}
+.tp-list{display:flex;flex-direction:column;gap:6px;max-height:58vh;overflow-y:auto;padding:2px}
+.tp-card{background:#0a1628;border:2px solid var(--bdr);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none}
+.tp-card:active{transform:scale(.98)}
+.tp-card.taken{opacity:.3;pointer-events:none}
+.tp-card.cur{border-color:var(--g);background:#10b98112}
+.tp-crest{width:32px;height:37px;flex-shrink:0}
 .tp-crest svg{width:100%;height:100%}
-.tp-name{font-size:9px;font-weight:700;color:#e2e8f0;line-height:1.3}
+.tp-name{font-size:11px;font-weight:700;color:#e2e8f0;line-height:1.3;flex:1}
+.tp-asign{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:10px;font-weight:800;cursor:pointer;flex-shrink:0;letter-spacing:.5px}
 .tp-clear{background:#c8000a18;border:1px solid #c8000a33;border-radius:9px;padding:9px;text-align:center;font-size:10px;color:var(--acc);cursor:pointer;margin-bottom:10px;font-weight:700}
 /* ── CALENDAR ── */
 .cal-round{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:10px}
@@ -537,8 +542,14 @@ select:focus{outline:none;border-color:var(--acc)}
 
   <!-- ASIGNACIÓN EQUIPOS -->
   <div style="margin-bottom:14px">
-    <div class="sh"><h2>Asignar Equipos</h2><span class="tag grey" id="sp-prog">0/10</span></div>
-    <div style="font-size:9px;color:var(--m);margin-bottom:8px">Toca cualquier posición para asignar o cambiar el equipo.</div>
+    <div class="sh"><h2>Sorteo Manual</h2><span class="tag grey" id="sp-prog">0/10</span></div>
+    <div style="background:#3b82f610;border:1px solid #3b82f630;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:18px">☝️</span>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#60a5fa">Toca una posición → selecciona el equipo</div>
+        <div style="font-size:9px;color:var(--m);margin-top:1px">Asigna cada equipo a la posición que le tocó en el sorteo</div>
+      </div>
+    </div>
     <div class="btn-row" style="margin-bottom:10px">
       <button class="btn btn-ghost btn-sm" onclick="resetSorteo()">↺ Limpiar todo</button>
     </div>
@@ -654,18 +665,13 @@ select:focus{outline:none;border-color:var(--acc)}
 
 <!-- MODAL ASIGNAR EQUIPO -->
 <div class="mo" id="mo-team" onclick="closeModal('mo-team',event)">
-  <div class="md" style="max-width:420px" onclick="event.stopPropagation()">
+  <div class="md" style="max-width:400px" onclick="event.stopPropagation()">
     <div class="md-title" id="tp-title">Asignar Equipo</div>
-    <div class="md-sub" id="tp-sub">Toca un equipo para seleccionarlo</div>
-    <div class="tp-clear" onclick="clearSlot()">✕ Quitar equipo asignado</div>
-    <div class="tp-grid" id="tp-grid"></div>
-    <div id="tp-preview" style="display:none;margin:10px 0 0;background:#10b98118;border:1px solid #10b98144;border-radius:10px;padding:10px 12px;display:none;align-items:center;gap:10px">
-      <div id="tp-prev-crest" style="width:36px;height:42px;flex-shrink:0"></div>
-      <div style="flex:1"><div style="font-size:11px;font-weight:800;color:#10b981" id="tp-prev-name">—</div><div style="font-size:9px;color:var(--m)">Seleccionado · Toca Agregar para confirmar</div></div>
-    </div>
-    <div class="md-actions" style="margin-top:12px;gap:8px">
+    <div class="md-sub" id="tp-sub">Toca el botón ASIGNAR del equipo elegido</div>
+    <div class="tp-clear" id="tp-clear" onclick="clearSlot()">✕ Quitar equipo de esta posición</div>
+    <div class="tp-list" id="tp-grid"></div>
+    <div class="md-actions" style="margin-top:10px">
       <button class="btn btn-ghost" onclick="closeModal('mo-team')">Cancelar</button>
-      <button class="btn" id="tp-agregar-btn" style="background:var(--g);color:#fff;opacity:.35;pointer-events:none" onclick="confirmTeam()">✅ Agregar</button>
     </div>
   </div>
 </div>
@@ -1282,85 +1288,93 @@ function renderBracketPreview(){
   html+='</div>';
 
   // ── FINAL ──
-  html+=sectionHeader('🏆','Gran Final','1 partido · Domingo 29 de Noviembre','var(--g)');
-  html+='<div style="border:2px solid var(--g);border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#0f1a0f,var(--c2))">'
-    +dateBar('final','var(--g)')
-    +'<div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">'
-    +'<div style="display:flex;align-items:center;gap:10px;padding:6px 0">'
-    +'<svg viewBox="0 0 60 70" style="width:28px;height:32px"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#1a2a1a" stroke="var(--g)" stroke-width="1.5"/></svg>'
-    +'<div><div style="font-size:13px;font-weight:800;color:var(--t)">Ganador Semifinal 1</div><div style="font-size:9px;color:var(--m)">Por definir</div></div>'
+  html+=sectionHeader('🏆','Gran Final','Villa Silvania · Domingo 29 de Noviembre · 19:00','var(--g)');
+  const pdF=PLAYOFF_DATES['final']||{};
+  const dsF=diaStyle['Domingo']||{bg:'#f59e0b22',color:'#f59e0b',bdr:'#f59e0b44',lbl:'DOM'};
+  html+='<div style="border:2px solid var(--g);border-radius:14px;overflow:hidden;background:linear-gradient(160deg,#071a07 0%,#0a1a0a 60%,#030d03 100%)">'
+    +'<div style="background:linear-gradient(90deg,var(--g)22,var(--g)08);border-bottom:1px solid var(--g)44;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">'
+    +'<div style="display:flex;align-items:center;gap:8px">'
+    +'<span style="background:'+dsF.color+';color:#000;font-size:8px;font-weight:900;padding:3px 8px;border-radius:20px">DOM</span>'
+    +'<span style="font-size:12px;font-weight:800;color:'+dsF.color+'">'+fmtDFull(pdF.fecha||'2026-11-29','Domingo')+'</span>'
     +'</div>'
-    +'<div style="text-align:center;font-size:22px;color:var(--gold);letter-spacing:3px;padding:2px 0">🏆</div>'
-    +'<div style="display:flex;align-items:center;gap:10px;padding:6px 0">'
-    +'<svg viewBox="0 0 60 70" style="width:28px;height:32px"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#1a2a1a" stroke="var(--g)" stroke-width="1.5"/></svg>'
-    +'<div><div style="font-size:13px;font-weight:800;color:var(--t)">Ganador Semifinal 2</div><div style="font-size:9px;color:var(--m)">Por definir</div></div>'
+    +'<div style="display:flex;align-items:center;gap:6px">'
+    +'<span style="font-size:12px;font-weight:700;color:var(--g)">19:00</span>'
+    +'<span style="font-size:9px;color:var(--m)">Villa Silvania</span>'
+    +'</div>'
+    +'</div>'
+    +'<div style="padding:16px 14px">'
+    +'<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #ffffff10">'
+    +'<svg viewBox="0 0 60 70" style="width:34px;height:40px;flex-shrink:0"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#122312" stroke="var(--g)" stroke-width="1.5"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="11" font-weight="900" font-family="Arial">SF1</text></svg>'
+    +'<div><div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:.3px">Campeón Semifinal 1</div><div style="font-size:9px;color:var(--m);margin-top:2px">Por definir · Jueves 26 Nov</div></div>'
+    +'</div>'
+    +'<div style="text-align:center;padding:10px 0;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:3px;font-family:\'Bebas Neue\',sans-serif">— VS —</div>'
+    +'<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid #ffffff10">'
+    +'<svg viewBox="0 0 60 70" style="width:34px;height:40px;flex-shrink:0"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#122312" stroke="var(--g)" stroke-width="1.5"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="11" font-weight="900" font-family="Arial">SF2</text></svg>'
+    +'<div><div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:.3px">Campeón Semifinal 2</div><div style="font-size:9px;color:var(--m);margin-top:2px">Por definir · Jueves 26 Nov</div></div>'
+    +'</div>'
+    +'<div style="margin-top:14px;text-align:center;background:var(--g)10;border:1px solid var(--g)33;border-radius:10px;padding:10px">'
+    +'<div style="font-size:26px;margin-bottom:4px">🏆</div>'
+    +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:var(--g)">CAMPEÓN LIGA S2 2026</div>'
+    +'<div style="font-size:9px;color:var(--m);margin-top:3px">Atlético Norte F.C</div>'
     +'</div>'
     +'</div></div>';
 
   html+='<div class="alert blue" style="margin-top:12px"><span class="alert-ico">📌</span><div>'
     +'<div class="at">Vista previa admin · Equipos por definir al completar F2</div>'
-    +'<div class="ab">QF Jornada 1: Jueves 19 Nov · QF Jornada 2: Lunes 23 Nov · SF: Jueves 26 Nov · Final: Domingo 29 Nov</div>'
+    +'<div class="ab">QF J1: Jue 19 Nov · QF J2: Lun 23 Nov · SF: Jue 26 Nov · Final: Dom 29 Nov 19:00</div>'
     +'</div></div>';
 
   document.getElementById('bracket-wrap').innerHTML=html;
 }
 
 // ── ASIGNACIÓN MANUAL ─────────────────────────────────────────────────
-let _tpSlot=null;let _tpSelected=null;
+let _tpSlot=null;
 function buildSlotBoard(){
   const s=getS();let html='',done=0;
   for(let i=1;i<=10;i++){
     const idx=s.nm[i];const a=idx!=null;if(a)done++;
-    const c=a?tC1(i):'var(--bdr)';
-    html+='<div class="sball'+(a?' done':'')+'" style="cursor:pointer;'+(a?'border-color:'+c:'')
-      +'" onclick="openTeamPicker('+i+')">'
-      +'<div class="sn">'+i+'</div><div class="sl">Pos.</div>'
-      +'<div class="sc">'+(a?cSVG(i):'<svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#111" stroke="#333" stroke-width="1.5"/></svg>')+'</div>'
-      +'<div class="st">'+(a?tShort(i):'+ Asignar')+'</div></div>';
+    const teamColor=a?TEAMS[idx].c1:'#333';
+    html+='<div class="sball'+(a?' done':'')+'" style="'+(a?'border-color:'+teamColor+';':'')+'" onclick="openTeamPicker('+i+')">'
+      +'<div class="sp"></div>'
+      +'<div class="sn">'+i+'</div>'
+      +'<div class="sl">Pos.</div>'
+      +'<div class="sc">'+(a?CRESTS[String(idx+1)]:'<svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#111" stroke="#2a2a2a" stroke-width="1.5"/><text x="30" y="45" text-anchor="middle" fill="#333" font-size="14" font-family="Arial">+</text></svg>')+'</div>'
+      +'<div class="st">'+(a?TEAMS[idx].sh:'Asignar')+'</div>'
+      +'</div>';
   }
   const el=document.getElementById('slot-board');if(el)el.innerHTML=html;
   const pg=document.getElementById('sp-prog');if(pg)pg.textContent=done+'/10';
 }
 function openTeamPicker(slot){
-  _tpSlot=slot;_tpSelected=null;
-  const btn=document.getElementById('tp-agregar-btn');if(btn){btn.style.opacity='.35';btn.style.pointerEvents='none';}
-  const prev=document.getElementById('tp-preview');if(prev)prev.style.display='none';
+  _tpSlot=slot;
   const s=getS();
   const usedByOther=new Set(Object.entries(s.nm).filter(([sl])=>+sl!==slot).map(([,idx])=>idx).filter(v=>v!=null));
-  document.getElementById('tp-title').textContent='Posición '+slot;
-  document.getElementById('tp-sub').textContent='Selecciona el equipo para la posición '+slot;
   const cur=s.nm[slot];
-  const clrEl=document.getElementById('tp-clear');
-  clrEl.style.display=cur!=null?'block':'none';
+  const titleEl=document.getElementById('tp-title');if(titleEl)titleEl.textContent='Posición '+slot;
+  const subEl=document.getElementById('tp-sub');if(subEl)subEl.textContent='Elige el equipo para la posición '+slot+' del sorteo';
+  const clrEl=document.getElementById('tp-clear');if(clrEl)clrEl.style.display=cur!=null?'block':'none';
   let html='';
-  TEAMS.forEach((t,i)=>{
+  TEAMS.forEach(function(t,i){
     const taken=usedByOther.has(i);
     const isCur=cur===i;
-    html+='<div class="tp-card'+(taken?' taken':'')+(isCur?' selected':'')+'" onclick="pickTeam('+i+')">'
+    html+='<div class="tp-card'+(taken?' taken':'')+(isCur?' cur':'')+'">'
       +'<div class="tp-crest">'+CRESTS[String(i+1)]+'</div>'
-      +'<div class="tp-name">'+t.name+(isCur?'<br><span style="color:var(--g);font-size:8px">✓ Asignado</span>':'')+'</div>'
+      +'<div class="tp-name">'+t.name+(isCur?'<br><span style="color:var(--g);font-size:8px;font-weight:600">✓ Asignado actualmente</span>':'')+(taken?'<br><span style="color:var(--m);font-size:8px">Ya asignado</span>':'')+'</div>'
+      +(taken?''
+        :'<button class="tp-asign" onclick="assignTeam('+i+')">ASIGNAR</button>')
       +'</div>';
   });
   document.getElementById('tp-grid').innerHTML=html;
   document.getElementById('mo-team').classList.add('open');
 }
-function pickTeam(teamIdx){
-  _tpSelected=teamIdx;
-  document.querySelectorAll('.tp-card').forEach(function(c){c.classList.remove('selected');});
-  const cards=document.querySelectorAll('.tp-card');
-  if(cards[teamIdx])cards[teamIdx].classList.add('selected');
-  setTimeout(function(){confirmTeam();},180);
-}
-function confirmTeam(){
-  if(_tpSelected===null)return;
-  const teamIdx=_tpSelected;const slot=_tpSlot;
+function assignTeam(teamIdx){
+  const slot=_tpSlot;
+  if(slot==null)return;
   const s=getS();s.nm[slot]=teamIdx;setS(s);
   document.getElementById('mo-team').classList.remove('open');
-  _tpSelected=null;
   buildSlotBoard();buildDelGrid();populateTeamFilter();
-  showToast('✅ '+TEAMS[teamIdx].name+' → Pos. '+slot);
+  showToast('✅ '+TEAMS[teamIdx].name+' asignado a Pos. '+slot);
 }
-function selectTeam(teamIdx){confirmTeam();}
 function clearSlot(){
   const s=getS();delete s.nm[_tpSlot];setS(s);
   document.getElementById('mo-team').classList.remove('open');
