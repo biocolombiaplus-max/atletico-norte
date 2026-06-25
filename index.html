@@ -1313,17 +1313,10 @@ function openTeamPicker(slot){
 }
 function pickTeam(teamIdx){
   _tpSelected=teamIdx;
-  // Highlight selected card
   document.querySelectorAll('.tp-card').forEach(function(c){c.classList.remove('selected');});
   const cards=document.querySelectorAll('.tp-card');
   if(cards[teamIdx])cards[teamIdx].classList.add('selected');
-  // Show preview
-  const t=TEAMS[teamIdx];
-  const prev=document.getElementById('tp-preview');
-  if(prev){prev.style.display='flex';document.getElementById('tp-prev-name').textContent=t.name;document.getElementById('tp-prev-crest').innerHTML=CRESTS[String(teamIdx+1)];}
-  // Enable Agregar button
-  const btn=document.getElementById('tp-agregar-btn');
-  if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  setTimeout(function(){confirmTeam();},180);
 }
 function confirmTeam(){
   if(_tpSelected===null)return;
@@ -1655,6 +1648,7 @@ function enableAdminMode(){
   const sec=document.getElementById('sec-admin');if(sec)sec.classList.add('active');
   document.querySelectorAll('.bnav a,.tnav-in a').forEach(a=>a.classList.remove('active'));
   buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();
+  renderLlave();
   window.scrollTo(0,0);
   showToast('🔐 Admin activado');
 }
