@@ -1162,9 +1162,18 @@ function renderGoles(){
 function renderLlave(){
   const s=getS();
   const f2ms=genF2();
-  const f2d=f2ms.every(m=>s.r2[m.id]!=null)&&f2ms.length>0;
+  const f2done=f2Done();
   const alrt=document.getElementById('llave-alert');
-  if(!f2Done()){
+
+  // Admin preview: show full schedule even without results
+  if(!f2done){
+    if(adminMode){
+      alrt.innerHTML='<div class="alert blue"><span class="alert-ico">🗓️</span><div><div class="at">Vista Previa Admin — Programación Playoff</div><div class="ab">Los equipos se definen al completar Fase 1 + Fase 2. Las fechas, horas y canchas ya están pre-programadas.</div></div></div>';
+      document.getElementById('champ-area').innerHTML='';
+      document.getElementById('clasif-area').innerHTML='';
+      renderBracketPreview();
+      return;
+    }
     alrt.innerHTML='<div class="alert yellow"><span class="alert-ico">⏳</span><div><div class="at">Fase 2 pendiente</div><div class="ab">Complete Fase 1 + Fase 2 para ver la llave del playoff.</div></div></div>';
     document.getElementById('bracket-wrap').innerHTML='';
     document.getElementById('champ-area').innerHTML='';
@@ -1213,6 +1222,54 @@ function renderLlave(){
     +bM(sfR[1],sfR[1].r,sfR[1].w,'sf')+'</div>'
     +'<div class="round"><div class="round-title">Final</div><div style="height:86px"></div>'
     +bM(finM,finR,champ,'final')+'</div>';
+}
+
+function renderBracketPreview(){
+  // Show pre-programmed dates for all playoff matches, teams as TBD
+  function pdTag(key){
+    const pd=PLAYOFF_DATES[key]||{};
+    if(!pd.fecha)return '';
+    const dc={Jueves:{bg:'#a78bfa22',color:'#a78bfa',lbl:'JUE'},Sábado:{bg:'#10b98122',color:'#10b981',lbl:'SÁB'},Lunes:{bg:'#3b82f622',color:'#60a5fa',lbl:'LUN'}};
+    const d=dc[pd.dia]||{bg:'#ffffff10',color:'#aaa',lbl:'?'};
+    return '<div style="display:flex;align-items:center;gap:5px;justify-content:center;flex-wrap:wrap;padding:5px 6px 2px">'
+      +'<span style="background:'+d.bg+';color:'+d.color+';border:1px solid '+d.color+'44;font-size:8px;font-weight:900;padding:2px 7px;border-radius:20px">'+d.lbl+'</span>'
+      +'<span style="font-size:9px;font-weight:800;color:'+d.color+'">'+fmtDFull(pd.fecha,pd.dia)+'</span>'
+      +'</div>'
+      +'<div style="text-align:center;padding:0 6px 4px;font-size:9px;color:var(--gold);font-weight:700">'+pd.hora+'&nbsp;&nbsp;<span style="font-size:8px;color:var(--m);font-weight:400">'+( pd.cancha||'')+'</span></div>';
+  }
+  function tbdMatch(key,label){
+    return '<div class="bm" style="border:1px solid var(--bdr);border-radius:10px;overflow:hidden;margin-bottom:4px">'
+      +pdTag(key)
+      +'<div style="border-top:1px solid var(--bdr)">'
+      +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#111" stroke="#333" stroke-width="1.5"/></svg></div><span class="bn">'+label+'</span></div>'
+      +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#111" stroke="#333" stroke-width="1.5"/></svg></div><span class="bn">Por definir</span></div>'
+      +'</div></div>';
+  }
+
+  let html='';
+  // CUARTOS
+  html+='<div style="margin-bottom:16px">';
+  html+='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;color:var(--acc);margin-bottom:8px;display:flex;align-items:center;gap:8px">⚔️ Cuartos de Final <span style="font-size:10px;font-weight:400;color:var(--m);font-family:Inter,sans-serif">· 4 partidos</span></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html+=tbdMatch('qf1','1° vs 8°');
+  html+=tbdMatch('qf3','2° vs 7°');
+  html+=tbdMatch('qf2','4° vs 5°');
+  html+=tbdMatch('qf4','3° vs 6°');
+  html+='</div></div>';
+  // SEMIFINALES
+  html+='<div style="margin-bottom:16px">';
+  html+='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px">🥊 Semifinales <span style="font-size:10px;font-weight:400;color:var(--m);font-family:Inter,sans-serif">· 2 partidos</span></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html+=tbdMatch('sf1','W QF1 vs W QF2');
+  html+=tbdMatch('sf2','W QF3 vs W QF4');
+  html+='</div></div>';
+  // FINAL
+  html+='<div>';
+  html+='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;color:var(--g);margin-bottom:8px;display:flex;align-items:center;gap:8px">🏆 Gran Final <span style="font-size:10px;font-weight:400;color:var(--m);font-family:Inter,sans-serif">· 1 partido</span></div>';
+  html+=tbdMatch('final','Campeón vs Finalista');
+  html+='</div>';
+
+  document.getElementById('bracket-wrap').innerHTML=html;
 }
 
 // ── ASIGNACIÓN MANUAL ─────────────────────────────────────────────────
