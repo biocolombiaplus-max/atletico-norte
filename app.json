@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "BIOfit",
+    "slug": "biofit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "biofit",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0A0A1A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.biocolombiaplus.biofit"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A1A"
+      },
+      "package": "com.biocolombiaplus.biofit",
+      "permissions": []
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        { "backgroundColor": "#0A0A1A" }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
