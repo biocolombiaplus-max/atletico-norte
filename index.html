@@ -389,49 +389,12 @@ select:focus{outline:none;border-color:var(--acc)}
 .sr-t td:nth-child(2){text-align:left;padding-left:8px;font-size:9px;font-weight:700}
 .sr-t tr:last-child td{border-bottom:none}
 .sr-t tr:hover td{background:#0d1520}
-/* ── PRINT ── */
+/* ── PRINT (native browser print fallback) ── */
 #print-area{display:none}
 @media print{
-  :root{--t:#111!important;--card:#fff!important;--bdr:#e0e0e0!important;--m:#666!important;--g:#059669!important;--b:#2563eb!important;--acc:#c8000a!important;--gold:#92400e!important}
-  body{background:#fff!important;color:#111!important;font-family:Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  @page{margin:10mm 12mm;size:A4}
-  .bnav,.tnav,.hero,.mo,.btn-row,.alert,.admin-badge,#print-btn-area,.print-btn,.sh .tag{display:none!important}
-  .page{padding:4px!important;max-width:none!important}
-  .sec{display:none!important}
-  #print-area{display:block!important}
-  /* Dark bg elements → light */
-  .cal-rhead{background:#0f1e35!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .cal-rhead h4{color:#f5a000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .sr-t th,.eq-t th{background:#0f1e35!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-table th{background:#0f1e35!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-table td.team-name{background:#e8f0fe!important;color:#0f1e35!important;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-slot-hdr{background:#1e3a5f!important;color:#93c5fd!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-g{background:#d1fae5!important;color:#065f46!important;border:1px solid #6ee7b7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-y{background:#fef3c7!important;color:#92400e!important;border:1px solid #fcd34d!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-r{background:#fee2e2!important;color:#991b1b!important;border:1px solid #fca5a5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-0{background:#f1f5f9!important;color:#94a3b8!important;border:1px solid #e2e8f0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hm-fase-title{background:#f0f4ff!important;color:#0f1e35!important;border-left:4px solid #c8000a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .eq-bar{background:#e2e8f0!important}.bc-bar-wrap{background:#e2e8f0!important}
-  .radar-card{background:#f8faff!important;border:1px solid #dde8ff!important}
-  .cal-round{background:#fff!important;border:1px solid #e0e8ff!important}
-  .hm-wrap,.eq-table-wr,.sr-wr{overflow:visible!important;max-width:100%}
-  .hm-table{min-width:0!important}
-  /* Report wrapper */
-  .rpt-hdr{background:#0f1e35!important;color:#fff!important;padding:14px 20px;display:flex;align-items:center;gap:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .rpt-hdr-name{font-size:20px;font-weight:900;letter-spacing:3px;color:#c8000a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .rpt-hdr-sub{font-size:9px;color:#ccc;letter-spacing:.1em}
-  .rpt-tbar{background:#c8000a!important;color:#fff!important;padding:8px 20px;font-size:12px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .rpt-meta{background:#f0f4ff!important;padding:6px 20px;display:flex;justify-content:space-between;font-size:9px;color:#555;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .rpt-body{padding:14px 20px}
-  .rpt-sec{margin-top:18px;padding-top:12px;border-top:2px solid #c8000a;page-break-inside:avoid}
-  .rpt-sec-title{font-size:13px;font-weight:900;color:#0f1e35;margin-bottom:8px;border-left:3px solid #c8000a;padding-left:8px;text-transform:uppercase;letter-spacing:.04em}
-  .rpt-break{page-break-before:always!important}
-  .rpt-footer{background:#f8f8f8!important;border-top:1px solid #ddd;padding:6px 20px;display:flex;justify-content:space-between;font-size:8px;color:#888;margin-top:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  /* Tables universal */
-  table{border-collapse:collapse;width:100%;font-size:9px}
-  th{background:#0f1e35!important;color:#fff!important;padding:5px 8px;border:1px solid #1e3a5f;font-size:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  td{padding:4px 8px;border-bottom:1px solid #eee;font-size:9px}
-  tr:nth-child(even) td{background:#f8faff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bnav,.tnav,.hero,.mo,.btn-row,.admin-badge,#print-btn-area,.print-btn{display:none!important}
+  .page{padding:4px!important}
+  .sec.active{display:block!important}
 }
 /* ── DESKTOP ── */
 @media(min-width:768px){
@@ -1606,24 +1569,118 @@ function renderStatsResumen(){
 }
 
 // ── PRINT ─────────────────────────────────────────────────────────────
-function _printWithArea(html){
-  const pa=document.getElementById('print-area');
-  pa.innerHTML=html;
-  window.onafterprint=function(){pa.innerHTML='';window.onafterprint=null;};
-  window.print();
-}
-function _rptHeader(title){
+const _RPT_CSS=
+  '*{box-sizing:border-box;margin:0;padding:0}'
+  +':root{--g:#10b981;--b:#3b82f6;--acc:#c8000a;--gold:#f5a000;--t:#111;--m:#666;--card:#f8faff;--bdr:#e0e0e0}'
+  +'body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'@page{margin:10mm 12mm;size:A4}'
+  +'.rpt-hdr{background:#0f1e35;color:#fff;padding:14px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.rpt-hdr-name{font-size:22px;font-weight:900;letter-spacing:3px;color:#c8000a;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.rpt-hdr-sub{font-size:9px;color:#ccc;letter-spacing:.1em;margin-top:3px}'
+  +'.rpt-tbar{background:#c8000a;color:#fff;padding:9px 20px;font-size:13px;font-weight:700;letter-spacing:.05em;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.rpt-meta{background:#f0f4ff;padding:6px 20px;display:flex;justify-content:space-between;font-size:9px;color:#555;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.rpt-body{padding:14px 20px}'
+  +'.rpt-sec{margin-top:16px;padding-top:12px;border-top:2px solid #c8000a;page-break-inside:avoid}'
+  +'.rpt-sec-title{font-size:13px;font-weight:900;color:#0f1e35;margin-bottom:10px;border-left:3px solid #c8000a;padding-left:8px;text-transform:uppercase;letter-spacing:.04em}'
+  +'.rpt-break{page-break-before:always}'
+  +'.rpt-footer{background:#f8f8f8;border-top:1px solid #ddd;padding:7px 20px;display:flex;justify-content:space-between;font-size:8px;color:#888;margin-top:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.sh,.print-btn,.alert-ico{display:none}'
+  +'.cal-round{border:1px solid #dde8ff;border-radius:8px;margin-bottom:10px;overflow:hidden}'
+  +'.cal-rhead{background:#0f1e35;color:#fff;padding:7px 12px;display:flex;align-items:center;gap:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.cal-rhead h4{font-size:11px;font-weight:700;color:#fff}'
+  +'.cal-row{display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid #f0f0f0}'
+  +'.cal-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.cal-label{font-size:9px;font-weight:700;color:#333;flex:1}'
+  +'.cal-date{font-size:9px;color:#555}'
+  +'input[type="date"]{display:none}'
+  +'.sr-wr{overflow:visible;border:1px solid #dde8ff;border-radius:8px;margin-bottom:12px}'
+  +'.sr-t{width:100%;border-collapse:collapse;font-size:9px}'
+  +'.sr-t th{background:#0f1e35;color:#fff;padding:5px;font-size:7.5px;text-transform:uppercase;letter-spacing:.04em;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.sr-t td{padding:5px;border-bottom:1px solid #eee}'
+  +'.sr-t tr:nth-child(even) td{background:#f8faff;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.pos-n{font-weight:900;font-size:13px;color:#666}'
+  +'.pos-n.top{color:#059669}.pos-n.elim{color:#c8000a}'
+  +'.pts{font-weight:900;font-size:9px;padding:2px 6px;border-radius:4px;background:#c8000a;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.pts.lead{background:#f5a000;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.tc-ball{width:20px;height:23px;flex-shrink:0;display:inline-block;vertical-align:middle}'
+  +'.tc-ball svg{width:100%;height:100%}'
+  +'.tcell{display:flex;align-items:center;gap:5px}'
+  +'.eq-summary{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}'
+  +'.eq-kpi{background:#f0f4ff;border:1px solid #dde8ff;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.ek-v{font-size:20px;font-weight:900;color:#0f1e35}'
+  +'.ek-l{font-size:8px;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}'
+  +'.eq-table-wr{overflow:visible;border:1px solid #dde8ff;border-radius:8px;margin-bottom:12px}'
+  +'.eq-t{width:100%;border-collapse:collapse;font-size:9px}'
+  +'.eq-t th{background:#0f1e35;color:#fff;padding:5px 6px;font-size:7.5px;text-transform:uppercase;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.eq-t td{padding:5px 6px;border-bottom:1px solid #eee}'
+  +'.eq-t tr:nth-child(even) td{background:#f8faff;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.eq-bar{height:5px;border-radius:3px;background:#e2e8f0;overflow:hidden;width:40px;display:inline-block;vertical-align:middle;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.eq-fill{height:100%;border-radius:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.eq-val{font-size:9px;font-weight:700;color:#333}'
+  +'.eq-ok{color:#059669}.eq-warn{color:#d97706}'
+  +'.eq-section-title{font-size:13px;font-weight:900;color:#0f1e35;margin:12px 0 6px;border-left:3px solid #c8000a;padding-left:7px;text-transform:uppercase;letter-spacing:.04em}'
+  +'.eq-badge{font-size:8px;padding:2px 7px;border-radius:100px;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;display:inline-block;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-wrap{overflow:visible;margin-bottom:14px}'
+  +'.hm-table{border-collapse:collapse;width:100%;font-size:9px}'
+  +'.hm-table th{background:#0f1e35;color:#fff;padding:5px 4px;text-align:center;font-size:7.5px;text-transform:uppercase;white-space:nowrap;border:1px solid #1e3a5f;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-table th.team-col{text-align:left;padding-left:8px}'
+  +'.hm-table td{border:1px solid #e8e8e8;text-align:center;padding:2px}'
+  +'.hm-table td.team-name{text-align:left;padding:4px 8px;background:#e8f0fe;font-weight:700;font-size:9px;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-slot-hdr{background:#1e3a5f!important;color:#93c5fd!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-cell{border-radius:5px;padding:4px 3px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:28px}'
+  +'.hm-v{font-size:12px;font-weight:800;line-height:1}'
+  +'.hm-ideal{font-size:7px;opacity:.7;line-height:1}'
+  +'.hm-g{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-y{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-r{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-0{background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:8px;color:#666}'
+  +'.hm-leg-item{display:flex;align-items:center;gap:4px}'
+  +'.hm-leg-dot{width:10px;height:10px;border-radius:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.hm-fase-title{font-size:14px;font-weight:900;color:#0f1e35;margin:12px 0 6px;background:#f0f4ff;padding:7px 12px;border-radius:5px;border-left:4px solid #c8000a;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.radar-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}'
+  +'.radar-card{border:1px solid #dde8ff;border-radius:8px;padding:10px 12px;background:#f8faff;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.radar-card h4{font-size:9px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}'
+  +'.bar-chart{display:flex;flex-direction:column;gap:4px}'
+  +'.bc-row{display:flex;align-items:center;gap:5px}'
+  +'.bc-label{font-size:8px;color:#555;width:70px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+  +'.bc-bar-wrap{flex:1;background:#e2e8f0;border-radius:2px;height:9px;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.bc-bar-fill{height:100%;border-radius:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.bc-val{font-size:8px;font-weight:700;color:#333;width:16px;flex-shrink:0;text-align:right}'
+  +'.tag{font-size:7px;font-weight:700;padding:2px 7px;border-radius:100px}'
+  +'.tag.green{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.tag.gold{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.tag.blue{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.tag.red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.tag.grey{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.alert{border-radius:8px;padding:8px 12px;margin:8px 0;display:flex;gap:6px;font-size:10px}'
+  +'.alert.blue{background:#dbeafe;border:1px solid #93c5fd;color:#1e40af;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.alert.green{background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.alert.yellow{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  +'.at{font-weight:700;font-size:10px;margin-bottom:2px}.ab{font-size:9px;opacity:.85}'
+  +'table{border-collapse:collapse;width:100%}'
+  +'th{padding:5px 8px;font-size:8px;text-transform:uppercase}'
+  +'td{padding:4px 8px;font-size:9px}'
+  +'@media print{.rpt-break{page-break-before:always}.rpt-sec{page-break-inside:avoid}}';
+
+function _openRptWindow(title, bodyHtml){
   const now=new Date();
   const fecha=now.toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
-  return '<div class="rpt-hdr"><div><div class="rpt-hdr-name">ATLÉTICO NORTE F.C</div>'
-    +'<div class="rpt-hdr-sub">Liga Interna · Segunda Temporada 2026 · Documento Oficial</div></div></div>'
+  const w=window.open('','_blank');
+  if(!w){showToast('⚠️ Permite ventanas emergentes para imprimir');return;}
+  w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/><title>'+title+'</title>'
+    +'<style>'+_RPT_CSS+'</style></head><body>'
+    +'<div class="rpt-hdr"><div class="rpt-hdr-name">ATLÉTICO NORTE F.C</div>'
+    +'<div class="rpt-hdr-sub">Liga Interna · Segunda Temporada 2026 · Documento Oficial</div></div>'
     +'<div class="rpt-tbar">'+title+'</div>'
-    +'<div class="rpt-meta"><span>📅 '+fecha+' · '+hora+'</span><span>fixture.cesarcreps.com</span></div>';
-}
-function _rptFooter(){
-  return '<div class="rpt-footer"><span>Atlético Norte F.C — Liga Interna S2 2026</span>'
-    +'<span>Documento generado automáticamente</span><span>fixture.cesarcreps.com</span></div>';
+    +'<div class="rpt-meta"><span>📅 '+fecha+' · '+hora+'</span><span>🔐 Solo administrador · fixture.cesarcreps.com</span></div>'
+    +'<div class="rpt-body">'+bodyHtml+'</div>'
+    +'<div class="rpt-footer"><span>Atlético Norte F.C — Liga Interna S2 2026</span>'
+    +'<span>Documento generado automáticamente</span><span>fixture.cesarcreps.com</span></div>'
+    +'</body></html>');
+  w.document.close();
+  setTimeout(function(){w.focus();w.print();},500);
 }
 function printAdmin(){
   const SECS=[
@@ -1640,10 +1697,8 @@ function printAdmin(){
       +'<div class="rpt-sec-title">'+s.title+'</div>'
       +el.innerHTML+'</div>';
   });
-  _printWithArea('<div>'
-    +_rptHeader('📋 Informe Completo — Liga Interna S2 2026')
-    +'<div class="rpt-body">'+body+'</div>'
-    +_rptFooter()+'</div>');
+  if(!body){showToast('⚠️ Carga la sección Admin primero');return;}
+  _openRptWindow('📋 Informe Completo — Liga Interna S2 2026',body);
 }
 
 // ── RESULT MODAL ──────────────────────────────────────────────────────
@@ -2198,11 +2253,8 @@ function renderEquidadMapa(){
 // ── PRINT REPORT ──────────────────────────────────────────────────────
 function printReport(contentId, title){
   const el=document.getElementById(contentId);
-  if(!el||!el.innerHTML.trim())return;
-  _printWithArea('<div>'
-    +_rptHeader(title)
-    +'<div class="rpt-body">'+el.innerHTML+'</div>'
-    +_rptFooter()+'</div>');
+  if(!el||!el.innerHTML.trim()){showToast('⚠️ Sección sin contenido');return;}
+  _openRptWindow(title, el.innerHTML);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
