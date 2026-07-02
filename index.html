@@ -389,12 +389,13 @@ select:focus{outline:none;border-color:var(--acc)}
 .sr-t td:nth-child(2){text-align:left;padding-left:8px;font-size:9px;font-weight:700}
 .sr-t tr:last-child td{border-bottom:none}
 .sr-t tr:hover td{background:#0d1520}
-/* ── PRINT (native browser print fallback) ── */
+/* ── PRINT ── */
 #print-area{display:none}
 @media print{
+  /* Default: hide nav chrome; show active section (native browser print) */
   .bnav,.tnav,.hero,.mo,.btn-row,.admin-badge,#print-btn-area,.print-btn{display:none!important}
   .page{padding:4px!important}
-  .sec.active{display:block!important}
+  /* When overlay is active (#_rpt_ps style overrides body>* to none and shows #_rpt_ov) */
 }
 /* ── DESKTOP ── */
 @media(min-width:768px){
@@ -1667,20 +1668,50 @@ function _openRptWindow(title, bodyHtml){
   const now=new Date();
   const fecha=now.toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
-  const w=window.open('','_blank');
-  if(!w){showToast('⚠️ Permite ventanas emergentes para imprimir');return;}
-  w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/><title>'+title+'</title>'
-    +'<style>'+_RPT_CSS+'</style></head><body>'
+  // Remove any existing overlay
+  const ex=document.getElementById('_rpt_ov');if(ex)ex.remove();
+  const exs=document.getElementById('_rpt_ps');if(exs)exs.remove();
+  const docHtml=''
     +'<div class="rpt-hdr"><div class="rpt-hdr-name">ATLÉTICO NORTE F.C</div>'
     +'<div class="rpt-hdr-sub">Liga Interna · Segunda Temporada 2026 · Documento Oficial</div></div>'
     +'<div class="rpt-tbar">'+title+'</div>'
-    +'<div class="rpt-meta"><span>📅 '+fecha+' · '+hora+'</span><span>🔐 Solo administrador · fixture.cesarcreps.com</span></div>'
+    +'<div class="rpt-meta"><span>📅 '+fecha+' · '+hora+'</span><span>fixture.cesarcreps.com</span></div>'
     +'<div class="rpt-body">'+bodyHtml+'</div>'
-    +'<div class="rpt-footer"><span>Atlético Norte F.C — Liga Interna S2 2026</span>'
-    +'<span>Documento generado automáticamente</span><span>fixture.cesarcreps.com</span></div>'
-    +'</body></html>');
-  w.document.close();
-  setTimeout(function(){w.focus();w.print();},500);
+    +'<div class="rpt-footer">'
+    +'<span>Atlético Norte F.C — Liga Interna S2 2026</span>'
+    +'<span>Documento generado automáticamente</span>'
+    +'<span>fixture.cesarcreps.com</span></div>';
+  // Build overlay with Shadow DOM (CSS isolation — no conflicts with dark app styles)
+  const ov=document.createElement('div');
+  ov.id='_rpt_ov';
+  ov.style.cssText='position:fixed;inset:0;z-index:9998;background:#fff;overflow-y:auto;-webkit-overflow-scrolling:touch';
+  const root=ov.attachShadow({mode:'open'});
+  root.innerHTML='<style>'
+    +_RPT_CSS
+    +'#doc{max-width:860px;margin:0 auto;padding-bottom:76px}'
+    +'#bar{position:fixed;bottom:0;left:0;right:0;background:#0f1e35;padding:10px 16px;display:flex;gap:10px;justify-content:center;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.pb{background:#c8000a;color:#fff;border:none;padding:12px 30px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.cb{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:12px 22px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif}'
+    +'@media print{#bar{display:none!important}#doc{max-width:none;padding:0}}'
+    +'</style>'
+    +'<div id="doc">'+docHtml+'</div>'
+    +'<div id="bar">'
+    +'<button class="pb" id="pb">🖨️ Imprimir / PDF</button>'
+    +'<button class="cb" id="cb">✕ Cerrar</button>'
+    +'</div>';
+  document.body.appendChild(ov);
+  // Print button: add temp main-page style that hides everything except overlay, then print
+  root.getElementById('pb').addEventListener('click',function(){
+    let ps=document.getElementById('_rpt_ps');
+    if(!ps){ps=document.createElement('style');ps.id='_rpt_ps';document.head.appendChild(ps);}
+    ps.textContent='@media print{body>*{display:none!important}#_rpt_ov{display:block!important;position:static!important;width:100%!important;height:auto!important;overflow:visible!important}}';
+    window.onafterprint=function(){if(ps.parentNode)ps.remove();window.onafterprint=null;};
+    window.print();
+  });
+  // Close button
+  root.getElementById('cb').addEventListener('click',function(){
+    ov.remove();const ps=document.getElementById('_rpt_ps');if(ps)ps.remove();
+  });
 }
 function printAdmin(){
   const SECS=[
