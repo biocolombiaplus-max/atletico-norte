@@ -1275,7 +1275,7 @@ function renderFixture(){
         rnd.ms.forEach(m=>{
           const r=s2.r2[m.id];
           const gl=r!=null?r.gl:'·',gv=r!=null?r.gv:'·';
-          const click=(adminMode||coordMode)&&m.l&&m.v?'mrow clickable" onclick="openResult(&apos;f2&apos;,&apos;'+m.id+'&apos;,'+m.l+','+m.v+')':'mrow';
+          const click=(adminMode||coordMode)&&m.l&&m.v?'mrow clickable" onclick="openResult(&#39;f2&#39;,&#39;'+m.id+'&#39;,'+m.l+','+m.v+')':'mrow';
           const dc=diaColor(m.dia,m.fecha);
           const canShort=(m.cancha||'').replace('Villa Silvania','Villa Silvania').replace('Coveadse','Coveadse');
           const fechaLbl=m.fecha?fmtDFull(m.fecha,m.dia):'';
@@ -1344,7 +1344,7 @@ function renderFixture(){
       const sc=s.sc&&s.sc[m.id];
       const golesL=sc&&sc.l?sc.l:[];
       const golesV=sc&&sc.v?sc.v:[];
-      const click=(adminMode||coordMode)?'mrow clickable" onclick="openResult(&apos;f1&apos;,'+m.id+','+m.l+','+m.v+')':'mrow';
+      const click=(adminMode||coordMode)?'mrow clickable" onclick="openResult(&#39;f1&#39;,'+m.id+','+m.l+','+m.v+')':'mrow';
       rows+='<div class="'+click+'">'
         +'<div class="tside"><div class="tball">'+cSVG(m.l)+'</div><div><div class="tname">'+tShort(m.l)+'</div><div class="trole">Local</div></div></div>'
         +'<div class="mc"><div class="mc-info"><span class="sdot" style="background:'+(r?'var(--g)':'var(--bdr)')+'"></span>'+m.hora+'</div>'
@@ -1484,7 +1484,7 @@ function renderLlave(){
       ?'<div class="bm-date"><span class="bm-date-day" style="color:'+dc+'">'+fmtDShort(pd.fecha,pd.dia)+'</span><span class="bm-date-info">'+pd.hora+(pd.cancha?' · '+(pd.cancha).replace('Villa Silvania','V.S.'):'')+'</span></div>'
       :'';
     const planBtn=(adminMode||coordMode)&&m.l&&m.v?'<div style="padding:2px 6px 4px;text-align:right"><button class="btn btn-ghost btn-sm" style="font-size:8px;padding:2px 6px" onclick="event.stopPropagation();printPlanilla(\''+ph+'\',\''+m.id+'\','+m.l+','+(m.v||0)+')">🖨️ Planilla</button></div>':'';
-    return '<div class="bm'+(extra?' '+extra:'')+(w?' won':'')+(cc?' can-click':'')+(cc?'" onclick="openResult(&apos;'+ph+'&apos;,&apos;'+m.id+'&apos;,'+m.l+','+(m.v||0)+')"':'"')+'>'
+    return '<div class="bm'+(extra?' '+extra:'')+(w?' won':'')+(cc?' can-click':'')+(cc?'" onclick="openResult(&#39;'+ph+'&#39;,&#39;'+m.id+'&#39;,'+m.l+','+(m.v||0)+')"':'"')+'>'
       +dateBar+bT(m.l,gl,w===m.l)+bT(m.v,gv,w===m.v)+planBtn+'</div>';
   }
   function plHdr(icon,label,sub,color){
@@ -1507,8 +1507,8 @@ function renderLlave(){
     const dcV=DC[pdV.dia]||'var(--m)';
     const dateBarI=pdI.fecha?'<div class="bm-date"><span class="bm-date-day" style="color:'+dcI+'">IDA · '+fmtDShort(pdI.fecha,pdI.dia)+'</span><span class="bm-date-info">'+pdI.hora+(pdI.cancha?' · '+(pdI.cancha).replace('Villa Silvania','V.S.'):'')+'</span></div>':'';
     const dateBarV=pdV.fecha?'<div class="bm-date"><span class="bm-date-day" style="color:'+dcV+'">VUELTA · '+fmtDShort(pdV.fecha,pdV.dia)+'</span><span class="bm-date-info">'+pdV.hora+(pdV.cancha?' · '+(pdV.cancha).replace('Villa Silvania','V.S.'):'')+'</span></div>':'';
-    const onclickI=ccI?' onclick="openResult(&apos;qf&apos;,&apos;'+m.id+'&apos;,'+m.l+','+(m.v||0)+')"':'';
-    const onclickV=ccV?' onclick="openResult(&apos;qf&apos;,&apos;'+m.id+'v&apos;,'+m.v+','+m.l+')"':'';
+    const onclickI=ccI?' onclick="openResult(&#39;qf&#39;,&#39;'+m.id+'&#39;,'+m.l+','+(m.v||0)+')"':'';
+    const onclickV=ccV?' onclick="openResult(&#39;qf&#39;,&#39;'+m.id+'v&#39;,'+m.v+','+m.l+')"':'';
     const aggBar=(aggL!=null&&aggV!=null)?'<div class="bm-date" style="background:#061830;font-size:10px;justify-content:center;gap:8px"><span style="color:var(--t)">Global:</span><b style="color:'+(aggL>aggV?'var(--g)':aggV>aggL?'#e55':'var(--m)')+'">'+aggL+'</b><span style="color:var(--m)">–</span><b style="color:'+(aggV>aggL?'var(--g)':aggL>aggV?'#e55':'var(--m)')+'">'+aggV+'</b>'+(w?'<span style="color:var(--g);margin-left:4px">→ '+tShort(w)+'</span>':'')+'</div>':'';
     return '<div class="bm'+(w?' won':'')+'"><div style="cursor:'+(ccI?'pointer':'default')+'"'+onclickI+'>'
       +dateBarI+bT(m.l,gli,w===m.l)+bT(m.v,gvi,w===m.v)+'</div>'
@@ -1696,7 +1696,7 @@ function renderCalendar(){
     const val=cal[key]||defaultVal||'';
     return '<div class="cal-row"><div class="cal-dot" style="background:'+color+'"></div>'
       +'<div class="cal-label">'+label+'</div>'
-      +'<div class="cal-date"><input type="date" value="'+val+'" onchange="saveCal(&apos;'+key+'&apos;,this.value)"></div></div>';
+      +'<div class="cal-date"><input type="date" value="'+val+'" onchange="saveCal(&#39;'+key+'&#39;,this.value)"></div></div>';
   }
   let html='';
   html+='<div class="cal-round"><div class="cal-rhead"><h4>⚽ Fase 1</h4><span class="tag blue">90 partidos</span></div>'
@@ -2162,7 +2162,7 @@ function openCoordModal(){
   if(adminMode)return; // admin already active
   coordPinVal='';
   buildPinPad('crd-pad','crd-display',handleCoordPinDigit);
-  updatePinDisplay('crd-display',coordPinVal);
+  updatePinDisplayC();
   document.getElementById('mo-coord').classList.add('open');
 }
 function handleCoordPinDigit(n){
@@ -2255,7 +2255,7 @@ function printPlanilla(phase,matchId,l,v){
   var s=getS();
   var maps={f1:s.r1,f2:s.r2,qf:s.rqf,sf:s.rsf,final:s.rf};
   var res=(maps[phase]||{})[matchId];
-  var mf=window.MF1||[];
+  var mf=MF1;
   var mdata=mf.filter(function(m){return m.id===matchId;})[0]||{};
   var fecha='';var hora='';var cancha='';
   if(mdata.fecha){
@@ -2268,12 +2268,12 @@ function printPlanilla(phase,matchId,l,v){
   if(mdata.cancha)cancha=mdata.cancha==='Villa Silvania'?'VILLA SILVANIA':'COVEADSE';
 
   var numStr='';
-  if(phase==='f1')numStr=String(matchId).padStart(3,'0');
+  if(phase==='f1')numStr=String(matchId+1).padStart(3,'0');
   else if(phase==='f2')numStr='F2-'+String(matchId).padStart(2,'0');
   else numStr=String(matchId).toUpperCase();
 
-  var teamL=l||'Local';
-  var teamV=v||'Visitante';
+  var teamL=(typeof l==='number'||parseInt(l)==l)?tName(parseInt(l)):(l||'Local');
+  var teamV=(typeof v==='number'||parseInt(v)==v)?tName(parseInt(v)):(v||'Visitante');
 
   // ─── SVG LOGO ────────────────────────────────────────────────────────────
   var LOGO='<svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" width="60" height="69">'
@@ -2864,7 +2864,7 @@ function pfRow(label,value,field,type,rawVal,opts){
   } else if(type==='date'){
     editHtml='<input id="'+id+'" type="date" class="pf-edit-field" style="display:none" value="'+(rawVal||'')+'">';
   } else {
-    editHtml='<input id="'+id+'" type="'+(type||'text')+'" class="pf-edit-field" style="display:none" value="'+value.replace(/'/g,'&apos;')+'">';
+    editHtml='<input id="'+id+'" type="'+(type||'text')+'" class="pf-edit-field" style="display:none" value="'+value.replace(/'/g,'&#39;')+'">';
   }
   return '<div class="pf-row" id="row_'+field+'">'
     +'<span class="pf-label">'+label+'</span>'
