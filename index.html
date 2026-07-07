@@ -909,6 +909,44 @@ select:focus{outline:none;border-color:var(--acc)}
     <div id="eq-mapa-content"></div>
   </div>
 
+  <!-- REGISTRAR NUEVO SOCIO (ADMIN) -->
+  <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="sh"><h2>➕ Registrar Nuevo Socio</h2><span class="tag blue">Admin</span>
+      <button class="print-btn" onclick="toggleAdminRegForm()" id="admin-reg-toggle-btn">📋 Abrir formulario</button>
+    </div>
+    <div id="admin-reg-form" style="display:none;margin-top:10px">
+      <div style="background:#080f1c;border:1px solid #1e3050;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Primer Nombre *</label><input id="ar-n1" placeholder="Primer nombre" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Segundo Nombre</label><input id="ar-n2" placeholder="Segundo nombre" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Primer Apellido *</label><input id="ar-a1" placeholder="Primer apellido" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Segundo Apellido</label><input id="ar-a2" placeholder="Segundo apellido" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Cédula *</label><input id="ar-ced" placeholder="N.º de cédula" type="number" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Fecha de Nacimiento *</label><input id="ar-fnac" type="date" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Teléfono *</label><input id="ar-tel" placeholder="Celular" type="tel" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Correo electrónico</label><input id="ar-email" placeholder="email@ejemplo.com" type="email" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Posición</label>
+            <select id="ar-pos" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box">
+              <option value="">Por definir</option>
+              <option>Portero</option><option>Defensa Central</option><option>Lateral Derecho</option><option>Lateral Izquierdo</option><option>Volante Defensivo</option><option>Volante Central</option><option>Mediapunta</option><option>Extremo Derecho</option><option>Extremo Izquierdo</option><option>Delantero Centro</option><option>Segundo Delantero</option>
+            </select>
+          </div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">N.º Camiseta</label><input id="ar-cam" placeholder="Ej: 10" type="number" min="1" max="99" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Contraseña temporal *</label><input id="ar-pass" placeholder="Mín. 4 caracteres" type="password" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+          <div><label style="font-size:9px;color:#3a8fd4;font-weight:700;display:block;margin-bottom:3px">Confirmar contraseña *</label><input id="ar-pass2" placeholder="Repetir contraseña" type="password" style="width:100%;padding:9px 10px;background:#0d1a2e;border:1px solid #1e3050;border-radius:9px;color:#e8f4ff;font-size:11px;box-sizing:border-box"></div>
+        </div>
+        <div id="ar-err" style="font-size:10px;color:#ff5252;text-align:center;min-height:14px;font-weight:700"></div>
+        <button onclick="adminCrearSocio()" style="background:linear-gradient(135deg,#0a3a1a,#0d5a28);color:#4caf50;border:1px solid #4caf5055;border-radius:12px;padding:12px;font-size:12px;font-weight:900;cursor:pointer;width:100%">✅ Registrar Socio</button>
+      </div>
+    </div>
+  </div>
+
   <!-- GESTIÓN DE SOCIOS / FUNDADORES -->
   <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
     <div class="sh"><h2>🏅 Socios y Tiers</h2><span class="tag gold">Membresías</span></div>
@@ -3624,6 +3662,55 @@ function renderAdminSociosList(){
       +'</div>';
   });
   cont.innerHTML=html;
+}
+
+// ── ADMIN: REGISTRAR NUEVO SOCIO ──────────────────────────────────────
+function toggleAdminRegForm(){
+  var f=document.getElementById('admin-reg-form');
+  var btn=document.getElementById('admin-reg-toggle-btn');
+  if(f.style.display==='none'){
+    f.style.display='block';
+    btn.textContent='✖ Cerrar formulario';
+  } else {
+    f.style.display='none';
+    btn.textContent='📋 Abrir formulario';
+  }
+}
+function adminCrearSocio(){
+  var err=document.getElementById('ar-err');
+  var g=function(i){var el=document.getElementById(i);return el?el.value.trim():'';}
+  var n1=g('ar-n1'),n2=g('ar-n2'),a1=g('ar-a1'),a2=g('ar-a2');
+  var ced=g('ar-ced'),fnac=g('ar-fnac'),tel=g('ar-tel');
+  var pass=g('ar-pass'),pass2=g('ar-pass2');
+  if(!n1||!a1||!ced||!fnac||!tel||!pass){err.textContent='Los campos con * son obligatorios';return;}
+  if(pass!==pass2){err.textContent='Las contraseñas no coinciden';return;}
+  if(pass.length<4){err.textContent='La contraseña debe tener mínimo 4 caracteres';return;}
+  var db=getSocios();
+  if(db[ced]){err.textContent='Esta cédula ya está registrada';return;}
+  var nombre=n1+(n2?' '+n2:'');
+  var apellido=a1+(a2?' '+a2:'');
+  db[ced]={
+    cedula:ced,nombre:nombre,apellido:apellido,nombreCompleto:nombre+' '+apellido,
+    fechaNac:fnac,telefono:tel,email:g('ar-email'),
+    ciudad:'Cúcuta',alergias:'Ninguna',
+    posicion:g('ar-pos'),numCamiseta:g('ar-cam'),
+    password:hashPass(pass),
+    estado:'activo',fechaIngreso:new Date().toISOString().slice(0,10),
+    foto:'',standby:null
+  };
+  setSocios(db);
+  err.textContent='';
+  // limpiar campos
+  ['ar-n1','ar-n2','ar-a1','ar-a2','ar-ced','ar-fnac','ar-tel','ar-email','ar-pos','ar-cam','ar-pass','ar-pass2'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  renderAdminSociosList();
+  renderAdminPagos();
+  showToast('✅ Socio '+nombre+' '+apellido+' registrado correctamente');
+  // Enviar correo de bienvenida si tiene email
+  if(db[ced].email) sendWelcomeEmail(db[ced]);
+  // Imprimir hoja de compromiso
+  setTimeout(function(){printHojaCompromiso(db[ced]);},600);
 }
 
 // ── VISOR DE DOCUMENTOS ───────────────────────────────────────────────
