@@ -412,11 +412,11 @@ select:focus{outline:none;border-color:var(--acc)}
 @media(min-width:1024px){.fix-grid{grid-template-columns:repeat(3,1fr)}}
 
 /* ── SOCIOS / AUTH ────────────────────────────────────────────────── */
-#login-overlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#050d1a 0%,#0a1628 60%,#0d0000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#login-overlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#050d1a 0%,#0a1628 60%,#0d0000 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #login-overlay.hidden{display:none}
-.lo-logo{width:90px;height:104px;margin-bottom:12px}
-.lo-club{font-size:18px;font-weight:900;color:#fff;letter-spacing:1px;text-align:center;line-height:1.2}
-.lo-sub{font-size:10px;color:#aaa;text-align:center;margin-bottom:24px;letter-spacing:.5px}
+.lo-logo{width:70px;height:81px;margin-bottom:8px;margin-top:16px}
+.lo-club{font-size:16px;font-weight:900;color:#fff;letter-spacing:1px;text-align:center;line-height:1.2}
+.lo-sub{font-size:10px;color:#aaa;text-align:center;margin-bottom:16px;letter-spacing:.5px}
 .lo-card{background:#0d1a2e;border:1px solid #1e3050;border-radius:16px;padding:22px 20px;width:100%;max-width:360px;box-shadow:0 8px 32px #000a}
 .lo-tabs{display:grid;grid-template-columns:1fr 1fr;border-radius:10px;overflow:hidden;margin-bottom:18px;border:1px solid #1e3050}
 .lo-tab{padding:9px;text-align:center;font-size:12px;font-weight:700;color:#556;background:#081420;cursor:pointer;transition:all .2s}
@@ -3288,6 +3288,7 @@ function printReport(contentId, title){
 populateTeamFilter();
 renderInicio();
 renderFixture();
+checkAuth();
 
 </script>
 </body>
