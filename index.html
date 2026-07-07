@@ -835,6 +835,12 @@ select:focus{outline:none;border-color:var(--acc)}
     <div id="eq-mapa-content"></div>
   </div>
 
+  <!-- SOCIOS EN STAND BY -->
+  <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="sh"><h2>⏸ Socios en Stand By</h2><span class="tag gold" id="sb-count-tag">0</span></div>
+    <div id="admin-standby-list"></div>
+  </div>
+
   <!-- DATOS + ACCIONES -->
   <div style="margin-top:8px;border-top:1px solid var(--bdr);padding-top:12px" id="print-btn-area">
     <div class="sh"><h2>Datos</h2></div>
@@ -1154,7 +1160,7 @@ function nav(id,el,isTop){
   if(id==='tabla')renderTabla();
   if(id==='goles')renderGoles();
   if(id==='llave')renderLlave();
-  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();}
+  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();}
   window.scrollTo(0,0);
 }
 
@@ -3136,6 +3142,77 @@ function cancelStandby(){
   showToast('✅ ¡Bienvenido de vuelta!');
 }
 
+// ── ADMIN: GESTIÓN SOCIOS STAND BY ───────────────────────────────────
+function renderSociosStandby(){
+  const db=getSocios();
+  const lista=Object.values(db).filter(s=>s.estado==='standby');
+  const tag=document.getElementById('sb-count-tag');
+  const cont=document.getElementById('admin-standby-list');
+  if(!cont)return;
+  if(tag)tag.textContent=lista.length;
+  if(lista.length===0){
+    cont.innerHTML='<div style="padding:14px;text-align:center;color:var(--m);font-size:11px">No hay socios en Stand By actualmente.</div>';
+    return;
+  }
+  let html='';
+  lista.forEach(function(s){
+    const sb=s.standby||{};
+    const sol=sb.fechaSolicitud?new Date(sb.fechaSolicitud+'T12:00:00'):null;
+    const elegible=sol?new Date(sol):null;
+    if(elegible)elegible.setMonth(elegible.getMonth()+2);
+    const diasRest=elegible?Math.max(0,Math.ceil((elegible-Date.now())/86400000)):0;
+    const nombre=(s.nombreCompleto||(s.nombre+' '+s.apellido)).trim();
+    const motivos={'economico':'Económico','laboral':'Laboral','salud':'Salud','personal':'Personal','otro':'Otro'};
+    const motivoLabel=motivos[sb.motivo]||sb.motivo||'—';
+    html+='<div style="background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:14px 16px;margin-bottom:10px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      +'<div>'
+      +'<div style="font-size:13px;font-weight:800;color:#fff">'+nombre+'</div>'
+      +'<div style="font-size:10px;color:#4a6080;margin-top:2px">C.C. '+Number(s.cedula).toLocaleString('es-CO')+(s.posicion?' · '+s.posicion:'')+(s.numCamiseta?' #'+s.numCamiseta:'')+'</div>'
+      +'</div>'
+      +'<span style="background:#2a1800;color:#ff9800;border:1px solid #ff980055;border-radius:20px;font-size:9px;font-weight:900;padding:3px 10px;text-transform:uppercase">⏸ Stand By</span>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'
+      +'<div style="background:#060e1a;border-radius:8px;padding:7px 10px">'
+      +'<div style="font-size:8px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px">Motivo</div>'
+      +'<div style="font-size:11px;color:#90caf9;font-weight:700;margin-top:1px">'+motivoLabel+'</div>'
+      +'</div>'
+      +'<div style="background:#060e1a;border-radius:8px;padding:7px 10px">'
+      +'<div style="font-size:8px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px">Solicitud</div>'
+      +'<div style="font-size:11px;color:#90caf9;font-weight:700;margin-top:1px">'+(sb.fechaSolicitud||'—')+'</div>'
+      +'</div>'
+      +(sb.fechaInicio?'<div style="background:#060e1a;border-radius:8px;padding:7px 10px">'
+      +'<div style="font-size:8px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px">Inicio pausa</div>'
+      +'<div style="font-size:11px;color:#ce93d8;font-weight:700;margin-top:1px">'+sb.fechaInicio+'</div>'
+      +'</div>':'')
+      +(sb.fechaRetorno?'<div style="background:#060e1a;border-radius:8px;padding:7px 10px">'
+      +'<div style="font-size:8px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px">Retorno estimado</div>'
+      +'<div style="font-size:11px;color:#a5d6a7;font-weight:700;margin-top:1px">'+sb.fechaRetorno+'</div>'
+      +'</div>':'')
+      +'</div>'
+      +(sb.desc?'<div style="font-size:10px;color:#607090;margin-bottom:10px;font-style:italic">"'+sb.desc+'"</div>':'')
+      +(diasRest>0?'<div style="font-size:9px;color:#ff9800;margin-bottom:8px">⏳ Elegible para reactivarse en '+diasRest+' días (política 2 meses)</div>':'<div style="font-size:9px;color:#4caf50;margin-bottom:8px">✅ Ya cumplió los 2 meses — puede reactivarse</div>')
+      +'<button class="btn btn-sm" style="background:linear-gradient(135deg,#0a3a0a,#0d5a0d);color:#4caf50;border:1px solid #4caf5055;width:100%;font-weight:800" onclick="adminActivarSocio(&#39;'+s.cedula+'&#39;)">✅ Activar Socio</button>'
+      +'</div>';
+  });
+  cont.innerHTML=html;
+}
+
+function adminActivarSocio(cedula){
+  if(!adminMode){showToast('❌ Solo el administrador puede hacer esto');return;}
+  const db=getSocios();
+  const soc=db[cedula];
+  if(!soc){showToast('❌ Socio no encontrado');return;}
+  if(soc.estado!=='standby'){showToast('ℹ️ El socio ya está activo');return;}
+  if(!confirm('¿Activar a '+((soc.nombreCompleto||(soc.nombre+' '+soc.apellido)).trim())+'?\n\nEsto cancelará su Stand By y lo regresará al estado Activo.')){return;}
+  soc.estado='activo';
+  soc.standby=null;
+  db[cedula]=soc;
+  setSocios(db);
+  renderSociosStandby();
+  showToast('✅ Socio activado correctamente');
+}
+
 
 
 // ── EMAIL BIENVENIDA ──────────────────────────────────────────────────────────
@@ -3307,7 +3384,7 @@ function enableAdminMode(){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById('sec-admin');if(sec)sec.classList.add('active');
   document.querySelectorAll('.bnav a,.tnav-in a').forEach(a=>a.classList.remove('active'));
-  buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();
+  buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();
   renderLlave();
   window.scrollTo(0,0);
   showToast('🔐 Admin activado');
