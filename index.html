@@ -264,7 +264,7 @@ select:focus{outline:none;border-color:var(--acc)}
 .btn-sm{padding:6px 11px;font-size:9px}
 
 /* ── MODALES ── */
-.mo{display:none;position:fixed;inset:0;background:#000000bb;z-index:500;backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
+.mo{display:none;position:fixed;inset:0;background:#000000bb;z-index:9500;backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
 .mo.open{display:flex}
 .md{background:#0d1520;border:1px solid var(--bdr);border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-width:460px;animation:su .22s ease}
 @media(min-width:460px){.mo{align-items:center}.md{border-radius:20px;margin:16px}}
@@ -506,7 +506,7 @@ select:focus{outline:none;border-color:var(--acc)}
 
 <!-- ── LOGIN OVERLAY ─────────────────────────────────────────── -->
 <div id="login-overlay">
-  <svg class="lo-logo" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="losg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#c0c0c0"/><stop offset="100%" stop-color="#888"/></linearGradient><linearGradient id="lorg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ee1111"/><stop offset="100%" stop-color="#880000"/></linearGradient></defs><path d="M100 4 L188 32 L188 128 Q188 192 100 226 Q12 192 12 128 L12 32 Z" fill="url(#losg)" stroke="#555" stroke-width="2"/><path d="M100 12 L182 38 L182 126 Q182 186 100 220 Q18 186 18 126 L18 38 Z" fill="#0d0d0d"/><path d="M18 38 L100 38 L100 116 L18 100 Z" fill="url(#lorg)"/><path d="M100 38 L182 38 L182 100 L100 116 Z" fill="#1a1a1a"/><path d="M18 100 L100 116 L100 200 Q55 218 18 188 Z" fill="url(#lorg)"/><path d="M100 116 L182 100 L182 188 Q145 218 100 200 Z" fill="#1a1a1a"/><text x="100" y="158" text-anchor="middle" fill="#cc2222" font-size="56" font-weight="900" font-family="Arial Black,sans-serif">AN</text><text x="100" y="186" text-anchor="middle" fill="#999" font-size="19" font-weight="700" font-family="Arial,sans-serif">FÚTBOL</text></svg>
+  <svg class="lo-logo" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" onclick="logoTap()" style="cursor:pointer"><defs><linearGradient id="losg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#c0c0c0"/><stop offset="100%" stop-color="#888"/></linearGradient><linearGradient id="lorg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ee1111"/><stop offset="100%" stop-color="#880000"/></linearGradient></defs><path d="M100 4 L188 32 L188 128 Q188 192 100 226 Q12 192 12 128 L12 32 Z" fill="url(#losg)" stroke="#555" stroke-width="2"/><path d="M100 12 L182 38 L182 126 Q182 186 100 220 Q18 186 18 126 L18 38 Z" fill="#0d0d0d"/><path d="M18 38 L100 38 L100 116 L18 100 Z" fill="url(#lorg)"/><path d="M100 38 L182 38 L182 100 L100 116 Z" fill="#1a1a1a"/><path d="M18 100 L100 116 L100 200 Q55 218 18 188 Z" fill="url(#lorg)"/><path d="M100 116 L182 100 L182 188 Q145 218 100 200 Z" fill="#1a1a1a"/><text x="100" y="158" text-anchor="middle" fill="#cc2222" font-size="56" font-weight="900" font-family="Arial Black,sans-serif">AN</text><text x="100" y="186" text-anchor="middle" fill="#999" font-size="19" font-weight="700" font-family="Arial,sans-serif">FÚTBOL</text></svg>
   <div class="lo-club">ATLÉTICO NORTE F.C.</div>
   <div class="lo-sub">LIGA INTERNA · S2 2026</div>
   <div class="lo-card">
@@ -994,12 +994,21 @@ function cSVG(slot){
 }
 
 // ── LOGO TAP (admin access) ───────────────────────────────────────────
+let coordTriggerTimer=null;
 function logoTap(){
   logoTaps++;
   if(logoTimer)clearTimeout(logoTimer);
-  logoTimer=setTimeout(()=>{logoTaps=0},2500);
-  if(logoTaps===3){openCoordModal();}
-  if(logoTaps>=5){logoTaps=0;clearTimeout(logoTimer);openPinModal();}
+  if(coordTriggerTimer)clearTimeout(coordTriggerTimer);
+  if(logoTaps>=5){
+    logoTaps=0;clearTimeout(logoTimer);openPinModal();return;
+  }
+  if(logoTaps===3){
+    // wait 900ms — if no more taps arrive, open coord; else let it keep going
+    coordTriggerTimer=setTimeout(()=>{
+      if(logoTaps===3){logoTaps=0;openCoordModal();}
+    },900);
+  }
+  logoTimer=setTimeout(()=>{logoTaps=0;},2500);
 }
 
 // ── STANDINGS ─────────────────────────────────────────────────────────
@@ -2172,6 +2181,7 @@ function updatePinDisplayC(){
 }
 function enableCoordMode(){
   coordMode=true;
+  const ov=document.getElementById('login-overlay');if(ov)ov.classList.add('hidden');
   const badge=document.getElementById('coord-badge');if(badge)badge.style.display='flex';
   renderFixture();renderGoles();renderLlave();
   window.scrollTo(0,0);
@@ -2181,6 +2191,7 @@ function exitCoord(){
   coordMode=false;
   const badge=document.getElementById('coord-badge');if(badge)badge.style.display='none';
   nav('inicio',null,false);
+  checkAuth();
 }
 function changeCoordPin(){
   coordNewPinVal='';
@@ -2830,7 +2841,7 @@ function cancelStandby(){
 function showToast(msg){
   let t=document.getElementById('toast-el');
   if(!t){t=document.createElement('div');t.id='toast-el';
-    t.style.cssText='position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%);background:#10b981;color:#fff;font-size:11px;font-weight:700;padding:10px 18px;border-radius:100px;z-index:999;white-space:nowrap;box-shadow:0 4px 20px #00000066;transition:opacity .3s';
+    t.style.cssText='position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%);background:#10b981;color:#fff;font-size:11px;font-weight:700;padding:10px 18px;border-radius:100px;z-index:99999;white-space:nowrap;box-shadow:0 4px 20px #00000066;transition:opacity .3s';
     document.body.appendChild(t);}
   t.textContent=msg;t.style.opacity='1';
   clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';},2800);
@@ -2839,6 +2850,7 @@ function showToast(msg){
 // ── ADMIN MODE ────────────────────────────────────────────────────────
 function enableAdminMode(){
   adminMode=true;
+  const ov=document.getElementById('login-overlay');if(ov)ov.classList.add('hidden');
   const badge=document.getElementById('admin-badge');if(badge)badge.style.display='flex';
   const at=document.getElementById('tnav-admin');if(at)at.style.display='inline';
   // Navigate to admin section automatically
@@ -2855,6 +2867,7 @@ function exitAdmin(){
   const badge=document.getElementById('admin-badge');if(badge)badge.style.display='none';
   const at=document.getElementById('tnav-admin');if(at)at.style.display='none';
   nav('inicio',null,false);
+  checkAuth();
 }
 
 // ── EXPORT/IMPORT ─────────────────────────────────────────────────────
