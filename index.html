@@ -456,7 +456,7 @@ select:focus{outline:none;border-color:var(--acc)}
 .perf-cover-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#00000066;border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
 .perf-av-wrap{position:absolute;bottom:-52px;left:50%;transform:translateX(-50%);z-index:2;text-align:center}
 .perf-av{width:104px;height:104px;border-radius:50%;border:4px solid #cc2222;background:linear-gradient(135deg,#0d1a2e,#1a0510);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px #000a,0 0 0 2px #0008;position:relative}
-.perf-av img{width:100%;height:100%;object-fit:cover}
+.perf-av img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
 .perf-av .av-ini-lg{font-size:38px;font-weight:900;color:#cc2222;font-family:"Bebas Neue",sans-serif;letter-spacing:2px}
 .perf-av-edit{position:absolute;inset:0;background:#00000066;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:50%;font-size:22px}
 .perf-av:hover .perf-av-edit,.perf-av:active .perf-av-edit{opacity:1}
@@ -3010,7 +3010,12 @@ function renderTabSeg(soc){
           +'<div class="sb-active-row">Retorno estimado: '+fmtDate(soc.standby.fechaRetorno)+'</div>'
           +(soc.standby.desc?'<div class="sb-active-row">'+soc.standby.desc+'</div>':''):'')
         +'<button class="lo-btn lo-btn-ghost" onclick="cancelStandby()" style="margin-top:12px">↩ Volver a Activo</button>'
-        +'</div>');
+        +'</div>')
+    +'<div style="margin-top:24px;padding-top:16px;border-top:1px solid #1e3050">'
+    +'<div style="font-size:9px;font-weight:700;color:#cc2222;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">⚠️ Zona de peligro</div>'
+    +'<button class="lo-btn" style="width:100%;background:linear-gradient(135deg,#1a0505,#2a0a0a);color:#ef5350;border:1px solid #ef535055;font-weight:700" onclick="eliminarMiCuenta()">🗑️ Eliminar mi cuenta</button>'
+    +'<div style="font-size:9px;color:#4a6080;margin-top:6px;text-align:center">Borra todos tus datos de este dispositivo permanentemente.</div>'
+    +'</div>';
 }
 
 function renderTabClub(soc){
@@ -3142,6 +3147,20 @@ function cancelStandby(){
   showToast('✅ ¡Bienvenido de vuelta!');
 }
 
+function eliminarMiCuenta(){
+  const ses=getSes();if(!ses)return;
+  const db=getSocios();
+  const soc=db[ses.cedula];
+  const nombre=soc?(soc.nombreCompleto||(soc.nombre+' '+soc.apellido)).trim():'tu cuenta';
+  if(!confirm('¿Eliminar '+nombre+'?\n\nEsto borrará todos tus datos de la app de forma permanente. Esta acción no se puede deshacer.')){return;}
+  delete db[ses.cedula];
+  setSocios(db);
+  setSes(null);
+  closePerfil();
+  checkAuth();
+  showToast('🗑️ Cuenta eliminada');
+}
+
 // ── ADMIN: GESTIÓN SOCIOS STAND BY ───────────────────────────────────
 function renderSociosStandby(){
   const db=getSocios();
@@ -3192,7 +3211,10 @@ function renderSociosStandby(){
       +'</div>'
       +(sb.desc?'<div style="font-size:10px;color:#607090;margin-bottom:10px;font-style:italic">"'+sb.desc+'"</div>':'')
       +(diasRest>0?'<div style="font-size:9px;color:#ff9800;margin-bottom:8px">⏳ Elegible para reactivarse en '+diasRest+' días (política 2 meses)</div>':'<div style="font-size:9px;color:#4caf50;margin-bottom:8px">✅ Ya cumplió los 2 meses — puede reactivarse</div>')
-      +'<button class="btn btn-sm" style="background:linear-gradient(135deg,#0a3a0a,#0d5a0d);color:#4caf50;border:1px solid #4caf5055;width:100%;font-weight:800" onclick="adminActivarSocio(&#39;'+s.cedula+'&#39;)">✅ Activar Socio</button>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button class="btn btn-sm" style="background:linear-gradient(135deg,#0a3a0a,#0d5a0d);color:#4caf50;border:1px solid #4caf5055;flex:1;font-weight:800" onclick="adminActivarSocio(&#39;'+s.cedula+'&#39;)">✅ Activar</button>'
+      +'<button class="btn btn-sm" style="background:linear-gradient(135deg,#1a0505,#2a0a0a);color:#ef5350;border:1px solid #ef535055;flex:1;font-weight:800" onclick="adminEliminarSocio(&#39;'+s.cedula+'&#39;)">🗑️ Eliminar</button>'
+      +'</div>'
       +'</div>';
   });
   cont.innerHTML=html;
@@ -3211,6 +3233,19 @@ function adminActivarSocio(cedula){
   setSocios(db);
   renderSociosStandby();
   showToast('✅ Socio activado correctamente');
+}
+
+function adminEliminarSocio(cedula){
+  if(!adminMode){showToast('❌ Solo el administrador puede hacer esto');return;}
+  const db=getSocios();
+  const soc=db[cedula];
+  if(!soc){showToast('❌ Socio no encontrado');return;}
+  const nombre=(soc.nombreCompleto||(soc.nombre+' '+soc.apellido)).trim();
+  if(!confirm('¿Eliminar a '+nombre+' permanentemente?\n\nSe borrarán todos sus datos del sistema.')){return;}
+  delete db[cedula];
+  setSocios(db);
+  renderSociosStandby();
+  showToast('🗑️ Socio eliminado');
 }
 
 
