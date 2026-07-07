@@ -443,56 +443,86 @@ select:focus{outline:none;border-color:var(--acc)}
 .user-avatar-btn .av-ini{font-size:12px;font-weight:900;color:#cc2222}
 
 /* ── PERFIL MODAL ── */
-.perfil-mo{position:fixed;inset:0;z-index:8000;background:#000c;display:flex;align-items:flex-end;justify-content:center}
+/* ── PERFIL PREMIUM ─────────────────────────────────────────────────── */
+.perfil-mo{position:fixed;inset:0;z-index:8000;background:#000000aa;display:flex;flex-direction:column;justify-content:flex-end}
 .perfil-mo.hidden{display:none}
-.perfil-sheet{background:linear-gradient(180deg,#0a1826 0%,#050d18 100%);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:93vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)}
+.perfil-sheet{background:linear-gradient(180deg,#080f1e 0%,#040b14 100%);border-radius:24px 24px 0 0;width:100%;max-height:96vh;overflow-y:auto;padding-bottom:calc(20px + env(safe-area-inset-bottom));box-shadow:0 -8px 40px #000a}
 .perfil-sheet::-webkit-scrollbar{display:none}
 
-/* cover + avatar */
-.perf-cover{height:90px;background:linear-gradient(135deg,#1a0000 0%,#330000 40%,#110a00 100%);position:relative;border-radius:20px 20px 0 0;overflow:hidden}
-.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,#ffffff06 0px,#ffffff06 1px,transparent 1px,transparent 8px);pointer-events:none}
-.perf-av-wrap{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);z-index:2}
-.perf-av{width:80px;height:80px;border-radius:50%;border:3px solid #cc2222;background:#0d1a2e;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px #0008}
+/* cover hero */
+.perf-cover{height:160px;background:linear-gradient(135deg,#1a0000 0%,#4a0000 30%,#1a0510 70%,#0a0a1a 100%);position:relative;border-radius:24px 24px 0 0;overflow:hidden;flex-shrink:0}
+.perf-cover-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,#cc222233,transparent);pointer-events:none}
+.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,#ffffff04 0px,#ffffff04 1px,transparent 1px,transparent 10px);pointer-events:none}
+.perf-cover-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#00000066;border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.perf-av-wrap{position:absolute;bottom:-52px;left:50%;transform:translateX(-50%);z-index:2;text-align:center}
+.perf-av{width:104px;height:104px;border-radius:50%;border:4px solid #cc2222;background:linear-gradient(135deg,#0d1a2e,#1a0510);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px #000a,0 0 0 2px #0008;position:relative}
 .perf-av img{width:100%;height:100%;object-fit:cover}
-.perf-av .av-ini-lg{font-size:28px;font-weight:900;color:#cc2222}
-.perf-av-edit{position:absolute;bottom:2px;right:2px;background:#cc2222;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid #050d18}
+.perf-av .av-ini-lg{font-size:38px;font-weight:900;color:#cc2222;font-family:"Bebas Neue",sans-serif;letter-spacing:2px}
+.perf-av-edit{position:absolute;inset:0;background:#00000066;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:50%;font-size:22px}
+.perf-av:hover .perf-av-edit,.perf-av:active .perf-av-edit{opacity:1}
 #foto-input{display:none}
 
-/* perfil body */
-.perf-body{padding:48px 18px 20px;text-align:center}
-.perf-name{font-size:18px;font-weight:900;color:#fff;margin-bottom:2px}
-.perf-cedula{font-size:11px;color:#556;margin-bottom:6px}
-.perf-badges{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
-.perf-badge{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
-.badge-activo{background:#0d2d0d;color:#4caf50;border:1px solid #4caf5044}
-.badge-standby{background:#2d1a00;color:#ff9800;border:1px solid #ff980044}
-.badge-posicion{background:#0a1628;color:#4fc3f7;border:1px solid #4fc3f744}
-.badge-camiseta{background:#1a0a28;color:#ce93d8;border:1px solid #ce93d844}
+/* body below cover */
+.perf-body{padding:60px 20px 16px;text-align:center}
+.perf-name{font-size:22px;font-weight:900;color:#fff;margin-bottom:3px;letter-spacing:.3px;line-height:1.2}
+.perf-pos-cam{font-size:12px;color:#cc4444;font-weight:700;margin-bottom:4px}
+.perf-cedula{font-size:11px;color:#445;margin-bottom:12px;letter-spacing:.5px}
+.perf-badges{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.perf-badge{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
+.badge-activo{background:linear-gradient(135deg,#0a2a0a,#0d3a0d);color:#4caf50;border:1px solid #4caf5055}
+.badge-standby{background:linear-gradient(135deg,#2a1800,#3a2200);color:#ff9800;border:1px solid #ff980055}
+.badge-posicion{background:linear-gradient(135deg,#071828,#0a2035);color:#4fc3f7;border:1px solid #4fc3f755}
+.badge-camiseta{background:linear-gradient(135deg,#160a28,#200a35);color:#ce93d8;border:1px solid #ce93d855}
 
-/* tabs inside perfil */
-.perf-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:10px;overflow:hidden;border:1px solid #1e3050;margin:0 0 16px}
-.perf-tab{padding:8px 4px;text-align:center;font-size:10px;font-weight:700;color:#556;background:#081420;cursor:pointer;transition:all .2s}
-.perf-tab.active{background:#cc2222;color:#fff}
+/* stat strip */
+.perf-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#1e3050;border-radius:12px;overflow:hidden;margin-bottom:18px}
+.perf-stat{background:#080f1e;padding:10px 4px;text-align:center}
+.perf-stat-n{font-size:18px;font-weight:900;color:#cc2222;line-height:1}
+.perf-stat-l{font-size:8px;color:#445;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* tabs */
+.perf-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:12px;overflow:hidden;border:1px solid #1e3050;margin:0 0 18px}
+.perf-tab{padding:10px 4px;text-align:center;font-size:10px;font-weight:700;color:#445;background:#06101c;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.perf-tab.active{background:linear-gradient(135deg,#cc2222,#880000);color:#fff}
 
 /* field cards */
-.pf-card{background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:14px;margin-bottom:10px;text-align:left}
-.pf-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #0f2035}
+.pf-card{background:#080f1e;border:1px solid #1a2a40;border-radius:14px;padding:16px;margin-bottom:12px;text-align:left}
+.pf-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0e1e30;gap:8px}
 .pf-row:last-child{border-bottom:none}
-.pf-label{font-size:9px;color:#556;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-.pf-value{font-size:12px;color:#dde;font-weight:600;text-align:right;max-width:55%}
-.pf-edit-icon{font-size:13px;margin-left:6px;cursor:pointer;opacity:.6}
-.pf-section-lbl{font-size:9px;color:#cc4444;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-
-/* edit fields inline */
-.pf-edit-field{width:100%;background:#050f1e;border:1px solid #cc222266;border-radius:6px;padding:6px 8px;color:#fff;font-size:12px;outline:none;margin-top:4px;font-family:inherit}
+.pf-label{font-size:9px;color:#445;text-transform:uppercase;letter-spacing:.5px;font-weight:700;flex-shrink:0}
+.pf-value{font-size:12px;color:#ccd;font-weight:600;text-align:right;flex:1}
+.pf-edit-icon{font-size:14px;margin-left:6px;cursor:pointer;opacity:.5;flex-shrink:0}
+.pf-section-lbl{font-size:9px;color:#cc4444;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.pf-edit-field{width:100%;background:#040b14;border:1px solid #cc222255;border-radius:8px;padding:8px 10px;color:#fff;font-size:13px;outline:none;margin-top:6px;font-family:inherit;transition:border .2s}
+.pf-edit-field:focus{border-color:#cc2222}
 .pf-save-row{display:flex;gap:8px;margin-top:10px}
-.pf-save-btn{flex:1;padding:8px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer}
-.btn-save{background:#cc2222;color:#fff}
-.btn-cancel{background:#1e3050;color:#8899bb}
+.pf-save-btn{flex:1;padding:10px;border-radius:10px;border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px}
+.btn-save{background:linear-gradient(135deg,#cc2222,#880000);color:#fff}
+.btn-cancel{background:#1a2a40;color:#667}
 
-/* standby form */
-.sb-form{background:#0d1a2e;border:1px solid #ff980033;border-radius:12px;padding:14px;margin-top:10px}
-.sb-title{font-size:13px;font-weight:900;color:#ff9800;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+/* alert cards */
+.alert-card{border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid}
+.alert-info{background:#071828;border-color:#1e4060;color:#4fc3f7}
+.alert-warn{background:#1a1000;border-color:#443000;color:#ff9800}
+.alert-ok{background:#071a07;border-color:#1a4020;color:#4caf50}
+.alert-card .al-title{font-size:11px;font-weight:900;margin-bottom:4px;letter-spacing:.3px}
+.alert-card .al-body{font-size:10px;opacity:.85;line-height:1.5}
+.progress-bar{height:8px;background:#0e1e30;border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#cc2222,#ff4444);transition:width .4s}
+
+/* standby */
+.sb-form{background:#080f1e;border:1px solid #ff980033;border-radius:14px;padding:16px;margin-top:12px}
+.sb-title{font-size:13px;font-weight:900;color:#ff9800;margin-bottom:14px;display:flex;align-items:center;gap:8px;letter-spacing:.3px}
+.sb-active{background:#1a1000;border:1px solid #ff980044;border-radius:14px;padding:16px;margin-top:12px}
+.sb-active-title{font-size:13px;font-weight:900;color:#ff9800;margin-bottom:10px}
+.sb-active-row{font-size:11px;color:#cca;padding:3px 0;line-height:1.5}
+.sb-countdown{background:#0d0700;border-radius:10px;padding:10px;margin:10px 0;text-align:center}
+.sb-countdown-n{font-size:28px;font-weight:900;color:#ff9800;line-height:1}
+.sb-countdown-l{font-size:9px;color:#886;text-transform:uppercase;letter-spacing:.5px}
+
+/* cp form */
+.cp-form{background:#080f1e;border:1px solid #cc222233;border-radius:14px;padding:16px;margin-bottom:12px}
+.cp-title{font-size:13px;font-weight:900;color:#cc4444;margin-bottom:14px;letter-spacing:.3px}
 .sb-active{background:#2d1a00;border:1px solid #ff980044;border-radius:10px;padding:12px;margin-top:10px}
 .sb-active-title{font-size:11px;font-weight:900;color:#ff9800;margin-bottom:6px}
 .sb-active-row{font-size:10px;color:#cc8800;margin-bottom:3px}
@@ -574,10 +604,12 @@ select:focus{outline:none;border-color:var(--acc)}
 </div>
 
 <!-- ── PERFIL MODAL ────────────────────────────────────────────── -->
-<div class="perfil-mo hidden" id="perfil-mo" onclick="closePerfil(event)">
-  <div class="perfil-sheet" onclick="event.stopPropagation()">
+<div class="perfil-mo hidden" id="perfil-mo">
+  <div class="perfil-sheet">
     <div class="perf-cover">
+      <div class="perf-cover-bg"></div>
       <div class="perf-cover-pattern"></div>
+      <button class="perf-cover-close" onclick="closePerfil()">✕</button>
       <div class="perf-av-wrap">
         <div class="perf-av" onclick="triggerFoto()">
           <img id="perf-av-img" src="" style="display:none">
@@ -589,8 +621,10 @@ select:focus{outline:none;border-color:var(--acc)}
     <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="onFotoSelect(event)">
     <div class="perf-body">
       <div class="perf-name" id="perf-name"></div>
+      <div class="perf-pos-cam" id="perf-pos-cam"></div>
       <div class="perf-cedula" id="perf-cedula"></div>
       <div class="perf-badges" id="perf-badges"></div>
+      <div class="perf-stats" id="perf-stats"></div>
       <div class="perf-tabs">
         <div class="perf-tab active" onclick="perfTab('info',this)">Perfil</div>
         <div class="perf-tab" onclick="perfTab('seguridad',this)">Seguridad</div>
@@ -2794,7 +2828,7 @@ function doRegister(){
   setSes({cedula:ced,ts:Date.now()});
   checkAuth();
   showToast('¡Bienvenido al club, '+nombre+'! ⚽');
-  setTimeout(function(){printHojaCompromiso(db[ced]);},400);
+  setTimeout(function(){printHojaCompromiso(db[ced]);sendWelcomeEmail(db[ced]);},500);
 }
 
 // ── PERFIL MODAL ──────────────────────────────────────────────────────
@@ -2803,8 +2837,7 @@ function openPerfil(){
   renderPerfil(soc);
   document.getElementById('perfil-mo').classList.remove('hidden');
 }
-function closePerfil(e){
-  if(e&&e.target!==document.getElementById('perfil-mo'))return;
+function closePerfil(){
   document.getElementById('perfil-mo').classList.add('hidden');
 }
 
@@ -2813,17 +2846,30 @@ function renderPerfil(soc){
   const img=document.getElementById('perf-av-img');
   const ini=document.getElementById('perf-av-ini');
   if(soc.foto){img.src=soc.foto;img.style.display='block';ini.style.display='none';}
-  else{img.style.display='none';ini.style.display='block';ini.textContent=(soc.nombre||'?')[0].toUpperCase();}
-  document.getElementById('perf-name').textContent=soc.nombreCompleto||soc.nombre+' '+soc.apellido;
-  document.getElementById('perf-cedula').textContent='C.C. '+Number(soc.cedula).toLocaleString('es-CO');
+  else{img.style.display='none';ini.style.display='block';
+    ini.textContent=((soc.nombre||'?')[0]+(soc.apellido||'?')[0]).toUpperCase();}
+  document.getElementById('perf-name').textContent=soc.nombreCompleto||(soc.nombre+' '+soc.apellido);
+  const pc=document.getElementById('perf-pos-cam');
+  if(pc)pc.textContent=(soc.posicion||'')+(soc.numCamiseta?' · #'+soc.numCamiseta:'');
+  document.getElementById('perf-cedula').textContent='C.C. '+Number(soc.cedula).toLocaleString('es-CO')+' · '+fmtDate(soc.fechaIngreso);
   // Badges
   const bdg=document.getElementById('perf-badges');
   let b='<span class="perf-badge '+(soc.estado==='standby'?'badge-standby':'badge-activo')+'">'+(soc.estado==='standby'?'⏸ Stand By':'✅ Activo')+'</span>';
-  if(soc.posicion)b+='<span class="perf-badge badge-posicion">'+soc.posicion+'</span>';
-  if(soc.numCamiseta)b+='<span class="perf-badge badge-camiseta">#'+soc.numCamiseta+'</span>';
+  if(soc.talla)b+='<span class="perf-badge badge-posicion">Talla '+soc.talla+'</span>';
+  if(soc.sangre)b+='<span class="perf-badge badge-camiseta">'+soc.sangre+'</span>';
   bdg.innerHTML=b;
-  // Render active tab
-  perfTab('info',document.querySelector('.perf-tab.active'));
+  // Stats strip
+  const ingreso=soc.fechaIngreso?new Date(soc.fechaIngreso+'T12:00:00'):new Date();
+  const dias=Math.max(0,Math.floor((Date.now()-ingreso.getTime())/86400000));
+  const meses=Math.floor(dias/30);
+  const st=document.getElementById('perf-stats');
+  if(st)st.innerHTML='<div class="perf-stat"><div class="perf-stat-n">'+dias+'</div><div class="perf-stat-l">Días</div></div>'
+    +'<div class="perf-stat"><div class="perf-stat-n">'+meses+'</div><div class="perf-stat-l">Meses</div></div>'
+    +'<div class="perf-stat"><div class="perf-stat-n">'+(soc.estado==='activo'?'🟢':'🟡')+'</div><div class="perf-stat-l">Estado</div></div>';
+  // Re-render active tab
+  const activeTab=document.querySelector('.perf-tab.active');
+  const tabId=activeTab?activeTab.textContent.trim().includes('Info')?'info':activeTab.textContent.trim().includes('Acceso')?'seguridad':'club':'info';
+  perfTab(tabId,activeTab||document.querySelector('.perf-tab'));
 }
 
 function perfTab(tab, el){
@@ -2963,16 +3009,45 @@ function renderTabSeg(soc){
 
 function renderTabClub(soc){
   const el=document.getElementById('perf-tab-club');
-  el.innerHTML='<div class="pf-card">'
+  const ingreso=soc.fechaIngreso?new Date(soc.fechaIngreso+'T12:00:00'):new Date();
+  const dias=Math.max(0,Math.floor((Date.now()-ingreso.getTime())/86400000));
+  const pct=Math.min(100,Math.round((dias/365)*100));
+  let alerts='';
+  if(soc.estado==='standby'&&soc.standby){
+    const sol=new Date(soc.standby.fechaSolicitud+'T12:00:00');
+    const elegible=new Date(sol);elegible.setMonth(elegible.getMonth()+2);
+    const diasRest=Math.max(0,Math.ceil((elegible-Date.now())/86400000));
+    const pctEsp=Math.min(100,Math.round(((60-diasRest)/60)*100));
+    alerts+='<div class="alert-card alert-warn">'
+      +'<div class="al-title">⏸ En Stand By desde '+fmtDate(soc.standby.fechaSolicitud)+'</div>'
+      +'<div class="al-body">Motivo: <b>'+soc.standby.motivo+'</b><br>'
+      +(soc.standby.desc?soc.standby.desc+'<br>':'')
+      +'Retorno estimado: '+fmtDate(soc.standby.fechaRetorno)+'</div>'
+      +(diasRest>0?'<div class="sb-countdown"><div class="sb-countdown-n">'+diasRest+'</div>'
+        +'<div class="sb-countdown-l">días para poder reactivarte</div></div>'
+        +'<div class="progress-bar"><div class="progress-fill" style="width:'+pctEsp+'%;background:linear-gradient(90deg,#ff9800,#ffcc00)"></div></div>':
+        '<div style="margin-top:8px;color:#4caf50;font-size:11px;font-weight:700">✅ Ya puedes reactivarte</div>')
+      +'</div>';
+  } else {
+    alerts+='<div class="alert-card alert-ok">'
+      +'<div class="al-title">✅ Socio Activo</div>'
+      +'<div class="al-body">Llevas <b>'+dias+' días</b> como miembro activo del club.</div>'
+      +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+      +'<div style="font-size:9px;color:#4caf5088;margin-top:2px">'+pct+'% del primer año completado</div>'
+      +'</div>';
+    if(dias<30)alerts+='<div class="alert-card alert-info"><div class="al-title">👋 ¡Bienvenido al equipo!</div><div class="al-body">Eres nuevo en el club. Conoce el reglamento y únete a los entrenamientos.</div></div>';
+  }
+  el.innerHTML=alerts
+    +'<div class="pf-card">'
     +'<div class="pf-section-lbl">Datos Deportivos</div>'
     +pfRow('Posición',soc.posicion||'—','posicion','select',soc.posicion,['Portero','Defensa Central','Lateral Derecho','Lateral Izquierdo','Mediocampista','Extremo Derecho','Extremo Izquierdo','Delantero','Comodín'])
     +pfRow('N.º Camiseta',soc.numCamiseta?'#'+soc.numCamiseta:'—','numCamiseta','number')
     +pfRow('Talla',soc.talla||'—','talla','select',soc.talla,['XS','S','M','L','XL','XXL'])
     +'</div>'
-    +'<div class="pf-card">'
-    +'<div class="pf-section-lbl">En el Club</div>'
+    +'<div class="pf-card"><div class="pf-section-lbl">En el Club</div>'
     +'<div class="pf-row"><span class="pf-label">Miembro desde</span><span class="pf-value">'+fmtDate(soc.fechaIngreso)+'</span></div>'
-    +'<div class="pf-row"><span class="pf-label">Estado</span><span class="pf-value" style="color:'+(soc.estado==='activo'?'#4caf50':'#ff9800')+'">'+( soc.estado==='activo'?'✅ Activo':'⏸ Stand By')+'</span></div>'
+    +'<div class="pf-row"><span class="pf-label">Días activo</span><span class="pf-value">'+dias+'</span></div>'
+    +'<div class="pf-row"><span class="pf-label">Estado</span><span class="pf-value" style="color:'+(soc.estado==='activo'?'#4caf50':'#ff9800')+';font-weight:900">'+(soc.estado==='activo'?'✅ Activo':'⏸ Stand By')+'</span></div>'
     +'</div>';
 }
 
@@ -3034,17 +3109,181 @@ function doStandby(){
   const err=document.getElementById('sb-err');
   if(!motivo||!fi){err.textContent='Selecciona el motivo y la fecha de inicio';return;}
   soc.estado='standby';
-  soc.standby={motivo,desc,fechaInicio:fi,fechaRetorno:fr,fechaSolicitud:new Date().toISOString().slice(0,10)};
+  const hoy=new Date().toISOString().slice(0,10);
+  soc.standby={motivo,desc,fechaInicio:fi,fechaRetorno:fr,fechaSolicitud:hoy};
   const db=getSocios();db[soc.cedula]=soc;setSocios(db);
   renderPerfil(soc);
   showToast('⏸ Stand By registrado');
+  setTimeout(function(){
+    printStandbyDoc(soc);
+    sendStandbyEmail(soc);
+  },400);
 }
 function cancelStandby(){
   const soc=getSocioActual();if(!soc)return;
+  if(soc.standby&&soc.standby.fechaSolicitud){
+    const sol=new Date(soc.standby.fechaSolicitud+'T12:00:00');
+    const elegible=new Date(sol);elegible.setMonth(elegible.getMonth()+2);
+    const diasRest=Math.max(0,Math.ceil((elegible-Date.now())/86400000));
+    if(diasRest>0){
+      showToast('⏳ Aún faltan '+diasRest+' días para poder reactivarte');
+      return;
+    }
+  }
   soc.estado='activo';soc.standby=null;
   const db=getSocios();db[soc.cedula]=soc;setSocios(db);
   renderPerfil(soc);
-  showToast('✅ De vuelta a activo');
+  showToast('✅ ¡Bienvenido de vuelta!');
+}
+
+
+
+// ── EMAIL BIENVENIDA ──────────────────────────────────────────────────────────
+function sendWelcomeEmail(soc){
+  if(!soc.email)return;
+  var nombre=soc.nombreCompleto||(soc.nombre+' '+soc.apellido);
+  var subj=encodeURIComponent('¡Bienvenido a Atlético Norte F.C. - Liga Interna S2 2026!');
+  var body=encodeURIComponent(
+    'Hola ' + nombre + ',\n\n'
+    +'¡Bienvenido oficialmente a Atlético Norte F.C.!\n\n'
+    +'Tus datos de ingreso:\n'
+    +'- Nombre: ' + nombre + '\n'
+    +'- Cédula: ' + soc.cedula + '\n'
+    +'- Posición: ' + (soc.posicion||'Por definir') + '\n'
+    +'- Camiseta: ' + (soc.numCamiseta?'#'+soc.numCamiseta:'Por asignar') + '\n'
+    +'- Fecha de ingreso: ' + (soc.fechaIngreso||'') + '\n\n'
+    +'Recuerda:\n'
+    +'✅ Respetar el reglamento interno\n'
+    +'✅ Asistir puntualmente a los partidos\n'
+    +'✅ Mantener el fair play en todo momento\n\n'
+    +'¡Nos vemos en la cancha!\n\n'
+    +'Atlético Norte F.C.\nLiga Interna S2 2026\n'
+    +'Unidos por la amistad, la salud y el deporte'
+  );
+  window.open('mailto:'+soc.email+'?subject='+subj+'&body='+body);
+}
+
+// ── EMAIL STAND BY ────────────────────────────────────────────────────────────
+function sendStandbyEmail(soc){
+  if(!soc.email||!soc.standby)return;
+  var nombre=soc.nombreCompleto||(soc.nombre+' '+soc.apellido);
+  var sb=soc.standby;
+  var subj=encodeURIComponent('Solicitud Stand By aprobada - Atlético Norte F.C.');
+  var body=encodeURIComponent(
+    'Hola ' + nombre + ',\n\n'
+    +'Tu solicitud de Stand By ha sido registrada correctamente.\n\n'
+    +'Detalles:\n'
+    +'- Motivo: ' + sb.motivo + '\n'
+    +(sb.desc?'- Descripción: ' + sb.desc + '\n':'')
+    +'- Fecha de inicio: ' + sb.fechaInicio + '\n'
+    +'- Retorno estimado: ' + (sb.fechaRetorno||'Por definir') + '\n'
+    +'- Fecha de solicitud: ' + sb.fechaSolicitud + '\n\n'
+    +'IMPORTANTE: Según el reglamento del club, podrás reactivar tu membresía\n'
+    +'a partir del ' + (function(){
+      var d=new Date(sb.fechaSolicitud+'T12:00:00');
+      d.setMonth(d.getMonth()+2);
+      return d.toLocaleDateString('es-CO');
+    })() + ' (mínimo 2 meses de stand by).\n\n'
+    +'¡Te esperamos de vuelta!\n\n'
+    +'Atlético Norte F.C.\nLiga Interna S2 2026'
+  );
+  window.open('mailto:'+soc.email+'?subject='+subj+'&body='+body);
+}
+
+// ── DOCUMENTO STAND BY ────────────────────────────────────────────────────────
+function printStandbyDoc(soc){
+  if(!soc.standby)return;
+  var sb=soc.standby;
+  var nombre=soc.nombreCompleto||(soc.nombre+' '+soc.apellido);
+  function fmtD(d){if(!d)return '';var p=d.split('-');if(p.length<3)return d;return p[2]+'/'+p[1]+'/'+p[0];}
+  var sol=new Date(sb.fechaSolicitud+'T12:00:00');
+  var elegible=new Date(sol);elegible.setMonth(elegible.getMonth()+2);
+  var elegibleStr=elegible.toLocaleDateString('es-CO');
+
+  var LOGO='<svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" width="60" height="69">'
+    +'<defs><linearGradient id="sbsg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#c0c0c0"/><stop offset="100%" stop-color="#888"/></linearGradient>'
+    +'<linearGradient id="sbrg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ee1111"/><stop offset="100%" stop-color="#880000"/></linearGradient></defs>'
+    +'<path d="M100 4 L188 32 L188 128 Q188 192 100 226 Q12 192 12 128 L12 32 Z" fill="url(#sbsg)" stroke="#555" stroke-width="2"/>'
+    +'<path d="M100 12 L182 38 L182 126 Q182 186 100 220 Q18 186 18 126 L18 38 Z" fill="#0d0d0d"/>'
+    +'<path d="M18 38 L100 38 L100 116 L18 100 Z" fill="url(#sbrg)"/>'
+    +'<path d="M100 38 L182 38 L182 100 L100 116 Z" fill="#1a1a1a"/>'
+    +'<path d="M18 100 L100 116 L100 200 Q55 218 18 188 Z" fill="url(#sbrg)"/>'
+    +'<path d="M100 116 L182 100 L182 188 Q145 218 100 200 Z" fill="#1a1a1a"/>'
+    +'<text x="100" y="158" text-anchor="middle" fill="#cc2222" font-size="56" font-weight="900" font-family="Arial Black,sans-serif">AN</text>'
+    +'<text x="100" y="186" text-anchor="middle" fill="#999" font-size="19" font-weight="700" font-family="Arial,sans-serif">FUTBOL</text></svg>';
+
+  var CSS='*{margin:0;padding:0;box-sizing:border-box}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#000;background:#fff}'
+    +'.page{width:210mm;min-height:297mm;padding:10mm 12mm}'
+    +'table{border-collapse:collapse;width:100%}'
+    +'td,th{padding:3px 6px;vertical-align:middle}'
+    +'.bord td{border:1px solid #333}'
+    +'.ttl{font-size:20px;font-weight:900;letter-spacing:1px;text-align:center}'
+    +'.sub{font-size:9px;font-style:italic;text-align:center;color:#444}'
+    +'.doc-title{font-size:15px;font-weight:900;text-align:center;letter-spacing:2px;margin:10px 0;padding:6px;border:2px solid #000;background:#f5f5f5}'
+    +'.sec{font-size:9px;font-weight:900;background:#333;color:#fff;padding:4px 8px;letter-spacing:1px;margin:8px 0 4px}'
+    +'.fl{font-size:8px;color:#555;padding-bottom:1px}'
+    +'.fv{font-size:11px;font-weight:700;border-bottom:1px solid #666;padding:2px 0;min-height:18px}'
+    +'.box{border:2px solid #ff9800;border-radius:6px;padding:10px;margin:10px 0;background:#fffdf0}'
+    +'.box-title{font-size:11px;font-weight:900;color:#cc6600;margin-bottom:6px}'
+    +'.comp{font-size:10px;line-height:1.8;text-align:justify;margin:8px 0}'
+    +'.sig{border-top:1px solid #333;margin-top:28px;padding-top:4px;font-size:9px;font-weight:700;text-align:center}'
+    +'.warn{background:#fff3e0;border:1px solid #ff9800;border-radius:4px;padding:8px;margin:8px 0;font-size:9px;color:#cc6600}';
+
+  var HDR='<table style="margin-bottom:8px" class="bord"><tr>'
+    +'<td style="width:70px;text-align:center;padding:4px">'+LOGO+'</td>'
+    +'<td style="text-align:center;padding:6px">'
+    +'<div class="ttl">ATLETICO NORTE F.C.</div>'
+    +'<div class="sub">Unidos por la amistad, la salud y el deporte</div>'
+    +'<div style="font-size:9px;font-weight:700;text-align:center">Liga Interna S2 2026</div>'
+    +'</td>'
+    +'<td style="width:80px;text-align:center;padding:6px">'
+    +'<div style="font-size:8px;font-weight:700">SOLICITUD N.&ordm;</div>'
+    +'<div style="font-size:20px;font-weight:900">'+soc.cedula.toString().slice(-4)+'</div>'
+    +'</td>'
+    +'</tr></table>'
+    +'<div class="doc-title">⏸ SOLICITUD DE STAND BY</div>';
+
+  var DATOS='<div class="sec">DATOS DEL SOCIO</div>'
+    +'<table class="bord" style="margin-bottom:6px"><tbody>'
+    +'<tr><td style="width:50%"><div class="fl">NOMBRE COMPLETO</div><div class="fv">'+nombre+'</div></td>'
+    +'<td><div class="fl">CEDULA</div><div class="fv">'+soc.cedula+'</div></td>'
+    +'<td><div class="fl">FECHA SOLICITUD</div><div class="fv">'+fmtD(sb.fechaSolicitud)+'</div></td></tr>'
+    +'</tbody></table>';
+
+  var SBDET='<div class="sec">DETALLE DEL STAND BY</div>'
+    +'<table class="bord" style="margin-bottom:6px"><tbody>'
+    +'<tr><td><div class="fl">MOTIVO</div><div class="fv">'+sb.motivo+'</div></td>'
+    +'<td><div class="fl">FECHA INICIO</div><div class="fv">'+fmtD(sb.fechaInicio)+'</div></td>'
+    +'<td><div class="fl">RETORNO ESTIMADO</div><div class="fv">'+fmtD(sb.fechaRetorno)+'</div></td></tr>'
+    +(sb.desc?'<tr><td colspan="3"><div class="fl">DESCRIPCION</div><div class="fv">'+sb.desc+'</div></td></tr>':'')
+    +'</tbody></table>';
+
+  var WARN='<div class="warn">⚠️ <strong>POLÍTICA DEL CLUB:</strong> Según el reglamento de Atlético Norte F.C., '
+    +'el socio podrá solicitar la reactivación de su membresía únicamente a partir del '
+    +'<strong>'+elegibleStr+'</strong> (mínimo 2 meses de stand by).</div>';
+
+  var COMP='<div class="sec">COMPROMISOS</div>'
+    +'<div class="comp">El socio <strong>'+nombre.toUpperCase()+'</strong> se compromete a:<br><br>'
+    +'1. Notificar al club cualquier cambio en las fechas de retorno establecidas.<br>'
+    +'2. Ponerse al día con cualquier obligación pendiente al momento de reactivarse.<br>'
+    +'3. Cumplir con el mínimo de 2 meses de stand by establecido por el reglamento.<br>'
+    +'4. No participar en partidos oficiales de la Liga Interna durante el período de stand by.</div>';
+
+  var FIRMA='<table style="margin-top:20px"><tr>'
+    +'<td style="width:45%;text-align:center;padding:10px"><div style="height:40px"></div>'
+    +'<div class="sig">Firma del Socio<br>'+nombre+'<br>C.C. '+soc.cedula+'</div></td>'
+    +'<td style="width:10%"></td>'
+    +'<td style="width:45%;text-align:center;padding:10px"><div style="height:40px"></div>'
+    +'<div class="sig">Representante del Club<br>Atlético Norte F.C.</div></td>'
+    +'</tr></table>';
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Stand By - '+nombre+'</title>'
+    +'<style>'+CSS+'</style></head><body><div class="page">'
+    +HDR+DATOS+SBDET+WARN+COMP+FIRMA
+    +'</div><sc'+'ript>window.onload=function(){window.print();};<'+'/script></body></html>';
+
+  _openPrintWindow(html,'Stand By');
 }
 
 
