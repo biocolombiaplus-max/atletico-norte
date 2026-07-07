@@ -2225,6 +2225,31 @@ function handleNewCoordPinDigit(n){
   }
 }
 
+
+// ── PRINT HELPER (Blob URL — compatible Android/iOS) ─────────────────────────
+function _openPrintWindow(html, title){
+  try{
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var w=window.open(url,'_blank');
+    if(!w){
+      // fallback: show in iframe overlay
+      var ov=document.createElement('div');ov.id='_pov';
+      ov.style.cssText='position:fixed;inset:0;z-index:99998;background:#fff;overflow:auto';
+      var toolbar='<div style="position:sticky;top:0;background:#cc2222;padding:10px 16px;display:flex;gap:12px;z-index:1">'
+        +'<button onclick="window.print()" style="background:#fff;color:#cc2222;border:none;padding:8px 16px;border-radius:8px;font-weight:900;font-size:14px;cursor:pointer">🖨️ Imprimir / Guardar PDF</button>'
+        +'<button onclick="document.getElementById(\'_pov\').remove()" style="background:transparent;color:#fff;border:1px solid #fff;padding:8px 16px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">✕ Cerrar</button>'
+        +'</div>';
+      var frame=document.createElement('iframe');
+      frame.style.cssText='width:100%;border:none;height:calc(100% - 52px)';
+      frame.srcdoc=html;
+      ov.innerHTML=toolbar;
+      ov.appendChild(frame);
+      document.body.appendChild(ov);
+    }
+  }catch(err){showToast('Error: '+err.message);}
+}
+
 // ── PLANILLA PARTIDO ──────────────────────────────────────────────────
 function printPlanilla(phase,matchId,l,v){
   var s=getS();
@@ -2513,10 +2538,7 @@ function printPlanilla(phase,matchId,l,v){
     +'<sc'+'ript>window.onload=function(){window.print();};<'+'/script>'
     +'</body></html>';
 
-  var w=window.open('','_blank','width=900,height=1100');
-  if(!w){showToast('⚠️ Permite ventanas emergentes para imprimir');return;}
-  w.document.write(html);
-  w.document.close();
+  _openPrintWindow(html,'Planilla');
 }
 
 
@@ -2649,10 +2671,7 @@ function printHojaCompromiso(soc){
     +'<sc'+'ript>window.onload=function(){window.print();};<'+'/script>'
     +'</body></html>';
 
-  var w=window.open('','_blank','width=900,height=1100');
-  if(!w){showToast('⚠️ Permite ventanas emergentes para imprimir');return;}
-  w.document.write(html);
-  w.document.close();
+  _openPrintWindow(html,'Hoja de Compromiso');
 }
 
 // ── SOCIOS AUTH SYSTEM ────────────────────────────────────────────────
@@ -2680,6 +2699,8 @@ function checkAuth(){
   const ses=getSes();
   const overlay=document.getElementById('login-overlay');
   const heroAv=document.getElementById('hero-avatar');
+  // Admin y Coordinador no necesitan sesión de socio
+  if(adminMode||coordMode){overlay.classList.add('hidden');return;}
   if(ses&&getSocios()[ses.cedula]){
     overlay.classList.add('hidden');
     heroAv.style.display='flex';
