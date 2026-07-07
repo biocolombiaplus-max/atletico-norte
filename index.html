@@ -541,8 +541,8 @@ select:focus{outline:none;border-color:var(--acc)}
     <li>Resultados Fase 2 suman a tabla general acumulada</li>
     <li>Los 2 últimos de la tabla general quedan eliminados</li>
     <li>8 mejores avanzan al playoff de cuartos de final</li>
-    <li>Cuartos: 1vs8 · 2vs7 · 3vs6 · 4vs5 (partido único)</li>
-    <li>Semis y Final: partido único · mata-mata</li>
+    <li>Cuartos de Final: partido único · Lun 16 Nov (2 partidos) y Jue 19 Nov (2 partidos)</li>
+    <li>Semis: partido único · Lunes 23 Nov · Final: tentativa Domingo 29 Nov</li>
   </ul></div>
   <div class="info-card"><h4>⏰ Horarios</h4><ul class="info-list">
     <li>Lunes: Coveadse 7:00 PM y 9:00 PM</li>
@@ -773,16 +773,12 @@ const F2_DATES=[
 // 5-team round-robin: [bye_index, [[pair1_i,pair1_j],[pair2_i,pair2_j]]]
 const RR5=[[0,[[1,4],[2,3]]],[1,[[3,4],[0,2]]],[2,[[0,4],[1,3]]],[3,[[2,4],[0,1]]],[4,[[1,2],[0,3]]]];
 const PLAYOFF_DATES={
-  qf1:{fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  qf3:{fecha:'2026-11-14',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
-  qf2:{fecha:'2026-11-16',dia:'Lunes',hora:'16:00',cancha:'Coveadse'},
-  qf4:{fecha:'2026-11-16',dia:'Lunes',hora:'18:00',cancha:'Coveadse'},
-  qf1v:{fecha:'2026-11-21',dia:'Sábado',hora:'06:00',cancha:'Coveadse'},
-  qf3v:{fecha:'2026-11-21',dia:'Sábado',hora:'06:00',cancha:'Villa Silvania'},
-  qf2v:{fecha:'2026-11-23',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
-  qf4v:{fecha:'2026-11-23',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
-  sf1:{fecha:'2026-11-26',dia:'Jueves',hora:'19:00',cancha:'Coveadse'},
-  sf2:{fecha:'2026-11-26',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  qf1:{fecha:'2026-11-16',dia:'Lunes',hora:'16:00',cancha:'Coveadse'},
+  qf2:{fecha:'2026-11-16',dia:'Lunes',hora:'18:00',cancha:'Coveadse'},
+  qf3:{fecha:'2026-11-19',dia:'Jueves',hora:'19:00',cancha:'Villa Silvania'},
+  qf4:{fecha:'2026-11-19',dia:'Jueves',hora:'21:00',cancha:'Villa Silvania'},
+  sf1:{fecha:'2026-11-23',dia:'Lunes',hora:'19:00',cancha:'Coveadse'},
+  sf2:{fecha:'2026-11-23',dia:'Lunes',hora:'21:00',cancha:'Coveadse'},
   final:{fecha:'2026-11-29',dia:'Domingo',hora:'19:00',cancha:'Villa Silvania'}
 };
 
@@ -873,19 +869,8 @@ function getQFPairs(){
 function winner(r,l,v){if(!r)return null;if(r.gl>r.gv)return l;if(r.gl<r.gv)return v;return null;}
 function qfWinner(id,l,v){
   const s=getS();
-  const ri=s.rqf[id]||null;
-  const rv=s.rqf[id+'v']||null;
-  if(!ri&&!rv)return null;
-  const gli=(ri?ri.gl:0)+(rv?rv.gv:0);
-  const gvi=(ri?ri.gv:0)+(rv?rv.gl:0);
-  if(gli>gvi)return l;
-  if(gli<gvi)return v;
-  // tie: away goals (vuelta away = original local)
-  const awayL=rv?rv.gl:0;
-  const awayV=ri?ri.gv:0;
-  if(awayL>awayV)return l;
-  if(awayL<awayV)return v;
-  return null;
+  const r=s.rqf[id]||null;
+  return winner(r,l,v);
 }
 
 // ── GOLEADORES ────────────────────────────────────────────────────────
@@ -1262,10 +1247,8 @@ function renderLlave(){
   alrt.innerHTML='';
   const qfP=getQFPairs();
   const qfR=qfP.map(m=>{
-    const ri=s.rqf[m.id]||null;
-    const rv=s.rqf[m.id+'v']||null;
     const w=qfWinner(m.id,m.l,m.v);
-    return{...m,ri,rv,w};
+    return{...m,w};
   });
   const sfP=[{id:'sf1',l:qfR[0].w,v:qfR[1].w},{id:'sf2',l:qfR[2].w,v:qfR[3].w}];
   const sfR=sfP.map(m=>{const r=m.l&&m.v?s.rsf[m.id]:null;return{...m,r,w:winner(r,m.l,m.v)};});
@@ -1289,7 +1272,7 @@ function renderLlave(){
   }
   function bM(m,r,w,ph,extra){
     const[gl,gv]=r?[r.gl,r.gv]:[null,null];
-    const cc=adminMode&&m.l&&m.v;
+    const cc=(adminMode||coordMode)&&m.l&&m.v;
     const pd=PLAYOFF_DATES[m.id]||{};
     const dc=DC[pd.dia]||'var(--m)';
     const dateBar=pd.fecha
@@ -1328,13 +1311,13 @@ function renderLlave(){
       +aggBar+'</div>';
   }
   let bw='';
-  bw+=plHdr('⚔️','Cuartos · Ida','12 y 14 Nov','var(--acc)');
+  bw+=plHdr('⚔️','Cuartos de Final','Partido único · 16 y 19 Nov','var(--acc)');
   bw+='<div class="pl-grid">';
-  bw+=bMv(qfR[0],qfR[0].ri,qfR[0].rv,qfR[0].w,'qf')+bMv(qfR[1],qfR[1].ri,qfR[1].rv,qfR[1].w,'qf');
-  bw+=bMv(qfR[2],qfR[2].ri,qfR[2].rv,qfR[2].w,'qf')+bMv(qfR[3],qfR[3].ri,qfR[3].rv,qfR[3].w,'qf');
+  bw+=bM(qfR[0],s.rqf[qfR[0].id],qfR[0].w,'qf','')+bM(qfR[1],s.rqf[qfR[1].id],qfR[1].w,'qf','');
+  bw+=bM(qfR[2],s.rqf[qfR[2].id],qfR[2].w,'qf','')+bM(qfR[3],s.rqf[qfR[3].id],qfR[3].w,'qf','');
   bw+='</div>';
   bw+=plArrow();
-  bw+=plHdr('🥊','Semifinales','2 partidos · Jueves 26 Nov','var(--gold)');
+  bw+=plHdr('🥊','Semifinales','Partido único · Lunes 23 Nov','var(--gold)');
   bw+='<div class="pl-grid">';
   bw+=bM(sfR[0],sfR[0].r,sfR[0].w,'sf','')+bM(sfR[1],sfR[1].r,sfR[1].w,'sf','');
   bw+='</div>';
@@ -1384,15 +1367,15 @@ function renderBracketPreview(){
       +'</div>';
   }
   let h='';
-  h+=pH('⚔️','Cuartos de Final · Ida','12 y 14 Nov','var(--acc)');
+  h+=pH('⚔️','Cuartos de Final','Partido único · 16 y 19 Nov','var(--acc)');
   h+='<div class="pl-grid">';
-  h+=pCardPair('qf1','qf1v','1° Clasificado','8° Clasificado','var(--acc)');
-  h+=pCardPair('qf3','qf3v','2° Clasificado','7° Clasificado','var(--acc)');
-  h+=pCardPair('qf2','qf2v','4° Clasificado','5° Clasificado','var(--acc)');
-  h+=pCardPair('qf4','qf4v','3° Clasificado','6° Clasificado','var(--acc)');
+  h+=pCard('qf1','1° Clasificado','8° Clasificado','var(--acc)');
+  h+=pCard('qf3','2° Clasificado','7° Clasificado','var(--acc)');
+  h+=pCard('qf2','4° Clasificado','5° Clasificado','var(--acc)');
+  h+=pCard('qf4','3° Clasificado','6° Clasificado','var(--acc)');
   h+='</div>';
   h+=pArr();
-  h+=pH('🥊','Semifinales','2 partidos · Jueves 26 Nov','var(--gold)');
+  h+=pH('🥊','Semifinales','Partido único · Lunes 23 Nov','var(--gold)');
   h+='<div class="pl-grid">';
   h+=pCard('sf1','Ganador QF1','Ganador QF2','var(--gold)');
   h+=pCard('sf2','Ganador QF3','Ganador QF4','var(--gold)');
@@ -1402,7 +1385,7 @@ function renderBracketPreview(){
   const pdF=PLAYOFF_DATES['final']||{};
   h+='<div class="pl-grid-1"><div class="bm final-card">'
     +'<div class="bm-date" style="background:linear-gradient(90deg,var(--g)15,transparent)">'
-    +'<span class="bm-date-day" style="color:#f59e0b">Dom '+(pdF.fecha?pdF.fecha.slice(8):29)+' Nov</span>'
+    +'<span class="bm-date-day" style="color:#f59e0b">Dom '+(pdF.fecha?pdF.fecha.slice(8):'29')+' Nov</span>'
     +'<span class="bm-date-info">19:00 · Villa Silvania</span></div>'
     +'<div class="bt tbd"><div class="mc3"><svg viewBox="0 0 60 70"><path d="M30 2 L57 13 L57 44 Q57 62 30 69 Q3 62 3 44 L3 13 Z" fill="#0a1f0a" stroke="var(--g)" stroke-width="2"/><text x="30" y="44" text-anchor="middle" fill="var(--g)" font-size="12" font-weight="900" font-family="Arial">SF1</text></svg></div>'
     +'<span class="bn" style="color:#c0e0c0">Campeón Semifinal 1</span></div>'
@@ -1415,7 +1398,7 @@ function renderBracketPreview(){
     +'<div class="pl-trophy-sub">Atlético Norte F.C</div></div>';
   h+='<div class="alert blue" style="margin-top:10px"><span class="alert-ico">📌</span><div>'
     +'<div class="at">Programación pre-confirmada · Equipos por definir</div>'
-    +'<div class="ab">QF Ida: 12-14 Nov · QF Vuelta: 19-21 Nov · SF: Jue 26 Nov · Final: Dom 29 Nov</div>'
+    +'<div class="ab">QF: 16 y 19 Nov (partido único) · SF: Lun 23 Nov · Final: Dom 29 Nov</div>'
     +'</div></div>';
   document.getElementById('bracket-wrap').innerHTML=h;
 }
@@ -1546,15 +1529,13 @@ function renderCalendar(){
     +fixedRow('QF Ida: 2° vs 7°','var(--acc)',PD.qf3.fecha,PD.qf3.hora,PD.qf3.cancha,'')
     +fixedRow('QF Ida: 4° vs 5°','var(--acc)',PD.qf2.fecha,PD.qf2.hora,PD.qf2.cancha,'')
     +fixedRow('QF Ida: 3° vs 6°','var(--acc)',PD.qf4.fecha,PD.qf4.hora,PD.qf4.cancha,'')
-    +fixedRow('QF Vuelta: 1° vs 8°','var(--acc)',PD.qf1v.fecha,PD.qf1v.hora,PD.qf1v.cancha,'Ventaja local = ida')
-    +fixedRow('QF Vuelta: 2° vs 7°','var(--acc)',PD.qf3v.fecha,PD.qf3v.hora,PD.qf3v.cancha,'')
-    +fixedRow('QF Vuelta: 4° vs 5°','var(--acc)',PD.qf2v.fecha,PD.qf2v.hora,PD.qf2v.cancha,'')
-    +fixedRow('QF Vuelta: 3° vs 6°','var(--acc)',PD.qf4v.fecha,PD.qf4v.hora,PD.qf4v.cancha,'')
+    +fixedRow('QF: 3° vs 6°','var(--acc)',PD.qf3.fecha,PD.qf3.hora,PD.qf3.cancha,'Partido único')
+    +fixedRow('QF: 4° vs 5°','var(--acc)',PD.qf4.fecha,PD.qf4.hora,PD.qf4.cancha,'Partido único')
     +fixedRow('Semifinal 1','var(--gold)',PD.sf1.fecha,PD.sf1.hora,PD.sf1.cancha,'')
     +fixedRow('Semifinal 2','var(--gold)',PD.sf2.fecha,PD.sf2.hora,PD.sf2.cancha,'')
     +fixedRow('Gran Final','#f59e0b',PD.final.fecha,PD.final.hora,PD.final.cancha,'')
     +'</div>';
-  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Cuartos a doble partido (ida y vuelta)</div><div class="ab">F1: 9 Jul – 17 Oct · F2: 19 Oct – 9 Nov · QF Ida: 12-14 Nov · QF Vuelta: 19-21 Nov · SF: 26 Nov · Final: 29 Nov</div></div></div>';
+  html+='<div class="alert blue" style="margin-top:8px"><span class="alert-ico">📌</span><div><div class="at">Fechas pre-programadas · Cuartos a doble partido (ida y vuelta)</div><div class="ab">F1: 13 Jul – 19 Oct · F2: 22 Oct – 12 Nov · QF: 16 y 19 Nov · SF: 23 Nov · Final: 29 Nov</div></div></div>';
   el.innerHTML=html;
 }
 
