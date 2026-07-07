@@ -2667,7 +2667,7 @@ function pfRow(label,value,field,type,rawVal,opts){
   }
   return '<div class="pf-row" id="row_'+field+'">'
     +'<span class="pf-label">'+label+'</span>'
-    +'<span class="pf-value" id="val_'+field+'">'+value+'<span class="pf-edit-icon" onclick="pfEdit(''+field+'')" title="Editar">✏️</span></span>'
+    +'<span class="pf-value" id="val_'+field+'">'+value+'<span class="pf-edit-icon" onclick="pfEdit(\''+field+'\')" title="Editar">✏️</span></span>'
     +editHtml
     +'</div>';
 }
@@ -2693,8 +2693,8 @@ function pfEdit(field){
     if(!row.querySelector('.pf-save-row')){
       const sr=document.createElement('div');
       sr.className='pf-save-row';
-      sr.innerHTML='<button class="pf-save-btn btn-save" onclick="pfSave(''+field+'')">Guardar</button>'
-        +'<button class="pf-save-btn btn-cancel" onclick="pfEdit(''+field+'')">Cancelar</button>';
+      sr.innerHTML='<button class="pf-save-btn btn-save" onclick="pfSave(\''+field+'\')">Guardar</button>'
+        +'<button class="pf-save-btn btn-cancel" onclick="pfEdit(\''+field+'\')">Cancelar</button>';
       row.appendChild(sr);
     }
   }
