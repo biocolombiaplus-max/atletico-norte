@@ -410,9 +410,200 @@ select:focus{outline:none;border-color:var(--acc)}
   .hero{padding:16px 24px}
 }
 @media(min-width:1024px){.fix-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── SOCIOS / AUTH ────────────────────────────────────────────────── */
+#login-overlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#050d1a 0%,#0a1628 60%,#0d0000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#login-overlay.hidden{display:none}
+.lo-logo{width:90px;height:104px;margin-bottom:12px}
+.lo-club{font-size:18px;font-weight:900;color:#fff;letter-spacing:1px;text-align:center;line-height:1.2}
+.lo-sub{font-size:10px;color:#aaa;text-align:center;margin-bottom:24px;letter-spacing:.5px}
+.lo-card{background:#0d1a2e;border:1px solid #1e3050;border-radius:16px;padding:22px 20px;width:100%;max-width:360px;box-shadow:0 8px 32px #000a}
+.lo-tabs{display:grid;grid-template-columns:1fr 1fr;border-radius:10px;overflow:hidden;margin-bottom:18px;border:1px solid #1e3050}
+.lo-tab{padding:9px;text-align:center;font-size:12px;font-weight:700;color:#556;background:#081420;cursor:pointer;transition:all .2s}
+.lo-tab.active{background:#cc2222;color:#fff}
+.lo-field{margin-bottom:12px}
+.lo-field label{display:block;font-size:10px;font-weight:700;color:#8899bb;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.lo-field input,.lo-field select,.lo-field textarea{width:100%;background:#050f1e;border:1px solid #1e3050;border-radius:8px;padding:10px 12px;color:#fff;font-size:13px;outline:none;transition:border .2s;font-family:inherit}
+.lo-field input:focus,.lo-field select:focus,.lo-field textarea:focus{border-color:#cc2222}
+.lo-field select option{background:#050f1e}
+.lo-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lo-btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px;letter-spacing:.5px;transition:all .2s}
+.lo-btn-primary{background:linear-gradient(135deg,#cc2222,#880000);color:#fff}
+.lo-btn-primary:active{opacity:.85}
+.lo-btn-ghost{background:#1e3050;color:#8899bb;margin-top:8px;font-size:12px}
+.lo-err{color:#e55;font-size:11px;text-align:center;margin-top:8px;min-height:16px}
+.lo-hint{font-size:10px;color:#556;text-align:center;margin-top:10px}
+.reg-scroll{max-height:60vh;overflow-y:auto;padding-right:4px}
+.reg-scroll::-webkit-scrollbar{width:4px}.reg-scroll::-webkit-scrollbar-track{background:#0a1628}.reg-scroll::-webkit-scrollbar-thumb{background:#1e3050;border-radius:4px}
+.reg-section-title{font-size:9px;font-weight:900;color:#cc4444;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #1e3050;padding-bottom:4px;margin:14px 0 10px}
+
+/* ── AVATAR HEADER ── */
+.user-avatar-btn{width:32px;height:32px;border-radius:50%;border:2px solid #cc2222;overflow:hidden;cursor:pointer;background:#0d1a2e;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-avatar-btn img{width:100%;height:100%;object-fit:cover}
+.user-avatar-btn .av-ini{font-size:12px;font-weight:900;color:#cc2222}
+
+/* ── PERFIL MODAL ── */
+.perfil-mo{position:fixed;inset:0;z-index:8000;background:#000c;display:flex;align-items:flex-end;justify-content:center}
+.perfil-mo.hidden{display:none}
+.perfil-sheet{background:linear-gradient(180deg,#0a1826 0%,#050d18 100%);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:93vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)}
+.perfil-sheet::-webkit-scrollbar{display:none}
+
+/* cover + avatar */
+.perf-cover{height:90px;background:linear-gradient(135deg,#1a0000 0%,#330000 40%,#110a00 100%);position:relative;border-radius:20px 20px 0 0;overflow:hidden}
+.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,#ffffff06 0px,#ffffff06 1px,transparent 1px,transparent 8px);pointer-events:none}
+.perf-av-wrap{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);z-index:2}
+.perf-av{width:80px;height:80px;border-radius:50%;border:3px solid #cc2222;background:#0d1a2e;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px #0008}
+.perf-av img{width:100%;height:100%;object-fit:cover}
+.perf-av .av-ini-lg{font-size:28px;font-weight:900;color:#cc2222}
+.perf-av-edit{position:absolute;bottom:2px;right:2px;background:#cc2222;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid #050d18}
+#foto-input{display:none}
+
+/* perfil body */
+.perf-body{padding:48px 18px 20px;text-align:center}
+.perf-name{font-size:18px;font-weight:900;color:#fff;margin-bottom:2px}
+.perf-cedula{font-size:11px;color:#556;margin-bottom:6px}
+.perf-badges{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.perf-badge{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+.badge-activo{background:#0d2d0d;color:#4caf50;border:1px solid #4caf5044}
+.badge-standby{background:#2d1a00;color:#ff9800;border:1px solid #ff980044}
+.badge-posicion{background:#0a1628;color:#4fc3f7;border:1px solid #4fc3f744}
+.badge-camiseta{background:#1a0a28;color:#ce93d8;border:1px solid #ce93d844}
+
+/* tabs inside perfil */
+.perf-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:10px;overflow:hidden;border:1px solid #1e3050;margin:0 0 16px}
+.perf-tab{padding:8px 4px;text-align:center;font-size:10px;font-weight:700;color:#556;background:#081420;cursor:pointer;transition:all .2s}
+.perf-tab.active{background:#cc2222;color:#fff}
+
+/* field cards */
+.pf-card{background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:14px;margin-bottom:10px;text-align:left}
+.pf-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #0f2035}
+.pf-row:last-child{border-bottom:none}
+.pf-label{font-size:9px;color:#556;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.pf-value{font-size:12px;color:#dde;font-weight:600;text-align:right;max-width:55%}
+.pf-edit-icon{font-size:13px;margin-left:6px;cursor:pointer;opacity:.6}
+.pf-section-lbl{font-size:9px;color:#cc4444;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+
+/* edit fields inline */
+.pf-edit-field{width:100%;background:#050f1e;border:1px solid #cc222266;border-radius:6px;padding:6px 8px;color:#fff;font-size:12px;outline:none;margin-top:4px;font-family:inherit}
+.pf-save-row{display:flex;gap:8px;margin-top:10px}
+.pf-save-btn{flex:1;padding:8px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer}
+.btn-save{background:#cc2222;color:#fff}
+.btn-cancel{background:#1e3050;color:#8899bb}
+
+/* standby form */
+.sb-form{background:#0d1a2e;border:1px solid #ff980033;border-radius:12px;padding:14px;margin-top:10px}
+.sb-title{font-size:13px;font-weight:900;color:#ff9800;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sb-active{background:#2d1a00;border:1px solid #ff980044;border-radius:10px;padding:12px;margin-top:10px}
+.sb-active-title{font-size:11px;font-weight:900;color:#ff9800;margin-bottom:6px}
+.sb-active-row{font-size:10px;color:#cc8800;margin-bottom:3px}
+
+/* change pass */
+.cp-form{background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:14px;margin-top:10px}
+.cp-title{font-size:13px;font-weight:900;color:#8899bb;margin-bottom:12px}
 </style>
 </head>
 <body>
+
+<!-- ── LOGIN OVERLAY ─────────────────────────────────────────── -->
+<div id="login-overlay">
+  <svg class="lo-logo" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="losg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#c0c0c0"/><stop offset="100%" stop-color="#888"/></linearGradient><linearGradient id="lorg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ee1111"/><stop offset="100%" stop-color="#880000"/></linearGradient></defs><path d="M100 4 L188 32 L188 128 Q188 192 100 226 Q12 192 12 128 L12 32 Z" fill="url(#losg)" stroke="#555" stroke-width="2"/><path d="M100 12 L182 38 L182 126 Q182 186 100 220 Q18 186 18 126 L18 38 Z" fill="#0d0d0d"/><path d="M18 38 L100 38 L100 116 L18 100 Z" fill="url(#lorg)"/><path d="M100 38 L182 38 L182 100 L100 116 Z" fill="#1a1a1a"/><path d="M18 100 L100 116 L100 200 Q55 218 18 188 Z" fill="url(#lorg)"/><path d="M100 116 L182 100 L182 188 Q145 218 100 200 Z" fill="#1a1a1a"/><text x="100" y="158" text-anchor="middle" fill="#cc2222" font-size="56" font-weight="900" font-family="Arial Black,sans-serif">AN</text><text x="100" y="186" text-anchor="middle" fill="#999" font-size="19" font-weight="700" font-family="Arial,sans-serif">FÚTBOL</text></svg>
+  <div class="lo-club">ATLÉTICO NORTE F.C.</div>
+  <div class="lo-sub">LIGA INTERNA · S2 2026</div>
+  <div class="lo-card">
+    <div class="lo-tabs">
+      <div class="lo-tab active" id="lo-tab-in" onclick="loTab('in')">Ingresar</div>
+      <div class="lo-tab" id="lo-tab-reg" onclick="loTab('reg')">Registrarse</div>
+    </div>
+    <!-- LOGIN -->
+    <div id="lo-panel-in">
+      <div class="lo-field"><label>Cédula</label><input type="number" id="lo-cedula" placeholder="Número de cédula" inputmode="numeric"></div>
+      <div class="lo-field"><label>Contraseña</label><input type="password" id="lo-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="lo-btn lo-btn-primary" onclick="doLogin()">Ingresar al Club</button>
+      <div class="lo-err" id="lo-err"></div>
+      <div class="lo-hint">¿Primera vez? Regístrate en la pestaña de la derecha</div>
+    </div>
+    <!-- REGISTRO -->
+    <div id="lo-panel-reg" style="display:none">
+      <div class="reg-scroll">
+        <div class="reg-section-title">📋 Datos Personales</div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Primer Nombre *</label><input type="text" id="rg-n1" placeholder="Nombre"></div>
+          <div class="lo-field"><label>Segundo Nombre</label><input type="text" id="rg-n2" placeholder="(Opcional)"></div>
+        </div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Primer Apellido *</label><input type="text" id="rg-a1" placeholder="Apellido"></div>
+          <div class="lo-field"><label>Segundo Apellido</label><input type="text" id="rg-a2" placeholder="(Opcional)"></div>
+        </div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Cédula *</label><input type="number" id="rg-ced" placeholder="Número" inputmode="numeric"></div>
+          <div class="lo-field"><label>Fecha de Nac. *</label><input type="date" id="rg-fnac"></div>
+        </div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Género</label><select id="rg-genero"><option value="">Seleccionar</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
+          <div class="lo-field"><label>Grupo Sanguíneo</label><select id="rg-sangre"><option value="">Seleccionar</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+        </div>
+        <div class="reg-section-title">📞 Contacto</div>
+        <div class="lo-field"><label>Celular *</label><input type="tel" id="rg-tel" placeholder="300..." inputmode="tel"></div>
+        <div class="lo-field"><label>Correo Electrónico</label><input type="email" id="rg-email" placeholder="correo@ejemplo.com"></div>
+        <div class="lo-field"><label>Dirección</label><input type="text" id="rg-dir" placeholder="Calle / Carrera..."></div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Barrio</label><input type="text" id="rg-barrio" placeholder="Barrio"></div>
+          <div class="lo-field"><label>Ciudad</label><input type="text" id="rg-ciudad" placeholder="Ciudad" value="Cúcuta"></div>
+        </div>
+        <div class="reg-section-title">🏥 Emergencia</div>
+        <div class="lo-field"><label>EPS / Seguro</label><input type="text" id="rg-eps" placeholder="Nombre EPS"></div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Contacto Emergencia</label><input type="text" id="rg-cem" placeholder="Nombre"></div>
+          <div class="lo-field"><label>Teléfono Emergencia</label><input type="tel" id="rg-tem" placeholder="300..." inputmode="tel"></div>
+        </div>
+        <div class="lo-field"><label>Alergias / Condición médica</label><input type="text" id="rg-alg" placeholder="Ninguna"></div>
+        <div class="reg-section-title">⚽ Deportivo</div>
+        <div class="lo-2col">
+          <div class="lo-field"><label>Posición</label><select id="rg-pos"><option value="">Seleccionar</option><option>Portero</option><option>Defensa Central</option><option>Lateral Derecho</option><option>Lateral Izquierdo</option><option>Mediocampista</option><option>Extremo Derecho</option><option>Extremo Izquierdo</option><option>Delantero</option><option>Comodín</option></select></div>
+          <div class="lo-field"><label>N.º Camiseta Favorito</label><input type="number" id="rg-cam" placeholder="10" min="1" max="99" inputmode="numeric"></div>
+        </div>
+        <div class="lo-field"><label>Talla Camiseta</label><select id="rg-talla"><option value="">Seleccionar</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+        <div class="reg-section-title">🔒 Contraseña</div>
+        <div class="lo-field"><label>Contraseña *</label><input type="password" id="rg-pass" placeholder="Mínimo 4 caracteres"></div>
+        <div class="lo-field"><label>Confirmar Contraseña *</label><input type="password" id="rg-pass2" placeholder="Repite la contraseña"></div>
+      </div>
+      <button class="lo-btn lo-btn-primary" onclick="doRegister()" style="margin-top:14px">Crear mi Perfil</button>
+      <div class="lo-err" id="rg-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PERFIL MODAL ────────────────────────────────────────────── -->
+<div class="perfil-mo hidden" id="perfil-mo" onclick="closePerfil(event)">
+  <div class="perfil-sheet" onclick="event.stopPropagation()">
+    <div class="perf-cover">
+      <div class="perf-cover-pattern"></div>
+      <div class="perf-av-wrap">
+        <div class="perf-av" onclick="triggerFoto()">
+          <img id="perf-av-img" src="" style="display:none">
+          <span class="av-ini-lg" id="perf-av-ini"></span>
+          <div class="perf-av-edit">📷</div>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="onFotoSelect(event)">
+    <div class="perf-body">
+      <div class="perf-name" id="perf-name"></div>
+      <div class="perf-cedula" id="perf-cedula"></div>
+      <div class="perf-badges" id="perf-badges"></div>
+      <div class="perf-tabs">
+        <div class="perf-tab active" onclick="perfTab('info',this)">Perfil</div>
+        <div class="perf-tab" onclick="perfTab('seguridad',this)">Seguridad</div>
+        <div class="perf-tab" onclick="perfTab('club',this)">Club</div>
+      </div>
+      <div id="perf-tab-info"></div>
+      <div id="perf-tab-seguridad" style="display:none"></div>
+      <div id="perf-tab-club" style="display:none"></div>
+      <button class="lo-btn lo-btn-ghost" onclick="doLogout()" style="margin-top:18px;width:100%">🚪 Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
 
 <div class="hero">
   <div class="hero-logo" id="hero-logo" onclick="logoTap()"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
@@ -458,6 +649,7 @@ select:focus{outline:none;border-color:var(--acc)}
   </div>
   <div class="admin-badge" id="admin-badge" style="display:none">🔐 Admin</div>
   <div class="admin-badge" id="coord-badge" style="display:none;background:#0e7490aa;border-color:#0e749044">🎯 Coord</div>
+  <div class="user-avatar-btn" id="hero-avatar" style="display:none" onclick="openPerfil()"><img id="hero-av-img" src="" style="display:none"><span class="av-ini" id="hero-av-ini"></span></div>
 </div>
 
 <nav class="tnav">
@@ -914,6 +1106,7 @@ function nav(id,el,isTop){
   const oi=other.indexOf(id);
   if(oi>=0){const ls=document.querySelectorAll(isTop?'.bnav a':'.tnav-in a');if(ls[oi])ls[oi].classList.add('active');}
   if(id==='inicio')renderInicio();
+  checkAuth();
   if(id==='fixture')renderFixture();
   if(id==='tabla')renderTabla();
   if(id==='goles')renderGoles();
@@ -2268,6 +2461,368 @@ function printPlanilla(phase,matchId,l,v){
   if(!w){showToast('⚠️ Permite ventanas emergentes para imprimir');return;}
   w.document.write(html);
   w.document.close();
+}
+
+
+
+// ── SOCIOS AUTH SYSTEM ────────────────────────────────────────────────
+const SK_SOC='an_socios_v1';
+const SK_SES='an_ses_v1';
+
+function getSocios(){try{return JSON.parse(localStorage.getItem(SK_SOC))||{};}catch(e){return {};}}
+function setSocios(d){localStorage.setItem(SK_SOC,JSON.stringify(d));}
+function getSes(){try{return JSON.parse(sessionStorage.getItem(SK_SES))||null;}catch(e){return null;}}
+function setSes(d){if(d)sessionStorage.setItem(SK_SES,JSON.stringify(d));else sessionStorage.removeItem(SK_SES);}
+
+function hashPass(pass){
+  // Simple deterministic hash for club use
+  let h=0;for(let i=0;i<pass.length;i++){h=(Math.imul(31,h)+pass.charCodeAt(i))|0;}
+  return 'h'+Math.abs(h).toString(36)+'_'+pass.length;
+}
+
+function getSocioActual(){
+  const ses=getSes();if(!ses)return null;
+  const db=getSocios();return db[ses.cedula]||null;
+}
+
+// ── CHECK SESSION ON LOAD ─────────────────────────────────────────────
+function checkAuth(){
+  const ses=getSes();
+  const overlay=document.getElementById('login-overlay');
+  const heroAv=document.getElementById('hero-avatar');
+  if(ses&&getSocios()[ses.cedula]){
+    overlay.classList.add('hidden');
+    heroAv.style.display='flex';
+    refreshAvatarHeader();
+  } else {
+    overlay.classList.remove('hidden');
+    heroAv.style.display='none';
+  }
+}
+
+function refreshAvatarHeader(){
+  const soc=getSocioActual();if(!soc)return;
+  const img=document.getElementById('hero-av-img');
+  const ini=document.getElementById('hero-av-ini');
+  if(soc.foto){img.src=soc.foto;img.style.display='block';ini.style.display='none';}
+  else{img.style.display='none';ini.style.display='block';ini.textContent=(soc.nombre||'?')[0].toUpperCase();}
+}
+
+// ── LOGIN TABS ────────────────────────────────────────────────────────
+function loTab(t){
+  document.getElementById('lo-panel-in').style.display=t==='in'?'block':'none';
+  document.getElementById('lo-panel-reg').style.display=t==='reg'?'block':'none';
+  document.getElementById('lo-tab-in').classList.toggle('active',t==='in');
+  document.getElementById('lo-tab-reg').classList.toggle('active',t==='reg');
+  document.getElementById('lo-err').textContent='';
+  document.getElementById('rg-err').textContent='';
+}
+
+// ── DO LOGIN ──────────────────────────────────────────────────────────
+function doLogin(){
+  const ced=document.getElementById('lo-cedula').value.trim();
+  const pass=document.getElementById('lo-pass').value;
+  const err=document.getElementById('lo-err');
+  if(!ced||!pass){err.textContent='Complete todos los campos';return;}
+  const db=getSocios();
+  const soc=db[ced];
+  if(!soc){err.textContent='Cédula no registrada. ¿Ya te registraste?';return;}
+  if(soc.password!==hashPass(pass)){err.textContent='Contraseña incorrecta';return;}
+  setSes({cedula:ced,ts:Date.now()});
+  document.getElementById('lo-pass').value='';
+  document.getElementById('lo-cedula').value='';
+  err.textContent='';
+  checkAuth();
+  showToast('¡Bienvenido, '+soc.nombre+'! ⚽');
+}
+
+// ── LOGOUT ────────────────────────────────────────────────────────────
+function doLogout(){
+  setSes(null);
+  closePerfil();
+  checkAuth();
+}
+
+// ── REGISTER ─────────────────────────────────────────────────────────
+function doRegister(){
+  const err=document.getElementById('rg-err');
+  const g=id=>document.getElementById(id).value.trim();
+  const n1=g('rg-n1'),n2=g('rg-n2'),a1=g('rg-a1'),a2=g('rg-a2');
+  const ced=g('rg-ced'),fnac=g('rg-fnac'),tel=g('rg-tel');
+  const pass=g('rg-pass'),pass2=g('rg-pass2');
+  if(!n1||!a1||!ced||!fnac||!tel||!pass){err.textContent='Los campos con * son obligatorios';return;}
+  if(pass!==pass2){err.textContent='Las contraseñas no coinciden';return;}
+  if(pass.length<4){err.textContent='La contraseña debe tener mínimo 4 caracteres';return;}
+  const db=getSocios();
+  if(db[ced]){err.textContent='Esta cédula ya está registrada';return;}
+  const nombre=n1+(n2?' '+n2:'');
+  const apellido=a1+(a2?' '+a2:'');
+  db[ced]={
+    cedula:ced,nombre,apellido,nombreCompleto:nombre+' '+apellido,
+    fechaNac:fnac,genero:g('rg-genero'),sangre:g('rg-sangre'),
+    telefono:tel,email:g('rg-email'),direccion:g('rg-dir'),
+    barrio:g('rg-barrio'),ciudad:g('rg-ciudad')||'Cúcuta',
+    eps:g('rg-eps'),contactoEmergencia:g('rg-cem'),telEmergencia:g('rg-tem'),
+    alergias:g('rg-alg')||'Ninguna',
+    posicion:g('rg-pos'),numCamiseta:g('rg-cam'),talla:g('rg-talla'),
+    password:hashPass(pass),
+    estado:'activo',fechaIngreso:new Date().toISOString().slice(0,10),
+    foto:'',standby:null
+  };
+  setSocios(db);
+  setSes({cedula:ced,ts:Date.now()});
+  checkAuth();
+  showToast('¡Bienvenido al club, '+nombre+'! ⚽');
+}
+
+// ── PERFIL MODAL ──────────────────────────────────────────────────────
+function openPerfil(){
+  const soc=getSocioActual();if(!soc)return;
+  renderPerfil(soc);
+  document.getElementById('perfil-mo').classList.remove('hidden');
+}
+function closePerfil(e){
+  if(e&&e.target!==document.getElementById('perfil-mo'))return;
+  document.getElementById('perfil-mo').classList.add('hidden');
+}
+
+function renderPerfil(soc){
+  // Avatar
+  const img=document.getElementById('perf-av-img');
+  const ini=document.getElementById('perf-av-ini');
+  if(soc.foto){img.src=soc.foto;img.style.display='block';ini.style.display='none';}
+  else{img.style.display='none';ini.style.display='block';ini.textContent=(soc.nombre||'?')[0].toUpperCase();}
+  document.getElementById('perf-name').textContent=soc.nombreCompleto||soc.nombre+' '+soc.apellido;
+  document.getElementById('perf-cedula').textContent='C.C. '+Number(soc.cedula).toLocaleString('es-CO');
+  // Badges
+  const bdg=document.getElementById('perf-badges');
+  let b='<span class="perf-badge '+(soc.estado==='standby'?'badge-standby':'badge-activo')+'">'+(soc.estado==='standby'?'⏸ Stand By':'✅ Activo')+'</span>';
+  if(soc.posicion)b+='<span class="perf-badge badge-posicion">'+soc.posicion+'</span>';
+  if(soc.numCamiseta)b+='<span class="perf-badge badge-camiseta">#'+soc.numCamiseta+'</span>';
+  bdg.innerHTML=b;
+  // Render active tab
+  perfTab('info',document.querySelector('.perf-tab.active'));
+}
+
+function perfTab(tab, el){
+  document.querySelectorAll('.perf-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  ['info','seguridad','club'].forEach(t=>{
+    document.getElementById('perf-tab-'+t).style.display=t===tab?'block':'none';
+  });
+  const soc=getSocioActual();if(!soc)return;
+  if(tab==='info')renderTabInfo(soc);
+  else if(tab==='seguridad')renderTabSeg(soc);
+  else if(tab==='club')renderTabClub(soc);
+}
+
+function fmtDate(d){if(!d)return '—';const[y,m,dd]=d.split('-');const M=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return parseInt(dd)+' '+M[parseInt(m)-1]+' '+y;}
+
+function renderTabInfo(soc){
+  const el=document.getElementById('perf-tab-info');
+  el.innerHTML='<div class="pf-card">'
+    +'<div class="pf-section-lbl">Datos Personales</div>'
+    +pfRow('Nombre completo',soc.nombreCompleto||'—','nombreCompleto')
+    +pfRow('Fecha de nacimiento',fmtDate(soc.fechaNac),'fechaNac','date',soc.fechaNac)
+    +pfRow('Género',soc.genero||'—','genero','select',soc.genero,['Masculino','Femenino','Otro'])
+    +pfRow('Grupo Sanguíneo',soc.sangre||'—','sangre','select',soc.sangre,['A+','A-','B+','B-','AB+','AB-','O+','O-'])
+    +'</div>'
+    +'<div class="pf-card">'
+    +'<div class="pf-section-lbl">Contacto</div>'
+    +pfRow('Celular',soc.telefono||'—','telefono','tel')
+    +pfRow('Correo',soc.email||'—','email','email')
+    +pfRow('Dirección',soc.direccion||'—','direccion')
+    +pfRow('Barrio',soc.barrio||'—','barrio')
+    +pfRow('Ciudad',soc.ciudad||'—','ciudad')
+    +'</div>'
+    +'<div class="pf-card">'
+    +'<div class="pf-section-lbl">Emergencia</div>'
+    +pfRow('EPS / Seguro',soc.eps||'—','eps')
+    +pfRow('Contacto emergencia',soc.contactoEmergencia||'—','contactoEmergencia')
+    +pfRow('Tel. emergencia',soc.telEmergencia||'—','telEmergencia','tel')
+    +pfRow('Alergias',soc.alergias||'Ninguna','alergias')
+    +'</div>';
+}
+
+function pfRow(label,value,field,type,rawVal,opts){
+  const id='pf_'+field;
+  let editHtml='';
+  if(type==='select'&&opts){
+    editHtml='<select id="'+id+'" class="pf-edit-field" style="display:none"><option value="">Seleccionar</option>'+opts.map(o=>'<option'+(o===rawVal?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+  } else if(type==='date'){
+    editHtml='<input id="'+id+'" type="date" class="pf-edit-field" style="display:none" value="'+(rawVal||'')+'">';
+  } else {
+    editHtml='<input id="'+id+'" type="'+(type||'text')+'" class="pf-edit-field" style="display:none" value="'+value.replace(/'/g,'&apos;')+'">';
+  }
+  return '<div class="pf-row" id="row_'+field+'">'
+    +'<span class="pf-label">'+label+'</span>'
+    +'<span class="pf-value" id="val_'+field+'">'+value+'<span class="pf-edit-icon" onclick="pfEdit(''+field+'')" title="Editar">✏️</span></span>'
+    +editHtml
+    +'</div>';
+}
+
+function pfEdit(field){
+  const valEl=document.getElementById('val_'+field);
+  const inpEl=document.getElementById('pf_'+field);
+  if(!inpEl)return;
+  const isEditing=inpEl.style.display==='block'||inpEl.style.display==='';
+  if(isEditing){
+    // Cancel
+    valEl.style.display='';
+    inpEl.style.display='none';
+    const row=document.getElementById('row_'+field);
+    const saveRow=row.querySelector('.pf-save-row');
+    if(saveRow)saveRow.remove();
+  } else {
+    valEl.style.display='none';
+    inpEl.style.display='block';
+    inpEl.focus();
+    // Add save/cancel buttons
+    const row=document.getElementById('row_'+field);
+    if(!row.querySelector('.pf-save-row')){
+      const sr=document.createElement('div');
+      sr.className='pf-save-row';
+      sr.innerHTML='<button class="pf-save-btn btn-save" onclick="pfSave(''+field+'')">Guardar</button>'
+        +'<button class="pf-save-btn btn-cancel" onclick="pfEdit(''+field+'')">Cancelar</button>';
+      row.appendChild(sr);
+    }
+  }
+}
+
+function pfSave(field){
+  const soc=getSocioActual();if(!soc)return;
+  const inpEl=document.getElementById('pf_'+field);
+  if(!inpEl)return;
+  const newVal=inpEl.value.trim();
+  // Special fields
+  if(field==='nombreCompleto'){
+    const parts=newVal.split(' ');
+    soc.nombre=parts[0]||soc.nombre;
+    soc.apellido=parts.slice(1).join(' ')||soc.apellido;
+  }
+  if(field==='fechaNac') soc.fechaNac=newVal;
+  else soc[field]=newVal;
+  soc.nombreCompleto=soc.nombre+' '+soc.apellido;
+  const db=getSocios();db[soc.cedula]=soc;setSocios(db);
+  renderPerfil(soc);
+  refreshAvatarHeader();
+  showToast('✅ Datos actualizados');
+}
+
+function renderTabSeg(soc){
+  const el=document.getElementById('perf-tab-seguridad');
+  el.innerHTML='<div class="cp-form">'
+    +'<div class="cp-title">🔒 Cambiar Contraseña</div>'
+    +'<div class="lo-field"><label>Contraseña actual</label><input type="password" id="cp-old" class="pf-edit-field" placeholder="Contraseña actual"></div>'
+    +'<div class="lo-field"><label>Nueva contraseña</label><input type="password" id="cp-new" class="pf-edit-field" placeholder="Mínimo 4 caracteres"></div>'
+    +'<div class="lo-field"><label>Confirmar nueva</label><input type="password" id="cp-new2" class="pf-edit-field" placeholder="Repite la nueva"></div>'
+    +'<button class="lo-btn lo-btn-primary" onclick="doChangePass()" style="margin-top:8px">Cambiar Contraseña</button>'
+    +'<div class="lo-err" id="cp-err"></div>'
+    +'</div>'
+    +(soc.estado==='activo'
+      ? '<div class="sb-form"><div class="sb-title">⏸ Solicitar Stand By</div>'
+        +'<div class="lo-field"><label>Motivo</label><select id="sb-motivo" class="pf-edit-field"><option value="">Seleccionar</option><option>Lesión</option><option>Viaje</option><option>Trabajo</option><option>Estudio</option><option>Personal</option><option>Otro</option></select></div>'
+        +'<div class="lo-field"><label>Descripción</label><textarea id="sb-desc" class="pf-edit-field" rows="2" placeholder="Explica brevemente el motivo..."></textarea></div>'
+        +'<div class="lo-2col">'
+        +'<div class="lo-field"><label>Fecha inicio</label><input type="date" id="sb-fi" class="pf-edit-field"></div>'
+        +'<div class="lo-field"><label>Retorno estimado</label><input type="date" id="sb-fr" class="pf-edit-field"></div>'
+        +'</div>'
+        +'<button class="lo-btn lo-btn-primary" onclick="doStandby()" style="background:linear-gradient(135deg,#cc7700,#884400)">⏸ Confirmar Stand By</button>'
+        +'<div class="lo-err" id="sb-err"></div>'
+        +'</div>'
+      : '<div class="sb-active"><div class="sb-active-title">⏸ En Stand By</div>'
+        +(soc.standby?'<div class="sb-active-row">Motivo: <b>'+soc.standby.motivo+'</b></div>'
+          +'<div class="sb-active-row">Inicio: '+fmtDate(soc.standby.fechaInicio)+'</div>'
+          +'<div class="sb-active-row">Retorno estimado: '+fmtDate(soc.standby.fechaRetorno)+'</div>'
+          +(soc.standby.desc?'<div class="sb-active-row">'+soc.standby.desc+'</div>':''):'')
+        +'<button class="lo-btn lo-btn-ghost" onclick="cancelStandby()" style="margin-top:12px">↩ Volver a Activo</button>'
+        +'</div>');
+}
+
+function renderTabClub(soc){
+  const el=document.getElementById('perf-tab-club');
+  el.innerHTML='<div class="pf-card">'
+    +'<div class="pf-section-lbl">Datos Deportivos</div>'
+    +pfRow('Posición',soc.posicion||'—','posicion','select',soc.posicion,['Portero','Defensa Central','Lateral Derecho','Lateral Izquierdo','Mediocampista','Extremo Derecho','Extremo Izquierdo','Delantero','Comodín'])
+    +pfRow('N.º Camiseta',soc.numCamiseta?'#'+soc.numCamiseta:'—','numCamiseta','number')
+    +pfRow('Talla',soc.talla||'—','talla','select',soc.talla,['XS','S','M','L','XL','XXL'])
+    +'</div>'
+    +'<div class="pf-card">'
+    +'<div class="pf-section-lbl">En el Club</div>'
+    +'<div class="pf-row"><span class="pf-label">Miembro desde</span><span class="pf-value">'+fmtDate(soc.fechaIngreso)+'</span></div>'
+    +'<div class="pf-row"><span class="pf-label">Estado</span><span class="pf-value" style="color:'+(soc.estado==='activo'?'#4caf50':'#ff9800')+'">'+( soc.estado==='activo'?'✅ Activo':'⏸ Stand By')+'</span></div>'
+    +'</div>';
+}
+
+// ── FOTO ──────────────────────────────────────────────────────────────
+function triggerFoto(){document.getElementById('foto-input').click();}
+function onFotoSelect(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const soc=getSocioActual();if(!soc)return;
+    // Compress to reasonable size
+    const img=new Image();
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      const MAX=400;
+      let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const data=canvas.toDataURL('image/jpeg',0.75);
+      soc.foto=data;
+      const db=getSocios();db[soc.cedula]=soc;setSocios(db);
+      renderPerfil(soc);
+      refreshAvatarHeader();
+      showToast('✅ Foto actualizada');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+
+// ── CHANGE PASSWORD ───────────────────────────────────────────────────
+function doChangePass(){
+  const soc=getSocioActual();if(!soc)return;
+  const old=document.getElementById('cp-old').value;
+  const nw=document.getElementById('cp-new').value;
+  const nw2=document.getElementById('cp-new2').value;
+  const err=document.getElementById('cp-err');
+  if(!old||!nw||!nw2){err.textContent='Complete todos los campos';return;}
+  if(soc.password!==hashPass(old)){err.textContent='Contraseña actual incorrecta';return;}
+  if(nw!==nw2){err.textContent='Las contraseñas no coinciden';return;}
+  if(nw.length<4){err.textContent='Mínimo 4 caracteres';return;}
+  soc.password=hashPass(nw);
+  const db=getSocios();db[soc.cedula]=soc;setSocios(db);
+  err.style.color='#4caf50';err.textContent='✅ Contraseña cambiada';
+  setTimeout(()=>{err.textContent='';err.style.color='#e55';
+    ['cp-old','cp-new','cp-new2'].forEach(id=>{document.getElementById(id).value='';});
+  },2000);
+}
+
+// ── STANDBY ───────────────────────────────────────────────────────────
+function doStandby(){
+  const soc=getSocioActual();if(!soc)return;
+  const motivo=document.getElementById('sb-motivo').value;
+  const desc=document.getElementById('sb-desc').value.trim();
+  const fi=document.getElementById('sb-fi').value;
+  const fr=document.getElementById('sb-fr').value;
+  const err=document.getElementById('sb-err');
+  if(!motivo||!fi){err.textContent='Selecciona el motivo y la fecha de inicio';return;}
+  soc.estado='standby';
+  soc.standby={motivo,desc,fechaInicio:fi,fechaRetorno:fr,fechaSolicitud:new Date().toISOString().slice(0,10)};
+  const db=getSocios();db[soc.cedula]=soc;setSocios(db);
+  renderPerfil(soc);
+  showToast('⏸ Stand By registrado');
+}
+function cancelStandby(){
+  const soc=getSocioActual();if(!soc)return;
+  soc.estado='activo';soc.standby=null;
+  const db=getSocios();db[soc.cedula]=soc;setSocios(db);
+  renderPerfil(soc);
+  showToast('✅ De vuelta a activo');
 }
 
 
