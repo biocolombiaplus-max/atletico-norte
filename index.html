@@ -2109,7 +2109,11 @@ function changePin(){
 function buildPinPad(padId,dispId,handler){
   const pad=document.getElementById(padId);
   const nums=[1,2,3,4,5,6,7,8,9,'',0,'⌫'];
-  pad.innerHTML=nums.map(n=>'<button class="pin-btn" onclick="'+handler.name+'(&apos;'+n+'&apos;)">'+(n===''?'':n)+'</button>').join('');
+  pad.innerHTML=nums.map(n=>'<button class="pin-btn" data-n="'+n+'" style="'+(n===''?'visibility:hidden':'')+'">'+( n===''?'':n)+'</button>').join('');
+  pad.onclick=function(e){
+    const btn=e.target.closest('.pin-btn');
+    if(btn)handler(btn.dataset.n);
+  };
 }
 function updatePinDisplay(id){
   const el=document.getElementById(id);
