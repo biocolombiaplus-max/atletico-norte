@@ -756,6 +756,13 @@ const PARTIDOS = [
 const ADMIN_PASS = "MUNDIAL2026";
 
 /* ============================================================
+   SINCRONIZACIÓN EN LA NUBE (Google Sheets + correo vía Apps Script)
+   Pega aquí la URL del Web App una vez desplegado (ver instrucciones).
+   Si se deja vacío, la app sigue funcionando en modo local/demo.
+============================================================ */
+const SHEETS_ENDPOINT = "";
+
+/* ============================================================
    STORAGE
 ============================================================ */
 const LS = {
@@ -862,7 +869,26 @@ function setInvalid(fieldEl, invalid){
   const input = fieldEl.querySelector("input,select");
   if(input) input.classList.toggle("err", invalid);
 }
-document.getElementById("formRegistro").addEventListener("submit", function(e){
+async function registrarEnNube(usuario){
+  if(!SHEETS_ENDPOINT) return {ok:true, sinConfigurar:true};
+  const ctrl = new AbortController();
+  const timeout = setTimeout(()=>ctrl.abort(), 12000);
+  try{
+    const resp = await fetch(SHEETS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita preflight CORS en Apps Script
+      body: JSON.stringify(usuario),
+      signal: ctrl.signal
+    });
+    clearTimeout(timeout);
+    return await resp.json();
+  }catch(err){
+    clearTimeout(timeout);
+    return {ok:false, error:"red", detalle:String(err)};
+  }
+}
+
+document.getElementById("formRegistro").addEventListener("submit", async function(e){
   e.preventDefault();
   let ok = true;
   const cliente = document.querySelector('input[name="cliente"]:checked');
@@ -918,10 +944,34 @@ document.getElementById("formRegistro").addEventListener("submit", function(e){
     whatsapp: fWpp.value.trim(), correo: correoNorm,
     fechaRegistro: new Date().toISOString()
   };
+
+  const btnSubmit = this.querySelector('button[type="submit"]');
+  const btnTextoOriginal = btnSubmit.innerHTML;
+  btnSubmit.disabled = true;
+  btnSubmit.innerHTML = "⏳ Enviando inscripción…";
+
+  const resultado = await registrarEnNube(usuario);
+
+  if(resultado.ok === false && resultado.error === "ya_registrado"){
+    toast("Ese correo ya está inscrito en el registro central. Usa 'Ya estoy inscrito' para ingresar.","⚠️");
+    btnSubmit.disabled = false;
+    btnSubmit.innerHTML = btnTextoOriginal;
+    return;
+  }
+
   usuarios.push(usuario);
   saveLS(LS.usuarios, usuarios);
   iniciarSesion(id);
-  toast("¡Inscripción exitosa! Ya puedes pronosticar 🎉","🏆");
+  btnSubmit.disabled = false;
+  btnSubmit.innerHTML = btnTextoOriginal;
+
+  if(resultado.sinConfigurar){
+    toast("¡Inscripción exitosa! Ya puedes pronosticar 🎉","🏆");
+  } else if(resultado.ok){
+    toast("¡Inscripción exitosa! Revisa tu correo para confirmar 📧","🏆");
+  } else {
+    toast("Guardado en este dispositivo. No pudimos enviar tu correo de confirmación, verifica tu conexión.","⚠️");
+  }
   this.reset();
   document.querySelectorAll(".field").forEach(f=>f.classList.remove("invalid"));
   goto("partidos");
