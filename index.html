@@ -444,31 +444,54 @@ select:focus{outline:none;border-color:var(--acc)}
 
 /* ── PERFIL MODAL ── */
 /* ── PERFIL PREMIUM ─────────────────────────────────────────────────── */
+@keyframes shimmer-gold{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes pulse-glow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes rotate-ring{0%{transform:translateX(-50%) rotate(0deg)}100%{transform:translateX(-50%) rotate(360deg)}}
 .perfil-mo{position:fixed;inset:0;z-index:8000;background:#00000088;display:flex;flex-direction:column;justify-content:flex-end;backdrop-filter:blur(4px)}
 .perfil-mo.hidden{display:none}
 .perfil-sheet{background:#060d18;border-radius:28px 28px 0 0;width:100%;max-height:96vh;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom));box-shadow:0 -12px 60px #000c}
 .perfil-sheet::-webkit-scrollbar{display:none}
 
 /* cover hero */
-.perf-cover{height:210px;background:#0d0a1a;position:relative;border-radius:28px 28px 0 0;overflow:hidden;flex-shrink:0}
+.perf-cover{height:210px;background:#0d0a1a;position:relative;border-radius:28px 28px 0 0;overflow:hidden;flex-shrink:0;transition:background .4s}
 .perf-cover-photo-bg{position:absolute;inset:-20px;background-size:cover;background-position:center 20%;filter:blur(22px) brightness(.35) saturate(1.6);transform:scale(1.05);pointer-events:none}
-.perf-cover-gradient{position:absolute;inset:0;background:linear-gradient(180deg,#cc222212 0%,#00000000 40%,#060d18ff 100%);pointer-events:none}
-.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,#ffffff05 0px,#ffffff05 1px,transparent 1px,transparent 14px);pointer-events:none}
-.perf-cover-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:260px;height:160px;background:radial-gradient(ellipse,#cc222228 0%,transparent 70%);pointer-events:none}
+.perf-cover-gradient{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,#060d18ff 100%);pointer-events:none}
+.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,#ffffff04 0px,#ffffff04 1px,transparent 1px,transparent 14px);pointer-events:none}
+.perf-cover-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:300px;height:180px;pointer-events:none;animation:pulse-glow 3s ease-in-out infinite}
+.perf-tier-label{position:absolute;top:16px;left:16px;padding:4px 12px;border-radius:20px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:1px;z-index:3;backdrop-filter:blur(8px)}
 .perf-cover-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#00000055;border:1px solid #ffffff18;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);z-index:3}
 .perf-av-wrap{position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);z-index:3;text-align:center}
-.perf-av{width:140px;height:140px;border-radius:50%;border:4px solid #cc2222;background:linear-gradient(135deg,#0d1a2e,#1a0510);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px #000c,0 0 0 3px #cc222244,0 0 32px #cc222233;position:relative;transition:box-shadow .3s}
-.perf-av.sb-av{border-color:#ff9800;box-shadow:0 8px 40px #000c,0 0 0 3px #ff980044,0 0 32px #ff980033}
+.perf-av{width:140px;height:140px;border-radius:50%;border:4px solid #cc2222;background:linear-gradient(135deg,#0d1a2e,#1a0510);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px #000c,0 0 0 3px #cc222244,0 0 32px #cc222233;position:relative;transition:box-shadow .3s,border-color .3s}
 .perf-av img{width:100%;height:100%;object-fit:cover;object-position:center 15%}
 .perf-av .av-ini-lg{font-size:46px;font-weight:900;color:#cc2222;font-family:"Bebas Neue",sans-serif;letter-spacing:2px;text-shadow:0 2px 16px #cc222266}
 .perf-av-edit{position:absolute;inset:0;background:#00000077;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;border-radius:50%;font-size:26px}
 .perf-av:active .perf-av-edit{opacity:1}
+/* fundador ring especial */
+.perf-av.tier-fundador{border-color:#d4af37;box-shadow:0 8px 40px #000c,0 0 0 3px #d4af3755,0 0 50px #d4af3744}
+.perf-av.tier-fundador .av-ini-lg{color:#d4af37;text-shadow:0 2px 20px #d4af3788}
+.perf-av.tier-elite{border-color:#b0c4ff;box-shadow:0 8px 40px #000c,0 0 0 3px #7ab8ff44,0 0 40px #7ab8ff33}
+.perf-av.tier-elite .av-ini-lg{color:#b0c4ff}
+.perf-av.tier-veterano{border-color:#ce93d8;box-shadow:0 8px 40px #000c,0 0 0 3px #ab47bc44,0 0 40px #ab47bc33}
+.perf-av.tier-veterano .av-ini-lg{color:#ce93d8}
+.perf-av.tier-activo{border-color:#4fc3f7;box-shadow:0 8px 40px #000c,0 0 0 3px #29b6f644,0 0 36px #29b6f633}
+.perf-av.tier-activo .av-ini-lg{color:#4fc3f7}
+.perf-av.tier-novato{border-color:#78909c;box-shadow:0 8px 40px #000c,0 0 0 3px #78909c33,0 0 24px #78909c22}
+.perf-av.tier-novato .av-ini-lg{color:#90a4ae}
+.perf-av.sb-av{border-color:#ff9800!important;box-shadow:0 8px 40px #000c,0 0 0 3px #ff980044,0 0 32px #ff980033!important}
 #foto-input{display:none}
+
+/* tier card strip (nombre + tier) */
+.perf-tier-strip{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.tier-strip-fundador{background:linear-gradient(90deg,#d4af3733,#d4af3711);border:1px solid #d4af3755;color:#d4af37;background-size:200%;animation:shimmer-gold 3s linear infinite}
+.tier-strip-elite{background:linear-gradient(135deg,#0a1830,#152545);border:1px solid #7ab8ff55;color:#b0c4ff}
+.tier-strip-veterano{background:linear-gradient(135deg,#1a0828,#280838);border:1px solid #ab47bc55;color:#ce93d8}
+.tier-strip-activo{background:linear-gradient(135deg,#06151f,#0a2030);border:1px solid #29b6f655;color:#4fc3f7}
+.tier-strip-novato{background:linear-gradient(135deg,#0e1218,#141c22);border:1px solid #78909c44;color:#90a4ae}
 
 /* body below cover */
 .perf-body{padding:84px 20px 16px;text-align:center}
-.perf-name{font-size:24px;font-weight:900;color:#fff;margin-bottom:2px;letter-spacing:.2px;line-height:1.2;text-shadow:0 2px 12px #0006}
-.perf-pos-cam{font-size:12px;color:#cc5555;font-weight:800;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.perf-name{font-size:24px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:.2px;line-height:1.2;text-shadow:0 2px 12px #0006}
+.perf-pos-cam{font-size:11px;color:#cc5555;font-weight:800;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
 .perf-cedula{font-size:10px;color:#3a5070;margin-bottom:14px;letter-spacing:.6px}
 .perf-badges{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
 .perf-badge{padding:5px 14px;border-radius:24px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
@@ -487,6 +510,33 @@ select:focus{outline:none;border-color:var(--acc)}
 .perf-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:14px;overflow:hidden;border:1px solid #0e1e30;margin:0 0 20px;background:#040c14}
 .perf-tab{padding:11px 4px;text-align:center;font-size:10px;font-weight:800;color:#3a5070;cursor:pointer;transition:all .2s;letter-spacing:.4px;text-transform:uppercase}
 .perf-tab.active{background:linear-gradient(135deg,#cc2222,#7a0000);color:#fff;text-shadow:0 1px 6px #0006}
+
+/* ── PAGOS ── */
+.pago-card{border-radius:18px;padding:18px;margin-bottom:14px;text-align:left;box-shadow:0 4px 24px #0006;position:relative;overflow:hidden}
+.pago-card-ok{background:linear-gradient(135deg,#071a07,#0a280a);border:1px solid #2a5a2a}
+.pago-card-pend{background:linear-gradient(135deg,#1a0e00,#281800);border:1px solid #5a3a00}
+.pago-card-venc{background:linear-gradient(135deg,#1a0505,#2a0808);border:1px solid #5a1010}
+.pago-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.pago-mes{font-size:14px;font-weight:900;color:#fff;letter-spacing:.3px}
+.pago-chip{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
+.pago-chip-ok{background:#1a4a1a;color:#66bb6a;border:1px solid #4caf5055}
+.pago-chip-pend{background:#3a2800;color:#ffa726;border:1px solid #ff980055}
+.pago-chip-venc{background:#3a0808;color:#ef5350;border:1px solid #ef535055}
+.pago-monto{font-size:28px;font-weight:900;line-height:1;margin-bottom:2px}
+.pago-monto-ok{color:#4caf50}
+.pago-monto-pend{color:#ff9800}
+.pago-monto-venc{color:#ef5350}
+.pago-sub{font-size:9px;color:#3a5070;text-transform:uppercase;letter-spacing:.6px}
+.pago-detail{font-size:10px;color:#567;margin-top:8px;padding-top:8px;border-top:1px solid #1a2a1a}
+.pago-hist-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0e1a0e;font-size:11px}
+.pago-hist-item:last-child{border-bottom:none}
+.pago-hist-mes{color:#cde;font-weight:700}
+.pago-hist-monto{color:#4caf50;font-weight:900}
+.pago-hist-fecha{color:#3a5070;font-size:9px}
+.pago-resumen{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#0e1e30;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.pago-res-cell{background:#070e1a;padding:12px 4px;text-align:center}
+.pago-res-n{font-size:18px;font-weight:900;line-height:1}
+.pago-res-l{font-size:8px;color:#3a5070;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
 /* field cards */
 .pf-card{background:linear-gradient(135deg,#070e1a,#060c16);border:1px solid #1a2e48;border-radius:18px;padding:18px;margin-bottom:14px;text-align:left;box-shadow:0 4px 24px #0004}
@@ -616,6 +666,7 @@ select:focus{outline:none;border-color:var(--acc)}
       <div class="perf-cover-gradient"></div>
       <div class="perf-cover-pattern"></div>
       <div class="perf-cover-glow" id="perf-cover-glow"></div>
+      <div class="perf-tier-label" id="perf-tier-label"></div>
       <button class="perf-cover-close" onclick="closePerfil()">✕</button>
       <div class="perf-av-wrap">
         <div class="perf-av" id="perf-av" onclick="triggerFoto()">
@@ -628,6 +679,7 @@ select:focus{outline:none;border-color:var(--acc)}
     <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="onFotoSelect(event)">
     <div class="perf-body">
       <div class="perf-name" id="perf-name"></div>
+      <div style="display:flex;justify-content:center;margin-bottom:6px"><div class="perf-tier-strip" id="perf-tier-strip"></div></div>
       <div class="perf-pos-cam" id="perf-pos-cam"></div>
       <div class="perf-cedula" id="perf-cedula"></div>
       <div class="perf-badges" id="perf-badges"></div>
@@ -840,6 +892,18 @@ select:focus{outline:none;border-color:var(--acc)}
       <button class="print-btn" onclick="printReport('eq-mapa-content','🗺️ Mapas de Equidad — Fase 1 y Fase 2')">🖨️ Imprimir</button>
     </div>
     <div id="eq-mapa-content"></div>
+  </div>
+
+  <!-- GESTIÓN DE SOCIOS / FUNDADORES -->
+  <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="sh"><h2>🏅 Socios y Tiers</h2><span class="tag gold">Membresías</span></div>
+    <div id="admin-socios-list"></div>
+  </div>
+
+  <!-- PAGOS DEL MES -->
+  <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="sh"><h2>💳 Control de Pagos</h2><span class="tag red" id="pago-count-tag">—</span></div>
+    <div id="admin-pagos-list"></div>
   </div>
 
   <!-- SOCIOS EN STAND BY -->
@@ -1167,7 +1231,7 @@ function nav(id,el,isTop){
   if(id==='tabla')renderTabla();
   if(id==='goles')renderGoles();
   if(id==='llave')renderLlave();
-  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();}
+  if(id==='admin'){buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();renderAdminPagos();renderAdminSociosList();}
   window.scrollTo(0,0);
 }
 
@@ -2854,6 +2918,47 @@ function closePerfil(){
   document.getElementById('perfil-mo').classList.add('hidden');
 }
 
+// ── SISTEMA DE TIERS ─────────────────────────────────────────────────
+const TIERS={
+  fundador:{id:'fundador',label:'🏆 Socio Fundador',color:'#d4af37',glow:'#d4af3744',cover:'linear-gradient(135deg,#1a1100 0%,#3d2a00 40%,#1a1100 100%)',avClass:'tier-fundador',stripClass:'tier-strip-fundador',tagBg:'#3d2a00',tagBorder:'#d4af3755',tagColor:'#d4af37'},
+  elite:{id:'elite',label:'💎 Socio Élite',color:'#b0c4ff',glow:'#7ab8ff33',cover:'linear-gradient(135deg,#060d1c 0%,#0d1e40 40%,#060d1c 100%)',avClass:'tier-elite',stripClass:'tier-strip-elite',tagBg:'#0d1e40',tagBorder:'#7ab8ff44',tagColor:'#b0c4ff'},
+  veterano:{id:'veterano',label:'⭐ Socio Veterano',color:'#ce93d8',glow:'#ab47bc33',cover:'linear-gradient(135deg,#0e0618 0%,#1e0a30 40%,#0e0618 100%)',avClass:'tier-veterano',stripClass:'tier-strip-veterano',tagBg:'#1e0a30',tagBorder:'#ab47bc44',tagColor:'#ce93d8'},
+  activo:{id:'activo',label:'🔵 Socio Activo',color:'#4fc3f7',glow:'#29b6f633',cover:'linear-gradient(135deg,#050f18 0%,#091c30 40%,#050f18 100%)',avClass:'tier-activo',stripClass:'tier-strip-activo',tagBg:'#091c30',tagBorder:'#29b6f644',tagColor:'#4fc3f7'},
+  novato:{id:'novato',label:'🆕 Socio Nuevo',color:'#90a4ae',glow:'#78909c22',cover:'linear-gradient(135deg,#080c10 0%,#101820 40%,#080c10 100%)',avClass:'tier-novato',stripClass:'tier-strip-novato',tagBg:'#101820',tagBorder:'#78909c33',tagColor:'#90a4ae'}
+};
+function getTier(soc){
+  if(soc.fundador)return TIERS.fundador;
+  const d=soc.fechaIngreso?Math.floor((Date.now()-new Date(soc.fechaIngreso+'T12:00:00').getTime())/86400000):0;
+  const a=d/365;
+  if(a>=10)return TIERS.elite;
+  if(a>=5)return TIERS.veterano;
+  if(a>=1)return TIERS.activo;
+  return TIERS.novato;
+}
+// años para siguiente tier
+function getAñosSig(soc){
+  const d=soc.fechaIngreso?Math.floor((Date.now()-new Date(soc.fechaIngreso+'T12:00:00').getTime())/86400000):0;
+  const a=d/365;
+  if(soc.fundador||a>=10)return null;
+  const sig=a>=5?10:a>=1?5:1;
+  return {sig,diasRest:Math.ceil((sig*365)-d)};
+}
+
+// ── PAGOS ─────────────────────────────────────────────────────────────
+const MESES_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function getCuota(){return getSocios()._cuota||30000;}
+function formatCOP(n){return '$'+Number(n).toLocaleString('es-CO');}
+function getPagoMes(soc,mes,año){return(soc.pagos||[]).find(p=>p.mes===mes&&p.año===año);}
+function getEstadoPago(soc){
+  const hoy=new Date();
+  const mes=hoy.getMonth()+1,año=hoy.getFullYear();
+  const pagado=getPagoMes(soc,mes,año);
+  if(pagado)return{estado:'ok',mes,año,pago:pagado};
+  // Vencido si ya pasó el día 10 del mes
+  const vence=new Date(año,hoy.getMonth(),10);
+  return{estado:hoy>vence?'vencido':'pendiente',mes,año,pago:null};
+}
+
 function renderPerfil(soc){
   // Avatar
   const img=document.getElementById('perf-av-img');
@@ -2871,16 +2976,21 @@ function renderPerfil(soc){
     ini.textContent=((soc.nombre||'?')[0]+(soc.apellido||'?')[0]).toUpperCase();
     if(photoBg)photoBg.style.backgroundImage='none';
   }
-  // Avatar glow color by estado
-  if(av){
-    av.className=isStandby?'perf-av sb-av':'perf-av';
-  }
-  // Cover glow color by estado
-  if(coverGlow){
-    coverGlow.style.background=isStandby
-      ?'radial-gradient(ellipse,#ff980022 0%,transparent 70%)'
-      :'radial-gradient(ellipse,#cc222222 0%,transparent 70%)';
-  }
+  // Tier
+  const tier=getTier(soc);
+  // Cover background
+  const cover=document.getElementById('perf-cover');
+  if(cover)cover.style.background=tier.cover;
+  // Avatar class
+  if(av)av.className='perf-av '+(isStandby?'sb-av':tier.avClass);
+  // Cover glow
+  if(coverGlow)coverGlow.style.background='radial-gradient(ellipse,'+tier.glow+' 0%,transparent 70%)';
+  // Tier label (top-left of cover)
+  const tl=document.getElementById('perf-tier-label');
+  if(tl){tl.textContent=tier.label;tl.style.background=tier.tagBg;tl.style.border='1px solid '+tier.tagBorder;tl.style.color=tier.tagColor;}
+  // Tier strip (below name)
+  const ts=document.getElementById('perf-tier-strip');
+  if(ts){ts.className='perf-tier-strip '+tier.stripClass;ts.textContent=tier.label;}
   document.getElementById('perf-name').textContent=soc.nombreCompleto||(soc.nombre+' '+soc.apellido);
   const pc=document.getElementById('perf-pos-cam');
   if(pc)pc.textContent=(soc.posicion||'')+(soc.numCamiseta?' · #'+soc.numCamiseta:'');
@@ -2888,22 +2998,23 @@ function renderPerfil(soc){
   // Badges
   const bdg=document.getElementById('perf-badges');
   let b='<span class="perf-badge '+(isStandby?'badge-standby':'badge-activo')+'">'+(isStandby?'⏸ Stand By':'✅ Activo')+'</span>';
-  if(soc.posicion)b+='<span class="perf-badge badge-posicion">'+soc.posicion+'</span>';
-  if(soc.talla)b+='<span class="perf-badge badge-posicion">Talla '+soc.talla+'</span>';
+  if(soc.numCamiseta)b+='<span class="perf-badge badge-posicion">#'+soc.numCamiseta+'</span>';
+  if(soc.talla)b+='<span class="perf-badge badge-camiseta">Talla '+soc.talla+'</span>';
   if(soc.sangre)b+='<span class="perf-badge badge-camiseta">'+soc.sangre+'</span>';
   bdg.innerHTML=b;
-  // Stats strip
+  // Stats strip — usar color del tier
+  const tc=isStandby?'#ff9800':tier.color;
   const ingreso=soc.fechaIngreso?new Date(soc.fechaIngreso+'T12:00:00'):new Date();
   const dias=Math.max(0,Math.floor((Date.now()-ingreso.getTime())/86400000));
-  const meses=Math.floor(dias/30);
+  const años=Math.floor(dias/365);
   const st=document.getElementById('perf-stats');
   if(st)st.innerHTML=
-    '<div class="perf-stat"><div class="perf-stat-n" style="color:'+(isStandby?'#ff9800':'#cc3333')+'">'+dias+'</div><div class="perf-stat-l">Días</div></div>'
-    +'<div class="perf-stat"><div class="perf-stat-n" style="color:'+(isStandby?'#ff9800':'#cc3333')+'">'+meses+'</div><div class="perf-stat-l">Meses</div></div>'
-    +'<div class="perf-stat"><div class="perf-stat-n">'+(isStandby?'🟡':'🟢')+'</div><div class="perf-stat-l">Estado</div></div>';
+    '<div class="perf-stat"><div class="perf-stat-n" style="color:'+tc+'">'+dias+'</div><div class="perf-stat-l">Días</div></div>'
+    +'<div class="perf-stat"><div class="perf-stat-n" style="color:'+tc+'">'+años+'</div><div class="perf-stat-l">Años</div></div>'
+    +'<div class="perf-stat"><div class="perf-stat-n">'+(isStandby?'⏸':'🟢')+'</div><div class="perf-stat-l">Estado</div></div>';
   // Re-render active tab
   const activeTab=document.querySelector('.perf-tab.active');
-  const tabId=activeTab?activeTab.textContent.trim().includes('Info')?'info':activeTab.textContent.trim().includes('Acceso')?'seguridad':'club':'info';
+  const tabId=activeTab?activeTab.textContent.trim().toLowerCase().includes('seg')?'seguridad':activeTab.textContent.trim().toLowerCase().includes('club')?'club':'info':'info';
   perfTab(tabId,activeTab||document.querySelector('.perf-tab'));
 }
 
@@ -3055,46 +3166,98 @@ function renderTabSeg(soc){
 
 function renderTabClub(soc){
   const el=document.getElementById('perf-tab-club');
+  const tier=getTier(soc);
+  const tc=tier.color;
   const ingreso=soc.fechaIngreso?new Date(soc.fechaIngreso+'T12:00:00'):new Date();
   const dias=Math.max(0,Math.floor((Date.now()-ingreso.getTime())/86400000));
-  const pct=Math.min(100,Math.round((dias/365)*100));
-  let alerts='';
+  const años=Math.floor(dias/365);
+  const siguienteTier=getAñosSig(soc);
+  let html='';
+
+  // ── Alerta de membresía / standby ─────────────────────────────────
   if(soc.estado==='standby'&&soc.standby){
     const sol=new Date(soc.standby.fechaSolicitud+'T12:00:00');
     const elegible=new Date(sol);elegible.setMonth(elegible.getMonth()+2);
     const diasRest=Math.max(0,Math.ceil((elegible-Date.now())/86400000));
     const pctEsp=Math.min(100,Math.round(((60-diasRest)/60)*100));
-    alerts+='<div class="alert-card alert-warn">'
-      +'<div class="al-title">⏸ En Stand By desde '+fmtDate(soc.standby.fechaSolicitud)+'</div>'
-      +'<div class="al-body">Motivo: <b>'+soc.standby.motivo+'</b><br>'
-      +(soc.standby.desc?soc.standby.desc+'<br>':'')
-      +'Retorno estimado: '+fmtDate(soc.standby.fechaRetorno)+'</div>'
-      +(diasRest>0?'<div class="sb-countdown"><div class="sb-countdown-n">'+diasRest+'</div>'
-        +'<div class="sb-countdown-l">días para poder reactivarte</div></div>'
-        +'<div class="progress-bar"><div class="progress-fill" style="width:'+pctEsp+'%;background:linear-gradient(90deg,#ff9800,#ffcc00)"></div></div>':
-        '<div style="margin-top:8px;color:#4caf50;font-size:11px;font-weight:700">✅ Ya puedes reactivarte</div>')
+    html+='<div class="alert-card alert-warn"><div class="al-title">⏸ En Stand By desde '+fmtDate(soc.standby.fechaSolicitud)+'</div>'
+      +'<div class="al-body">Motivo: <b>'+soc.standby.motivo+'</b>'+(soc.standby.desc?'<br>'+soc.standby.desc:'')+'<br>Retorno estimado: '+fmtDate(soc.standby.fechaRetorno)+'</div>'
+      +(diasRest>0
+        ?'<div class="sb-countdown"><div class="sb-countdown-n">'+diasRest+'</div><div class="sb-countdown-l">días para poder reactivarte</div></div>'
+         +'<div class="progress-bar"><div class="progress-fill" style="width:'+pctEsp+'%;background:linear-gradient(90deg,#ff9800,#ffcc00)"></div></div>'
+        :'<div style="margin-top:8px;color:#4caf50;font-size:11px;font-weight:700">✅ Ya puedes reactivarte — ve al tab Seguridad</div>')
       +'</div>';
   } else {
-    alerts+='<div class="alert-card alert-ok">'
-      +'<div class="al-title">✅ Socio Activo</div>'
-      +'<div class="al-body">Llevas <b>'+dias+' días</b> como miembro activo del club.</div>'
-      +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
-      +'<div style="font-size:9px;color:#4caf5088;margin-top:2px">'+pct+'% del primer año completado</div>'
-      +'</div>';
-    if(dias<30)alerts+='<div class="alert-card alert-info"><div class="al-title">👋 ¡Bienvenido al equipo!</div><div class="al-body">Eres nuevo en el club. Conoce el reglamento y únete a los entrenamientos.</div></div>';
+    if(dias<30)html+='<div class="alert-card alert-info"><div class="al-title">👋 ¡Bienvenido al equipo!</div><div class="al-body">Eres nuevo en Atlético Norte F.C. Conoce el reglamento y únete a los entrenamientos.</div></div>';
   }
-  el.innerHTML=alerts
-    +'<div class="pf-card">'
-    +'<div class="pf-section-lbl">Datos Deportivos</div>'
-    +pfRow('Posición',soc.posicion||'—','posicion','select',soc.posicion,['Portero','Defensa Central','Lateral Derecho','Lateral Izquierdo','Mediocampista','Extremo Derecho','Extremo Izquierdo','Delantero','Comodín'])
-    +pfRow('N.º Camiseta',soc.numCamiseta?'#'+soc.numCamiseta:'—','numCamiseta','number')
-    +pfRow('Talla',soc.talla||'—','talla','select',soc.talla,['XS','S','M','L','XL','XXL'])
-    +'</div>'
-    +'<div class="pf-card"><div class="pf-section-lbl">En el Club</div>'
-    +'<div class="pf-row"><span class="pf-label">Miembro desde</span><span class="pf-value">'+fmtDate(soc.fechaIngreso)+'</span></div>'
-    +'<div class="pf-row"><span class="pf-label">Días activo</span><span class="pf-value">'+dias+'</span></div>'
-    +'<div class="pf-row"><span class="pf-label">Estado</span><span class="pf-value" style="color:'+(soc.estado==='activo'?'#4caf50':'#ff9800')+';font-weight:900">'+(soc.estado==='activo'?'✅ Activo':'⏸ Stand By')+'</span></div>'
+
+  // ── Tarjeta de tier ───────────────────────────────────────────────
+  html+='<div style="background:'+tier.cover+';border:1px solid '+tier.tagBorder+';border-radius:18px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden">'
+    +(tier.id==='fundador'?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,#d4af3708 100%);pointer-events:none"></div>':'')
+    +'<div style="font-size:9px;font-weight:900;color:'+tc+';text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:6px">🏅 Membresía<span style="flex:1;height:1px;background:linear-gradient(90deg,'+tc+'33,transparent)"></span></div>'
+    +'<div style="font-size:26px;font-weight:900;color:'+tc+';line-height:1;margin-bottom:2px">'+tier.label+'</div>'
+    +'<div style="font-size:10px;color:#3a5070;margin-bottom:12px">Desde '+fmtDate(soc.fechaIngreso)+' · '+años+' año'+(años!==1?'s':'')+' en el club</div>'
+    +(siguienteTier
+      ?'<div style="font-size:9px;color:#3a5070;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Próximo nivel: '+siguienteTier.diasRest+' días</div>'
+       +'<div style="height:6px;background:#0e1e30;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,Math.round(((siguienteTier.sig*365-siguienteTier.diasRest)/(siguienteTier.sig*365))*100))+'%;background:linear-gradient(90deg,'+tc+','+tc+'88);border-radius:3px;transition:width .4s"></div></div>'
+      :'<div style="font-size:11px;color:'+tc+';font-weight:800">🏆 Nivel máximo alcanzado</div>')
     +'</div>';
+
+  // ── Resumen de pagos ──────────────────────────────────────────────
+  const cuota=getCuota();
+  const hoy=new Date();
+  const pagosMes12=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);
+    const m=d.getMonth()+1,a=d.getFullYear();
+    pagosMes12.push({mes:m,año:a,pago:getPagoMes(soc,m,a)});
+  }
+  const pagados=pagosMes12.filter(p=>p.pago).length;
+  const pendientes=pagosMes12.filter(p=>!p.pago).length;
+  const totalPagado=(soc.pagos||[]).reduce((s,p)=>s+Number(p.monto||0),0);
+
+  html+='<div class="pago-resumen" style="margin-bottom:14px">'
+    +'<div class="pago-res-cell"><div class="pago-res-n" style="color:#4caf50">'+pagados+'</div><div class="pago-res-l">Pagados</div></div>'
+    +'<div class="pago-res-cell"><div class="pago-res-n" style="color:#ff9800">'+pendientes+'</div><div class="pago-res-l">Pendientes</div></div>'
+    +'<div class="pago-res-cell"><div class="pago-res-n" style="color:'+tc+';font-size:13px">'+formatCOP(totalPagado)+'</div><div class="pago-res-l">Total</div></div>'
+    +'</div>';
+
+  // Estado del mes actual
+  const est=getEstadoPago(soc);
+  const mesLabel=MESES_ES[est.mes-1]+' '+est.año;
+  if(est.estado==='ok'){
+    html+='<div class="pago-card pago-card-ok">'
+      +'<div class="pago-head"><div><div class="pago-mes">'+mesLabel+'</div><div class="pago-sub">Cuota mensual</div></div><span class="pago-chip pago-chip-ok">✅ Al día</span></div>'
+      +'<div class="pago-monto pago-monto-ok">'+formatCOP(est.pago.monto)+'</div>'
+      +'<div class="pago-detail">Pagado el '+fmtDate(est.pago.fecha)+(est.pago.ref?' · Ref: '+est.pago.ref:'')+'</div>'
+      +'</div>';
+  } else if(est.estado==='vencido'){
+    html+='<div class="pago-card pago-card-venc">'
+      +'<div class="pago-head"><div><div class="pago-mes">'+mesLabel+'</div><div class="pago-sub">Cuota mensual</div></div><span class="pago-chip pago-chip-venc">⚠️ Vencida</span></div>'
+      +'<div class="pago-monto pago-monto-venc">'+formatCOP(cuota)+'</div>'
+      +'<div class="pago-detail" style="color:#ef535088">La cuota de este mes está vencida. Contacta al presidente para regularizarla.</div>'
+      +'</div>';
+  } else {
+    html+='<div class="pago-card pago-card-pend">'
+      +'<div class="pago-head"><div><div class="pago-mes">'+mesLabel+'</div><div class="pago-sub">Cuota mensual</div></div><span class="pago-chip pago-chip-pend">🕐 Pendiente</span></div>'
+      +'<div class="pago-monto pago-monto-pend">'+formatCOP(cuota)+'</div>'
+      +'<div class="pago-detail">Vence el 10 de '+MESES_ES[est.mes-1]+'. Realiza tu pago a tiempo.</div>'
+      +'</div>';
+  }
+
+  // Historial últimos 6 meses
+  const hist=(soc.pagos||[]).slice().sort((a,b)=>b.año!==a.año?b.año-a.año:b.mes-a.mes).slice(0,6);
+  if(hist.length>0){
+    html+='<div class="pf-card"><div class="pf-card-title">💳 Historial de Pagos</div>';
+    hist.forEach(p=>{
+      html+='<div class="pago-hist-item"><div><div class="pago-hist-mes">'+MESES_ES[p.mes-1]+' '+p.año+'</div><div class="pago-hist-fecha">'+fmtDate(p.fecha)+(p.ref?' · '+p.ref:'')+'</div></div><div class="pago-hist-monto">'+formatCOP(p.monto)+'</div></div>';
+    });
+    html+='</div>';
+  } else {
+    html+='<div class="pf-card"><div style="text-align:center;padding:10px 0;font-size:11px;color:#3a5070">Sin pagos registrados aún.<br>El administrador puede cargar tu historial.</div></div>';
+  }
+
+  el.innerHTML=html;
 }
 
 // ── FOTO ──────────────────────────────────────────────────────────────
@@ -3285,6 +3448,132 @@ function adminEliminarSocio(cedula){
 
 
 
+// ── ADMIN: PAGOS ─────────────────────────────────────────────────────
+function renderAdminPagos(){
+  const db=getSocios();
+  const socios=Object.values(db).filter(s=>!s._cuota); // excluir meta keys
+  const cuota=getCuota();
+  const hoy=new Date();
+  const mes=hoy.getMonth()+1,año=hoy.getFullYear();
+  const mesLabel=MESES_ES[mes-1]+' '+año;
+
+  // Socios con pago pendiente este mes
+  const pendientes=socios.filter(s=>!getPagoMes(s,mes,año));
+  const pagados=socios.filter(s=>!!getPagoMes(s,mes,año));
+
+  const cont=document.getElementById('admin-pagos-list');
+  if(!cont)return;
+  const tag=document.getElementById('pago-count-tag');
+  if(tag)tag.textContent=pendientes.length+' pendientes';
+
+  let html='<div style="font-size:10px;font-weight:700;color:#3a5070;margin-bottom:12px">'+mesLabel+' · Cuota: '+formatCOP(cuota)+'</div>';
+
+  // Resumen
+  html+='<div class="pago-resumen" style="margin-bottom:16px">'
+    +'<div class="pago-res-cell"><div class="pago-res-n" style="color:#4caf50">'+pagados.length+'</div><div class="pago-res-l">Al día</div></div>'
+    +'<div class="pago-res-cell"><div class="pago-res-n" style="color:#ff9800">'+pendientes.length+'</div><div class="pago-res-l">Pendientes</div></div>'
+    +'<div class="pago-res-cell"><div class="pago-res-n" style="color:#4fc3f7;font-size:13px">'+formatCOP(pagados.length*cuota)+'</div><div class="pago-res-l">Recaudado</div></div>'
+    +'</div>';
+
+  if(pendientes.length===0){
+    html+='<div style="padding:14px;text-align:center;color:#4caf50;font-size:12px;font-weight:700">✅ Todos los socios al día este mes</div>';
+  } else {
+    html+='<div style="font-size:9px;color:#ff9800;font-weight:900;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">⚠️ Pendientes de pago</div>';
+    pendientes.forEach(function(s){
+      const nombre=(s.nombreCompleto||(s.nombre+' '+s.apellido)).trim();
+      const tier=getTier(s);
+      html+='<div style="background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px">'
+        +'<div>'
+        +'<div style="font-size:12px;font-weight:800;color:#fff">'+nombre+'</div>'
+        +'<div style="font-size:9px;color:'+tier.color+';font-weight:700">'+tier.label+'</div>'
+        +'<div style="font-size:9px;color:#3a5070;margin-top:1px">C.C. '+Number(s.cedula).toLocaleString('es-CO')+(s.telefono?' · '+s.telefono:'')+'</div>'
+        +'</div>'
+        +'<button style="background:linear-gradient(135deg,#0a3a0a,#0d5a0d);color:#4caf50;border:1px solid #4caf5055;border-radius:10px;padding:8px 14px;font-size:10px;font-weight:900;white-space:nowrap;cursor:pointer" onclick="adminRegistrarPago(&#39;'+s.cedula+'&#39;)">💳 Registrar</button>'
+        +'</div>';
+    });
+  }
+
+  if(pagados.length>0){
+    html+='<div style="font-size:9px;color:#4caf50;font-weight:900;text-transform:uppercase;letter-spacing:.8px;margin:12px 0 8px">✅ Pagos registrados este mes</div>';
+    pagados.forEach(function(s){
+      const p=getPagoMes(s,mes,año);
+      const nombre=(s.nombreCompleto||(s.nombre+' '+s.apellido)).trim();
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0e1a0e;font-size:10px">'
+        +'<span style="color:#cde;font-weight:700">'+nombre+'</span>'
+        +'<span style="color:#4caf50;font-weight:900">'+formatCOP(p.monto)+'</span>'
+        +'</div>';
+    });
+  }
+
+  cont.innerHTML=html;
+}
+
+function adminRegistrarPago(cedula){
+  if(!adminMode){showToast('❌ Solo el administrador puede hacer esto');return;}
+  const db=getSocios();
+  const soc=db[cedula];
+  if(!soc){showToast('❌ Socio no encontrado');return;}
+  const cuota=getCuota();
+  const hoy=new Date();
+  const mes=hoy.getMonth()+1,año=hoy.getFullYear();
+  const nombreSoc=(soc.nombreCompleto||(soc.nombre+' '+soc.apellido)).trim();
+  const ref=prompt('Registrar pago de '+nombreSoc+'\nMes: '+MESES_ES[mes-1]+' '+año+'\nMonto ('+formatCOP(cuota)+' por defecto).\n\nReferencia / método de pago (ej: Nequi, Efectivo, Daviplata):');
+  if(ref===null)return;
+  const montoStr=prompt('Monto pagado (dejar vacío = '+formatCOP(cuota)+'):');
+  if(montoStr===null)return;
+  const monto=montoStr.trim()?Number(montoStr.replace(/[^0-9]/g,'')):cuota;
+  if(!soc.pagos)soc.pagos=[];
+  // Evitar duplicado del mismo mes
+  soc.pagos=soc.pagos.filter(p=>!(p.mes===mes&&p.año===año));
+  soc.pagos.push({mes,año,monto,fecha:hoy.toISOString().slice(0,10),ref:ref||'Efectivo'});
+  db[cedula]=soc;
+  setSocios(db);
+  renderAdminPagos();
+  showToast('✅ Pago de '+nombreSoc+' registrado: '+formatCOP(monto));
+}
+
+function adminMarcarFundador(cedula){
+  if(!adminMode){showToast('❌ Solo el administrador puede hacer esto');return;}
+  const db=getSocios();
+  const soc=db[cedula];
+  if(!soc)return;
+  const nombre=(soc.nombreCompleto||(soc.nombre+' '+soc.apellido)).trim();
+  const esFundador=!!soc.fundador;
+  if(!confirm((esFundador?'Quitar':'Asignar')+' categoría Fundador a '+nombre+'?')){return;}
+  soc.fundador=!esFundador;
+  db[cedula]=soc;
+  setSocios(db);
+  renderAdminSociosList();
+  showToast(esFundador?'🏅 Categoría Fundador removida':'🏆 '+nombre+' es ahora Socio Fundador');
+}
+
+function renderAdminSociosList(){
+  const db=getSocios();
+  const cont=document.getElementById('admin-socios-list');
+  if(!cont)return;
+  const socios=Object.values(db).filter(s=>typeof s.cedula==='string'||typeof s.cedula==='number');
+  if(socios.length===0){cont.innerHTML='<div style="padding:14px;text-align:center;color:#3a5070;font-size:11px">No hay socios registrados.</div>';return;}
+  let html='';
+  socios.sort((a,b)=>{
+    const ta=getTier(a),tb=getTier(b);
+    const ord={fundador:0,elite:1,veterano:2,activo:3,novato:4};
+    return (ord[ta.id]||4)-(ord[tb.id]||4);
+  }).forEach(function(s){
+    const nombre=(s.nombreCompleto||(s.nombre+' '+s.apellido)).trim();
+    const tier=getTier(s);
+    const esFundador=!!s.fundador;
+    html+='<div style="background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px">'
+      +'<div>'
+      +'<div style="font-size:12px;font-weight:800;color:#fff">'+nombre+'</div>'
+      +'<div style="font-size:9px;color:'+tier.color+';font-weight:700">'+tier.label+'</div>'
+      +'<div style="font-size:9px;color:#3a5070">C.C. '+Number(s.cedula).toLocaleString('es-CO')+(s.posicion?' · '+s.posicion:'')+'</div>'
+      +'</div>'
+      +'<button style="background:'+(esFundador?'linear-gradient(135deg,#3d2a00,#5a3a00)':'linear-gradient(135deg,#0d1a2e,#162030)')+';color:'+(esFundador?'#d4af37':'#3a5070')+';border:1px solid '+(esFundador?'#d4af3755':'#1e3050')+';border-radius:10px;padding:7px 12px;font-size:9px;font-weight:900;cursor:pointer;white-space:nowrap" onclick="adminMarcarFundador(&#39;'+s.cedula+'&#39;)">🏆 '+(esFundador?'Quitar Fundador':'Hacer Fundador')+'</button>'
+      +'</div>';
+  });
+  cont.innerHTML=html;
+}
+
 // ── EMAIL BIENVENIDA ──────────────────────────────────────────────────────────
 function sendWelcomeEmail(soc){
   if(!soc.email)return;
@@ -3454,7 +3743,7 @@ function enableAdminMode(){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById('sec-admin');if(sec)sec.classList.add('active');
   document.querySelectorAll('.bnav a,.tnav-in a').forEach(a=>a.classList.remove('active'));
-  buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();
+  buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();renderAdminPagos();renderAdminSociosList();
   renderLlave();
   window.scrollTo(0,0);
   showToast('🔐 Admin activado');
