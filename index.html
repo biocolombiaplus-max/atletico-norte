@@ -444,53 +444,58 @@ select:focus{outline:none;border-color:var(--acc)}
 
 /* ── PERFIL MODAL ── */
 /* ── PERFIL PREMIUM ─────────────────────────────────────────────────── */
-.perfil-mo{position:fixed;inset:0;z-index:8000;background:#000000aa;display:flex;flex-direction:column;justify-content:flex-end}
+.perfil-mo{position:fixed;inset:0;z-index:8000;background:#00000088;display:flex;flex-direction:column;justify-content:flex-end;backdrop-filter:blur(4px)}
 .perfil-mo.hidden{display:none}
-.perfil-sheet{background:linear-gradient(180deg,#080f1e 0%,#040b14 100%);border-radius:24px 24px 0 0;width:100%;max-height:96vh;overflow-y:auto;padding-bottom:calc(20px + env(safe-area-inset-bottom));box-shadow:0 -8px 40px #000a}
+.perfil-sheet{background:#060d18;border-radius:28px 28px 0 0;width:100%;max-height:96vh;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom));box-shadow:0 -12px 60px #000c}
 .perfil-sheet::-webkit-scrollbar{display:none}
 
 /* cover hero */
-.perf-cover{height:160px;background:linear-gradient(135deg,#1a0000 0%,#4a0000 30%,#1a0510 70%,#0a0a1a 100%);position:relative;border-radius:24px 24px 0 0;overflow:hidden;flex-shrink:0}
-.perf-cover-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,#cc222233,transparent);pointer-events:none}
-.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,#ffffff04 0px,#ffffff04 1px,transparent 1px,transparent 10px);pointer-events:none}
-.perf-cover-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#00000066;border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
-.perf-av-wrap{position:absolute;bottom:-52px;left:50%;transform:translateX(-50%);z-index:2;text-align:center}
-.perf-av{width:104px;height:104px;border-radius:50%;border:4px solid #cc2222;background:linear-gradient(135deg,#0d1a2e,#1a0510);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px #000a,0 0 0 2px #0008;position:relative}
-.perf-av img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
-.perf-av .av-ini-lg{font-size:38px;font-weight:900;color:#cc2222;font-family:"Bebas Neue",sans-serif;letter-spacing:2px}
-.perf-av-edit{position:absolute;inset:0;background:#00000066;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:50%;font-size:22px}
-.perf-av:hover .perf-av-edit,.perf-av:active .perf-av-edit{opacity:1}
+.perf-cover{height:210px;background:#0d0a1a;position:relative;border-radius:28px 28px 0 0;overflow:hidden;flex-shrink:0}
+.perf-cover-photo-bg{position:absolute;inset:-20px;background-size:cover;background-position:center 20%;filter:blur(22px) brightness(.35) saturate(1.6);transform:scale(1.05);pointer-events:none}
+.perf-cover-gradient{position:absolute;inset:0;background:linear-gradient(180deg,#cc222212 0%,#00000000 40%,#060d18ff 100%);pointer-events:none}
+.perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,#ffffff05 0px,#ffffff05 1px,transparent 1px,transparent 14px);pointer-events:none}
+.perf-cover-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:260px;height:160px;background:radial-gradient(ellipse,#cc222228 0%,transparent 70%);pointer-events:none}
+.perf-cover-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#00000055;border:1px solid #ffffff18;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);z-index:3}
+.perf-av-wrap{position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);z-index:3;text-align:center}
+.perf-av{width:140px;height:140px;border-radius:50%;border:4px solid #cc2222;background:linear-gradient(135deg,#0d1a2e,#1a0510);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px #000c,0 0 0 3px #cc222244,0 0 32px #cc222233;position:relative;transition:box-shadow .3s}
+.perf-av.sb-av{border-color:#ff9800;box-shadow:0 8px 40px #000c,0 0 0 3px #ff980044,0 0 32px #ff980033}
+.perf-av img{width:100%;height:100%;object-fit:cover;object-position:center 15%}
+.perf-av .av-ini-lg{font-size:46px;font-weight:900;color:#cc2222;font-family:"Bebas Neue",sans-serif;letter-spacing:2px;text-shadow:0 2px 16px #cc222266}
+.perf-av-edit{position:absolute;inset:0;background:#00000077;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;border-radius:50%;font-size:26px}
+.perf-av:active .perf-av-edit{opacity:1}
 #foto-input{display:none}
 
 /* body below cover */
-.perf-body{padding:60px 20px 16px;text-align:center}
-.perf-name{font-size:22px;font-weight:900;color:#fff;margin-bottom:3px;letter-spacing:.3px;line-height:1.2}
-.perf-pos-cam{font-size:12px;color:#cc4444;font-weight:700;margin-bottom:4px}
-.perf-cedula{font-size:11px;color:#445;margin-bottom:12px;letter-spacing:.5px}
-.perf-badges{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
-.perf-badge{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
-.badge-activo{background:linear-gradient(135deg,#0a2a0a,#0d3a0d);color:#4caf50;border:1px solid #4caf5055}
-.badge-standby{background:linear-gradient(135deg,#2a1800,#3a2200);color:#ff9800;border:1px solid #ff980055}
-.badge-posicion{background:linear-gradient(135deg,#071828,#0a2035);color:#4fc3f7;border:1px solid #4fc3f755}
-.badge-camiseta{background:linear-gradient(135deg,#160a28,#200a35);color:#ce93d8;border:1px solid #ce93d855}
+.perf-body{padding:84px 20px 16px;text-align:center}
+.perf-name{font-size:24px;font-weight:900;color:#fff;margin-bottom:2px;letter-spacing:.2px;line-height:1.2;text-shadow:0 2px 12px #0006}
+.perf-pos-cam{font-size:12px;color:#cc5555;font-weight:800;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.perf-cedula{font-size:10px;color:#3a5070;margin-bottom:14px;letter-spacing:.6px}
+.perf-badges{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.perf-badge{padding:5px 14px;border-radius:24px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
+.badge-activo{background:linear-gradient(135deg,#071a07,#0a2d0a);color:#66bb6a;border:1px solid #4caf5066}
+.badge-standby{background:linear-gradient(135deg,#2a1400,#3d2000);color:#ffa726;border:1px solid #ff980066}
+.badge-posicion{background:linear-gradient(135deg,#061522,#0a2038);color:#4fc3f7;border:1px solid #29b6f666}
+.badge-camiseta{background:linear-gradient(135deg,#140826,#1e0a33);color:#ce93d8;border:1px solid #ab47bc66}
 
 /* stat strip */
-.perf-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#1e3050;border-radius:12px;overflow:hidden;margin-bottom:18px}
-.perf-stat{background:#080f1e;padding:10px 4px;text-align:center}
-.perf-stat-n{font-size:18px;font-weight:900;color:#cc2222;line-height:1}
-.perf-stat-l{font-size:8px;color:#445;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.perf-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#0e1e30;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 16px #0006}
+.perf-stat{background:#070e1a;padding:14px 4px;text-align:center}
+.perf-stat-n{font-size:22px;font-weight:900;color:#cc3333;line-height:1}
+.perf-stat-l{font-size:8px;color:#3a5070;text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
 
 /* tabs */
-.perf-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:12px;overflow:hidden;border:1px solid #1e3050;margin:0 0 18px}
-.perf-tab{padding:10px 4px;text-align:center;font-size:10px;font-weight:700;color:#445;background:#06101c;cursor:pointer;transition:all .2s;letter-spacing:.3px}
-.perf-tab.active{background:linear-gradient(135deg,#cc2222,#880000);color:#fff}
+.perf-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:14px;overflow:hidden;border:1px solid #0e1e30;margin:0 0 20px;background:#040c14}
+.perf-tab{padding:11px 4px;text-align:center;font-size:10px;font-weight:800;color:#3a5070;cursor:pointer;transition:all .2s;letter-spacing:.4px;text-transform:uppercase}
+.perf-tab.active{background:linear-gradient(135deg,#cc2222,#7a0000);color:#fff;text-shadow:0 1px 6px #0006}
 
 /* field cards */
-.pf-card{background:#080f1e;border:1px solid #1a2a40;border-radius:14px;padding:16px;margin-bottom:12px;text-align:left}
-.pf-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0e1e30;gap:8px}
-.pf-row:last-child{border-bottom:none}
-.pf-label{font-size:9px;color:#445;text-transform:uppercase;letter-spacing:.5px;font-weight:700;flex-shrink:0}
-.pf-value{font-size:12px;color:#ccd;font-weight:600;text-align:right;flex:1}
+.pf-card{background:linear-gradient(135deg,#070e1a,#060c16);border:1px solid #1a2e48;border-radius:18px;padding:18px;margin-bottom:14px;text-align:left;box-shadow:0 4px 24px #0004}
+.pf-card-title{font-size:9px;font-weight:900;color:#cc4444;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.pf-card-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#cc222222,transparent)}
+.pf-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0e1e30;gap:8px}
+.pf-row:last-child{border-bottom:none;padding-bottom:0}
+.pf-label{font-size:9px;color:#3a5070;text-transform:uppercase;letter-spacing:.6px;font-weight:700;flex-shrink:0}
+.pf-value{font-size:13px;color:#cde;font-weight:600;text-align:right;flex:1}
 .pf-edit-icon{font-size:14px;margin-left:6px;cursor:pointer;opacity:.5;flex-shrink:0}
 .pf-section-lbl{font-size:9px;color:#cc4444;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .pf-edit-field{width:100%;background:#040b14;border:1px solid #cc222255;border-radius:8px;padding:8px 10px;color:#fff;font-size:13px;outline:none;margin-top:6px;font-family:inherit;transition:border .2s}
@@ -606,12 +611,14 @@ select:focus{outline:none;border-color:var(--acc)}
 <!-- ── PERFIL MODAL ────────────────────────────────────────────── -->
 <div class="perfil-mo hidden" id="perfil-mo">
   <div class="perfil-sheet">
-    <div class="perf-cover">
-      <div class="perf-cover-bg"></div>
+    <div class="perf-cover" id="perf-cover">
+      <div class="perf-cover-photo-bg" id="perf-cover-photo-bg"></div>
+      <div class="perf-cover-gradient"></div>
       <div class="perf-cover-pattern"></div>
+      <div class="perf-cover-glow" id="perf-cover-glow"></div>
       <button class="perf-cover-close" onclick="closePerfil()">✕</button>
       <div class="perf-av-wrap">
-        <div class="perf-av" onclick="triggerFoto()">
+        <div class="perf-av" id="perf-av" onclick="triggerFoto()">
           <img id="perf-av-img" src="" style="display:none">
           <span class="av-ini-lg" id="perf-av-ini"></span>
           <div class="perf-av-edit">📷</div>
@@ -2851,16 +2858,37 @@ function renderPerfil(soc){
   // Avatar
   const img=document.getElementById('perf-av-img');
   const ini=document.getElementById('perf-av-ini');
-  if(soc.foto){img.src=soc.foto;img.style.display='block';ini.style.display='none';}
-  else{img.style.display='none';ini.style.display='block';
-    ini.textContent=((soc.nombre||'?')[0]+(soc.apellido||'?')[0]).toUpperCase();}
+  const av=document.getElementById('perf-av');
+  const photoBg=document.getElementById('perf-cover-photo-bg');
+  const coverGlow=document.getElementById('perf-cover-glow');
+  const isStandby=soc.estado==='standby';
+  // Avatar image + initials
+  if(soc.foto){
+    img.src=soc.foto;img.style.display='block';ini.style.display='none';
+    if(photoBg)photoBg.style.backgroundImage='url('+soc.foto+')';
+  } else {
+    img.style.display='none';ini.style.display='block';
+    ini.textContent=((soc.nombre||'?')[0]+(soc.apellido||'?')[0]).toUpperCase();
+    if(photoBg)photoBg.style.backgroundImage='none';
+  }
+  // Avatar glow color by estado
+  if(av){
+    av.className=isStandby?'perf-av sb-av':'perf-av';
+  }
+  // Cover glow color by estado
+  if(coverGlow){
+    coverGlow.style.background=isStandby
+      ?'radial-gradient(ellipse,#ff980022 0%,transparent 70%)'
+      :'radial-gradient(ellipse,#cc222222 0%,transparent 70%)';
+  }
   document.getElementById('perf-name').textContent=soc.nombreCompleto||(soc.nombre+' '+soc.apellido);
   const pc=document.getElementById('perf-pos-cam');
   if(pc)pc.textContent=(soc.posicion||'')+(soc.numCamiseta?' · #'+soc.numCamiseta:'');
-  document.getElementById('perf-cedula').textContent='C.C. '+Number(soc.cedula).toLocaleString('es-CO')+' · '+fmtDate(soc.fechaIngreso);
+  document.getElementById('perf-cedula').textContent='C.C. '+Number(soc.cedula).toLocaleString('es-CO')+' · Miembro desde '+fmtDate(soc.fechaIngreso);
   // Badges
   const bdg=document.getElementById('perf-badges');
-  let b='<span class="perf-badge '+(soc.estado==='standby'?'badge-standby':'badge-activo')+'">'+(soc.estado==='standby'?'⏸ Stand By':'✅ Activo')+'</span>';
+  let b='<span class="perf-badge '+(isStandby?'badge-standby':'badge-activo')+'">'+(isStandby?'⏸ Stand By':'✅ Activo')+'</span>';
+  if(soc.posicion)b+='<span class="perf-badge badge-posicion">'+soc.posicion+'</span>';
   if(soc.talla)b+='<span class="perf-badge badge-posicion">Talla '+soc.talla+'</span>';
   if(soc.sangre)b+='<span class="perf-badge badge-camiseta">'+soc.sangre+'</span>';
   bdg.innerHTML=b;
@@ -2869,9 +2897,10 @@ function renderPerfil(soc){
   const dias=Math.max(0,Math.floor((Date.now()-ingreso.getTime())/86400000));
   const meses=Math.floor(dias/30);
   const st=document.getElementById('perf-stats');
-  if(st)st.innerHTML='<div class="perf-stat"><div class="perf-stat-n">'+dias+'</div><div class="perf-stat-l">Días</div></div>'
-    +'<div class="perf-stat"><div class="perf-stat-n">'+meses+'</div><div class="perf-stat-l">Meses</div></div>'
-    +'<div class="perf-stat"><div class="perf-stat-n">'+(soc.estado==='activo'?'🟢':'🟡')+'</div><div class="perf-stat-l">Estado</div></div>';
+  if(st)st.innerHTML=
+    '<div class="perf-stat"><div class="perf-stat-n" style="color:'+(isStandby?'#ff9800':'#cc3333')+'">'+dias+'</div><div class="perf-stat-l">Días</div></div>'
+    +'<div class="perf-stat"><div class="perf-stat-n" style="color:'+(isStandby?'#ff9800':'#cc3333')+'">'+meses+'</div><div class="perf-stat-l">Meses</div></div>'
+    +'<div class="perf-stat"><div class="perf-stat-n">'+(isStandby?'🟡':'🟢')+'</div><div class="perf-stat-l">Estado</div></div>';
   // Re-render active tab
   const activeTab=document.querySelector('.perf-tab.active');
   const tabId=activeTab?activeTab.textContent.trim().includes('Info')?'info':activeTab.textContent.trim().includes('Acceso')?'seguridad':'club':'info';
@@ -2895,14 +2924,20 @@ function fmtDate(d){if(!d)return '—';const[y,m,dd]=d.split('-');const M=['ene'
 function renderTabInfo(soc){
   const el=document.getElementById('perf-tab-info');
   el.innerHTML='<div class="pf-card">'
-    +'<div class="pf-section-lbl">Datos Personales</div>'
+    +'<div class="pf-card-title">👤 Datos Personales</div>'
     +pfRow('Nombre completo',soc.nombreCompleto||'—','nombreCompleto')
     +pfRow('Fecha de nacimiento',fmtDate(soc.fechaNac),'fechaNac','date',soc.fechaNac)
     +pfRow('Género',soc.genero||'—','genero','select',soc.genero,['Masculino','Femenino','Otro'])
     +pfRow('Grupo Sanguíneo',soc.sangre||'—','sangre','select',soc.sangre,['A+','A-','B+','B-','AB+','AB-','O+','O-'])
     +'</div>'
     +'<div class="pf-card">'
-    +'<div class="pf-section-lbl">Contacto</div>'
+    +'<div class="pf-card-title">⚽ Datos Deportivos</div>'
+    +pfRow('Posición',soc.posicion||'—','posicion','select',soc.posicion,['Portero','Defensa','Mediocampista','Delantero'])
+    +pfRow('N.º Camiseta',soc.numCamiseta||'—','numCamiseta','number')
+    +pfRow('Talla',soc.talla||'—','talla','select',soc.talla,['XS','S','M','L','XL','XXL'])
+    +'</div>'
+    +'<div class="pf-card">'
+    +'<div class="pf-card-title">📞 Contacto</div>'
     +pfRow('Celular',soc.telefono||'—','telefono','tel')
     +pfRow('Correo',soc.email||'—','email','email')
     +pfRow('Dirección',soc.direccion||'—','direccion')
@@ -2910,7 +2945,7 @@ function renderTabInfo(soc){
     +pfRow('Ciudad',soc.ciudad||'—','ciudad')
     +'</div>'
     +'<div class="pf-card">'
-    +'<div class="pf-section-lbl">Emergencia</div>'
+    +'<div class="pf-card-title">🏥 Emergencia</div>'
     +pfRow('EPS / Seguro',soc.eps||'—','eps')
     +pfRow('Contacto emergencia',soc.contactoEmergencia||'—','contactoEmergencia')
     +pfRow('Tel. emergencia',soc.telEmergencia||'—','telEmergencia','tel')
