@@ -2123,7 +2123,7 @@ function handlePinDigit(n){
   pinVal+=n;updatePinDisplay('pin-display');
   if(pinVal.length===4){
     const s=getS();
-    if(pinVal===s.pin){
+    if(pinVal===(s.pin||'1234')){
       document.getElementById('mo-pin').classList.remove('open');
       pinVal='';
       setTimeout(()=>enableAdminMode(),120);
@@ -2162,7 +2162,7 @@ function handleCoordPinDigit(n){
   coordPinVal+=n;updatePinDisplayC();
   if(coordPinVal.length===4){
     const s=getS();
-    if(coordPinVal===s.coordPin){
+    if(coordPinVal===(s.coordPin||'0000')){
       document.getElementById('mo-coord').classList.remove('open');
       coordPinVal='';
       setTimeout(()=>enableCoordMode(),120);
