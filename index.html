@@ -452,9 +452,11 @@ select:focus{outline:none;border-color:var(--acc)}
 .perfil-sheet{background:#060d18;border-radius:28px 28px 0 0;width:100%;max-height:96vh;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom));box-shadow:0 -12px 60px #000c}
 .perfil-sheet::-webkit-scrollbar{display:none}
 
-/* cover hero */
-.perf-cover{height:210px;background:#0d0a1a;position:relative;border-radius:28px 28px 0 0;overflow:hidden;flex-shrink:0;transition:background .4s}
-.perf-cover-photo-bg{position:absolute;inset:-20px;background-size:cover;background-position:center 20%;filter:blur(22px) brightness(.35) saturate(1.6);transform:scale(1.05);pointer-events:none}
+/* cover hero — overflow:visible para que el avatar no se corte */
+.perf-cover{height:210px;background:#0d0a1a;position:relative;border-radius:28px 28px 0 0;overflow:visible;flex-shrink:0;transition:background .4s}
+/* capa interior que sí recorta el fondo difuminado */
+.perf-cover-clip{position:absolute;inset:0;border-radius:28px 28px 0 0;overflow:hidden;pointer-events:none}
+.perf-cover-photo-bg{position:absolute;inset:-20px;background-size:cover;background-position:center 20%;filter:blur(22px) brightness(.35) saturate(1.6);transform:scale(1.05)}
 .perf-cover-gradient{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,#060d18ff 100%);pointer-events:none}
 .perf-cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,#ffffff04 0px,#ffffff04 1px,transparent 1px,transparent 14px);pointer-events:none}
 .perf-cover-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:300px;height:180px;pointer-events:none;animation:pulse-glow 3s ease-in-out infinite}
@@ -585,6 +587,15 @@ select:focus{outline:none;border-color:var(--acc)}
 /* change pass */
 .cp-form{background:#0d1a2e;border:1px solid #1e3050;border-radius:12px;padding:14px;margin-top:10px}
 .cp-title{font-size:13px;font-weight:900;color:#8899bb;margin-bottom:12px}
+
+/* doc buttons */
+.doc-btn{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#070e1a,#060c16);border:1px solid #1a2e48;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-decoration:none;transition:border-color .2s;width:100%}
+.doc-btn:active{border-color:#4fc3f7}
+.doc-btn-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.doc-btn-text{text-align:left;flex:1}
+.doc-btn-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:2px}
+.doc-btn-sub{font-size:10px;color:#3a5070}
+.doc-btn-arrow{font-size:16px;color:#3a5070;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -662,12 +673,16 @@ select:focus{outline:none;border-color:var(--acc)}
 <div class="perfil-mo hidden" id="perfil-mo">
   <div class="perfil-sheet">
     <div class="perf-cover" id="perf-cover">
-      <div class="perf-cover-photo-bg" id="perf-cover-photo-bg"></div>
-      <div class="perf-cover-gradient"></div>
-      <div class="perf-cover-pattern"></div>
-      <div class="perf-cover-glow" id="perf-cover-glow"></div>
+      <!-- capa con overflow:hidden para recortar foto blur y gradientes -->
+      <div class="perf-cover-clip">
+        <div class="perf-cover-photo-bg" id="perf-cover-photo-bg"></div>
+        <div class="perf-cover-gradient"></div>
+        <div class="perf-cover-pattern"></div>
+        <div class="perf-cover-glow" id="perf-cover-glow"></div>
+      </div>
       <div class="perf-tier-label" id="perf-tier-label"></div>
       <button class="perf-cover-close" onclick="closePerfil()">✕</button>
+      <!-- avatar fuera del clip para que no se corte -->
       <div class="perf-av-wrap">
         <div class="perf-av" id="perf-av" onclick="triggerFoto()">
           <img id="perf-av-img" src="" style="display:none">
@@ -930,6 +945,28 @@ select:focus{outline:none;border-color:var(--acc)}
 <!-- ÁREA DE IMPRESIÓN -->
 <div id="print-area"></div>
 
+</div>
+
+<!-- MODAL VISOR DE DOCUMENTOS -->
+<div id="doc-viewer-mo" style="display:none;position:fixed;inset:0;z-index:10000;background:#00000099;flex-direction:column;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeDocViewer()">
+  <div style="display:flex;flex-direction:column;height:100%;padding:env(safe-area-inset-top,16px) 0 env(safe-area-inset-bottom,0) 0" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#060d18;border-bottom:1px solid #1e3050;flex-shrink:0">
+      <div>
+        <div id="doc-viewer-title" style="font-size:14px;font-weight:900;color:#fff;letter-spacing:.2px"></div>
+        <div id="doc-viewer-sub" style="font-size:9px;color:#3a5070;margin-top:2px;text-transform:uppercase;letter-spacing:.6px"></div>
+      </div>
+      <button onclick="closeDocViewer()" style="width:36px;height:36px;border-radius:50%;background:#1e3050;border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+    <!-- iframe viewer -->
+    <div style="flex:1;overflow:hidden;background:#111">
+      <iframe id="doc-viewer-iframe" src="" style="width:100%;height:100%;border:none;display:block"></iframe>
+    </div>
+    <!-- Footer -->
+    <div style="padding:10px 18px;background:#060d18;border-top:1px solid #1e3050;display:flex;gap:8px;flex-shrink:0">
+      <a id="doc-viewer-dl" href="" download style="flex:1;text-align:center;padding:10px;background:#1e3050;color:#4fc3f7;border-radius:10px;font-size:11px;font-weight:700;text-decoration:none;border:1px solid #29b6f655">⬇️ Descargar PDF</a>
+    </div>
+  </div>
 </div>
 
 
@@ -3257,6 +3294,21 @@ function renderTabClub(soc){
     html+='<div class="pf-card"><div style="text-align:center;padding:10px 0;font-size:11px;color:#3a5070">Sin pagos registrados aún.<br>El administrador puede cargar tu historial.</div></div>';
   }
 
+  // ── Documentos del club ─────────────────────────────────────────
+  html+='<div style="margin-top:4px">'
+    +'<div style="font-size:9px;font-weight:900;color:#cc4444;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:6px">📄 Documentos del Club<span style="flex:1;height:1px;background:linear-gradient(90deg,#cc222222,transparent)"></span></div>'
+    +'<button class="doc-btn" onclick="openDocViewer(\'reglamento\')">'
+    +'<div class="doc-btn-icon" style="background:linear-gradient(135deg,#1a0a00,#2d1500)">📋</div>'
+    +'<div class="doc-btn-text"><div class="doc-btn-title">Reglamento del Campeonato</div><div class="doc-btn-sub">1er y 2do semestre 2025 · PDF</div></div>'
+    +'<div class="doc-btn-arrow">›</div>'
+    +'</button>'
+    +'<button class="doc-btn" onclick="openDocViewer(\'estatutos\')">'
+    +'<div class="doc-btn-icon" style="background:linear-gradient(135deg,#00101a,#001e30)">⚖️</div>'
+    +'<div class="doc-btn-text"><div class="doc-btn-title">Estatutos del Club</div><div class="doc-btn-sub">Club Deportivo Atlético Norte F.C. · PDF</div></div>'
+    +'<div class="doc-btn-arrow">›</div>'
+    +'</button>'
+    +'</div>';
+
   el.innerHTML=html;
 }
 
@@ -3572,6 +3624,27 @@ function renderAdminSociosList(){
       +'</div>';
   });
   cont.innerHTML=html;
+}
+
+// ── VISOR DE DOCUMENTOS ───────────────────────────────────────────────
+const DOCS={
+  reglamento:{title:'Reglamento del Campeonato',sub:'1er y 2do semestre 2025',url:'./reglamento.pdf'},
+  estatutos:{title:'Estatutos del Club',sub:'Club Deportivo Atlético Norte F.C.',url:'./estatutos.pdf'}
+};
+function openDocViewer(key){
+  const doc=DOCS[key];if(!doc)return;
+  document.getElementById('doc-viewer-title').textContent=doc.title;
+  document.getElementById('doc-viewer-sub').textContent=doc.sub;
+  document.getElementById('doc-viewer-iframe').src=doc.url;
+  document.getElementById('doc-viewer-dl').href=doc.url;
+  document.getElementById('doc-viewer-dl').download=key+'.pdf';
+  document.getElementById('doc-viewer-mo').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeDocViewer(){
+  document.getElementById('doc-viewer-mo').style.display='none';
+  document.getElementById('doc-viewer-iframe').src='';
+  document.body.style.overflow='';
 }
 
 // ── EMAIL BIENVENIDA ──────────────────────────────────────────────────────────
