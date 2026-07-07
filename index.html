@@ -654,21 +654,21 @@ select:focus{outline:none;border-color:var(--acc)}
 
 <nav class="tnav">
   <div class="tnav-in">
-    <a href="#" class="active" onclick="nav('inicio',this,true);return false">🏠 Inicio</a>
-    <a href="#" onclick="nav('fixture',this,true);return false">📅 Fixture</a>
-    <a href="#" onclick="nav('tabla',this,true);return false">📊 Tabla</a>
-    <a href="#" onclick="nav('goles',this,true);return false">⚽ Goleadores</a>
-    <a href="#" onclick="nav('llave',this,true);return false">🏆 Llave</a>
-    <a href="#" onclick="nav('info',this,true);return false">ℹ️ Info</a>
-    <a href="#" id="tnav-admin" style="display:none" onclick="nav('admin',this,true);return false">⚙️ Admin</a>
+    <a href="javascript:void(0)" class="active" onclick="nav('inicio',this,true)">🏠 Inicio</a>
+    <a href="javascript:void(0)" onclick="nav('fixture',this,true)">📅 Fixture</a>
+    <a href="javascript:void(0)" onclick="nav('tabla',this,true)">📊 Tabla</a>
+    <a href="javascript:void(0)" onclick="nav('goles',this,true)">⚽ Goleadores</a>
+    <a href="javascript:void(0)" onclick="nav('llave',this,true)">🏆 Llave</a>
+    <a href="javascript:void(0)" onclick="nav('info',this,true)">ℹ️ Info</a>
+    <a href="javascript:void(0)" id="tnav-admin" style="display:none" onclick="nav('admin',this,true)">⚙️ Admin</a>
   </div>
 </nav>
 <nav class="bnav">
-  <a href="#" class="active" onclick="nav('inicio',this,false);return false"><span class="ico">🏠</span>Inicio</a>
-  <a href="#" onclick="nav('fixture',this,false);return false"><span class="ico">📅</span>Fixture</a>
-  <a href="#" onclick="nav('tabla',this,false);return false"><span class="ico">📊</span>Tabla</a>
-  <a href="#" onclick="nav('goles',this,false);return false"><span class="ico">⚽</span>Goles</a>
-  <a href="#" onclick="nav('llave',this,false);return false"><span class="ico">🏆</span>Llave</a>
+  <a href="javascript:void(0)" class="active" onclick="nav('inicio',this,false)"><span class="ico">🏠</span>Inicio</a>
+  <a href="javascript:void(0)" onclick="nav('fixture',this,false)"><span class="ico">📅</span>Fixture</a>
+  <a href="javascript:void(0)" onclick="nav('tabla',this,false)"><span class="ico">📊</span>Tabla</a>
+  <a href="javascript:void(0)" onclick="nav('goles',this,false)"><span class="ico">⚽</span>Goles</a>
+  <a href="javascript:void(0)" onclick="nav('llave',this,false)"><span class="ico">🏆</span>Llave</a>
 </nav>
 
 <div class="page">
@@ -2680,8 +2680,18 @@ const SK_SES='an_ses_v1';
 
 function getSocios(){try{return JSON.parse(localStorage.getItem(SK_SOC))||{};}catch(e){return {};}}
 function setSocios(d){localStorage.setItem(SK_SOC,JSON.stringify(d));}
-function getSes(){try{return JSON.parse(sessionStorage.getItem(SK_SES))||null;}catch(e){return null;}}
-function setSes(d){if(d)sessionStorage.setItem(SK_SES,JSON.stringify(d));else sessionStorage.removeItem(SK_SES);}
+function getSes(){
+  try{
+    var d=JSON.parse(localStorage.getItem(SK_SES))||null;
+    // Expira después de 24 horas (86400000 ms)
+    if(d&&d.ts&&(Date.now()-d.ts)>86400000){localStorage.removeItem(SK_SES);return null;}
+    return d;
+  }catch(e){return null;}
+}
+function setSes(d){
+  if(d)localStorage.setItem(SK_SES,JSON.stringify(d));
+  else localStorage.removeItem(SK_SES);
+}
 
 function hashPass(pass){
   // Simple deterministic hash for club use
