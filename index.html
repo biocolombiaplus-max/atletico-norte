@@ -963,6 +963,14 @@ select:focus{outline:none;border-color:var(--acc)}
   <div class="sh"><h2>⚙️ Admin</h2><span class="tag red">Solo Presidente</span></div>
   <div class="alert yellow"><span class="alert-ico">🔐</span><div><div class="at">Modo Administrador Activo</div><div class="ab">Solo el presidente puede ver y editar esta sección.</div></div></div>
 
+  <!-- Accesos rápidos en admin (visibles en móvil) -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+    <button onclick="nav('fixture',null,true)" style="background:#1e3a5f;border:1px solid #2d5a9f;border-radius:10px;padding:10px 4px;color:#fff;font-size:9px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:20px">📅</span>Fixture</button>
+    <button onclick="nav('tabla',null,true)" style="background:#1a3a1a;border:1px solid #2d6a2d;border-radius:10px;padding:10px 4px;color:#fff;font-size:9px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:20px">📊</span>Tabla</button>
+    <button onclick="nav('goles',null,true)" style="background:#3a2a0a;border:1px solid #8a5a0a;border-radius:10px;padding:10px 4px;color:#fff;font-size:9px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:20px">⚽</span>Goles</button>
+    <button onclick="nav('llave',null,true)" style="background:#2a1a3a;border:1px solid #6a3a9a;border-radius:10px;padding:10px 4px;color:#fff;font-size:9px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:20px">🏆</span>Llave</button>
+  </div>
+
   <!-- ASIGNACIÓN EQUIPOS -->
   <div style="margin-bottom:14px">
     <div class="sh"><h2>Sorteo Manual</h2><span class="tag grey" id="sp-prog">0/10</span></div>
@@ -4249,7 +4257,7 @@ function enableAdminMode(){
   const sec=document.getElementById('sec-admin');if(sec)sec.classList.add('active');
   document.querySelectorAll('.bnav a,.tnav-in a').forEach(a=>a.classList.remove('active'));
   buildSlotBoard();buildDelGrid();renderCalendar();renderStatsResumen();renderEquidad();renderEquidadMapa();renderSociosStandby();renderAdminPagos();renderAdminSociosList();
-  renderLlave();
+  renderFixture();renderLlave();
   _fbSetUI(_fbReady);
   var fbInp=document.getElementById('fb-url-input');
   if(fbInp&&!fbInp.value){var fbSaved=localStorage.getItem(FB_URL_SK)||'';if(fbSaved)fbInp.value=fbSaved;}
