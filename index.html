@@ -1326,6 +1326,7 @@ const PLAYOFF_DATES={
 // ── STATE ─────────────────────────────────────────────────────────────
 const SK='an_v3';
 const FB_URL_SK='an_fb_url';
+const FB_URL_DEFAULT='https://atletico-norte-default-rtdb.firebaseio.com';
 
 // ── FIREBASE SYNC STATE ───────────────────────────────────────────────
 var _fbApp=null,_fbStateRef=null,_fbSocRef=null,_fbSuppressNext=false,_fbReady=false;
@@ -5049,13 +5050,13 @@ function _fbInit(url){
   }
 }
 
-// Auto-connect on load if URL is saved
+// Auto-connect on load — usa URL hardcodeada por defecto
 function _fbAutoConnect(){
-  var url=localStorage.getItem(FB_URL_SK)||'';
-  if(url){_fbInit(url);}
-  // Populate input field in admin panel when it opens
+  var url=localStorage.getItem(FB_URL_SK)||FB_URL_DEFAULT;
+  if(!localStorage.getItem(FB_URL_SK))localStorage.setItem(FB_URL_SK,FB_URL_DEFAULT);
+  _fbInit(url);
   var inp=document.getElementById('fb-url-input');
-  if(inp&&url)inp.value=url;
+  if(inp)inp.value=url;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
