@@ -884,7 +884,7 @@ select:focus{outline:none;border-color:var(--acc)}
 
 <!-- FIXTURE -->
 <section id="sec-fixture" class="sec">
-  <div class="sh"><h2>Fixture</h2><span class="tag blue" id="fix-tag">Fase 1 · 2 Vueltas</span></div>
+  <div class="sh"><h2>Fixture</h2><span class="tag blue" id="fix-tag">Fase 1 · 2 Vueltas</span><button id="fx-print-btn" class="print-btn" style="display:none;margin-left:auto" onclick="openFxPrintModal()">🖨️ Imprimir / PDF</button></div>
   <div class="fix-bar">
     <label>Fase</label>
     <select id="flt-fase" onchange="renderFixture()"><option value="f1">Fase 1</option><option value="f2">Fase 2</option></select>
@@ -1113,6 +1113,34 @@ select:focus{outline:none;border-color:var(--acc)}
     <div class="pin-pad" id="cnp-pad"></div>
     <div class="btn-row" style="margin-top:8px">
       <button class="btn btn-ghost" onclick="closeModal('mo-chcoord')">Cancelar</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL IMPRIMIR FIXTURE -->
+<div id="fx-print-mo" style="display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,5,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:linear-gradient(160deg,#080f1c 0%,#0d1a2e 100%);border:1px solid #1e3a5f;border-radius:22px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 24px 80px #000c">
+    <div style="background:linear-gradient(135deg,#0d1f3a,#0a1525);padding:18px 20px 14px;border-bottom:1px solid #1e3050;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#e8f4ff;letter-spacing:.5px">🖨️ Imprimir Fixture</div>
+        <div style="font-size:10px;color:#3a5070;margin-top:2px">Selecciona el tipo de reporte</div>
+      </div>
+      <button onclick="closeFxPrintModal()" style="background:none;border:none;color:#3a5070;font-size:20px;cursor:pointer;line-height:1;padding:4px">✕</button>
+    </div>
+    <div style="padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px">
+      <button onclick="closeFxPrintModal();printFixtureF1('general')" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#0a1f3a,#0d2a50);border:1px solid #1e4a7a;border-radius:14px;padding:14px 16px;cursor:pointer;text-align:left;width:100%;transition:all .15s" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#1e4a7a'">
+        <div style="width:42px;height:42px;background:#1e3a6a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📅</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#e8f4ff;margin-bottom:3px">Fixture General</div>
+          <div style="font-size:10px;color:#4a7aaa;line-height:1.4">Todos los partidos ordenados por fecha · 1 partido por fila</div>
+        </div>
+      </button>
+      <button onclick="closeFxPrintModal();printFixtureF1('team')" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#1a0a0a,#2a0d0d);border:1px solid #5a1a1a;border-radius:14px;padding:14px 16px;cursor:pointer;text-align:left;width:100%;transition:all .15s" onmouseover="this.style.borderColor='#c8000a'" onmouseout="this.style.borderColor='#5a1a1a'">
+        <div style="width:42px;height:42px;background:#3a1010;border-radius:10px;display:flex;align-items:center;justify-content:font-size:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px">⚽</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#e8f4ff;margin-bottom:3px">Fixture por Equipos</div>
+          <div style="font-size:10px;color:#8a4a4a;line-height:1.4">Una sección por equipo · 18 partidos por equipo con rival, horario y cancha</div>
+        </div>
+      </button>
     </div>
   </div>
 </div>
@@ -2482,6 +2510,7 @@ function enableCoordMode(){
   coordMode=true;
   const ov=document.getElementById('login-overlay');if(ov)ov.classList.add('hidden');
   const badge=document.getElementById('coord-badge');if(badge)badge.style.display='flex';
+  const fxpb=document.getElementById('fx-print-btn');if(fxpb)fxpb.style.display='flex';
   renderFixture();renderGoles();renderLlave();
   window.scrollTo(0,0);
   showToast('🎯 Coordinador activado');
@@ -2489,6 +2518,7 @@ function enableCoordMode(){
 function exitCoord(){
   coordMode=false;
   const badge=document.getElementById('coord-badge');if(badge)badge.style.display='none';
+  const fxpb=document.getElementById('fx-print-btn');if(fxpb&&!adminMode)fxpb.style.display='none';
   nav('inicio',null,false);
   checkAuth();
 }
@@ -4141,6 +4171,7 @@ function enableAdminMode(){
   adminMode=true;
   const ov=document.getElementById('login-overlay');if(ov)ov.classList.add('hidden');
   const badge=document.getElementById('admin-badge');if(badge)badge.style.display='flex';
+  const fxpb=document.getElementById('fx-print-btn');if(fxpb)fxpb.style.display='flex';
   const at=document.getElementById('tnav-admin');if(at)at.style.display='inline';
   // Navigate to admin section automatically
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
@@ -4154,6 +4185,7 @@ function enableAdminMode(){
 function exitAdmin(){
   adminMode=false;
   const badge=document.getElementById('admin-badge');if(badge)badge.style.display='none';
+  const fxpb=document.getElementById('fx-print-btn');if(fxpb&&!coordMode)fxpb.style.display='none';
   const at=document.getElementById('tnav-admin');if(at)at.style.display='none';
   nav('inicio',null,false);
   checkAuth();
@@ -4571,6 +4603,235 @@ function printReport(contentId, title){
   const el=document.getElementById(contentId);
   if(!el||!el.innerHTML.trim()){showToast('⚠️ Sección sin contenido');return;}
   _openRptWindow(title, el.innerHTML);
+}
+
+// ── FIXTURE PRINT ─────────────────────────────────────────────────────
+function openFxPrintModal(){
+  const mo=document.getElementById('fx-print-mo');
+  if(mo){mo.style.display='flex';}
+}
+function closeFxPrintModal(){
+  const mo=document.getElementById('fx-print-mo');
+  if(mo){mo.style.display='none';}
+}
+
+function printFixtureF1(mode){
+  const s=getS();
+  const FESTIVOS=['2026-07-13','2026-07-20','2026-08-17','2026-10-12'];
+
+  function teamC1(slot){const i=s.nm[slot];return i!=null?TEAMS[i].c1:'#1e3050';}
+  function teamC2(slot){const i=s.nm[slot];return i!=null?TEAMS[i].c2:'#ffffff';}
+
+  function diaStyle(dia,fecha){
+    if(FESTIVOS.includes(fecha))return{bg:'#fff3cd',color:'#7c5000',bdr:'#f0c040',label:'FEST'};
+    if(dia==='Sábado')return{bg:'#d4edda',color:'#155724',bdr:'#74c99a',label:'SÁB'};
+    if(dia==='Lunes')return{bg:'#cce5ff',color:'#004085',bdr:'#80b8ff',label:'LUN'};
+    if(dia==='Jueves')return{bg:'#e8d5f5',color:'#4a1a7c',bdr:'#b07ae0',label:'JUE'};
+    return{bg:'#f0f0f0',color:'#333',bdr:'#ccc',label:dia.substring(0,3).toUpperCase()};
+  }
+
+  // ── CSS adicional para reportes de fixture ────────────────────────
+  const FX_CSS=
+    '.fx-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-kpi{flex:1;min-width:60px;background:#f0f4ff;border:1px solid #dde8ff;border-radius:8px;padding:8px 10px;text-align:center}'
+    +'.fx-kpi-n{font-size:20px;font-weight:900;color:#0f1e35;line-height:1}'
+    +'.fx-kpi-l{font-size:8px;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}'
+    +'.fx-date-section{margin-bottom:12px;page-break-inside:avoid}'
+    +'.fx-date-hdr{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px 6px 0 0;border-left:4px solid;font-size:11px;font-weight:800;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-dia-badge{font-size:8px;font-weight:900;padding:2px 7px;border-radius:20px;letter-spacing:.06em;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-vu-badge{margin-left:auto;font-size:8px;font-weight:700;color:#666;background:#e8e8e8;padding:2px 8px;border-radius:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-tbl{width:100%;border-collapse:collapse;font-size:9px;border:1px solid #dde8ff;border-top:none}'
+    +'.fx-tbl thead th{background:#0f1e35;color:#fff;padding:5px 6px;font-size:7.5px;text-transform:uppercase;letter-spacing:.04em;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-tbl tbody tr:nth-child(even){background:#f8faff}'
+    +'.fx-tbl tbody tr.fx-played{background:#f0fdf4}'
+    +'.fx-tbl td{padding:4px 6px;border-bottom:1px solid #eee;vertical-align:middle}'
+    +'.fx-hora{font-size:10px;font-weight:700;color:#0f1e35;white-space:nowrap}'
+    +'.fx-badge{font-size:8px;font-weight:900;padding:2px 6px;border-radius:4px;text-align:center;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-logo{width:22px;padding:1px}'
+    +'.fx-logo svg,.fx-logo-sm svg{width:100%;height:100%;display:block}'
+    +'.fx-logo-sm{width:18px;height:20px;display:inline-block;vertical-align:middle}'
+    +'.fx-tname{font-size:9.5px;font-weight:600;color:#111;white-space:nowrap}'
+    +'.fx-tname.fx-right{text-align:right}'
+    +'.fx-score{text-align:center;font-size:11px;font-weight:900;color:#0f1e35;white-space:nowrap;padding:0 6px}'
+    +'.fx-dash{color:#aaa;margin:0 2px}'
+    +'.fx-cancha{font-size:8px;color:#666;white-space:nowrap}'
+    +'.fx-res{text-align:center;font-size:11px}'
+    // Team report styles
+    +'.fx-team-section{page-break-before:always}'
+    +'.fx-team-section:first-child{page-break-before:avoid}'
+    +'.fx-team-hdr{display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:12px;margin-bottom:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-team-logo{width:54px;height:62px;flex-shrink:0}'
+    +'.fx-team-logo svg{width:100%;height:100%}'
+    +'.fx-team-name{font-size:20px;font-weight:900;letter-spacing:.5px;line-height:1;margin-bottom:4px}'
+    +'.fx-team-sub{font-size:9px;opacity:.75;letter-spacing:.05em;margin-bottom:6px}'
+    +'.fx-team-stats{display:flex;gap:12px;font-size:9px;opacity:.85;flex-wrap:wrap}'
+    +'.fx-team-badge{font-size:18px;font-weight:900;padding:8px 14px;border-radius:10px;letter-spacing:1px;margin-left:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-team-tbl .fx-num{text-align:center;color:#888;font-size:9px;width:24px}'
+    +'.fx-team-tbl .fx-fecha{white-space:nowrap;font-size:9px}'
+    +'.fx-team-tbl .fx-cond{text-align:center}'
+    +'.fx-cond-badge{font-size:7.5px;font-weight:900;padding:2px 7px;border-radius:20px;letter-spacing:.06em;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-cond-l{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}'
+    +'.fx-cond-v{background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4}'
+    +'.fx-rival{white-space:nowrap}'
+    +'.fx-rival-inner{display:flex;align-items:center;gap:5px}'
+    +'.fx-rival-logo{width:18px;height:20px;flex-shrink:0}'
+    +'.fx-rival-logo svg{width:100%;height:100%}'
+    +'.fx-vu{text-align:center;font-size:9px;color:#666;font-weight:700}'
+    +'.fx-res-cell{text-align:center}'
+    +'.fx-result{font-size:10px;font-weight:900;padding:2px 8px;border-radius:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.fx-res-w{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}'
+    +'.fx-res-l{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}'
+    +'.fx-res-e{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}'
+    +'.fx-res-pend{background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0}'
+    +'.fx-team-footer{display:flex;gap:12px;flex-wrap:wrap;font-size:9px;color:#555;padding:8px 10px;background:#f8faff;border:1px solid #dde8ff;border-top:none;border-radius:0 0 6px 6px;margin-bottom:14px}'
+    +'.fx-tr td{padding:5px 6px;border-bottom:1px solid #eee}'
+    +'.fx-tr-alt td{background:#f8faff!important}'
+    +'@media print{.fx-date-section{page-break-inside:avoid}.fx-team-section{page-break-before:always}.fx-team-section:first-child{page-break-before:avoid}}';
+
+  if(mode==='general'){
+    const byDate={};
+    MF1.forEach(m=>{(byDate[m.fecha]=byDate[m.fecha]||[]).push(m);});
+    const dates=Object.keys(byDate).sort();
+    const done=Object.keys(s.r1).length;
+
+    let body='<style>'+FX_CSS+'</style>';
+
+    // Summary KPIs
+    body+='<div class="fx-summary">'
+      +'<div class="fx-kpi"><div class="fx-kpi-n">90</div><div class="fx-kpi-l">Partidos</div></div>'
+      +'<div class="fx-kpi"><div class="fx-kpi-n">'+dates.length+'</div><div class="fx-kpi-l">Fechas</div></div>'
+      +'<div class="fx-kpi"><div class="fx-kpi-n">10</div><div class="fx-kpi-l">Equipos</div></div>'
+      +'<div class="fx-kpi"><div class="fx-kpi-n">'+done+'</div><div class="fx-kpi-l">Jugados</div></div>'
+      +'<div class="fx-kpi"><div class="fx-kpi-n">'+(90-done)+'</div><div class="fx-kpi-l">Pendientes</div></div>'
+      +'</div>';
+
+    dates.forEach(function(fecha){
+      const gms=byDate[fecha].sort(function(a,b){return a.hora.localeCompare(b.hora);});
+      const dia=gms[0].dia;
+      const ds=diaStyle(dia,fecha);
+      const vuLabel=gms[0].vu===1?'1ª Vuelta':'2ª Vuelta';
+
+      body+='<div class="fx-date-section">';
+      body+='<div class="fx-date-hdr" style="background:'+ds.bg+';color:'+ds.color+';border-left-color:'+ds.bdr+'">'
+        +'<span class="fx-dia-badge" style="background:'+ds.color+';color:#fff">'+ds.label+'</span>'
+        +'<span style="font-size:12px;font-weight:800">'+fmtDFull(fecha,dia)+'</span>'
+        +'<span class="fx-vu-badge">'+vuLabel+'</span>'
+        +'</div>';
+
+      body+='<table class="fx-tbl"><thead><tr>'
+        +'<th>Hora</th><th></th><th></th><th>Local</th>'
+        +'<th style="text-align:center;padding:0 8px">Resultado</th>'
+        +'<th style="text-align:right">Visitante</th><th></th><th></th>'
+        +'<th>Cancha</th><th style="text-align:center">Estado</th>'
+        +'</tr></thead><tbody>';
+
+      gms.forEach(function(m){
+        const r=s.r1[m.id];
+        const gl=r!=null?r.gl:'–';
+        const gv=r!=null?r.gv:'–';
+        const c1L=teamC1(m.l),c2L=teamC2(m.l);
+        const c1V=teamC1(m.v),c2V=teamC2(m.v);
+        body+='<tr class="fx-tr'+(r?' fx-played':'')+'">'
+          +'<td class="fx-hora">'+m.hora+'</td>'
+          +'<td class="fx-logo" style="width:22px;height:25px">'+cSVG(m.l)+'</td>'
+          +'<td><span class="fx-badge" style="background:'+c1L+';color:'+c2L+'">'+tShort(m.l)+'</span></td>'
+          +'<td class="fx-tname">'+tName(m.l)+'</td>'
+          +'<td class="fx-score">'+gl+'<span class="fx-dash">–</span>'+gv+'</td>'
+          +'<td class="fx-tname fx-right">'+tName(m.v)+'</td>'
+          +'<td><span class="fx-badge" style="background:'+c1V+';color:'+c2V+'">'+tShort(m.v)+'</span></td>'
+          +'<td class="fx-logo" style="width:22px;height:25px">'+cSVG(m.v)+'</td>'
+          +'<td class="fx-cancha">'+m.cancha.replace('Villa Silvania','V.Silvania')+'</td>'
+          +'<td class="fx-res">'+(r?'✅':'⏳')+'</td>'
+          +'</tr>';
+      });
+      body+='</tbody></table></div>';
+    });
+
+    _openRptWindow('📅 Fixture General — Fase 1 · Liga Interna S2 2026', body);
+
+  } else { // mode === 'team'
+    let body='<style>'+FX_CSS+'</style>';
+
+    for(let slot=1;slot<=10;slot++){
+      const teamMs=MF1.filter(function(m){return m.l===slot||m.v===slot;})
+        .sort(function(a,b){return a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora);});
+      const tc1=teamC1(slot),tc2=teamC2(slot);
+      const playedCount=teamMs.filter(function(m){return s.r1[m.id]!=null;}).length;
+      const homeCount=teamMs.filter(function(m){return m.l===slot;}).length;
+      const awayCount=teamMs.filter(function(m){return m.v===slot;}).length;
+      const v1Count=teamMs.filter(function(m){return m.vu===1;}).length;
+      const v1Played=teamMs.filter(function(m){return m.vu===1&&s.r1[m.id];}).length;
+      const v2Count=teamMs.filter(function(m){return m.vu===2;}).length;
+      const v2Played=teamMs.filter(function(m){return m.vu===2&&s.r1[m.id];}).length;
+
+      body+='<div class="fx-team-section">';
+      // Team header card
+      body+='<div class="fx-team-hdr" style="background:linear-gradient(135deg,'+tc1+','+tc1+'cc);border:2px solid '+tc1+';color:'+tc2+'">'
+        +'<div class="fx-team-logo">'+cSVG(slot)+'</div>'
+        +'<div style="flex:1">'
+        +'<div class="fx-team-name">'+tName(slot)+'</div>'
+        +'<div class="fx-team-sub">FIXTURE INDIVIDUAL · LIGA INTERNA S2 2026</div>'
+        +'<div class="fx-team-stats">'
+        +'<span>18 partidos</span>'
+        +'<span>🏠 '+homeCount+' de local</span>'
+        +'<span>✈️ '+awayCount+' visitante</span>'
+        +'<span>✅ '+playedCount+' jugados</span>'
+        +'</div>'
+        +'</div>'
+        +'<div class="fx-team-badge" style="background:'+tc2+';color:'+tc1+';border:2px solid rgba(255,255,255,.3)">'+tShort(slot)+'</div>'
+        +'</div>';
+
+      // Matches table
+      body+='<table class="fx-tbl fx-team-tbl"><thead><tr>'
+        +'<th style="text-align:center">#</th>'
+        +'<th>Fecha</th>'
+        +'<th>Hora</th>'
+        +'<th style="text-align:center">Cond.</th>'
+        +'<th>Rival</th>'
+        +'<th>Cancha</th>'
+        +'<th style="text-align:center">Vu.</th>'
+        +'<th style="text-align:center">Resultado</th>'
+        +'</tr></thead><tbody>';
+
+      teamMs.forEach(function(m,mi){
+        const isLocal=m.l===slot;
+        const rival=isLocal?m.v:m.l;
+        const r=s.r1[m.id];
+        var res='—',resClass='fx-res-pend';
+        if(r){
+          const gf=isLocal?r.gl:r.gv;
+          const gc=isLocal?r.gv:r.gl;
+          res=gf+'–'+gc;
+          if(gf>gc)resClass='fx-res-w';
+          else if(gf<gc)resClass='fx-res-l';
+          else resClass='fx-res-e';
+        }
+        const ds=diaStyle(m.dia,m.fecha);
+        body+='<tr class="fx-tr'+(mi%2?' fx-tr-alt':'')+'">'
+          +'<td class="fx-num">'+( mi+1)+'</td>'
+          +'<td class="fx-fecha"><span class="fx-dia-badge" style="background:'+ds.bg+';color:'+ds.color+';border:1px solid '+ds.bdr+';margin-right:4px">'+ds.label+'</span>'
+          +fmtDShort(m.fecha,m.dia)+'</td>'
+          +'<td class="fx-hora">'+m.hora+'</td>'
+          +'<td class="fx-cond"><span class="fx-cond-badge '+(isLocal?'fx-cond-l':'fx-cond-v')+'">'+(isLocal?'LOCAL':'VISIT')+'</span></td>'
+          +'<td class="fx-rival"><div class="fx-rival-inner"><div class="fx-rival-logo">'+cSVG(rival)+'</div><span>'+tName(rival)+'</span></div></td>'
+          +'<td class="fx-cancha">'+m.cancha.replace('Villa Silvania','V.Silvania')+'</td>'
+          +'<td class="fx-vu">V'+m.vu+'</td>'
+          +'<td class="fx-res-cell"><span class="fx-result '+resClass+'">'+res+'</span></td>'
+          +'</tr>';
+      });
+
+      body+='</tbody></table>';
+      body+='<div class="fx-team-footer">'
+        +'<span>🏠 Local: '+homeCount+' partidos</span>'
+        +'<span>✈️ Visitante: '+awayCount+' partidos</span>'
+        +'<span>1ª Vuelta: '+v1Count+' partidos ('+v1Played+' jugados)</span>'
+        +'<span>2ª Vuelta: '+v2Count+' partidos ('+v2Played+' jugados)</span>'
+        +'</div>';
+      body+='</div>';
+    }
+
+    _openRptWindow('⚽ Fixture por Equipos — Fase 1 · Liga Interna S2 2026', body);
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
