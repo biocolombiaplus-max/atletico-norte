@@ -1343,9 +1343,16 @@ function getS(){
   try{
     var raw=JSON.parse(localStorage.getItem(SK));
     if(!raw)return dfS();
-    // Ensure nm is populated with defaults for any missing slot
     var def=dfS();
+    // Ensure every required field exists (Firebase may send partial data)
     if(!raw.nm||Object.keys(raw.nm).length===0)raw.nm=def.nm;
+    if(!raw.r1||typeof raw.r1!=='object')raw.r1=def.r1;
+    if(!raw.r2||typeof raw.r2!=='object')raw.r2=def.r2;
+    if(!raw.rqf||typeof raw.rqf!=='object')raw.rqf=def.rqf;
+    if(!raw.rsf||typeof raw.rsf!=='object')raw.rsf=def.rsf;
+    if(!raw.rf||typeof raw.rf!=='object')raw.rf=def.rf;
+    if(!raw.sc||typeof raw.sc!=='object')raw.sc=def.sc;
+    if(!raw.cal||typeof raw.cal!=='object')raw.cal=def.cal;
     return raw;
   }catch(e){return dfS();}
 }
@@ -5022,11 +5029,19 @@ function _fbInit(url){
       var data=snap.val();
       if(!data)return;
       var cur=JSON.parse(localStorage.getItem(SK)||'null')||dfS();
-      // Merge: preserve local PINs; use remote game data
+      var def=dfS();
+      // Preserve local PINs; use remote game data
       data.pin=cur.pin||'1234';
       data.coordPin=cur.coordPin||'0000';
-      // Ensure nm is populated
-      if(!data.nm||Object.keys(data.nm).length===0)data.nm=dfS().nm;
+      // Ensure every field exists before writing to localStorage
+      if(!data.nm||Object.keys(data.nm).length===0)data.nm=def.nm;
+      if(!data.r1||typeof data.r1!=='object')data.r1=def.r1;
+      if(!data.r2||typeof data.r2!=='object')data.r2=def.r2;
+      if(!data.rqf||typeof data.rqf!=='object')data.rqf=def.rqf;
+      if(!data.rsf||typeof data.rsf!=='object')data.rsf=def.rsf;
+      if(!data.rf||typeof data.rf!=='object')data.rf=def.rf;
+      if(!data.sc||typeof data.sc!=='object')data.sc=def.sc;
+      if(!data.cal||typeof data.cal!=='object')data.cal=def.cal;
       localStorage.setItem(SK,JSON.stringify(data));
       _fbUpdateLastSync();
       _fbRefreshAll();
