@@ -33,28 +33,36 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .pg.active{display:block}
 
 /* ── AD BANNER ── */
-.adb{background:linear-gradient(135deg,#040c1e 0%,#071428 40%,#0a1a35 70%,#040c1e 100%);border-bottom:1px solid rgba(245,159,11,.35);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
-.adb::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(200,16,46,.06),transparent 30%,transparent 70%,rgba(0,48,135,.08));pointer-events:none}
-/* Sponsor strip */
-.adsponsors{display:flex;align-items:stretch;gap:0;flex-shrink:0;border-bottom:1px solid rgba(245,159,11,.15)}
-.adsp{display:flex;align-items:center;gap:8px;padding:7px 14px;flex:1;position:relative;cursor:default}
-.adsp:first-child{border-right:1px solid rgba(245,159,11,.15)}
-.adsp-logo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.4)}
-.adsp-txt{display:flex;flex-direction:column;gap:1px;min-width:0}
-.adsp-name{font-size:11px;font-weight:900;color:#fff;letter-spacing:.3px;line-height:1.1}
-.adsp-tag{font-size:8.5px;color:rgba(255,255,255,.55);font-weight:600;letter-spacing:.2px;line-height:1.2}
-.adsp-badge{position:absolute;top:5px;right:8px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:2px 5px;border-radius:3px}
+.adb{background:linear-gradient(180deg,#08101f 0%,#050d1a 100%);border-bottom:1px solid rgba(255,255,255,.07);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
+/* Sponsor strip — side by side on desktop */
+.adsponsors{display:flex;align-items:center;justify-content:center;gap:0;flex-shrink:0;padding:10px 16px 9px}
+.adsp{display:flex;align-items:center;gap:11px;padding:0 20px;position:relative;cursor:default;flex:1;max-width:280px}
+.adsp:first-child{justify-content:flex-end;border-right:1px solid rgba(255,255,255,.07)}
+.adsp:last-child{justify-content:flex-start}
+.adsp-logo{flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.adsp-txt{display:flex;flex-direction:column;gap:2px}
+.adsp-name{font-size:13px;font-weight:900;color:#fff;letter-spacing:-.1px;line-height:1}
+.adsp-tag{font-size:9px;color:rgba(255,255,255,.45);font-weight:500;letter-spacing:.1px;line-height:1.2}
 /* Ticker */
-.adticker{overflow:hidden;position:relative;height:30px;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-.adtrack{display:flex;gap:48px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 32s linear infinite}
+.adticker{overflow:hidden;position:relative;height:26px;border-top:1px solid rgba(255,255,255,.05);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.adtrack{display:flex;gap:52px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 36s linear infinite}
 .adtrack:hover{animation-play-state:paused}
-.admsg{display:inline-flex;align-items:center;gap:7px;height:30px}
-.admsg .ic{font-size:14px}
-.admsg .tx{font-size:10.5px;font-weight:700;color:rgba(238,242,248,.85)}
-.admsg .hl{color:var(--gl);font-weight:900}
-.admsg .sep2{color:var(--bd);margin:0 3px}
+.admsg{display:inline-flex;align-items:center;gap:6px;height:26px}
+.admsg .ic{font-size:12px;opacity:.7}
+.admsg .tx{font-size:10px;font-weight:600;color:rgba(200,210,230,.7);letter-spacing:.1px}
+.admsg .hl{color:rgba(200,210,230,.95);font-weight:800}
 @keyframes adscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
+/* ── DESKTOP OVERRIDES ── */
+@media(min-width:600px){
+  .adb{flex-direction:column}
+  .adsponsors{padding:12px 32px 11px;gap:0}
+  .adsp{max-width:340px}
+  .adsp-name{font-size:15px!important}
+  .adsp-tag{font-size:10px}
+  .adticker{height:28px}
+  .admsg .tx{font-size:11px}
+}
 /* ── HEADER ── */
 .hdr{background:linear-gradient(160deg,#070f20 0%,#0c1d38 60%,#071228 100%);border-bottom:1px solid var(--bd);padding:10px 14px 10px;flex-shrink:0}
 .hi{display:flex;align-items:center;gap:12px}
@@ -367,27 +375,48 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- AD BANNER -->
 <div class="adb">
-  <!-- Sponsor logos -->
   <div class="adsponsors">
+    <!-- Comfaoriente -->
     <div class="adsp">
-      <div class="adsp-logo" style="background:linear-gradient(135deg,#002776,#003087)">
-        <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="16" fill="none" stroke="#ffd700" stroke-width="1.5"/><text x="18" y="14" text-anchor="middle" fill="#ffd700" font-size="5.5" font-weight="900" font-family="Arial">COMFA</text><text x="18" y="22" text-anchor="middle" fill="#fff" font-size="7" font-weight="900" font-family="Arial">ORIENTE</text></svg>
+      <div class="adsp-txt" style="text-align:right">
+        <div class="adsp-name" style="color:#e8c84a;font-size:14px;letter-spacing:-.3px">ComfaOriente</div>
+        <div class="adsp-tag">S&oacute;lo beneficios</div>
       </div>
-      <div class="adsp-txt">
-        <div class="adsp-name">Comfaoriente</div>
-        <div class="adsp-tag">Aliado del deporte Norte&shy;santandereano</div>
+      <div class="adsp-logo">
+        <!-- ComfaOriente logo: blue circle + gold star + figure -->
+        <svg viewBox="0 0 52 52" width="52" height="52">
+          <circle cx="26" cy="26" r="24" fill="#003087"/>
+          <circle cx="26" cy="26" r="24" fill="none" stroke="#e8c84a" stroke-width="1.5"/>
+          <!-- stylized figure in motion -->
+          <circle cx="26" cy="13" r="4" fill="#e8c84a"/>
+          <path d="M22 18 Q26 22 30 18 L33 30 Q28 27 26 32 Q24 27 19 30 Z" fill="#fff"/>
+          <path d="M19 30 L16 40" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M33 30 L36 40" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          <!-- gold star top right -->
+          <polygon points="40,8 41.5,12 46,12 42.5,14.5 44,18.5 40,16 36,18.5 37.5,14.5 34,12 38.5,12" fill="#e8c84a" opacity=".9"/>
+        </svg>
       </div>
-      <div class="adsp-badge" style="background:rgba(255,215,0,.15);color:#ffd700;border:1px solid rgba(255,215,0,.3)">PATROCINADOR</div>
     </div>
+    <!-- Comfanorte -->
     <div class="adsp">
-      <div class="adsp-logo" style="background:linear-gradient(135deg,#005a2b,#00843d)">
-        <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="16" fill="none" stroke="#fff" stroke-width="1.5"/><text x="18" y="14" text-anchor="middle" fill="#fff" font-size="5.5" font-weight="900" font-family="Arial">COMFA</text><text x="18" y="22" text-anchor="middle" fill="#fff" font-size="7" font-weight="900" font-family="Arial">NORTE</text></svg>
+      <div class="adsp-logo">
+        <!-- Comfanorte logo: 4 red dots in X pattern -->
+        <svg viewBox="0 0 52 52" width="52" height="52">
+          <rect width="52" height="52" rx="10" fill="#fff"/>
+          <!-- 4 circles in cross/X pattern -->
+          <circle cx="14" cy="14" r="8" fill="#c8102e"/>
+          <circle cx="38" cy="14" r="8" fill="#c8102e"/>
+          <circle cx="14" cy="38" r="8" fill="#c8102e"/>
+          <circle cx="38" cy="38" r="8" fill="#c8102e"/>
+          <!-- connecting lines (subtle) -->
+          <line x1="14" y1="14" x2="38" y2="38" stroke="#c8102e" stroke-width="3" opacity=".25"/>
+          <line x1="38" y1="14" x2="14" y2="38" stroke="#c8102e" stroke-width="3" opacity=".25"/>
+        </svg>
       </div>
       <div class="adsp-txt">
-        <div class="adsp-name">Comfanorte</div>
-        <div class="adsp-tag">Comprometida con el f&uacute;tbol local</div>
+        <div class="adsp-name" style="font-size:14px;letter-spacing:-.3px"><span style="color:#fff">Comfa</span><span style="color:#c8102e">norte</span><sup style="font-size:8px;color:rgba(255,255,255,.5)">®</sup></div>
+        <div class="adsp-tag">Donde queremos estar</div>
       </div>
-      <div class="adsp-badge" style="background:rgba(0,255,127,.1);color:#5dd99a;border:1px solid rgba(0,255,127,.2)">PATROCINADOR</div>
     </div>
   </div>
   <!-- Ticker -->
@@ -396,14 +425,14 @@ tbody td:nth-child(2){text-align:left}
       <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &nbsp;&middot;&nbsp; 135 partidos &middot; 10 equipos &middot; 3 vueltas</span></span>
       <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
       <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Playoffs mata-mata &nbsp;&middot;&nbsp; <span class="hl">El campe&oacute;n se corona en cancha</span></span></span>
-      <span class="admsg"><span class="ic">&#127381;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
+      <span class="admsg"><span class="ic">&#9829;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
       <span class="admsg"><span class="ic">&#128197;</span><span class="tx">Fixture optimizado &nbsp;&middot;&nbsp; S&aacute;bados distribuidos equitativamente</span></span>
       <span class="admsg"><span class="ic">&#127963;&#65039;</span><span class="tx"><span class="hl">Atl&eacute;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
       <!-- duplicate for seamless loop -->
       <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &nbsp;&middot;&nbsp; 135 partidos &middot; 10 equipos &middot; 3 vueltas</span></span>
       <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
       <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Playoffs mata-mata &nbsp;&middot;&nbsp; <span class="hl">El campe&oacute;n se corona en cancha</span></span></span>
-      <span class="admsg"><span class="ic">&#127381;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
+      <span class="admsg"><span class="ic">&#9829;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
       <span class="admsg"><span class="ic">&#128197;</span><span class="tx">Fixture optimizado &nbsp;&middot;&nbsp; S&aacute;bados distribuidos equitativamente</span></span>
       <span class="admsg"><span class="ic">&#127963;&#65039;</span><span class="tx"><span class="hl">Atl&eacute;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
     </div>
