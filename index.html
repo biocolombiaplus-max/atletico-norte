@@ -118,6 +118,51 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .admact .aico{font-size:18px;flex-shrink:0}
 .admact .atxt{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px}
 
+/* ── PRINT / PDF ── */
+@media print{
+  .app,.bnv,.hdr,.adb,.admpntabs,.pag,.pph,.no-print{display:none!important}
+  body,html{background:#fff!important;color:#000!important;font-size:11px}
+  #printArea{display:block!important;padding:0;margin:0}
+  .pr-header{text-align:center;padding:20px 0 14px;border-bottom:3px solid #c8102e;margin-bottom:18px}
+  .pr-header h1{font-size:22px;font-weight:900;color:#c8102e;letter-spacing:-.5px;margin-bottom:4px}
+  .pr-header p{font-size:10px;color:#555;letter-spacing:.5px}
+  .pr-section{margin-bottom:20px}
+  .pr-section h2{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#222;border-bottom:1px solid #ddd;padding-bottom:6px;margin-bottom:10px}
+  .pr-table{width:100%;border-collapse:collapse;font-size:10px}
+  .pr-table th{background:#c8102e!important;color:#fff!important;padding:6px 8px;text-align:left;font-weight:800;font-size:9px;text-transform:uppercase;letter-spacing:.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-table td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:middle}
+  .pr-table tr:nth-child(even) td{background:#f8f8f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-badge-fest{background:#fef3c7!important;color:#92400e!important;border-radius:4px;padding:1px 5px;font-weight:700;font-size:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-cancha-cov{background:#dbeafe!important;color:#1e40af!important;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-cancha-cnf{background:#d1fae5!important;color:#065f46!important;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-cancha-vls{background:#fef9c3!important;color:#713f12!important;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-vu{background:#ede9fe!important;color:#5b21b6!important;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-eq-row td:first-child{font-weight:900;color:#c8102e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-footer{text-align:center;font-size:8px;color:#999;margin-top:24px;padding-top:10px;border-top:1px solid #eee}
+  @page{margin:12mm 10mm;size:A4}
+}
+#printArea{display:none}
+/* Print modal */
+.prmo{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:none;align-items:flex-end;justify-content:center;z-index:300;padding:0}
+.prmo.op{display:flex}
+.prmd{background:var(--b2);border:1px solid var(--bd);border-top-left-radius:24px;border-top-right-radius:24px;width:100%;max-width:520px;overflow:hidden;max-height:92dvh;display:flex;flex-direction:column}
+.prmd-hd{background:linear-gradient(135deg,rgba(200,16,46,.15),rgba(14,165,233,.1));padding:20px 20px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;text-align:center}
+.prmd-hd h2{font-size:18px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px}
+.prmd-hd p{font-size:11px;color:var(--m)}
+.prmd-body{padding:16px 16px 20px;overflow-y:auto;flex:1}
+.propt{background:var(--cd);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent}
+.propt:active{transform:scale(.97);border-color:var(--ac)}
+.propt-ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.propt-txt h3{font-size:14px;font-weight:900;margin-bottom:3px}
+.propt-txt p{font-size:11px;color:var(--m);line-height:1.4}
+.prsel{border:2px solid var(--ac)!important;background:rgba(14,165,233,.06)!important}
+.prbtn{width:100%;background:linear-gradient(135deg,#c8102e,#8b0000);color:#fff;border:none;padding:15px;border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.3px;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
+.prbtn:active{transform:scale(.98)}
+.prbtn-sub{width:100%;background:transparent;border:1px solid var(--bd);color:var(--m);padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+/* Team filter for print */
+.pr-eq-sel{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.pr-eq-btn{background:var(--b3);border:1px solid var(--bd);border-radius:10px;padding:8px 4px;font-size:10px;font-weight:800;color:var(--m);cursor:pointer;text-align:center;transition:.15s;-webkit-appearance:none}
+.pr-eq-btn.sel{background:rgba(14,165,233,.15);border-color:var(--ac);color:var(--ac)}
 /* ── ADMIN PANEL PREMIUM (pg-panel) ── */
 .admpntabs{display:flex;gap:0;background:rgba(0,0,0,.4);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
 .admpntabs::-webkit-scrollbar{display:none}
@@ -462,7 +507,7 @@ tbody td:nth-child(2){text-align:left}
       <div class="admacts">
         <button class="admact" onclick="shPl()"><span class="aico">&#128176;</span><span class="atxt">Planilla Cobro</span></button>
         <button class="admact" onclick="shSo()"><span class="aico">&#128101;</span><span class="atxt">Gestionar Socios</span></button>
-        <button class="admact" onclick="shBdg()"><span class="aico">&#127960;&#65039;</span><span class="atxt">Escudos Equipos</span></button>
+        <button class="admact" onclick="showTab(\'panel\');setTimeout(function(){adNav(\'escudos\');},200)"><span class="aico">&#127960;&#65039;</span><span class="atxt">Escudos Equipos</span></button>
         <button class="admact" onclick="expC()"><span class="aico">&#128228;</span><span class="atxt">Exportar CSV</span></button>
       </div>
     </div>
@@ -547,6 +592,45 @@ tbody td:nth-child(2){text-align:left}
   <button class="ni" id="ni-goles" onclick="showTab('goles')"><span class="ico">&#9917;</span>Goles</button>
   <button class="ni" id="ni-llave" onclick="showTab('llave')"><span class="ico">&#127942;</span>Llave</button>
 </nav>
+</div>
+
+<!-- ══════════ PRINT AREA (hidden, shown on print) ══════════ -->
+<div id="printArea">
+  <div class="pr-header">
+    <h1>&#9917; Atl&#233;tico Norte F.C. &#183; Liga Interna S2 2026</h1>
+    <p id="prTitle">Fixture General &#183; 135 partidos &#183; 10 equipos &#183; 3 vueltas</p>
+  </div>
+  <div id="prContent"></div>
+  <div class="pr-footer">Generado el <span id="prDate"></span> &#183; fixture.cesarcreps.com &#183; Atl&#233;tico Norte F.C.</div>
+</div>
+
+<!-- ══════════ PRINT MODAL ══════════ -->
+<div class="prmo" id="mPrint">
+  <div class="prmd">
+    <div class="prmd-hd">
+      <h2>&#128438; Imprimir / Exportar PDF</h2>
+      <p>Elige qu&#233; deseas imprimir o guardar como PDF</p>
+    </div>
+    <div class="prmd-body">
+      <div class="propt" id="prOptFx" onclick="prSelectOpt('fx')">
+        <div class="propt-ico" style="background:rgba(14,165,233,.12)">&#128197;</div>
+        <div class="propt-txt"><h3>Fixture General</h3><p>Todos los 135 partidos ordenados por semana, fecha y hora</p></div>
+      </div>
+      <div class="propt" id="prOptEq" onclick="prSelectOpt('eq')">
+        <div class="propt-ico" style="background:rgba(139,92,246,.12)">&#127960;&#65039;</div>
+        <div class="propt-txt"><h3>Fixture por Equipo</h3><p>Todos los partidos de un equipo espec&#237;fico</p></div>
+      </div>
+      <div id="prEqSel" style="display:none">
+        <div class="pr-eq-sel" id="prEqBtns"></div>
+      </div>
+      <div class="propt" id="prOptQd" onclick="prSelectOpt('qd')">
+        <div class="propt-ico" style="background:rgba(16,185,129,.12)">&#128202;</div>
+        <div class="propt-txt"><h3>Tablas de Equidad</h3><p>Distribuci&#243;n de canchas, horarios, festivos y s&#225;bados por equipo</p></div>
+      </div>
+      <button class="prbtn" onclick="doPrint()">&#128438; Imprimir / Guardar PDF</button>
+      <button class="prbtn-sub" onclick="cM('mPrint')">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════ MODALS ══════════ -->
@@ -1007,6 +1091,7 @@ function adNav(tab){
   tabs.forEach(function(t,i){var names=['overview','equipos','fixture','equidad','stats'];t.classList.toggle('active',names[i]===tab);});
   if(tab==='overview') adShowOverview();
   else if(tab==='equipos') adShowEq();
+  else if(tab==='escudos'){adShowEq();shBdg();}
   else if(tab==='fixture') adShowFxAdm();
   else if(tab==='equidad') adShowEqd();
   else if(tab==='stats') adShowSt();
@@ -1023,6 +1108,7 @@ function adShowOverview(){
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'equipos\')"><span class="aico">&#127960;&#65039;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Equipos</div><div class="atxt">Editar y escudos</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="expC()"><span class="aico">&#128228;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Exportar</div><div class="atxt">CSV socios</div></div></button>';
   h+='</div>';
+  h+='<button onclick="openM(\'mPrint\')" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(14,165,233,.12));border:1px solid rgba(200,16,46,.3);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;-webkit-appearance:none"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#8b0000);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#128438;</div><div style="text-align:left"><div style="font-size:14px;font-weight:900;color:var(--t);letter-spacing:-.2px">Imprimir / PDF</div><div style="font-size:10px;color:var(--m);margin-top:2px">Fixture general &#183; Por equipo &#183; Tablas de equidad</div></div><div style="margin-left:auto;font-size:18px;color:var(--m)">&#8250;</div></button>';
   h+='<div id="pEx" style="margin-top:14px"></div>';
   h+='</div>';
   adCnt(h);
@@ -1036,12 +1122,23 @@ function adShowPl(){
 // ── EQUIPOS (admin) ──
 var EQ_LOADED={};
 function adShowEq(){
-  var h='<div class="eqgrd">';
+  var h='<div style="padding:10px 16px 6px;display:flex;align-items:center;justify-content:space-between">';
+  h+='<div style="font-size:10px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px">Equipos</div>';
+  h+='<button onclick="adNav(\'escudos\')" style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--ac);padding:6px 12px;border-radius:8px;font-size:10px;font-weight:800;cursor:pointer;-webkit-appearance:none">&#128247; Gestionar Escudos</button>';
+  h+='</div>';
+  h+='<div class="eqgrd">';
   for(var i=1;i<=10;i++){
     var col=TC[i]||'#c8102e';
+    var hasBdg=!!custBadges[i];
     h+='<div class="eqcard" id="eqcard'+i+'" onclick="adTogEq('+i+',this)">';
     h+='<div class="eqhd">';
+    // Badge with camera overlay for direct upload
+    h+='<label style="cursor:pointer;flex-shrink:0;position:relative;display:block;width:34px;height:41px" onclick="event.stopPropagation()">';
     h+='<div class="eqbdg">'+bdg(i,'')+'</div>';
+    h+='<div style="position:absolute;inset:0;background:rgba(0,0,0,.55);border-radius:4px;display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">&#128247;</div>';
+    if(hasBdg)h+='<div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;background:#10b981;border-radius:50%;border:2px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:7px">&#10003;</div>';
+    h+='<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)">';
+    h+='</label>';
     h+='<div style="flex:1"><div class="eqnm">'+tn(i)+'</div><div class="eqab">Equipo '+i+'</div></div>';
     h+='<span class="eqchv">&#8964;</span>';
     h+='</div>';
@@ -1744,6 +1841,119 @@ async function rmBdg(tid){
   if(!confirm("\u00bfEliminar el escudo de "+tn(tid)+"?"))return;
   if(fbR&&db)await db.ref("/teamBadges/"+tid).remove();
   delete custBadges[tid];shBdg();
+}
+
+// ── PRINT / PDF ──
+var prOpt='fx', prEqSel=0;
+function prSelectOpt(opt){
+  prOpt=opt;
+  ['fx','eq','qd'].forEach(function(o){
+    var el=document.getElementById('prOpt'+o.charAt(0).toUpperCase()+o.slice(1));
+    if(el)el.classList.toggle('prsel',o===opt);
+  });
+  var eqSel=document.getElementById('prEqSel');
+  if(eqSel) eqSel.style.display=opt==='eq'?'block':'none';
+  if(opt==='eq'){
+    var btns=document.getElementById('prEqBtns');
+    if(btns&&!btns.children.length){
+      var h='';
+      for(var i=1;i<=10;i++){
+        h+='<button class="pr-eq-btn'+(i===1?' sel':'')+'" data-eq="'+i+'" onclick="prPickEq('+i+',this)">E'+i+'<br><span style="font-size:8px;font-weight:600;display:block;margin-top:2px;opacity:.7">'+T[i].s+'</span></button>';
+      }
+      btns.innerHTML=h;
+      prEqSel=1;
+    }
+  }
+}
+function prPickEq(tid,el){
+  prEqSel=tid;
+  document.querySelectorAll('.pr-eq-btn').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+}
+function doPrint(){
+  document.getElementById('prDate').textContent=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  var content='', title='';
+  var dayOrd={Lunes:0,Jueves:1,Sabado:2};
+  var dayLabel={Lunes:'Lunes',Jueves:'Jueves',Sabado:'S\u00e1bado'};
+  var canchaClass={Comfanorte:'pr-cancha-cnf',Coveadse:'pr-cancha-cov','Villa Silvania':'pr-cancha-vls'};
+  function prTeamName(t){return T[t]?T[t].n:'E'+t;}
+  function prRow(m){
+    var festTag=m.festivo?'<span class=\'pr-badge-fest\'>Festivo</span> ':'';
+    var cc=canchaClass[m.cancha]||'';
+    return '<tr><td style=\'width:28px;color:#888;font-size:9px\'>'+m.id+'</td>'
+      +'<td>'+festTag+'<strong>'+dayLabel[m.dia]+'</strong></td>'
+      +'<td style=\'font-size:9px;color:#555\'>'+fmtDate(m.fecha)+'</td>'
+      +'<td><span class=\'pr-cancha-'+m.cancha.replace(/ /g,'-').toLowerCase()+'\' style=\'border-radius:4px;padding:1px 5px;font-weight:700;font-size:9px\'>'+m.hora+'</span></td>'
+      +'<td><span class=\''+cc+'\'>'+m.cancha+'</span></td>'
+      +'<td style=\'font-weight:800\'>'+prTeamName(m.equipo1||m.l)+' <span style=\'color:#999\'>vs</span> '+prTeamName(m.equipo2||m.v)+'</td>'
+      +'<td><span style=\'background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700\'>V'+m.vuelta+'</span></td>'
+      +'</tr>';
+  }
+  function fmtDate(d){if(!d)return '';var dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('es-CO',{day:\'2-digit\',month:\'short\'});}
+  var allMs=MF.slice().sort(function(a,b){return a.semana-b.semana||dayOrd[a.dia]-dayOrd[b.dia]||a.hora.localeCompare(b.hora);});
+  if(prOpt==='fx'){
+    title='Fixture General &#183; 135 partidos &#183; 10 equipos &#183; 3 vueltas';
+    var byWeek={};
+    allMs.forEach(function(m){if(!byWeek[m.semana])byWeek[m.semana]={};if(!byWeek[m.semana][m.dia])byWeek[m.semana][m.dia]=[];byWeek[m.semana][m.dia].push(m);});
+    Object.keys(byWeek).sort(function(a,b){return a-b;}).forEach(function(w){
+      var byDay=byWeek[w];
+      var firstM=Object.values(byDay)[0][0];
+      var isFest=firstM&&firstM.festivo!==undefined&&Object.values(byDay).flat().some(function(m){return m.festivo;});
+      content+='<div class=\'pr-section\'>';
+      content+='<h2>Semana '+w+(isFest?' &#127881; Festivo':'')+'</h2>';
+      content+='<table class=\'pr-table\'><thead><tr><th>#</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>';
+      ['Lunes','Jueves','Sabado'].forEach(function(day){
+        if(byDay[day])byDay[day].forEach(function(m){content+=prRow(m);});
+      });
+      content+='</tbody></table></div>';
+    });
+  } else if(prOpt==='eq'){
+    var tid=prEqSel||1;
+    var tms=allMs.filter(function(m){return m.equipo1===tid||m.equipo2===tid||m.l===tid||m.v===tid;});
+    title='Fixture de '+prTeamName(tid)+' &#183; '+tms.length+' partidos';
+    content+='<div class=\'pr-section\'>';
+    content+='<table class=\'pr-table pr-eq-row\'><thead><tr><th>#</th><th>Sem</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>';
+    tms.forEach(function(m){
+      var festTag=m.festivo?'<span class=\'pr-badge-fest\'>Fest</span> ':'';
+      var cc=canchaClass[m.cancha]||'';
+      var rival=((m.equipo1||m.l)===tid)?(m.equipo2||m.v):(m.equipo1||m.l);
+      var cond=((m.equipo1||m.l)===tid)?'<span style=\'color:#c8102e;font-weight:700\'>Local</span>':'<span style=\'color:#555\'>Visita</span>';
+      content+='<tr><td style=\'font-size:9px;color:#888\'>'+m.id+'</td><td style=\'font-weight:700\'>S'+m.semana+'</td><td>'+festTag+dayLabel[m.dia]+'</td><td style=\'font-size:9px;color:#555\'>'+fmtDate(m.fecha)+'</td><td><span style=\'font-weight:800\'>'+m.hora+'</span></td><td><span class=\''+cc+'\'>'+m.cancha+'</span></td><td><strong>'+prTeamName(tid)+'</strong> vs '+prTeamName(rival)+' ('+cond+')</td><td><span style=\'background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700\'>V'+m.vuelta+'</span></td></tr>';
+    });
+    content+='</tbody></table></div>';
+  } else {
+    title='Tablas de Equidad &#183; Liga Interna S2 2026';
+    var eq={};
+    for(var t=1;t<=10;t++)eq[t]={canchas:{Comfanorte:0,Coveadse:0,'Villa Silvania':0},horas:{},dias:{Lunes:0,Jueves:0,Sabado:0},fest:0,sat:0,total:0};
+    allMs.forEach(function(m){
+      [m.equipo1||m.l,m.equipo2||m.v].forEach(function(t){
+        if(!eq[t])return;
+        eq[t].canchas[m.cancha]=(eq[t].canchas[m.cancha]||0)+1;
+        eq[t].horas[m.hora]=(eq[t].horas[m.hora]||0)+1;
+        eq[t].dias[m.dia]=(eq[t].dias[m.dia]||0)+1;
+        if(m.festivo)eq[t].fest++;
+        if(m.dia==='Sabado')eq[t].sat++;
+        eq[t].total++;
+      });
+    });
+    var hrs=HOURS;
+    content+='<div class=\'pr-section\'><h2>&#127960;&#65039; Canchas por Equipo</h2>';
+    content+='<table class=\'pr-table\'><thead><tr><th>Equipo</th><th>Comfanorte</th><th>Coveadse</th><th>Villa Silvania</th><th>Total</th></tr></thead><tbody>';
+    for(var t=1;t<=10;t++){content+='<tr><td style=\'font-weight:800\'>'+prTeamName(t)+'</td><td style=\'text-align:center\'>'+eq[t].canchas.Comfanorte+'</td><td style=\'text-align:center\'>'+eq[t].canchas.Coveadse+'</td><td style=\'text-align:center\'>'+eq[t].canchas['Villa Silvania']+'</td><td style=\'text-align:center;font-weight:900\'>'+eq[t].total+'</td></tr>';}
+    content+='</tbody></table></div>';
+    content+='<div class=\'pr-section\'><h2>&#8986; Horarios por Equipo</h2>';
+    content+='<table class=\'pr-table\'><thead><tr><th>Equipo</th>'+hrs.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>';
+    for(var t=1;t<=10;t++){content+='<tr><td style=\'font-weight:800\'>'+prTeamName(t)+'</td>'+hrs.map(function(h){return '<td style=\'text-align:center\'>'+(eq[t].horas[h]||0)+'</td>';}).join('')+'</tr>';}
+    content+='</tbody></table></div>';
+    content+='<div class=\'pr-section\'><h2>&#127881; Festivos y S\u00e1bados por Equipo</h2>';
+    content+='<table class=\'pr-table\'><thead><tr><th>Equipo</th><th>Lunes Festivo</th><th>S\u00e1bados</th><th>Lunes Total</th><th>Jueves Total</th></tr></thead><tbody>';
+    for(var t=1;t<=10;t++){content+='<tr><td style=\'font-weight:800\'>'+prTeamName(t)+'</td><td style=\'text-align:center;font-weight:700;color:#92400e\'>'+eq[t].fest+'</td><td style=\'text-align:center\'>'+eq[t].sat+'</td><td style=\'text-align:center\'>'+eq[t].dias.Lunes+'</td><td style=\'text-align:center\'>'+eq[t].dias.Jueves+'</td></tr>';}
+    content+='</tbody></table></div>';
+  }
+  document.getElementById('prTitle').innerHTML=title;
+  document.getElementById('prContent').innerHTML=content;
+  cM('mPrint');
+  setTimeout(function(){window.print();},300);
 }
 
 // ── PLANILLA ──
