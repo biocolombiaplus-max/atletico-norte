@@ -1878,19 +1878,20 @@ function doPrint(){
   var canchaClass={Comfanorte:'pr-cancha-cnf',Coveadse:'pr-cancha-cov','Villa Silvania':'pr-cancha-vls'};
   function prTeamName(t){return T[t]?T[t].n:'E'+t;}
   function prRow(m){
-    var festTag=m.festivo?'<span class=\'pr-badge-fest\'>Festivo</span> ':'';
-    var cc=canchaClass[m.cancha]||'';
-    return '<tr><td style=\'width:28px;color:#888;font-size:9px\'>'+m.id+'</td>'
-      +'<td>'+festTag+'<strong>'+dayLabel[m.dia]+'</strong></td>'
-      +'<td style=\'font-size:9px;color:#555\'>'+fmtDate(m.fecha)+'</td>'
-      +'<td><span class=\'pr-cancha-'+m.cancha.replace(/ /g,'-').toLowerCase()+'\' style=\'border-radius:4px;padding:1px 5px;font-weight:700;font-size:9px\'>'+m.hora+'</span></td>'
-      +'<td><span class=\''+cc+'\'>'+m.cancha+'</span></td>'
-      +'<td style=\'font-weight:800\'>'+prTeamName(m.equipo1||m.l)+' <span style=\'color:#999\'>vs</span> '+prTeamName(m.equipo2||m.v)+'</td>'
-      +'<td><span style=\'background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700\'>V'+m.vuelta+'</span></td>'
-      +'</tr>';
+    var festTag=m.festivo?"<span class='pr-badge-fest'>Festivo</span> ":"";
+    var cc=canchaClass[m.cancha]||"";
+    return "<tr><td style='width:28px;color:#888;font-size:9px'>"+m.id+"</td>"
+      +"<td>"+festTag+"<strong>"+dayLabel[m.dia]+"</strong></td>"
+      +"<td style='font-size:9px;color:#555'>"+fmtDate(m.fecha)+"</td>"
+      +"<td><span class='pr-cancha-"+m.cancha.replace(/ /g,"-").toLowerCase()+"' style='border-radius:4px;padding:1px 5px;font-weight:700;font-size:9px'>"+m.hora+"</span></td>"
+      +"<td><span class='"+cc+"'>"+m.cancha+"</span></td>"
+      +"<td style='font-weight:800'>"+prTeamName(m.l)+" <span style='color:#999'>vs</span> "+prTeamName(m.v)+"</td>"
+      +"<td><span style='background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700'>V"+m.vu+"</span></td>"
+      +"</tr>";
   }
-  function fmtDate(d){if(!d)return '';var dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('es-CO',{day:\'2-digit\',month:\'short\'});}
-  var allMs=MF.slice().sort(function(a,b){return a.semana-b.semana||dayOrd[a.dia]-dayOrd[b.dia]||a.hora.localeCompare(b.hora);});
+  function fmtDate(d){if(!d)return '';var dt=new Date(d+"T12:00:00");return dt.toLocaleDateString("es-CO",{day:"2-digit",month:"short"});}
+  function getDia(fecha){var d=new Date(fecha+"T12:00:00");var w=d.getDay();return w===1?"Lunes":w===4?"Jueves":"Sabado";}
+  var allMs=MF.map(function(m){return Object.assign({},m,{semana:m.week,dia:getDia(m.fecha),equipo1:m.l,equipo2:m.v,vuelta:m.vu});}).sort(function(a,b){return a.semana-b.semana||dayOrd[a.dia]-dayOrd[b.dia]||a.hora.localeCompare(b.hora);});
   if(prOpt==='fx'){
     title='Fixture General &#183; 135 partidos &#183; 10 equipos &#183; 3 vueltas';
     var byWeek={};
@@ -1899,9 +1900,9 @@ function doPrint(){
       var byDay=byWeek[w];
       var firstM=Object.values(byDay)[0][0];
       var isFest=firstM&&firstM.festivo!==undefined&&Object.values(byDay).flat().some(function(m){return m.festivo;});
-      content+='<div class=\'pr-section\'>';
-      content+='<h2>Semana '+w+(isFest?' &#127881; Festivo':'')+'</h2>';
-      content+='<table class=\'pr-table\'><thead><tr><th>#</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>';
+      content+="<div class='pr-section'>";
+      content+="<h2>Semana "+w+(isFest?" &#127881; Festivo":"")+"</h2>";
+      content+="<table class='pr-table'><thead><tr><th>#</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>";
       ['Lunes','Jueves','Sabado'].forEach(function(day){
         if(byDay[day])byDay[day].forEach(function(m){content+=prRow(m);});
       });
@@ -1911,14 +1912,14 @@ function doPrint(){
     var tid=prEqSel||1;
     var tms=allMs.filter(function(m){return m.equipo1===tid||m.equipo2===tid||m.l===tid||m.v===tid;});
     title='Fixture de '+prTeamName(tid)+' &#183; '+tms.length+' partidos';
-    content+='<div class=\'pr-section\'>';
-    content+='<table class=\'pr-table pr-eq-row\'><thead><tr><th>#</th><th>Sem</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>';
+    content+="<div class='pr-section'>";
+    content+="<table class='pr-table pr-eq-row'><thead><tr><th>#</th><th>Sem</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>";
     tms.forEach(function(m){
-      var festTag=m.festivo?'<span class=\'pr-badge-fest\'>Fest</span> ':'';
-      var cc=canchaClass[m.cancha]||'';
-      var rival=((m.equipo1||m.l)===tid)?(m.equipo2||m.v):(m.equipo1||m.l);
-      var cond=((m.equipo1||m.l)===tid)?'<span style=\'color:#c8102e;font-weight:700\'>Local</span>':'<span style=\'color:#555\'>Visita</span>';
-      content+='<tr><td style=\'font-size:9px;color:#888\'>'+m.id+'</td><td style=\'font-weight:700\'>S'+m.semana+'</td><td>'+festTag+dayLabel[m.dia]+'</td><td style=\'font-size:9px;color:#555\'>'+fmtDate(m.fecha)+'</td><td><span style=\'font-weight:800\'>'+m.hora+'</span></td><td><span class=\''+cc+'\'>'+m.cancha+'</span></td><td><strong>'+prTeamName(tid)+'</strong> vs '+prTeamName(rival)+' ('+cond+')</td><td><span style=\'background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700\'>V'+m.vuelta+'</span></td></tr>';
+      var festTag=m.festivo?"<span class='pr-badge-fest'>Fest</span> ":"";
+      var cc=canchaClass[m.cancha]||"";
+      var rival=m.l===tid?m.v:m.l;
+      var cond=m.l===tid?"<span style='color:#c8102e;font-weight:700'>Local</span>":"<span style='color:#555'>Visita</span>";
+      content+="<tr><td style='font-size:9px;color:#888'>"+m.id+"</td><td style='font-weight:700'>S"+m.week+"</td><td>"+festTag+dayLabel[m.dia]+"</td><td style='font-size:9px;color:#555'>"+fmtDate(m.fecha)+"</td><td><span style='font-weight:800'>"+m.hora+"</span></td><td><span class='"+cc+"'>"+m.cancha+"</span></td><td><strong>"+prTeamName(tid)+"</strong> vs "+prTeamName(rival)+" ("+cond+")</td><td><span style='background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700'>V"+m.vu+"</span></td></tr>";
     });
     content+='</tbody></table></div>';
   } else {
@@ -1926,29 +1927,29 @@ function doPrint(){
     var eq={};
     for(var t=1;t<=10;t++)eq[t]={canchas:{Comfanorte:0,Coveadse:0,'Villa Silvania':0},horas:{},dias:{Lunes:0,Jueves:0,Sabado:0},fest:0,sat:0,total:0};
     allMs.forEach(function(m){
-      [m.equipo1||m.l,m.equipo2||m.v].forEach(function(t){
+      [m.l,m.v].forEach(function(t){
         if(!eq[t])return;
         eq[t].canchas[m.cancha]=(eq[t].canchas[m.cancha]||0)+1;
         eq[t].horas[m.hora]=(eq[t].horas[m.hora]||0)+1;
         eq[t].dias[m.dia]=(eq[t].dias[m.dia]||0)+1;
         if(m.festivo)eq[t].fest++;
-        if(m.dia==='Sabado')eq[t].sat++;
+        if(m.dia==="Sabado")eq[t].sat++;
         eq[t].total++;
       });
     });
     var hrs=HOURS;
-    content+='<div class=\'pr-section\'><h2>&#127960;&#65039; Canchas por Equipo</h2>';
-    content+='<table class=\'pr-table\'><thead><tr><th>Equipo</th><th>Comfanorte</th><th>Coveadse</th><th>Villa Silvania</th><th>Total</th></tr></thead><tbody>';
-    for(var t=1;t<=10;t++){content+='<tr><td style=\'font-weight:800\'>'+prTeamName(t)+'</td><td style=\'text-align:center\'>'+eq[t].canchas.Comfanorte+'</td><td style=\'text-align:center\'>'+eq[t].canchas.Coveadse+'</td><td style=\'text-align:center\'>'+eq[t].canchas['Villa Silvania']+'</td><td style=\'text-align:center;font-weight:900\'>'+eq[t].total+'</td></tr>';}
-    content+='</tbody></table></div>';
-    content+='<div class=\'pr-section\'><h2>&#8986; Horarios por Equipo</h2>';
-    content+='<table class=\'pr-table\'><thead><tr><th>Equipo</th>'+hrs.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>';
-    for(var t=1;t<=10;t++){content+='<tr><td style=\'font-weight:800\'>'+prTeamName(t)+'</td>'+hrs.map(function(h){return '<td style=\'text-align:center\'>'+(eq[t].horas[h]||0)+'</td>';}).join('')+'</tr>';}
-    content+='</tbody></table></div>';
-    content+='<div class=\'pr-section\'><h2>&#127881; Festivos y S\u00e1bados por Equipo</h2>';
-    content+='<table class=\'pr-table\'><thead><tr><th>Equipo</th><th>Lunes Festivo</th><th>S\u00e1bados</th><th>Lunes Total</th><th>Jueves Total</th></tr></thead><tbody>';
-    for(var t=1;t<=10;t++){content+='<tr><td style=\'font-weight:800\'>'+prTeamName(t)+'</td><td style=\'text-align:center;font-weight:700;color:#92400e\'>'+eq[t].fest+'</td><td style=\'text-align:center\'>'+eq[t].sat+'</td><td style=\'text-align:center\'>'+eq[t].dias.Lunes+'</td><td style=\'text-align:center\'>'+eq[t].dias.Jueves+'</td></tr>';}
-    content+='</tbody></table></div>';
+    content+="<div class='pr-section'><h2>&#127960;&#65039; Canchas por Equipo</h2>";
+    content+="<table class='pr-table'><thead><tr><th>Equipo</th><th>Comfanorte</th><th>Coveadse</th><th>Villa Silvania</th><th>Total</th></tr></thead><tbody>";
+    for(var t=1;t<=10;t++){content+="<tr><td style='font-weight:800'>"+prTeamName(t)+"</td><td style='text-align:center'>"+eq[t].canchas.Comfanorte+"</td><td style='text-align:center'>"+eq[t].canchas.Coveadse+"</td><td style='text-align:center'>"+eq[t].canchas["Villa Silvania"]+"</td><td style='text-align:center;font-weight:900'>"+eq[t].total+"</td></tr>";}
+    content+="</tbody></table></div>";
+    content+="<div class='pr-section'><h2>&#8986; Horarios por Equipo</h2>";
+    content+="<table class='pr-table'><thead><tr><th>Equipo</th>"+hrs.map(function(h){return "<th>"+h+"</th>";}).join("")+"</tr></thead><tbody>";
+    for(var t=1;t<=10;t++){content+="<tr><td style='font-weight:800'>"+prTeamName(t)+"</td>"+hrs.map(function(h){return "<td style='text-align:center'>"+(eq[t].horas[h]||0)+"</td>";}).join("")+"</tr>";}
+    content+="</tbody></table></div>";
+    content+="<div class='pr-section'><h2>&#127881; Festivos y S\u00e1bados por Equipo</h2>";
+    content+="<table class='pr-table'><thead><tr><th>Equipo</th><th>Lunes Festivo</th><th>S\u00e1bados</th><th>Lunes Total</th><th>Jueves Total</th></tr></thead><tbody>";
+    for(var t=1;t<=10;t++){content+="<tr><td style='font-weight:800'>"+prTeamName(t)+"</td><td style='text-align:center;font-weight:700;color:#92400e'>"+eq[t].fest+"</td><td style='text-align:center'>"+eq[t].sat+"</td><td style='text-align:center'>"+eq[t].dias.Lunes+"</td><td style='text-align:center'>"+eq[t].dias.Jueves+"</td></tr>";}
+    content+="</tbody></table></div>";
   }
   document.getElementById('prTitle').innerHTML=title;
   document.getElementById('prContent').innerHTML=content;
