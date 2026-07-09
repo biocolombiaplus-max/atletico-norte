@@ -1297,16 +1297,18 @@ function eqScoreBar(diff,label){
 function adShowEqd(){
   var TEAMS=[1,2,3,4,5,6,7,8,9,10];
   var eq={};
-  TEAMS.forEach(function(t){eq[t]={tot:0,loc:0,vis:0,fest:0,canchas:{},horas:{},vueltas:{1:0,2:0,3:0},semanas:{}};});
+  TEAMS.forEach(function(t){eq[t]={tot:0,loc:0,vis:0,fest:0,canchas:{},horas:{},vueltas:{1:0,2:0,3:0},semanas:{},dias:{lf:0,lr:0,ju:0,sa:0}};});
   RC.forEach(function(m){
     var l=m[4],v=m[5],vu=m[6],fest=m[7],wk=m[8];
     var cn=CANCHAS[m[3]],hr=HOURS[m[2]];
+    var dt=fest?'lf':hr==='06:00'?'sa':cn==='Villa Silvania'?'ju':'lr';
     [l,v].forEach(function(t){
       eq[t].tot++;
       eq[t].canchas[cn]=(eq[t].canchas[cn]||0)+1;
       eq[t].horas[hr]=(eq[t].horas[hr]||0)+1;
       eq[t].vueltas[vu]=(eq[t].vueltas[vu]||0)+1;
       eq[t].semanas[wk]=(eq[t].semanas[wk]||0)+1;
+      eq[t].dias[dt]++;
       if(fest)eq[t].fest++;
     });
     eq[l].loc++;eq[v].vis++;
@@ -1399,7 +1401,37 @@ function adShowEqd(){
   var maxHrDiff=Math.max.apply(null,hD.map(function(d){return d.diff;}));
   h+=eqScoreBar(maxHrDiff,'Equidad de Horarios');
 
-  // ── 4. EQUIDAD POR FESTIVOS ──
+  // ── 4. EQUIDAD POR DÍA ──
+  h+=eqSectionHd('&#128197;','Equidad por Día de Juego','Partidos por equipo según el tipo de día: Lunes Festivo, Lunes Regular, Jueves y Sábado');
+  var dayKeys=['lf','lr','ju','sa'];
+  var dayLabels=['Lun Festivo','Lun Regular','Jueves','S\u00e1bado'];
+  var dayColors=['#f59e0b','#60a5fa','#34d399','#a78bfa'];
+  var dayBgColors=['rgba(245,159,11,.08)','rgba(96,165,250,.08)','rgba(52,211,153,.08)','rgba(167,139,250,.08)'];
+  var dayBorders=['rgba(245,159,11,.25)','rgba(96,165,250,.25)','rgba(52,211,153,.25)','rgba(167,139,250,.25)'];
+  var daysD=dayKeys.map(function(dk){return colVals(function(t){return eq[t].dias[dk];});});
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 6px"><table style="width:100%;border-collapse:collapse;min-width:420px">';
+  h+='<thead><tr><th style="background:rgba(96,165,250,.08);color:#60a5fa;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 8px;text-align:left;border-bottom:1px solid rgba(96,165,250,.2)">Equipo</th>';
+  dayLabels.forEach(function(lbl,i){h+='<th style="background:'+dayBgColors[i]+';color:'+dayColors[i]+';font-size:8px;font-weight:900;letter-spacing:.5px;padding:8px 5px;text-align:center;border-bottom:1px solid '+dayBorders[i]+'">'+lbl+'</th>';});
+  h+='<th style="background:rgba(255,255,255,.04);color:var(--m);font-size:8px;font-weight:900;letter-spacing:.5px;padding:8px 5px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)">Total</th>';
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr>'+eqTeamCell(t);
+    dayKeys.forEach(function(dk,i){var v=eq[t].dias[dk];h+='<td '+eqCell(v,daysD[i].mn,daysD[i].mx,daysD[i].avg)+'>'+v+'</td>';});
+    h+='<td style="text-align:center;padding:7px 5px;font-size:10px;font-weight:900;color:var(--t)">'+eq[t].tot+'</td>';
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="padding:0 16px 8px;display:flex;flex-wrap:wrap;gap:8px">';
+  dayLabels.forEach(function(lbl,i){
+    var d=daysD[i];
+    h+='<span style="font-size:8.5px;color:'+dayColors[i]+';font-weight:700;background:'+dayBgColors[i]+';border:1px solid '+dayBorders[i]+';border-radius:5px;padding:3px 7px">'+lbl+': '+d.mn+'–'+d.mx+' (ideal '+(d.avg).toFixed(1)+')</span>';
+  });
+  h+='</div>';
+  h+=eqLegend();
+  var maxDayDiff=Math.max.apply(null,daysD.map(function(d){return d.diff;}));
+  h+=eqScoreBar(maxDayDiff,'Equidad por Día de Juego');
+
+  // ── 5bis. EQUIDAD POR FESTIVOS ──
   h+=eqSectionHd('&#127881;','Equidad en Festivos','Cuántos partidos festivos tiene cada equipo');
   var festTotal=RC.filter(function(m){return m[7];}).length;
   h+='<div style="margin:0 16px 10px;background:rgba(245,159,11,.06);border:1px solid rgba(245,159,11,.18);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;color:var(--gl);font-weight:800;margin-bottom:10px">Total partidos en festivos: '+festTotal+' &nbsp;|&nbsp; Ideal por equipo: '+Math.round(festTotal*2/10)+' (aprox.)</div>';
