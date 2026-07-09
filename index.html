@@ -146,6 +146,29 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .eqemp{padding:14px 12px;font-size:10px;color:var(--m);text-align:center;font-style:italic}
 .eqchv{font-size:10px;color:var(--m);transition:.3s}
 .eqcard.open .eqchv{transform:rotate(180deg)}
+/* Team editor */
+.eqed{padding:16px}
+.eqed-hd{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.eqed-back{background:none;border:none;color:var(--gl);font-size:13px;font-weight:800;cursor:pointer;padding:6px 10px 6px 0;-webkit-appearance:none}
+.eqed-ttl{font-size:14px;font-weight:900;color:var(--t)}
+.eqed-hero{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px}
+.eqed-bdg-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+.eqed-bdg{width:72px;height:86px;border-radius:10px;overflow:hidden;background:var(--b3);display:flex;align-items:center;justify-content:center;border:2px solid var(--bd);position:relative}
+.eqed-bdg img{width:100%;height:100%;object-fit:contain}
+.eqed-bdg-ovl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);text-align:center;padding:4px;font-size:9px;font-weight:700;color:#fff}
+.eqed-bdg-btn{font-size:10px;font-weight:800;color:var(--ac);background:rgba(245,159,11,.1);border:1px solid rgba(245,159,11,.25);border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;-webkit-appearance:none}
+.eqed-info{flex:1;min-width:0}
+.eqed-tag{font-size:8.5px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.eqed-nm{font-size:18px;font-weight:900;color:var(--t);margin-bottom:2px}
+.eqed-sub{font-size:10px;color:var(--m)}
+.eqed-field{margin-bottom:14px}
+.eqed-lbl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;color:var(--m);margin-bottom:6px}
+.eqed-inp{width:100%;background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:11px 13px;border-radius:10px;font-size:13px;font-weight:600;box-sizing:border-box;-webkit-appearance:none}
+.eqed-inp:focus{outline:none;border-color:var(--ac)}
+.eqed-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.eqed-save{width:100%;background:var(--ac);color:#fff;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;margin-top:6px;letter-spacing:.3px;-webkit-appearance:none}
+.eqed-del{width:100%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:11px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;margin-top:8px;-webkit-appearance:none}
+.eqed-sec{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--m);padding:14px 0 8px;border-top:1px solid var(--bd);margin-top:4px}
 /* Admin fixture */
 .admfxwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:14px 0}
 .admfxtbl{width:100%;border-collapse:collapse;font-size:10px;min-width:520px}
@@ -637,7 +660,7 @@ const FB={
 };
 
 let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null,cfe=0;
-let sortPos=null,sortAssign={},custBadges={},DLG_CACHE=[];
+let sortPos=null,sortAssign={},custBadges={},DLG_CACHE=[],teamInfo={};
 
 window.addEventListener("load",function(){
   try{
@@ -656,10 +679,8 @@ window.addEventListener("load",function(){
       var d=s.val();
       rDlg(d?Object.values(d):DLG_DEF);
     });
-    db.ref("/teamBadges").on("value",function(s){
-      custBadges=s.val()||{};
-      // Re-render any open view
-    });
+    db.ref("/teamBadges").on("value",function(s){custBadges=s.val()||{};});
+    db.ref("/equipos").on("value",function(s){teamInfo=s.val()||{};});
   }catch(e){
     console.warn("Firebase:",e.message);
     rFx();rTb();rDlg(DLG_DEF);
@@ -999,7 +1020,7 @@ function adShowOverview(){
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(245,159,11,.2);background:rgba(245,159,11,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'planilla\')"><span class="aico">&#128176;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Planilla</div><div class="atxt">Cobros socios</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(14,165,233,.2);background:rgba(14,165,233,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shSo()"><span class="aico">&#128101;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios</div><div class="atxt">Gestionar roles</div></div></button>';
-  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shBdg()"><span class="aico">&#127960;&#65039;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Escudos</div><div class="atxt">Subir im\u00e1genes</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'equipos\')"><span class="aico">&#127960;&#65039;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Equipos</div><div class="atxt">Editar y escudos</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="expC()"><span class="aico">&#128228;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Exportar</div><div class="atxt">CSV socios</div></div></button>';
   h+='</div>';
   h+='<div id="pEx" style="margin-top:14px"></div>';
@@ -1070,9 +1091,21 @@ function adTogEq(tid,card){
   if(!pl)return;
   if(pl.classList.toggle('open')){
     var jug=EQ_LOADED[tid]||[];
-    if(!jug.length){pl.innerHTML='<div class="eqemp">Sin jugadores asignados</div>';return;}
+    var info=teamInfo[tid]||{};
+    var dlgHtml='';
+    if(info.delegado||info.tel){
+      dlgHtml='<div style="display:flex;align-items:center;gap:8px;padding:9px 12px 2px;border-bottom:1px solid rgba(255,255,255,.05)">';
+      dlgHtml+='<span style="font-size:15px">&#128100;</span>';
+      dlgHtml+='<div><div style="font-size:10px;font-weight:800;color:var(--t)">'+(info.delegado||'Sin delegado')+'</div>';
+      if(info.tel)dlgHtml+='<div style="font-size:9px;color:var(--m)">&#128222; '+(info.tel)+'</div>';
+      dlgHtml+='</div>';
+      if(info.color)dlgHtml+='<div style="width:12px;height:12px;border-radius:50%;background:'+(info.color||'#888')+';margin-left:auto;flex-shrink:0"></div>';
+      dlgHtml+='</div>';
+    }
+    var editBtn='<div style="padding:8px 12px"><button onclick="editEq('+tid+')" style="width:100%;background:rgba(245,159,11,.1);border:1px solid rgba(245,159,11,.2);color:var(--gl);padding:8px;border-radius:9px;font-size:10px;font-weight:800;cursor:pointer">&#9998; Editar equipo</button></div>';
+    if(!jug.length){pl.innerHTML=dlgHtml+editBtn+'<div class="eqemp">Sin jugadores asignados</div>';return;}
     var sorted=jug.slice().sort(function(a,b){return(parseInt(a.num)||99)-(parseInt(b.num)||99);});
-    var h='';
+    var h=dlgHtml+editBtn;
     sorted.forEach(function(sc){
       h+='<div class="eqpli">';
       h+='<div class="eqnum">'+(sc.num||'?')+'</div>';
@@ -1082,6 +1115,94 @@ function adTogEq(tid,card){
     });
     pl.innerHTML=h;
   }
+}
+
+// ── EDITOR DE EQUIPO ──
+function editEq(tid){
+  var info=teamInfo[tid]||{};
+  var hasBdg=!!custBadges[tid];
+  var h='<div class="eqed">';
+  // Header con back
+  h+='<div class="eqed-hd"><button class="eqed-back" onclick="adNav('equipos')">&#8592; Equipos</button></div>';
+  // Hero: escudo + nombre
+  h+='<div class="eqed-hero">';
+  h+='<div class="eqed-bdg-wrap">';
+  h+='<label style="cursor:pointer">';
+  h+='<div class="eqed-bdg" id="eedBdgPrv">';
+  if(hasBdg) h+='<img src="'+custBadges[tid]+'" id="eedBdgImg"/>';
+  else h+=bdg(tid,'')+'<div id="eedBdgImg" style="display:none"></div>';
+  h+='<div class="eqed-bdg-ovl">&#128247; cambiar</div>';
+  h+='</div>';
+  h+='<input type="file" accept="image/*" style="display:none" onchange="eedUpBdg(event,'+tid+')">';
+  h+='</label>';
+  if(hasBdg) h+='<button class="eqed-bdg-btn" onclick="eedRmBdg('+tid+')">&#128465; Quitar</button>';
+  h+='</div>';
+  h+='<div class="eqed-info">';
+  h+='<div class="eqed-tag">Equipo '+tid+'</div>';
+  h+='<div class="eqed-nm">'+tn(tid)+'</div>';
+  h+='<div class="eqed-sub">'+(EQ_LOADED[tid]||[]).length+' jugadores registrados</div>';
+  h+='</div></div>';
+  // Campos
+  h+='<div class="eqed-sec">&#128100; Delegado</div>';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Nombre del delegado</div><input class="eqed-inp" id="eedDlg" placeholder="Nombre completo" value="'+(info.delegado||'')+'"></div>';
+  h+='<div class="eqed-row">';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Tel&#233;fono</div><input class="eqed-inp" id="eedTel" type="tel" placeholder="300 000 0000" value="'+(info.tel||'')+'"></div>';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Cargo</div><input class="eqed-inp" id="eedCargo" placeholder="Delegado" value="'+(info.cargo||'Delegado')+'"></div>';
+  h+='</div>';
+  h+='<div class="eqed-sec">&#127960;&#65039; Identidad</div>';
+  h+='<div class="eqed-row">';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Nombre corto</div><input class="eqed-inp" id="eedAlias" placeholder="Ej: Dep. Norte" value="'+(info.alias||'')+'"></div>';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Color uniforme</div><input class="eqed-inp" id="eedColor" type="color" style="padding:4px;height:42px" value="'+(info.color||TC[tid]||'#c8102e')+'"></div>';
+  h+='</div>';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Estadio / Sede</div><input class="eqed-inp" id="eedSede" placeholder="Cancha o sede del equipo" value="'+(info.sede||'')+'"></div>';
+  h+='<div class="eqed-field"><div class="eqed-lbl">Nota interna (opcional)</div><input class="eqed-inp" id="eedNota" placeholder="Observaciones del equipo" value="'+(info.nota||'')+'"></div>';
+  // Guardar
+  h+='<button class="eqed-save" onclick="eedSave('+tid+')">&#9989; Guardar cambios</button>';
+  h+='</div>';
+  adCnt(h);
+}
+
+async function eedSave(tid){
+  var data={
+    delegado:document.getElementById('eedDlg').value.trim(),
+    tel:document.getElementById('eedTel').value.trim(),
+    cargo:document.getElementById('eedCargo').value.trim()||'Delegado',
+    alias:document.getElementById('eedAlias').value.trim(),
+    color:document.getElementById('eedColor').value,
+    sede:document.getElementById('eedSede').value.trim(),
+    nota:document.getElementById('eedNota').value.trim(),
+    updatedAt:Date.now()
+  };
+  if(fbR&&db) await db.ref('/equipos/'+tid).set(data);
+  teamInfo[tid]=data;
+  var t=document.createElement('div');
+  t.textContent='\u2705 '+tn(tid)+' guardado';
+  t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+  document.body.appendChild(t);setTimeout(function(){t.remove();},2800);
+  adNav('equipos');
+}
+
+async function eedUpBdg(e,tid){
+  var f=e.target.files[0];if(!f)return;
+  var rd=new FileReader();rd.onload=function(ev){
+    var img=new Image();img.onload=async function(){
+      var mx=300,sc=Math.min(mx/img.width,mx/img.height,1);
+      var cv=document.createElement('canvas');cv.width=img.width*sc;cv.height=img.height*sc;
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      var comp=cv.toDataURL('image/jpeg',.85);
+      if(fbR&&db)await db.ref('/teamBadges/'+tid).set(comp);
+      custBadges[tid]=comp;
+      // Update preview in editor
+      var prv=document.getElementById('eedBdgPrv');
+      if(prv){prv.innerHTML='<img src="'+comp+'" style="width:100%;height:100%;object-fit:contain"><div class="eqed-bdg-ovl">&#128247; cambiar</div>';}
+    };img.src=ev.target.result;
+  };rd.readAsDataURL(f);
+}
+
+async function eedRmBdg(tid){
+  if(!confirm('\u00bfQuitar el escudo de '+tn(tid)+'?'))return;
+  if(fbR&&db)await db.ref('/teamBadges/'+tid).remove();
+  delete custBadges[tid];editEq(tid);
 }
 
 // ── FIXTURE ADMIN VIEW ──
