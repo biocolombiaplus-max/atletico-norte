@@ -34,23 +34,14 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 
 /* ── AD BANNER ── */
 .adb{background:linear-gradient(180deg,#08101f 0%,#050d1a 100%);border-bottom:1px solid rgba(255,255,255,.07);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
-/* Sponsor strip — side by side on desktop */
-.adsponsors{display:flex;align-items:center;justify-content:center;gap:0;flex-shrink:0;padding:10px 16px 9px}
-.adsp{display:flex;align-items:center;gap:11px;padding:0 20px;position:relative;cursor:default;flex:1;max-width:280px}
-.adsp:first-child{justify-content:flex-end;border-right:1px solid rgba(255,255,255,.07)}
-.adsp:last-child{justify-content:flex-start}
-.adsp-logo{flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.adsp-txt{display:flex;flex-direction:column;gap:2px}
-.adsp-name{font-size:13px;font-weight:900;color:#fff;letter-spacing:-.1px;line-height:1}
-.adsp-tag{font-size:9px;color:rgba(255,255,255,.45);font-weight:500;letter-spacing:.1px;line-height:1.2}
 /* Ticker */
-.adticker{overflow:hidden;position:relative;height:26px;border-top:1px solid rgba(255,255,255,.05);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.adtrack{display:flex;gap:52px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 36s linear infinite}
+.adticker{overflow:hidden;position:relative;height:32px;mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.adtrack{display:flex;gap:56px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 36s linear infinite}
 .adtrack:hover{animation-play-state:paused}
-.admsg{display:inline-flex;align-items:center;gap:6px;height:26px}
-.admsg .ic{font-size:12px;opacity:.7}
-.admsg .tx{font-size:10px;font-weight:600;color:rgba(200,210,230,.7);letter-spacing:.1px}
-.admsg .hl{color:rgba(200,210,230,.95);font-weight:800}
+.admsg{display:inline-flex;align-items:center;gap:7px;height:32px}
+.admsg .ic{font-size:13px;opacity:.75}
+.admsg .tx{font-size:11px;font-weight:600;color:rgba(200,215,235,.75);letter-spacing:.1px}
+.admsg .hl{color:rgba(220,232,250,.95);font-weight:800}
 @keyframes adscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ── DESKTOP OVERRIDES ── */
@@ -375,50 +366,6 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- AD BANNER -->
 <div class="adb">
-  <div class="adsponsors">
-    <!-- Comfaoriente -->
-    <div class="adsp">
-      <div class="adsp-txt" style="text-align:right">
-        <div class="adsp-name" style="color:#e8c84a;font-size:14px;letter-spacing:-.3px">ComfaOriente</div>
-        <div class="adsp-tag">S&oacute;lo beneficios</div>
-      </div>
-      <div class="adsp-logo">
-        <!-- ComfaOriente logo: blue circle + gold star + figure -->
-        <svg viewBox="0 0 52 52" width="52" height="52">
-          <circle cx="26" cy="26" r="24" fill="#003087"/>
-          <circle cx="26" cy="26" r="24" fill="none" stroke="#e8c84a" stroke-width="1.5"/>
-          <!-- stylized figure in motion -->
-          <circle cx="26" cy="13" r="4" fill="#e8c84a"/>
-          <path d="M22 18 Q26 22 30 18 L33 30 Q28 27 26 32 Q24 27 19 30 Z" fill="#fff"/>
-          <path d="M19 30 L16 40" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M33 30 L36 40" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-          <!-- gold star top right -->
-          <polygon points="40,8 41.5,12 46,12 42.5,14.5 44,18.5 40,16 36,18.5 37.5,14.5 34,12 38.5,12" fill="#e8c84a" opacity=".9"/>
-        </svg>
-      </div>
-    </div>
-    <!-- Comfanorte -->
-    <div class="adsp">
-      <div class="adsp-logo">
-        <!-- Comfanorte logo: 4 red dots in X pattern -->
-        <svg viewBox="0 0 52 52" width="52" height="52">
-          <rect width="52" height="52" rx="10" fill="#fff"/>
-          <!-- 4 circles in cross/X pattern -->
-          <circle cx="14" cy="14" r="8" fill="#c8102e"/>
-          <circle cx="38" cy="14" r="8" fill="#c8102e"/>
-          <circle cx="14" cy="38" r="8" fill="#c8102e"/>
-          <circle cx="38" cy="38" r="8" fill="#c8102e"/>
-          <!-- connecting lines (subtle) -->
-          <line x1="14" y1="14" x2="38" y2="38" stroke="#c8102e" stroke-width="3" opacity=".25"/>
-          <line x1="38" y1="14" x2="14" y2="38" stroke="#c8102e" stroke-width="3" opacity=".25"/>
-        </svg>
-      </div>
-      <div class="adsp-txt">
-        <div class="adsp-name" style="font-size:14px;letter-spacing:-.3px"><span style="color:#fff">Comfa</span><span style="color:#c8102e">norte</span><sup style="font-size:8px;color:rgba(255,255,255,.5)">®</sup></div>
-        <div class="adsp-tag">Donde queremos estar</div>
-      </div>
-    </div>
-  </div>
   <!-- Ticker -->
   <div class="adticker">
     <div class="adtrack" id="adTrack">
