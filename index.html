@@ -485,6 +485,8 @@ tbody td:nth-child(2){text-align:left}
     <div class="stl" style="margin-top:14px">&#127942; Playoffs <span>Mata-mata</span></div>
     <div class="brkw" id="brc"></div>
   </div>
+  <!-- Equidad pública -->
+  <div id="pubEqd"></div>
 </div>
 
 <!-- ═══ GOLES ═══ -->
@@ -686,7 +688,7 @@ function showTab(t){
   var ni=document.getElementById("ni-"+t);if(ni)ni.classList.add("active");
   if(t==="panel")rPn();
   if(t==="fixture")rFx();
-  if(t==="tabla")rTb();
+  if(t==="tabla"){rTb();rEqd();}
 }
 
 // ── HEADER ──
@@ -1126,6 +1128,114 @@ function adShowFxAdm(){
     h+='</div>';
   });
   adCnt(h);
+}
+
+// ── EQUIDAD PÚBLICA (visible sin login) ──
+function rEqd(){
+  var el=document.getElementById('pubEqd');if(!el)return;
+  // Build equity data from compiled fixture
+  var TEAMS=[1,2,3,4,5,6,7,8,9,10];
+  var eq={};
+  TEAMS.forEach(function(t){eq[t]={tot:0,loc:0,vis:0,fest:0,canchas:{},horas:{},vueltas:{1:0,2:0,3:0},semanas:{}};});
+  RC.forEach(function(m){
+    var l=m[4],v=m[5],vu=m[6],fest=m[7],wk=m[8];
+    var cn=CANCHAS[m[3]],hr=HOURS[m[2]];
+    [l,v].forEach(function(t){
+      eq[t].tot++;eq[t].canchas[cn]=(eq[t].canchas[cn]||0)+1;
+      eq[t].horas[hr]=(eq[t].horas[hr]||0)+1;
+      eq[t].vueltas[vu]=(eq[t].vueltas[vu]||0)+1;
+      eq[t].semanas[wk]=(eq[t].semanas[wk]||0)+1;
+      if(fest)eq[t].fest++;
+    });
+    eq[l].loc++;eq[v].vis++;
+  });
+  function colV(fn){var vs=TEAMS.map(fn);var mn=Math.min.apply(null,vs),mx=Math.max.apply(null,vs),avg=vs.reduce(function(a,b){return a+b;},0)/vs.length;return{vs:vs,mn:mn,mx:mx,avg:avg,diff:mx-mn};}
+
+  var h='<div class="stl" style="margin-top:4px">&#128200; Equidad del Fixture <span>S2 2026</span></div>';
+
+  // Regla LJ
+  var viols=chkReglaLJ();
+  h+='<div style="margin:0 16px 10px;padding:12px 14px;border-radius:10px;border:1px solid '+(viols.length?'rgba(200,16,46,.3)':'rgba(16,185,129,.25)')+';background:'+(viols.length?'rgba(200,16,46,.07)':'rgba(16,185,129,.08)')+';">';
+  if(viols.length===0){
+    h+='<div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">&#9989;</span><div><div style="font-size:11px;font-weight:900;color:#34d399">Regla Lunes+Jueves: Sin violaciones</div><div style="font-size:9px;color:var(--m);margin-top:2px">Todos los equipos cumplen en las 19 semanas</div></div></div>';
+  } else {
+    h+='<div style="font-size:10px;font-weight:900;color:#f87171">&#128308; '+viols.length+' violaciones detectadas — Regla Lunes+Jueves</div>';
+    viols.slice(0,3).forEach(function(v){h+='<div style="font-size:9px;color:var(--m);margin-top:4px">Sem '+v.wk+': '+tn(v.team)+' — '+v.lunFecha+' (Lun) y '+v.jueFecha+' (Jue)</div>';});
+  }
+  h+='</div>';
+
+  // General equity table
+  var totD=colV(function(t){return eq[t].tot;});
+  var locD=colV(function(t){return eq[t].loc;});
+  var visD=colV(function(t){return eq[t].vis;});
+  var festD=colV(function(t){return eq[t].fest;});
+  function eqC(v,mn,mx){var s='text-align:center;padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;font-weight:800;';if(v===mx)s+='color:#34d399;background:rgba(16,185,129,.08)';else if(v===mn)s+='color:#f87171;background:rgba(200,16,46,.07)';else s+='color:var(--t)';return 'style="'+s+'"';}
+  h+='<div style="margin:0 16px 6px;font-size:9px;font-weight:900;color:var(--gl);text-transform:uppercase;letter-spacing:.7px">Partidos por Equipo</div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 8px"><table style="width:100%;border-collapse:collapse;min-width:300px">';
+  h+='<thead><tr><th style="font-size:8px;font-weight:900;color:var(--m);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)">Equipo</th>';
+  ['Total','Local','Visit.','Festiv.'].forEach(function(c){h+='<th style="font-size:8px;font-weight:900;color:var(--m);text-align:center;padding:6px 4px;border-bottom:1px solid var(--bd)">'+c+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr><td style="padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04)"><div style="display:flex;align-items:center;gap:5px"><div style="width:14px;height:17px">'+bdg(t,'')+'</div><span style="font-size:9px;font-weight:800">'+ts(t)+'</span></div></td>';
+    h+='<td '+eqC(eq[t].tot,totD.mn,totD.mx)+'>'+eq[t].tot+'</td>';
+    h+='<td '+eqC(eq[t].loc,locD.mn,locD.mx)+'>'+eq[t].loc+'</td>';
+    h+='<td '+eqC(eq[t].vis,visD.mn,visD.mx)+'>'+eq[t].vis+'</td>';
+    h+='<td '+eqC(eq[t].fest,festD.mn,festD.mx)+'>'+eq[t].fest+'</td>';
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="display:flex;gap:12px;padding:0 16px 8px"><span style="font-size:8px;color:#34d399;font-weight:700">&#9632; Mayor</span><span style="font-size:8px;color:#f87171;font-weight:700">&#9632; Menor</span></div>';
+
+  // Equity by cancha
+  var cnchs=['Confanorte','Coveadse','Villa Silvania'];
+  var cD=cnchs.map(function(c){return colV(function(t){return eq[t].canchas[c]||0;});});
+  h+='<div style="margin:8px 16px 6px;font-size:9px;font-weight:900;color:var(--gl);text-transform:uppercase;letter-spacing:.7px">Por Cancha</div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 8px"><table style="width:100%;border-collapse:collapse;min-width:280px">';
+  h+='<thead><tr><th style="font-size:8px;font-weight:900;color:var(--m);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)">Equipo</th>';
+  ['Confanorte','Coveadse','V.Silvania'].forEach(function(c){h+='<th style="font-size:8px;font-weight:900;color:var(--m);text-align:center;padding:6px 4px;border-bottom:1px solid var(--bd)">'+c+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr><td style="padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04)"><div style="display:flex;align-items:center;gap:5px"><div style="width:14px;height:17px">'+bdg(t,'')+'</div><span style="font-size:9px;font-weight:800">'+ts(t)+'</span></div></td>';
+    cnchs.forEach(function(cn,ci){var v=eq[t].canchas[cn]||0;h+='<td '+eqC(v,cD[ci].mn,cD[ci].mx)+'>'+v+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+
+  // Equity by horario
+  var hD=HOURS.map(function(hr){return colV(function(t){return eq[t].horas[hr]||0;});});
+  h+='<div style="margin:8px 16px 6px;font-size:9px;font-weight:900;color:var(--gl);text-transform:uppercase;letter-spacing:.7px">Por Horario</div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 8px"><table style="width:100%;border-collapse:collapse;min-width:380px">';
+  h+='<thead><tr><th style="font-size:8px;font-weight:900;color:var(--m);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)">Equipo</th>';
+  HOURS.forEach(function(hr){h+='<th style="font-size:8px;font-weight:900;color:var(--m);text-align:center;padding:6px 3px;border-bottom:1px solid var(--bd)">'+hr+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr><td style="padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04)"><div style="display:flex;align-items:center;gap:5px"><div style="width:14px;height:17px">'+bdg(t,'')+'</div><span style="font-size:9px;font-weight:800">'+ts(t)+'</span></div></td>';
+    HOURS.forEach(function(hr,hi){var v=eq[t].horas[hr]||0;h+='<td '+eqC(v,hD[hi].mn,hD[hi].mx)+'>'+v+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+
+  // Equity by semana (compact grid)
+  var semanas=Object.keys(RC.reduce(function(o,m){o[m[8]]=1;return o;},{})).map(Number).sort(function(a,b){return a-b;});
+  h+='<div style="margin:8px 16px 6px;font-size:9px;font-weight:900;color:var(--gl);text-transform:uppercase;letter-spacing:.7px">Partidos por Semana</div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 8px"><table style="width:100%;border-collapse:collapse;min-width:'+Math.max(300,semanas.length*34+80)+'px">';
+  h+='<thead><tr><th style="font-size:8px;font-weight:900;color:var(--m);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);position:sticky;left:0;background:var(--bg)">Equipo</th>';
+  semanas.forEach(function(wk){h+='<th style="font-size:7.5px;font-weight:900;color:var(--m);text-align:center;padding:6px 3px;border-bottom:1px solid var(--bd);min-width:28px">S'+wk+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr><td style="padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);background:var(--bg);position:sticky;left:0"><div style="display:flex;align-items:center;gap:5px"><div style="width:14px;height:17px">'+bdg(t,'')+'</div><span style="font-size:9px;font-weight:800">'+ts(t)+'</span></div></td>';
+    semanas.forEach(function(wk){
+      var v=eq[t].semanas[wk]||0;
+      var bg=v===0?'rgba(255,255,255,.02)':v>=3?'rgba(200,16,46,.2)':v===2?'rgba(16,185,129,.1)':'rgba(245,159,11,.1)';
+      var cl=v===0?'var(--m)':v>=3?'#f87171':v===2?'#34d399':'#fbbf24';
+      h+='<td style="background:'+bg+';color:'+cl+';font-weight:900;text-align:center;padding:6px 3px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px">'+v+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="display:flex;gap:10px;padding:0 16px 16px;flex-wrap:wrap"><span style="font-size:8px;color:#34d399;font-weight:700">&#9632; 2 partidos</span><span style="font-size:8px;color:#fbbf24;font-weight:700">&#9632; 1 partido</span><span style="font-size:8px;color:#f87171;font-weight:700">&#9632; 3+ (revisar)</span></div>';
+
+  el.innerHTML=h;
 }
 
 // ── REGLA: equipo no juega Lunes+Jueves misma semana (si lunes no es festivo) ──
