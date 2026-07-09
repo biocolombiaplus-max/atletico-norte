@@ -33,22 +33,26 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .pg.active{display:block}
 
 /* ── AD BANNER ── */
-.adb{background:linear-gradient(90deg,#060f22,#0a1830 50%,#060f22);border-bottom:1px solid rgba(245,159,11,.2);padding:5px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0;overflow:hidden}
-.adl{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.adlg{height:26px;border-radius:3px}
-.adsep{width:1px;height:18px;background:var(--bd);flex-shrink:0}
-.adtk{font-size:7.5px;color:var(--gl);letter-spacing:1.5px;font-weight:800;text-transform:uppercase}
-.adsu{font-size:7px;color:var(--m);margin-top:1px}
-.adpt{border:1px dashed rgba(14,165,233,.4);border-radius:5px;padding:2px 7px;font-size:7.5px;color:var(--ac);font-weight:700;white-space:nowrap;flex-shrink:0}
-/* Ticker animado */
-.adticker{flex:1;overflow:hidden;position:relative;height:32px;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.adtrack{display:flex;gap:40px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 28s linear infinite}
+.adb{background:linear-gradient(135deg,#040c1e 0%,#071428 40%,#0a1a35 70%,#040c1e 100%);border-bottom:1px solid rgba(245,159,11,.35);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
+.adb::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(200,16,46,.06),transparent 30%,transparent 70%,rgba(0,48,135,.08));pointer-events:none}
+/* Sponsor strip */
+.adsponsors{display:flex;align-items:stretch;gap:0;flex-shrink:0;border-bottom:1px solid rgba(245,159,11,.15)}
+.adsp{display:flex;align-items:center;gap:8px;padding:7px 14px;flex:1;position:relative;cursor:default}
+.adsp:first-child{border-right:1px solid rgba(245,159,11,.15)}
+.adsp-logo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.adsp-txt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.adsp-name{font-size:11px;font-weight:900;color:#fff;letter-spacing:.3px;line-height:1.1}
+.adsp-tag{font-size:8.5px;color:rgba(255,255,255,.55);font-weight:600;letter-spacing:.2px;line-height:1.2}
+.adsp-badge{position:absolute;top:5px;right:8px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:2px 5px;border-radius:3px}
+/* Ticker */
+.adticker{overflow:hidden;position:relative;height:30px;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.adtrack{display:flex;gap:48px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 32s linear infinite}
 .adtrack:hover{animation-play-state:paused}
-.admsg{display:inline-flex;align-items:center;gap:6px;height:32px}
-.admsg .ic{font-size:13px}
-.admsg .tx{font-size:9px;font-weight:700;color:var(--t)}
-.admsg .hl{color:var(--gl)}
-.admsg .sep2{color:var(--bd);margin:0 2px}
+.admsg{display:inline-flex;align-items:center;gap:7px;height:30px}
+.admsg .ic{font-size:14px}
+.admsg .tx{font-size:10.5px;font-weight:700;color:rgba(238,242,248,.85)}
+.admsg .hl{color:var(--gl);font-weight:900}
+.admsg .sep2{color:var(--bd);margin:0 3px}
 @keyframes adscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ── HEADER ── */
@@ -363,28 +367,45 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- AD BANNER -->
 <div class="adb">
-  <div class="adl">
-    <svg class="adlg" viewBox="0 0 70 28"><rect width="70" height="28" rx="3" fill="#003087"/><text x="35" y="10" text-anchor="middle" fill="#ffd700" font-size="5" font-weight="900" font-family="Arial">COMFAORIENTE</text><text x="35" y="21" text-anchor="middle" fill="#fff" font-size="8.5" font-weight="900" font-family="Arial">COMFA</text></svg>
-    <svg class="adlg" viewBox="0 0 70 28"><rect width="70" height="28" rx="3" fill="#00843d"/><text x="35" y="10" text-anchor="middle" fill="#fff" font-size="5" font-weight="900" font-family="Arial">COMFANORTE</text><text x="35" y="21" text-anchor="middle" fill="#fff" font-size="8.5" font-weight="900" font-family="Arial">COMFA</text></svg>
+  <!-- Sponsor logos -->
+  <div class="adsponsors">
+    <div class="adsp">
+      <div class="adsp-logo" style="background:linear-gradient(135deg,#002776,#003087)">
+        <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="16" fill="none" stroke="#ffd700" stroke-width="1.5"/><text x="18" y="14" text-anchor="middle" fill="#ffd700" font-size="5.5" font-weight="900" font-family="Arial">COMFA</text><text x="18" y="22" text-anchor="middle" fill="#fff" font-size="7" font-weight="900" font-family="Arial">ORIENTE</text></svg>
+      </div>
+      <div class="adsp-txt">
+        <div class="adsp-name">Comfaoriente</div>
+        <div class="adsp-tag">Aliado del deporte Norte&shy;santandereano</div>
+      </div>
+      <div class="adsp-badge" style="background:rgba(255,215,0,.15);color:#ffd700;border:1px solid rgba(255,215,0,.3)">PATROCINADOR</div>
+    </div>
+    <div class="adsp">
+      <div class="adsp-logo" style="background:linear-gradient(135deg,#005a2b,#00843d)">
+        <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="16" fill="none" stroke="#fff" stroke-width="1.5"/><text x="18" y="14" text-anchor="middle" fill="#fff" font-size="5.5" font-weight="900" font-family="Arial">COMFA</text><text x="18" y="22" text-anchor="middle" fill="#fff" font-size="7" font-weight="900" font-family="Arial">NORTE</text></svg>
+      </div>
+      <div class="adsp-txt">
+        <div class="adsp-name">Comfanorte</div>
+        <div class="adsp-tag">Comprometida con el f&uacute;tbol local</div>
+      </div>
+      <div class="adsp-badge" style="background:rgba(0,255,127,.1);color:#5dd99a;border:1px solid rgba(0,255,127,.2)">PATROCINADOR</div>
+    </div>
   </div>
-  <div class="adsep"></div>
+  <!-- Ticker -->
   <div class="adticker">
     <div class="adtrack" id="adTrack">
+      <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &nbsp;&middot;&nbsp; 135 partidos &middot; 10 equipos &middot; 3 vueltas</span></span>
       <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
-      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &middot; 135 partidos &middot; 10 equipos</span></span>
-      <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&#250;tbol local</span></span>
-      <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Temporada 2 &middot; 3 vueltas &middot; Playoffs mata-mata</span></span>
-      <span class="admsg"><span class="ic">&#128241;</span><span class="tx">&#191;Quieres pautar aqu&#237;? Cont&#225;ctanos</span></span>
-      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Atl&#233;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
-      <span class="admsg"><span class="ic">&#9989;</span><span class="tx">Fixture optimizado &middot; S&#225;bados sin consecutivos &middot; v7.4</span></span>
+      <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Playoffs mata-mata &nbsp;&middot;&nbsp; <span class="hl">El campe&oacute;n se corona en cancha</span></span></span>
+      <span class="admsg"><span class="ic">&#127381;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
+      <span class="admsg"><span class="ic">&#128197;</span><span class="tx">Fixture optimizado &nbsp;&middot;&nbsp; S&aacute;bados distribuidos equitativamente</span></span>
+      <span class="admsg"><span class="ic">&#127963;&#65039;</span><span class="tx"><span class="hl">Atl&eacute;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
       <!-- duplicate for seamless loop -->
+      <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &nbsp;&middot;&nbsp; 135 partidos &middot; 10 equipos &middot; 3 vueltas</span></span>
       <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
-      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &middot; 135 partidos &middot; 10 equipos</span></span>
-      <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&#250;tbol local</span></span>
-      <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Temporada 2 &middot; 3 vueltas &middot; Playoffs mata-mata</span></span>
-      <span class="admsg"><span class="ic">&#128241;</span><span class="tx">&#191;Quieres pautar aqu&#237;? Cont&#225;ctanos</span></span>
-      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Atl&#233;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
-      <span class="admsg"><span class="ic">&#9989;</span><span class="tx">Fixture optimizado &middot; S&#225;bados sin consecutivos &middot; v7.4</span></span>
+      <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Playoffs mata-mata &nbsp;&middot;&nbsp; <span class="hl">El campe&oacute;n se corona en cancha</span></span></span>
+      <span class="admsg"><span class="ic">&#127381;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
+      <span class="admsg"><span class="ic">&#128197;</span><span class="tx">Fixture optimizado &nbsp;&middot;&nbsp; S&aacute;bados distribuidos equitativamente</span></span>
+      <span class="admsg"><span class="ic">&#127963;&#65039;</span><span class="tx"><span class="hl">Atl&eacute;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
     </div>
   </div>
 </div>
@@ -1576,10 +1597,25 @@ async function doUd(){
 // ── TEAM BADGE UPLOADS (admin) ──
 function pExEl(){return document.getElementById("pEx")||document.getElementById("admPnCnt");}
 async function shBdg(){
-  var h='<div style="padding:14px 16px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">&#127960; Escudos de Equipos</div>';
+  var h='<div style="padding:16px">';
+  h+='<div style="font-size:13px;font-weight:900;color:var(--t);margin-bottom:4px">&#127960;&#65039; Escudos de Equipos</div>';
+  h+='<div style="font-size:11px;color:var(--m);margin-bottom:16px;line-height:1.5">Sube la foto del escudo de cada equipo. Toca el escudo o el botón <strong style="color:var(--ac)">Subir foto</strong> para elegir una imagen desde su celular o computador.</div>';
   for(var i=1;i<=10;i++){
     var has=!!custBadges[i];
-    h+='<div class="tbdgu"><div class="tbdg-av" style="width:42px;height:50px">'+bdg(i,'')+'</div><div style="flex:1"><div style="font-size:12px;font-weight:700">'+tn(i)+'</div><div style="font-size:9px;color:var(--m)">'+(has?'&#10003; Escudo subido':'SVG por defecto')+'</div></div><label style="background:var(--b3);border:1px solid var(--bd);color:var(--m);padding:6px 10px;border-radius:7px;font-size:10px;cursor:pointer;font-weight:700">Subir<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label></div>';
+    h+='<div style="background:var(--cd);border:1px solid '+(has?'rgba(16,185,129,.35)':'var(--bd)')+';border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px">';
+    // Escudo grande clickeable
+    h+='<label style="cursor:pointer;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px">';
+    h+='<div style="width:56px;height:66px;border-radius:8px;overflow:hidden;border:2px solid '+(has?'rgba(16,185,129,.5)':'rgba(255,255,255,.1)')+';background:var(--b3);display:flex;align-items:center;justify-content:center;position:relative">'+bdg(i,'')+'<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);text-align:center;font-size:8px;padding:2px;color:#fff;font-weight:700">&#128247;</div></div>';
+    h+='<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)">';
+    h+='</label>';
+    // Info
+    h+='<div style="flex:1;min-width:0">';
+    h+='<div style="font-size:15px;font-weight:800;color:var(--t);margin-bottom:3px">'+tn(i)+'</div>';
+    h+='<div style="font-size:11px;color:'+(has?'#10b981':'var(--m)')+';margin-bottom:10px">'+(has?'&#9989; Escudo personalizado':'&#128247; Usando escudo por defecto')+'</div>';
+    h+='<div style="display:flex;gap:8px">';
+    h+='<label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--ac);color:#fff;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.2px">&#128247; Subir foto<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label>';
+    if(has) h+='<button onclick="rmBdg('+i+')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">&#128465;</button>';
+    h+='</div></div></div>';
   }
   h+='</div>';
   adCnt(h);
@@ -1587,11 +1623,30 @@ async function shBdg(){
 async function upBdg(e){
   var f=e.target.files[0],tid=parseInt(e.target.getAttribute("data-tid"));
   if(!f)return;
+  // Compress if large
   var rd=new FileReader();rd.onload=async function(ev){
     var d=ev.target.result;
-    if(fbR&&db)await db.ref("/teamBadges/"+tid).set(d);
-    custBadges[tid]=d;alert("\u2705 Escudo actualizado para "+tn(tid));shBdg();
+    // Resize to max 300px via canvas
+    var img=new Image();img.onload=async function(){
+      var mx=300,sc=Math.min(mx/img.width,mx/img.height,1);
+      var cv=document.createElement("canvas");cv.width=img.width*sc;cv.height=img.height*sc;
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      var comp=cv.toDataURL("image/jpeg",.85);
+      if(fbR&&db)await db.ref("/teamBadges/"+tid).set(comp);
+      custBadges[tid]=comp;
+      // Show success toast
+      var t=document.createElement("div");
+      t.textContent="✅ Escudo de "+tn(tid)+" actualizado";
+      t.style.cssText="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4)";
+      document.body.appendChild(t);setTimeout(function(){t.remove();},3000);
+      shBdg();
+    };img.src=d;
   };rd.readAsDataURL(f);
+}
+async function rmBdg(tid){
+  if(!confirm("\u00bfEliminar el escudo de "+tn(tid)+"?"))return;
+  if(fbR&&db)await db.ref("/teamBadges/"+tid).remove();
+  delete custBadges[tid];shBdg();
 }
 
 // ── PLANILLA ──
