@@ -230,8 +230,9 @@ tbody td:first-child{text-align:left;padding-left:10px}
   </div>
   <div class="hch">
     <span class="chip"><span class="ci">&#9917;</span> 10 Equipos</span>
-    <span class="chip"><span class="ci">&#128197;</span> 135 Partidos F1</span>
+    <span class="chip"><span class="ci">&#128197;</span> 135 Partidos &middot; 3 Vueltas</span>
     <span class="chip" id="chipSt"><span class="ci">&#9203;</span> Por Iniciar</span>
+    <span class="chip" id="chipVu"><span class="ci">&#128260;</span> Vuelta <span id="chipVuN">0</span>/3</span>
   </div>
 </div>
 
@@ -294,16 +295,16 @@ tbody td:first-child{text-align:left;padding-left:10px}
 <div class="pg" id="pg-fixture">
   <div class="flt">
     <button class="fbn active" onclick="setF('all',this)">Todos</button>
-    <button class="fbn" onclick="setF('1',this)">Vueltas 1&amp;2</button>
-    <button class="fbn" onclick="setF('2',this)">Vuelta 3</button>
-    <button class="fbn" onclick="setF('p',this)">Playoffs</button>
+    <button class="fbn" onclick="setF('v1',this)">Vuelta 1</button>
+    <button class="fbn" onclick="setF('v2',this)">Vuelta 2</button>
+    <button class="fbn" onclick="setF('v3',this)">Vuelta 3</button>
   </div>
   <div class="fcn" id="fc"></div>
 </div>
 
 <!-- TABLA -->
 <div class="pg" id="pg-tabla">
-  <div class="stl">Tabla de Posiciones &mdash; Fase 1</div>
+  <div class="stl">Tabla de Posiciones &mdash; Liga Interna S2 2026</div>
   <div class="tw"><table>
     <thead><tr><th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th></tr></thead>
     <tbody id="tb"></tbody>
@@ -326,7 +327,7 @@ tbody td:first-child{text-align:left;padding-left:10px}
 <!-- LLAVE -->
 <div class="pg" id="pg-llave">
   <div class="stl">&#127942; Bracket Playoffs</div>
-  <div id="llaveMsg" style="padding:0 14px 10px;font-size:11px;color:var(--m)">Se activa al completar los 135 partidos de Fase 1 (3 vueltas). Top 8 clasifican.</div>
+  <div id="llaveMsg" style="padding:0 14px 10px;font-size:11px;color:var(--m)">Se activa al completar los 135 partidos de las 3 vueltas. Top 8 clasifican &mdash; 1&deg;v8&deg; &middot; 2&deg;v7&deg; &middot; 3&deg;v6&deg; &middot; 4&deg;v5&deg;.</div>
   <div class="brkw" id="brc2"></div>
 </div>
 
@@ -590,6 +591,8 @@ function updHdr(){
   if(pl===0)c.innerHTML="<span class=\"ci\">\u23f3</span> Por Iniciar";
   else if(pl<135)c.innerHTML="<span class=\"ci\">\u26bd</span> En Curso";
   else c.innerHTML="<span class=\"ci\">\u2705</span> Finalizado";
+  var maxVu=0;MF.forEach(function(m){if(res[m.id]&&m.vu>maxVu)maxVu=m.vu;});
+  var cvn=document.getElementById("chipVuN");if(cvn)cvn.textContent=maxVu;
 }
 
 // Fixture
@@ -597,12 +600,11 @@ function setF(f,b){cf=f;document.querySelectorAll(".fbn").forEach(function(x){x.
 function rFx(){
   updHdr();
   var ms=MF.filter(function(m){
-    if(cf==="1")return m.vu<=2;
-    if(cf==="2")return m.vu===3&&m.vu!==3;// placeholder - vuelta 3 is 3rd round
-    if(cf==="p")return false;// playoffs not in MF yet
+    if(cf==="v1")return m.vu===1;
+    if(cf==="v2")return m.vu===2;
+    if(cf==="v3")return m.vu===3;
     return true;
   });
-  if(cf==="2")ms=MF.filter(function(m){return m.vu===3;});
   var bd={};ms.forEach(function(m){if(!bd[m.fecha])bd[m.fecha]=[];bd[m.fecha].push(m);});
   var h="";
   Object.keys(bd).sort().forEach(function(dt){
@@ -629,7 +631,6 @@ function twk(hdr){var b=hdr.nextElementSibling;b.classList.toggle("open");}
 function cSt(){
   var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[]};
   MF.forEach(function(m){
-    if(m.vu===3)return;// skip vuelta 3 which is playoff placeholder
     var r=res[m.id];if(!r||r.l===undefined)return;
     st[m.l].pj++;st[m.v].pj++;
     st[m.l].gf+=r.l;st[m.l].gc+=r.v;
@@ -652,9 +653,8 @@ function rTb(){
     h+="<td><div class=\"fd2\">"+f5.map(function(f){return"<div class=\"f"+f+"\"></div>";}).join("")+"</div></td></tr>";
   });
   document.getElementById("tb").innerHTML=h;
-  var p1=MF.filter(function(m){return m.vu!==3;});
-  var done=p1.filter(function(m){return res[m.id]&&res[m.id].l!==undefined;}).length;
-  if(done===p1.length&&p1.length>0){
+  var done=MF.filter(function(m){return res[m.id]&&res[m.id].l!==undefined;}).length;
+  if(done===MF.length&&MF.length>0){
     document.getElementById("brs").style.display="block";
     rBr(st.slice(0,8));
   }
