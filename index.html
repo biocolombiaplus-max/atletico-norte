@@ -30,14 +30,23 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .pg.active{display:block}
 
 /* ── AD BANNER ── */
-.adb{background:linear-gradient(90deg,#060f22,#0a1830 50%,#060f22);border-bottom:1px solid rgba(245,159,11,.2);padding:5px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.adl{display:flex;gap:6px;align-items:center}
+.adb{background:linear-gradient(90deg,#060f22,#0a1830 50%,#060f22);border-bottom:1px solid rgba(245,159,11,.2);padding:5px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0;overflow:hidden}
+.adl{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .adlg{height:26px;border-radius:3px}
 .adsep{width:1px;height:18px;background:var(--bd);flex-shrink:0}
-.adm{flex:1;text-align:center}
 .adtk{font-size:7.5px;color:var(--gl);letter-spacing:1.5px;font-weight:800;text-transform:uppercase}
 .adsu{font-size:7px;color:var(--m);margin-top:1px}
 .adpt{border:1px dashed rgba(14,165,233,.4);border-radius:5px;padding:2px 7px;font-size:7.5px;color:var(--ac);font-weight:700;white-space:nowrap;flex-shrink:0}
+/* Ticker animado */
+.adticker{flex:1;overflow:hidden;position:relative;height:32px;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.adtrack{display:flex;gap:40px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 28s linear infinite}
+.adtrack:hover{animation-play-state:paused}
+.admsg{display:inline-flex;align-items:center;gap:6px;height:32px}
+.admsg .ic{font-size:13px}
+.admsg .tx{font-size:9px;font-weight:700;color:var(--t)}
+.admsg .hl{color:var(--gl)}
+.admsg .sep2{color:var(--bd);margin:0 2px}
+@keyframes adscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ── HEADER ── */
 .hdr{background:linear-gradient(160deg,#070f20 0%,#0c1d38 60%,#071228 100%);border-bottom:1px solid var(--bd);padding:10px 14px 10px;flex-shrink:0}
@@ -278,8 +287,23 @@ tbody td:nth-child(2){text-align:left}
     <svg class="adlg" viewBox="0 0 70 28"><rect width="70" height="28" rx="3" fill="#00843d"/><text x="35" y="10" text-anchor="middle" fill="#fff" font-size="5" font-weight="900" font-family="Arial">COMFANORTE</text><text x="35" y="21" text-anchor="middle" fill="#fff" font-size="8.5" font-weight="900" font-family="Arial">COMFA</text></svg>
   </div>
   <div class="adsep"></div>
-  <div class="adm"><div class="adtk">&#9733; Gracias por su apoyo &#9733;</div><div class="adsu">Aliados del deporte nortesantandereano</div></div>
-  <div class="adpt">&#128241; Pautar aqu&#237;</div>
+  <div class="adticker">
+    <div class="adtrack" id="adTrack">
+      <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
+      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &middot; 135 partidos &middot; 10 equipos</span></span>
+      <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&#250;tbol local</span></span>
+      <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Temporada 2 &middot; 3 vueltas &middot; Playoffs mata-mata</span></span>
+      <span class="admsg"><span class="ic">&#128241;</span><span class="tx">&#191;Quieres pautar aqu&#237;? Cont&#225;ctanos</span></span>
+      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Atl&#233;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
+      <!-- duplicate for seamless loop -->
+      <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
+      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &middot; 135 partidos &middot; 10 equipos</span></span>
+      <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&#250;tbol local</span></span>
+      <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Temporada 2 &middot; 3 vueltas &middot; Playoffs mata-mata</span></span>
+      <span class="admsg"><span class="ic">&#128241;</span><span class="tx">&#191;Quieres pautar aqu&#237;? Cont&#225;ctanos</span></span>
+      <span class="admsg"><span class="ic">&#128081;</span><span class="tx"><span class="hl">Atl&#233;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
+    </div>
+  </div>
 </div>
 
 <!-- HEADER -->
@@ -659,21 +683,21 @@ function rFx(){
     var dm=bd[dt];var isF=dm[0].festivo;
     var dayFull=["Domingo","Lunes","Martes","Mi\u00e9rcoles","Jueves","Viernes","S\u00e1bado"][new Date(dt+"T12:00:00").getDay()];
     var openCls=first?" open":"";first=false;
-    h+='<div class="wb"><div class="wh" onclick="twk(this)"><div class="whl"><div class="wday">'+dayFull+(isF?' <span class="fest">&#127881; Festivo</span>':"")+'</div><div class="wdate">'+fd(dt)+"</div></div><div class="whc"><div class="whcn">"+dm.length+'</div><div style="font-size:9px">partidos &middot; Sem '+dm[0].week+"</div></div></div><div class="wbdy"+openCls+"">";
+    h+='<div class="wb"><div class="wh" onclick="twk(this)"><div class="whl"><div class="wday">'+dayFull+(isF?' <span class="fest">&#127881; Festivo</span>':'')+'</div><div class="wdate">'+fd(dt)+'</div></div><div class="whc"><div class="whcn">'+dm.length+'</div><div style="font-size:9px">partidos · Sem '+dm[0].week+'</div></div></div><div class="wbdy'+openCls+'">';
     dm.forEach(function(m){
       var r=res[m.id],ip=!!r;
       var cc=m.cancha==="Coveadse"?"cov":m.cancha==="Confanorte"?"cnf":"vls";
-      h+='<div class="mc'+(ip?" pl")+'">';
-      h+='<div class="ts">'+bdg(m.l,"bw")+'<div><div class="tnm">'+tn(m.l)+'</div><div class="tsb">'+ts(m.l)+"</div></div></div>";
+      h+='<div class="mc'+(ip?' pl':'')+'">';
+      h+='<div class="ts">'+bdg(m.l,'bw')+'<div><div class="tnm">'+tn(m.l)+'</div><div class="tsb">'+ts(m.l)+'</div></div></div>';
       h+='<div class="sb">';
-      if(ip)h+='<div class="sn">'+r.l+'<span class="ss">-</span>'+r.v+"</div>";
+      if(ip)h+='<div class="sn">'+r.l+'<span class="ss">-</span>'+r.v+'</div>';
       else h+='<div class="sn" style="color:var(--dm)">-:-</div>';
-      h+='<div class="mm"><span class="mhora">'+m.hora+'</span><span class="mcancha '+cc+'">'+m.cancha+'</span><span class="mvu">V'+m.vu+"</span>";
+      h+='<div class="mm"><span class="mhora">'+m.hora+'</span><span class="mcancha '+cc+'">'+m.cancha+'</span><span class="mvu">V'+m.vu+'</span>';
       if(cEd())h+='<span class="ec" data-mid="'+m.id+'" onclick="oRsEl(this)">&#9999;&#65039;</span>';
-      h+="</div></div>";
-      h+='<div class="ts aw"><div><div class="tnm">'+tn(m.v)+'</div><div class="tsb">'+ts(m.v)+"</div></div>"+bdg(m.v,"bw")+"</div></div>";
+      h+='</div></div>';
+      h+='<div class="ts aw"><div><div class="tnm">'+tn(m.v)+'</div><div class="tsb">'+ts(m.v)+'</div></div>'+bdg(m.v,'bw')+'</div></div>';
     });
-    h+="</div></div>";
+    h+='</div></div>';
   });
   document.getElementById("fc").innerHTML=h||'<div class="es"><div class="esi">&#128197;</div><p>Sin partidos</p></div>';
 }
@@ -695,11 +719,11 @@ function rTb(){
   var st=cSt();var h="";
   st.forEach(function(t,i){
     var cls=i<3?"g1 t8":i<8?"t8":"";var f5=t.fm.slice(-5);
-    h+="<tr><td><span class="pos-badge "+cls+"">"+(i+1)+"</span></td>";
-    h+="<td><div class="trn">"+bdg(t.id,"bs")+"<span>"+tn(t.id)+"</span></div></td>";
-    h+="<td>"+t.pj+"</td><td>"+t.g+"</td><td>"+t.e+"</td><td>"+t.p+"</td>";
-    h+="<td>"+t.gf+"</td><td>"+t.gc+"</td><td>"+(t.gf-t.gc)+"</td><td class="pts">"+t.pts+"</td>";
-    h+="<td><div class="fd2">"+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join("")+"</div></td></tr>";
+    h+='<tr><td><span class="pos-badge '+cls+'">'+(i+1)+'</span></td>';
+    h+='<td><div class="trn">'+bdg(t.id,'bs')+'<span>'+tn(t.id)+'</span></div></td>';
+    h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
+    h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+'</td>';
+    h+='<td><div class="fd2">'+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join('')+'</div></td></tr>';
   });
   document.getElementById("tb").innerHTML=h;
   var done=MF.filter(function(m){return res[m.id]&&res[m.id].l!==undefined;}).length;
@@ -826,13 +850,13 @@ function rDlg(dlgs){
 }
 function openDlg(d){
   document.getElementById("mDlgT").textContent=tn(d.t);
-  document.getElementById("mDlgB").innerHTML=
-    '<div style="text-align:center;padding:10px 0 14px">'+bdg(d.t,'',)+'</div>'.replace(''','"')+
-    '<div style="display:flex;flex-direction:column;gap:6px">'+
-    '<div style="background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:10px 14px"><div style="font-size:8.5px;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Delegado</div><div style="font-size:14px;font-weight:700">'+(d.n||"Sin asignar")+"</div></div>"+
-    (d.cargo?'<div style="background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:10px 14px"><div style="font-size:8.5px;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Cargo</div><div style="font-size:13px;font-weight:700">'+d.cargo+"</div></div>":"")+
-    (d.tel?'<a href="https://wa.me/57'+d.tel.replace(/\D/g,"")+'" target="_blank" style="display:flex;align-items:center;gap:10px;background:#25d366;border-radius:10px;padding:12px 16px;text-decoration:none;color:#fff;font-weight:800"><span style="font-size:20px">&#128233;</span> WhatsApp: '+d.tel+"</a>":"")+
-    "</div>";
+  var mb='<div style="text-align:center;padding:10px 0 14px">'+bdg(d.t,'')+'</div>';
+  mb+='<div style="display:flex;flex-direction:column;gap:6px">';
+  mb+='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:10px 14px"><div style="font-size:8.5px;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Delegado</div><div style="font-size:14px;font-weight:700">'+(d.n||'Sin asignar')+'</div></div>';
+  if(d.cargo)mb+='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:10px 14px"><div style="font-size:8.5px;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Cargo</div><div style="font-size:13px;font-weight:700">'+d.cargo+'</div></div>';
+  if(d.tel)mb+='<a href="https://wa.me/57'+d.tel.replace(/\D/g,'')+'" target="_blank" style="display:flex;align-items:center;gap:10px;background:#25d366;border-radius:10px;padding:12px 16px;text-decoration:none;color:#fff;font-weight:800"><span style="font-size:20px">&#128233;</span> WhatsApp: '+d.tel+'</a>';
+  mb+='</div>';
+  document.getElementById("mDlgB").innerHTML=mb;
   openM("mDlg");
 }
 
@@ -843,11 +867,11 @@ function rPn(){
   if(!cu){document.getElementById("pnc").innerHTML='<div class="es"><div class="esi">&#128272;</div><p>Inicia sesi&#243;n para ver tu panel</p><br><button class="sb2" style="max-width:200px;margin:0 auto" onclick="openL()">Ingresar</button></div>';return;}
   var nm=pf.nombre||"Socio "+cu;
   var h='<div class="pph"><div class="pav" onclick="trgPh()" id="avD">'+(pf.photoURL?'<img src="'+pf.photoURL+'" style="width:100%;height:100%;object-fit:cover">':'&#128100;')+'</div><input type="file" id="phF" accept="image/*" style="display:none" onchange="upPh(event)"><div class="pnm">'+nm+'</div><div class="prl">'+cr+'</div><div class="pcd">CC '+cu+"</div></div>";
-  h+='<div class="pag"><div class="ab" onclick="openMData()"><div class="ai">&#128221;</div><div class="al">Mis Datos</div></div><div class="ab" onclick="openM('mCp')"><div class="ai">&#128273;</div><div class="al">Cambiar Clave</div></div>';
-  if(cEd())h+='<div class="ab" onclick="showTab('fixture')"><div class="ai">&#9917;</div><div class="al">Resultados</div></div>';
+  h+='<div class="pag"><div class="ab" onclick="openMData()"><div class="ai">&#128221;</div><div class="al">Mis Datos</div></div><div class="ab" onclick="openM(\'mCp\')"><div class="ai">&#128273;</div><div class="al">Cambiar Clave</div></div>';
+  if(cEd())h+='<div class="ab" onclick="showTab(\'fixture\')"><div class="ai">&#9917;</div><div class="al">Resultados</div></div>';
   if(cr==="Administrador"||cr==="Coordinador Financiero")h+='<div class="ab" onclick="shPl()"><div class="ai">&#128176;</div><div class="al">Planilla</div></div>';
   if(cr==="Administrador"){h+='<div class="ab" onclick="shSo()"><div class="ai">&#128101;</div><div class="al">Socios</div></div><div class="ab" onclick="shBdg()"><div class="ai">&#127960;&#65039;</div><div class="al">Escudos</div></div><div class="ab" onclick="expC()"><div class="ai">&#128228;</div><div class="al">Exportar CSV</div></div>';}
-  h+="</div>";
+  h+='</div>';
   h+='<div id="pEx" style="padding:0 16px"></div>';
   h+='<div style="padding:14px 16px 24px"><button class="cb" onclick="doLt()">&#128682; Cerrar Sesi&#243;n</button></div>';
   document.getElementById("pnc").innerHTML=h;
@@ -874,7 +898,7 @@ async function shBdg(){
   var h='<p style="font-size:9.5px;color:var(--m);margin-bottom:12px">Sube la imagen real de cada escudo (PNG/JPG). Se muestra en todo el fixture.</p>';
   for(var i=1;i<=10;i++){
     var has=!!custBadges[i];
-    h+='<div class="tbdgu"><div class="tbdg-av" style="width:42px;height:50px">'+bdg(i,"")+'</div><div style="flex:1"><div style="font-size:12px;font-weight:700">'+tn(i)+"</div><div style="font-size:9px;color:var(--m)">"+(has?"&#10003; Escudo subido":"SVG por defecto")+'</div></div><label style="background:var(--b3);border:1px solid var(--bd);color:var(--m);padding:6px 10px;border-radius:7px;font-size:10px;cursor:pointer;font-weight:700">Subir<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label></div>';
+    h+='<div class="tbdgu"><div class="tbdg-av" style="width:42px;height:50px">'+bdg(i,'')+'</div><div style="flex:1"><div style="font-size:12px;font-weight:700">'+tn(i)+'</div><div style="font-size:9px;color:var(--m)">'+(has?'&#10003; Escudo subido':'SVG por defecto')+'</div></div><label style="background:var(--b3);border:1px solid var(--bd);color:var(--m);padding:6px 10px;border-radius:7px;font-size:10px;cursor:pointer;font-weight:700">Subir<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label></div>';
   }
   document.getElementById("pEx").innerHTML=h;
 }
@@ -897,7 +921,7 @@ async function shPl(){
   var h='<p style="font-size:9.5px;font-weight:800;color:var(--gl);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">&#128176; Planilla de Cobro</p>';
   ks.forEach(function(c){
     var sc=so[c];var pd=!!sc.pagado;
-    h+='<div class="pli"><div><div class="pln">'+(sc.nombre||"Sin nombre")+'</div><div class="plc">CC '+c+"</div></div><div style="display:flex;align-items:center"><span class="pls "+(pd?"sp":"se")+"">"+(pd?"&#9989; Pagado":"&#9203; Pendiente")+'</span><button class="tbtn" data-c="'+c+'" onclick="tgPgEl(this)">'+(pd?"Revertir":"Pagar")+"</button></div></div>";
+    h+='<div class="pli"><div><div class="pln">'+(sc.nombre||'Sin nombre')+'</div><div class="plc">CC '+c+'</div></div><div style="display:flex;align-items:center"><span class="pls '+(pd?'sp':'se')+'">'+(pd?'&#9989; Pagado':'&#9203; Pendiente')+'</span><button class="tbtn" data-c="'+c+'" onclick="tgPgEl(this)">'+(pd?'Revertir':'Pagar')+'</button></div></div>';
   });
   document.getElementById("pEx").innerHTML=h;
 }
@@ -908,10 +932,10 @@ function chRlEl(el){chRl(el.getAttribute("data-c"),el.value);}
 async function shSo(){
   if(!fbR||!db){document.getElementById("pEx").innerHTML='<div class="es"><p>Firebase no disponible</p></div>';return;}
   var s=await db.ref("/socios").get();var so=s.val()||{};var ks=Object.keys(so).sort();
-  var h='<p style="font-size:9.5px;font-weight:800;color:var(--gl);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">&#128101; Socios ('+ks.length+")</p>";
+  var h='<p style="font-size:9.5px;font-weight:800;color:var(--gl);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">&#128101; Socios ('+ks.length+')</p>';
   ks.forEach(function(c){
     var sc=so[c];
-    h+='<div class="pli"><div><div class="pln">'+(sc.nombre||"Sin nombre")+'</div><div class="plc">CC '+c+"</div></div><select data-c=""+c+"" onchange="chRlEl(this)" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:7px;font-size:10px">"+["Socio","Administrador","Coordinador Deportivo","Coordinador Financiero"].map(function(ro){return"<option"+(sc.rol===ro?" selected":"")+">"+ro+"</option>";}).join("")+"</select></div>";
+    h+='<div class="pli"><div><div class="pln">'+(sc.nombre||'Sin nombre')+'</div><div class="plc">CC '+c+'</div></div><select data-c="'+c+'" onchange="chRlEl(this)" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:7px;font-size:10px">'+["Socio","Administrador","Coordinador Deportivo","Coordinador Financiero"].map(function(ro){return'<option'+(sc.rol===ro?' selected':'')+'>'+ro+'</option>';}).join('')+'</select></div>';
   });
   document.getElementById("pEx").innerHTML=h;
 }
