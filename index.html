@@ -101,7 +101,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .qab.ol{background:linear-gradient(135deg,#2a2208,#3d3210);color:#d4a93e;border:1px solid #4a4218}
 .qab.pu{background:linear-gradient(135deg,#1e0e40,#2d1a5a);color:#b07ef7;border:1px solid #3a2070}
 
-/* ── ADMIN BLOCK ── */
+/* ── ADMIN BLOCK (inicio page quick-access) ── */
 .admbx{margin:14px 16px 0;background:rgba(245,159,11,.06);border:1px solid rgba(245,159,11,.2);border-radius:var(--r2);overflow:hidden}
 .admhd{padding:12px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(245,159,11,.15)}
 .admhd h3{font-size:13px;font-weight:900;flex:1}
@@ -111,6 +111,84 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .admact:active{background:var(--b3)}
 .admact .aico{font-size:18px;flex-shrink:0}
 .admact .atxt{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px}
+
+/* ── ADMIN PANEL PREMIUM (pg-panel) ── */
+.admpntabs{display:flex;gap:0;background:rgba(0,0,0,.4);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.admpntabs::-webkit-scrollbar{display:none}
+.admpntab{flex-shrink:0;padding:11px 16px;font-size:9px;font-weight:900;color:var(--m);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;letter-spacing:.8px;transition:.15s;-webkit-appearance:none}
+.admpntab.active{color:var(--gl);border-bottom-color:var(--gl)}
+.admpntab:active{opacity:.7}
+/* Team grid */
+.eqgrd{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px}
+.eqcard{border-radius:12px;overflow:hidden;border:1px solid var(--bd);background:var(--b2);cursor:pointer;transition:.15s}
+.eqcard:active{transform:scale(.97);opacity:.9}
+.eqhd{padding:11px 12px;display:flex;align-items:center;gap:10px}
+.eqbdg{width:34px;height:41px;flex-shrink:0}
+.eqnm{font-size:10.5px;font-weight:900;line-height:1.25;flex:1}
+.eqab{font-size:8.5px;color:var(--m);font-weight:700;margin-top:1px}
+.eqmeta{display:flex;justify-content:space-between;padding:6px 12px 10px;border-top:1px solid var(--bd)}
+.eqmetaitem{text-align:center}
+.eqmetav{font-size:14px;font-weight:900;color:var(--t)}
+.eqmetal{font-size:7.5px;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.eqpl{display:none;background:rgba(0,0,0,.25);border-top:1px solid var(--bd)}
+.eqpl.open{display:block}
+.eqpli{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.eqpli:last-child{border-bottom:none}
+.eqnum{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--anr),#8b0000);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.eqpnm{font-size:11px;font-weight:700;flex:1}
+.eqpos{font-size:8.5px;background:var(--b3);border:1px solid var(--bd);border-radius:5px;padding:2px 6px;color:var(--m);font-weight:700}
+.eqemp{padding:14px 12px;font-size:10px;color:var(--m);text-align:center;font-style:italic}
+.eqchv{font-size:10px;color:var(--m);transition:.3s}
+.eqcard.open .eqchv{transform:rotate(180deg)}
+/* Admin fixture */
+.admfxwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:14px 0}
+.admfxtbl{width:100%;border-collapse:collapse;font-size:10px;min-width:520px}
+.admfxtbl th{background:rgba(245,159,11,.12);color:var(--gl);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;padding:9px 10px;white-space:nowrap;text-align:left;position:sticky;top:0;z-index:2}
+.admfxtbl td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+.admfxtbl tr:hover td{background:rgba(255,255,255,.02)}
+.admfxdate{font-size:9px;color:var(--m);font-weight:700}
+.admfxhora{background:var(--b3);border:1px solid var(--bd);border-radius:5px;padding:2px 6px;font-size:9px;font-weight:800;white-space:nowrap}
+.admfxcancha{border-radius:5px;padding:2px 7px;font-size:8.5px;font-weight:800;white-space:nowrap}
+.admfxcancha.cov{background:rgba(14,165,233,.15);color:#38bdf8;border:1px solid rgba(14,165,233,.25)}
+.admfxcancha.cnf{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.admfxcancha.vls{background:rgba(245,159,11,.15);color:#fbbf24;border:1px solid rgba(245,159,11,.25)}
+.admfxres{color:var(--gl);font-weight:900;font-size:12px}
+.admfxpnd{color:var(--m);font-size:9px;font-style:italic}
+.admfxvu{font-size:8px;background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2);border-radius:5px;padding:2px 6px;font-weight:700}
+.admfxteam{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800}
+.admfxteam .tb{width:18px;height:22px;flex-shrink:0}
+/* Stats */
+.statsgrd{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px 8px}
+.stcard{background:var(--b2);border:1px solid var(--bd);border-radius:12px;padding:12px 10px;text-align:center}
+.stcv{font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1;color:var(--t)}
+.stcv.ac{color:var(--ac)}
+.stcv.gl{color:var(--gl)}
+.stcv.rd{color:var(--anr)}
+.stcl{font-size:7.5px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--m);margin-top:5px}
+.stprog{margin:0 16px 14px;background:var(--b2);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.stprogbar{background:var(--bd);border-radius:6px;height:8px;overflow:hidden;margin:10px 0 6px}
+.stprogfill{height:100%;background:linear-gradient(90deg,var(--anr),var(--ac));border-radius:6px;transition:width 1s ease}
+.stlist{padding:0 16px 8px}
+.stlisthd{font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.strow{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--b2);border:1px solid var(--bd);border-radius:9px;margin-bottom:5px}
+.strank{width:20px;font-size:11px;font-weight:900;text-align:center;flex-shrink:0}
+.strank.r1{color:#ffd700}
+.strank.r2{color:#c0c0c0}
+.strank.r3{color:#cd7f32}
+.stval{font-size:16px;font-weight:900;color:var(--gl);min-width:26px;text-align:right;flex-shrink:0}
+.stnm{font-size:11px;font-weight:700;flex:1}
+.steq{font-size:8.5px;color:var(--m);margin-top:1px}
+/* Equidad table */
+.eqdtbl{width:100%;border-collapse:collapse;font-size:10px}
+.eqdtbl th{background:rgba(14,165,233,.1);color:var(--ac);font-size:7.5px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;padding:8px 8px;text-align:center;border-bottom:1px solid rgba(14,165,233,.2)}
+.eqdtbl th:first-child{text-align:left}
+.eqdtbl td{padding:8px 8px;border-bottom:1px solid var(--bd);text-align:center;vertical-align:middle}
+.eqdtbl td:first-child{text-align:left}
+.eqdtbl tr:last-child td{border-bottom:none}
+.eqdtbl .pts{font-weight:900;color:var(--gl);font-size:13px}
+.eqdtbl .dg.pos{color:#34d399}
+.eqdtbl .dg.neg{color:var(--anr)}
+.eqdbdg{width:20px;height:24px;display:inline-block;vertical-align:middle;margin-right:5px}
 
 /* ── SORTEO MANUAL ── */
 .sortgrd{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 16px 16px}
@@ -378,19 +456,19 @@ tbody td:nth-child(2){text-align:left}
     </div>
   </div>
 
-  <!-- Delegados -->
-  <div class="stl">&#128101; Delegados</div>
-  <div class="dlg" id="dlgList"></div>
   <div style="height:8px"></div>
 </div>
 
 <!-- ═══ FIXTURE ═══ -->
 <div class="pg" id="pg-fixture">
-  <div class="flt">
+  <div class="flt" id="fltVu">
     <button class="fbn active" onclick="setF('all',this)">Todos</button>
-    <button class="fbn" onclick="setF('v1',this)">Vuelta 1</button>
-    <button class="fbn" onclick="setF('v2',this)">Vuelta 2</button>
-    <button class="fbn" onclick="setF('v3',this)">Vuelta 3</button>
+    <button class="fbn" onclick="setF('v1',this)">V.1</button>
+    <button class="fbn" onclick="setF('v2',this)">V.2</button>
+    <button class="fbn" onclick="setF('v3',this)">V.3</button>
+  </div>
+  <div id="fltEqRow" style="overflow-x:auto;display:flex;gap:6px;padding:0 12px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+    <button class="fbn active" id="feqAll" onclick="setFEq(0,this)" style="flex-shrink:0">&#127937; Todos</button>
   </div>
   <div class="fcn" id="fc"></div>
 </div>
@@ -554,7 +632,7 @@ const FB={
   appId:"1:383457224555:web:bc43b5f866c574ca028e2e"
 };
 
-let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null;
+let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null,cfe=0;
 let sortPos=null,sortAssign={},custBadges={},DLG_CACHE=[];
 
 window.addEventListener("load",function(){
@@ -673,12 +751,22 @@ function onOut(){
 }
 
 // ── FIXTURE ──
-function setF(f,b){cf=f;document.querySelectorAll(".fbn").forEach(function(x){x.classList.remove("active");});b.classList.add("active");rFx();}
+function setF(f,b){cf=f;document.querySelectorAll("#fltVu .fbn").forEach(function(x){x.classList.remove("active");});b.classList.add("active");rFx();}
+function setFEq(tid,b){cfe=tid;document.querySelectorAll("#fltEqRow .fbn").forEach(function(x){x.classList.remove("active");});b.classList.add("active");rFx();}
+function initFltEq(){
+  var row=document.getElementById("fltEqRow");if(!row)return;
+  var h='<button class="fbn active" id="feqAll" onclick="setFEq(0,this)" style="flex-shrink:0">&#127937; Todos</button>';
+  var TN={1:{n:"C\u00facuta Deportivo",s:"CUC"},2:{n:"At. Bucaramanga",s:"BUC"},3:{n:"Atl. Nacional",s:"NAL"},4:{n:"Ind. Santa Fe",s:"SNF"},5:{n:"Millonarios",s:"MIL"},6:{n:"Dep. Cali",s:"CAL"},7:{n:"Dep. Tolima",s:"TOL"},8:{n:"Am\u00e9rica de Cali",s:"AME"},9:{n:"Junior F.C.",s:"JUN"},10:{n:"Inter Bogot\u00e1",s:"INT"}};
+  for(var i=1;i<=10;i++){h+='<button class="fbn" onclick="setFEq('+i+',this)" style="flex-shrink:0;display:flex;align-items:center;gap:4px"><span style="width:16px;height:19px;display:inline-block">'+bdg(i,'')+'</span>'+TN[i].s+'</button>';}
+  row.innerHTML=h;
+}
 function twk(hdr){var b=hdr.nextElementSibling;b.classList.toggle("open");}
 function rFx(){
   updHdr();
   var ms=MF.filter(function(m){
-    if(cf==="v1")return m.vu===1;if(cf==="v2")return m.vu===2;if(cf==="v3")return m.vu===3;return true;
+    var vuOk=(cf==="v1"?m.vu===1:cf==="v2"?m.vu===2:cf==="v3"?m.vu===3:true);
+    var eqOk=(cfe===0||(m.l===cfe||m.v===cfe));
+    return vuOk&&eqOk;
   });
   var bd={};ms.forEach(function(m){if(!bd[m.fecha])bd[m.fecha]=[];bd[m.fecha].push(m);});
   var h="";var first=true;
@@ -872,15 +960,239 @@ function openMData(){openM("mDt");ldUd();}
 function rPn(){
   if(!cu){document.getElementById("pnc").innerHTML='<div class="es"><div class="esi">&#128272;</div><p>Inicia sesi&#243;n para ver tu panel</p><br><button class="sb2" style="max-width:200px;margin:0 auto" onclick="openL()">Ingresar</button></div>';return;}
   var nm=pf.nombre||"Socio "+cu;
-  var h='<div class="pph"><div class="pav" onclick="trgPh()" id="avD">'+(pf.photoURL?'<img src="'+pf.photoURL+'" style="width:100%;height:100%;object-fit:cover">':'&#128100;')+'</div><input type="file" id="phF" accept="image/*" style="display:none" onchange="upPh(event)"><div class="pnm">'+nm+'</div><div class="prl">'+cr+'</div><div class="pcd">CC '+cu+"</div></div>";
+  var isAdm=cr==="Administrador";
+  var h='<div class="pph"><div class="pav" onclick="trgPh()" id="avD">'+(pf.photoURL?'<img src="'+pf.photoURL+'" style="width:100%;height:100%;object-fit:cover">':'&#128100;')+'</div><input type="file" id="phF" accept="image/*" style="display:none" onchange="upPh(event)"><div class="pnm">'+nm+'</div><div class="prl">'+cr+'</div><div class="pcd">CC '+cu+'</div></div>';
   h+='<div class="pag"><div class="ab" onclick="openMData()"><div class="ai">&#128221;</div><div class="al">Mis Datos</div></div><div class="ab" onclick="openM(\'mCp\')"><div class="ai">&#128273;</div><div class="al">Cambiar Clave</div></div>';
   if(cEd())h+='<div class="ab" onclick="showTab(\'fixture\')"><div class="ai">&#9917;</div><div class="al">Resultados</div></div>';
-  if(cr==="Administrador"||cr==="Coordinador Financiero")h+='<div class="ab" onclick="shPl()"><div class="ai">&#128176;</div><div class="al">Planilla</div></div>';
-  if(cr==="Administrador"){h+='<div class="ab" onclick="shSo()"><div class="ai">&#128101;</div><div class="al">Socios</div></div><div class="ab" onclick="shBdg()"><div class="ai">&#127960;&#65039;</div><div class="al">Escudos</div></div><div class="ab" onclick="expC()"><div class="ai">&#128228;</div><div class="al">Exportar CSV</div></div>';}
+  if(cr==="Administrador"||cr==="Coordinador Financiero")h+='<div class="ab" onclick="adNav(\'planilla\')"><div class="ai">&#128176;</div><div class="al">Planilla</div></div>';
   h+='</div>';
-  h+='<div id="pEx" style="padding:0 16px"></div>';
+  if(isAdm){
+    h+='<div class="admpntabs" id="admpntabs"><button class="admpntab active" onclick="adNav(\'overview\')">&#9881; Panel</button><button class="admpntab" onclick="adNav(\'equipos\')">&#128101; Equipos</button><button class="admpntab" onclick="adNav(\'fixture\')">&#128197; Fixture</button><button class="admpntab" onclick="adNav(\'equidad\')">&#128202; Equidad</button><button class="admpntab" onclick="adNav(\'stats\')">&#9889; Estad\u00edsticas</button></div>';
+    h+='<div id="admPnCnt" style="min-height:200px"></div>';
+  } else {
+    h+='<div id="admPnCnt"></div>';
+  }
   h+='<div style="padding:14px 16px 24px"><button class="cb" onclick="doLt()">&#128682; Cerrar Sesi&#243;n</button></div>';
   document.getElementById("pnc").innerHTML=h;
+  if(isAdm) adShowOverview();
+}
+
+function adNav(tab){
+  var tabs=document.querySelectorAll('.admpntab');
+  tabs.forEach(function(t,i){var names=['overview','equipos','fixture','equidad','stats'];t.classList.toggle('active',names[i]===tab);});
+  if(tab==='overview') adShowOverview();
+  else if(tab==='equipos') adShowEq();
+  else if(tab==='fixture') adShowFxAdm();
+  else if(tab==='equidad') adShowEqd();
+  else if(tab==='stats') adShowSt();
+  else if(tab==='planilla') adShowPl();
+}
+
+function adCnt(h){var el=document.getElementById('admPnCnt');if(el)el.innerHTML=h;}
+
+function adShowOverview(){
+  var h='<div style="padding:14px 16px 4px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">&#9881; Herramientas de Administraci\u00f3n</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(245,159,11,.2);background:rgba(245,159,11,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'planilla\')"><span class="aico">&#128176;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Planilla</div><div class="atxt">Cobros socios</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(14,165,233,.2);background:rgba(14,165,233,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shSo()"><span class="aico">&#128101;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios</div><div class="atxt">Gestionar roles</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shBdg()"><span class="aico">&#127960;&#65039;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Escudos</div><div class="atxt">Subir im\u00e1genes</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="expC()"><span class="aico">&#128228;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Exportar</div><div class="atxt">CSV socios</div></div></button>';
+  h+='</div>';
+  h+='<div id="pEx" style="margin-top:14px"></div>';
+  h+='</div>';
+  adCnt(h);
+}
+
+function adShowPl(){
+  adCnt('<div class="es"><div class="esi">&#128176;</div><p>Cargando...</p></div>');
+  shPl();
+}
+
+// ── EQUIPOS (admin) ──
+var EQ_LOADED={};
+function adShowEq(){
+  var h='<div class="eqgrd">';
+  for(var i=1;i<=10;i++){
+    var col=TC[i]||'#c8102e';
+    h+='<div class="eqcard" id="eqcard'+i+'" onclick="adTogEq('+i+',this)">';
+    h+='<div class="eqhd">';
+    h+='<div class="eqbdg">'+bdg(i,'')+'</div>';
+    h+='<div style="flex:1"><div class="eqnm">'+tn(i)+'</div><div class="eqab">Equipo '+i+'</div></div>';
+    h+='<span class="eqchv">&#8964;</span>';
+    h+='</div>';
+    h+='<div class="eqmeta">';
+    h+='<div class="eqmetaitem"><div class="eqmetav" id="eqpj'+i+'">—</div><div class="eqmetal">PJ</div></div>';
+    h+='<div class="eqmetaitem"><div class="eqmetav" id="eqpts'+i+'">—</div><div class="eqmetal">Pts</div></div>';
+    h+='<div class="eqmetaitem"><div class="eqmetav" id="eqjug'+i+'">—</div><div class="eqmetal">Jugadores</div></div>';
+    h+='</div>';
+    h+='<div class="eqpl" id="eqpl'+i+'"></div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  adCnt(h);
+  adLoadEqStats();
+  adLoadEqPlayers();
+}
+
+function adLoadEqStats(){
+  var ts=cSt();
+  ts.forEach(function(t){
+    var pj=document.getElementById('eqpj'+t.id);
+    var pts=document.getElementById('eqpts'+t.id);
+    if(pj)pj.textContent=t.pj;
+    if(pts)pts.textContent=t.pts;
+  });
+}
+
+async function adLoadEqPlayers(){
+  if(!fbR||!db)return;
+  var s=await db.ref('/socios').get();
+  var so=s.val()||{};
+  var byTeam={};
+  Object.values(so).forEach(function(sc){
+    var eq=parseInt(sc.equipo)||0;
+    if(eq>=1&&eq<=10){if(!byTeam[eq])byTeam[eq]=[];byTeam[eq].push(sc);}
+  });
+  EQ_LOADED=byTeam;
+  for(var t=1;t<=10;t++){
+    var cnt=document.getElementById('eqjug'+t);
+    if(cnt)cnt.textContent=(byTeam[t]||[]).length;
+  }
+}
+
+function adTogEq(tid,card){
+  card.classList.toggle('open');
+  var pl=document.getElementById('eqpl'+tid);
+  if(!pl)return;
+  if(pl.classList.toggle('open')){
+    var jug=EQ_LOADED[tid]||[];
+    if(!jug.length){pl.innerHTML='<div class="eqemp">Sin jugadores asignados</div>';return;}
+    var sorted=jug.slice().sort(function(a,b){return(parseInt(a.num)||99)-(parseInt(b.num)||99);});
+    var h='';
+    sorted.forEach(function(sc){
+      h+='<div class="eqpli">';
+      h+='<div class="eqnum">'+(sc.num||'?')+'</div>';
+      h+='<div style="flex:1"><div class="eqpnm">'+(sc.nombre||'Sin nombre')+'</div><div style="font-size:8.5px;color:var(--m)">CC '+(sc.cedula||'')+'</div></div>';
+      h+='<span class="eqpos">'+(sc.pos||'—')+'</span>';
+      h+='</div>';
+    });
+    pl.innerHTML=h;
+  }
+}
+
+// ── FIXTURE ADMIN VIEW ──
+function adShowFxAdm(){
+  var byDate={};
+  RC.forEach(function(m){
+    var dt=DATES[m[1]];
+    if(!byDate[dt])byDate[dt]=[];
+    byDate[dt].push(m);
+  });
+  var days=['Dom','Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b'];
+  var months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var played=0,total=RC.length;
+  RC.forEach(function(m){if(res[m[0]])played++;});
+  var h='<div class="stprog" style="margin:14px 16px">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:900">Avance del Fixture</span><span style="font-size:16px;font-weight:900;color:var(--gl)">'+played+'/'+total+'</span></div>';
+  h+='<div class="stprogbar"><div class="stprogfill" style="width:'+Math.round(played/total*100)+'%"></div></div>';
+  h+='<div style="font-size:9px;color:var(--m)">'+Math.round(played/total*100)+'% completado &nbsp;&middot;&nbsp; '+(total-played)+' partidos pendientes</div>';
+  h+='</div>';
+  var sortedDates=Object.keys(byDate).sort();
+  sortedDates.forEach(function(dt){
+    var ms=byDate[dt];
+    var d=new Date(dt+'T12:00:00');
+    var dayName=days[d.getDay()];
+    var dateStr=dayName+' '+d.getDate()+' '+months[d.getMonth()];
+    var wk=ms[0][8];
+    h+='<div style="margin:0 16px 6px">';
+    h+='<div style="font-size:9px;font-weight:900;color:var(--gl);text-transform:uppercase;letter-spacing:1px;padding:8px 12px;background:rgba(245,159,11,.08);border:1px solid rgba(245,159,11,.18);border-radius:9px 9px 0 0;display:flex;justify-content:space-between;align-items:center"><span>&#128197; '+dateStr+'</span><span style="color:var(--m);font-weight:700;font-size:8.5px">Sem '+wk+' &middot; '+ms.length+' partidos</span></div>';
+    ms.sort(function(a,b){return a[2]-b[2];}).forEach(function(m,idx){
+      var mid=m[0],dt2=DATES[m[1]],hora=HOURS[m[2]],cancha=CANCHAS[m[3]],loc=m[4],vis=m[5],vu=m[6];
+      var r=res[mid];
+      var cc=cancha==='Coveadse'?'cov':cancha==='Confanorte'?'cnf':'vls';
+      var last=idx===ms.length-1;
+      h+='<div style="background:var(--b2);border:1px solid rgba(245,159,11,.12);border-top:none'+(last?';border-radius:0 0 9px 9px':'')+';padding:10px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+      h+='<span class="admfxhora">'+hora+'</span>';
+      h+='<span class="admfxcancha '+cc+'">'+cancha+'</span>';
+      h+='<span class="admfxvu">V'+vu+'</span>';
+      h+='<div style="flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:180px">';
+      h+='<div class="admfxteam"><div class="tb">'+bdg(loc,'')+'</div>'+tn(loc)+'</div>';
+      if(r){h+='<span class="admfxres">'+r.gl+' — '+r.gv+'</span>';}else{h+='<span class="admfxpnd">vs</span>';}
+      h+='<div class="admfxteam" style="justify-content:flex-end"><div class="tb">'+bdg(vis,'')+'</div>'+tn(vis)+'</div>';
+      h+='</div>';
+      if(cEd())h+='<span class="ec" data-mid="'+mid+'" onclick="oRsEl(this)" style="font-size:16px;cursor:pointer;flex-shrink:0">&#9999;&#65039;</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  adCnt(h);
+}
+
+// ── TABLA EQUIDAD (admin standings) ──
+function adShowEqd(){
+  var ts=cSt();
+  var h='<div style="padding:14px 16px 4px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">&#128202; Tabla de Equidad</div></div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 14px"><table class="eqdtbl"><thead><tr>';
+  h+='<th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th class="pts">Pts</th></tr></thead><tbody>';
+  ts.forEach(function(t,i){
+    var dg=t.gf-t.gc;
+    var cls=i<8?'':'color:var(--m)';
+    var dgc=dg>0?'pos':dg<0?'neg':'';
+    var rankCls=i===0?'style="color:var(--gl);font-weight:900"':i<8?'style="color:var(--ac)"':'style="color:var(--m)"';
+    h+='<tr style="'+cls+'">';
+    h+='<td '+rankCls+'>'+(i+1)+'</td>';
+    h+='<td><div style="display:flex;align-items:center;gap:7px"><div class="eqdbdg">'+bdg(t.id,'')+'</div><div><div style="font-size:10.5px;font-weight:800">'+tn(t.id)+'</div></div></div></td>';
+    h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
+    h+='<td>'+t.gf+'</td><td>'+t.gc+'</td>';
+    h+='<td class="dg '+dgc+'">'+(dg>0?'+':'')+dg+'</td>';
+    h+='<td class="pts">'+t.pts+'</td>';
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="margin:0 16px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
+  h+='<div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--ac);font-weight:900;text-transform:uppercase;letter-spacing:.8px">Clasifican</div><div style="font-size:20px;font-weight:900;color:var(--ac)">8</div><div style="font-size:8px;color:var(--m)">Playoffs</div></div>';
+  h+='<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:#34d399;font-weight:900;text-transform:uppercase;letter-spacing:.8px">Lider</div><div style="font-size:13px;font-weight:900;color:#34d399">'+(ts[0]?tn(ts[0].id):'—')+'</div><div style="font-size:8px;color:var(--m)">'+(ts[0]?ts[0].pts+' pts':'—')+'</div></div>';
+  h+='<div style="background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--anr);font-weight:900;text-transform:uppercase;letter-spacing:.8px">Último</div><div style="font-size:13px;font-weight:900;color:var(--anr)">'+(ts[9]?tn(ts[9].id):'—')+'</div><div style="font-size:8px;color:var(--m)">'+(ts[9]?ts[9].pts+' pts':'—')+'</div></div>';
+  h+='</div>';
+  adCnt(h);
+}
+
+// ── ESTADÍSTICAS (admin) ──
+function adShowSt(){
+  var ts=cSt();
+  var total=RC.length,played=0,goles=0,maxPts=0,minPts=999;
+  RC.forEach(function(m){var r=res[m[0]];if(r){played++;goles+=r.gl+r.gv;}});
+  ts.forEach(function(t){if(t.pts>maxPts)maxPts=t.pts;if(t.pts<minPts)minPts=t.pts;});
+  var avg=played?Math.round((goles/played)*10)/10:0;
+  var h='<div class="statsgrd">';
+  h+='<div class="stcard"><div class="stcv ac">'+played+'</div><div class="stcl">Jugados</div></div>';
+  h+='<div class="stcard"><div class="stcv">'+(total-played)+'</div><div class="stcl">Pendientes</div></div>';
+  h+='<div class="stcard"><div class="stcv gl">'+goles+'</div><div class="stcl">Goles</div></div>';
+  h+='<div class="stcard"><div class="stcv">'+avg+'</div><div class="stcl">Goles/Partido</div></div>';
+  h+='<div class="stcard"><div class="stcv rd">'+maxPts+'</div><div class="stcl">Max Puntos</div></div>';
+  h+='<div class="stcard"><div class="stcv">'+Math.round(played/total*100)+'%</div><div class="stcl">Completado</div></div>';
+  h+='</div>';
+  h+='<div class="stlist">';
+  h+='<div class="stlisthd">&#129351; Goleadores</div>';
+  var garr=Object.values(gm).filter(function(x){return x.goals>0;}).sort(function(a,b){return b.goals-a.goals;}).slice(0,8);
+  var medals=['🥇','🥈','🥉'];
+  if(garr.length){garr.forEach(function(g,i){h+='<div class="strow"><span class="strank '+(i<3?'r'+(i+1):'')+'">'+([medals[0],medals[1],medals[2]][i]||i+1)+'</span><div style="flex:1"><div class="stnm">'+g.name+'</div><div class="steq">'+tn(g.team)+'</div></div><span class="stval">'+g.goals+'</span></div>';});}
+  else h+='<div style="text-align:center;padding:14px;font-size:10px;color:var(--m)">Sin goles registrados</div>';
+  h+='<div class="stlisthd" style="margin-top:14px">&#128202; Rendimiento Equipos</div>';
+  ts.slice(0,5).forEach(function(t,i){
+    var pct=t.pj?Math.round(t.pts/(t.pj*3)*100):0;
+    h+='<div class="strow"><span class="strank '+(i<3?'r'+(i+1):'')+'">'+([medals[0],medals[1],medals[2]][i]||i+1)+'</span><div style="flex:1"><div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:24px">'+bdg(t.id,'')+'</div><div class="stnm">'+tn(t.id)+'</div></div><div style="background:var(--bd);border-radius:4px;height:4px;margin-top:5px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,var(--anr),var(--ac));border-radius:4px"></div></div></div><span class="stval">'+t.pts+'</span></div>';
+  });
+  h+='<div class="stlisthd" style="margin-top:14px">&#127960;&#65039; Partidos por Cancha</div>';
+  var canchaCnt={'Coveadse':0,'Confanorte':0,'Villa Silvania':0};
+  RC.forEach(function(m){canchaCnt[CANCHAS[m[3]]]++;});
+  Object.entries(canchaCnt).forEach(function(en){
+    var pct=Math.round(en[1]/total*100);
+    var cc=en[0]==='Coveadse'?'#38bdf8':en[0]==='Confanorte'?'#34d399':'#fbbf24';
+    h+='<div class="strow"><div style="flex:1"><div class="stnm">'+en[0]+'</div><div style="background:var(--bd);border-radius:4px;height:4px;margin-top:5px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+cc+';border-radius:4px"></div></div></div><span class="stval" style="color:'+cc+'">'+en[1]+'</span></div>';
+  });
+  h+='</div>';
+  adCnt(h);
 }
 function upPh(e){
   var f=e.target.files[0];if(!f)return;
@@ -900,13 +1212,15 @@ async function doUd(){
 }
 
 // ── TEAM BADGE UPLOADS (admin) ──
+function pExEl(){return document.getElementById("pEx")||document.getElementById("admPnCnt");}
 async function shBdg(){
-  var h='<p style="font-size:9.5px;color:var(--m);margin-bottom:12px">Sube la imagen real de cada escudo (PNG/JPG). Se muestra en todo el fixture.</p>';
+  var h='<div style="padding:14px 16px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">&#127960; Escudos de Equipos</div>';
   for(var i=1;i<=10;i++){
     var has=!!custBadges[i];
     h+='<div class="tbdgu"><div class="tbdg-av" style="width:42px;height:50px">'+bdg(i,'')+'</div><div style="flex:1"><div style="font-size:12px;font-weight:700">'+tn(i)+'</div><div style="font-size:9px;color:var(--m)">'+(has?'&#10003; Escudo subido':'SVG por defecto')+'</div></div><label style="background:var(--b3);border:1px solid var(--bd);color:var(--m);padding:6px 10px;border-radius:7px;font-size:10px;cursor:pointer;font-weight:700">Subir<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label></div>';
   }
-  document.getElementById("pEx").innerHTML=h;
+  h+='</div>';
+  adCnt(h);
 }
 async function upBdg(e){
   var f=e.target.files[0],tid=parseInt(e.target.getAttribute("data-tid"));
@@ -923,27 +1237,29 @@ function tgPgEl(el){tgPg(el.getAttribute("data-c"));}
 async function shPl(){
   var so={};if(fbR&&db){var s=await db.ref("/socios").get();so=s.val()||{};}
   var ks=Object.keys(so).sort();
-  if(!ks.length){document.getElementById("pEx").innerHTML='<div class="es"><div class="esi">&#128176;</div><p>Sin socios</p></div>';return;}
-  var h='<p style="font-size:9.5px;font-weight:800;color:var(--gl);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">&#128176; Planilla de Cobro</p>';
+  if(!ks.length){adCnt('<div class="es"><div class="esi">&#128176;</div><p>Sin socios</p></div>');return;}
+  var h='<div style="padding:14px 16px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">&#128176; Planilla de Cobro</div>';
   ks.forEach(function(c){
     var sc=so[c];var pd=!!sc.pagado;
     h+='<div class="pli"><div><div class="pln">'+(sc.nombre||'Sin nombre')+'</div><div class="plc">CC '+c+'</div></div><div style="display:flex;align-items:center"><span class="pls '+(pd?'sp':'se')+'">'+(pd?'&#9989; Pagado':'&#9203; Pendiente')+'</span><button class="tbtn" data-c="'+c+'" onclick="tgPgEl(this)">'+(pd?'Revertir':'Pagar')+'</button></div></div>';
   });
-  document.getElementById("pEx").innerHTML=h;
+  h+='</div>';
+  adCnt(h);
 }
 async function tgPg(c){if(!fbR||!db)return;var s=await db.ref("/socios/"+c+"/pagado").get();await db.ref("/socios/"+c+"/pagado").set(!s.val());shPl();}
 
 // ── GESTIONAR SOCIOS ──
 function chRlEl(el){chRl(el.getAttribute("data-c"),el.value);}
 async function shSo(){
-  if(!fbR||!db){document.getElementById("pEx").innerHTML='<div class="es"><p>Firebase no disponible</p></div>';return;}
+  if(!fbR||!db){adCnt('<div class="es"><p>Firebase no disponible</p></div>');return;}
   var s=await db.ref("/socios").get();var so=s.val()||{};var ks=Object.keys(so).sort();
-  var h='<p style="font-size:9.5px;font-weight:800;color:var(--gl);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">&#128101; Socios ('+ks.length+')</p>';
+  var h='<div style="padding:14px 16px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">&#128101; Socios ('+ks.length+')</div>';
   ks.forEach(function(c){
     var sc=so[c];
     h+='<div class="pli"><div><div class="pln">'+(sc.nombre||'Sin nombre')+'</div><div class="plc">CC '+c+'</div></div><select data-c="'+c+'" onchange="chRlEl(this)" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:7px;font-size:10px">'+["Socio","Administrador","Coordinador Deportivo","Coordinador Financiero"].map(function(ro){return'<option'+(sc.rol===ro?' selected':'')+'>'+ro+'</option>';}).join('')+'</select></div>';
   });
-  document.getElementById("pEx").innerHTML=h;
+  h+='</div>';
+  adCnt(h);
 }
 async function chRl(c,r){if(fbR&&db)await db.ref("/socios/"+c+"/rol").set(r);}
 
@@ -957,7 +1273,7 @@ async function expC(){
 }
 
 // ── INIT ──
-rFx();rTb();rDlg(DLG_DEF);updHdr();
+initFltEq();rFx();rTb();rDlg(DLG_DEF);updHdr();
 setTimeout(function(){rSortGrd();},100);
 </script>
 </body>
