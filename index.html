@@ -555,7 +555,7 @@ const FB={
 };
 
 let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null;
-let sortPos=null,sortAssign={},custBadges={};
+let sortPos=null,sortAssign={},custBadges={},DLG_CACHE=[];
 
 window.addEventListener("load",function(){
   try{
@@ -838,20 +838,23 @@ async function clrSort(){
 }
 
 // ── DELEGADOS ──
+function openDlgI(el){openDlg(DLG_CACHE[+el.getAttribute('data-di')]);}
 function rDlg(dlgs){
-  var h="";
-  dlgs.forEach(function(d){
-    var tel=d.tel||"";
-    h+='<div class="dlc" onclick="openDlg('+JSON.stringify(d)+')">';
-    h+='<div class="dlb">'+bdg(d.t,"")+"</div>";
-    h+='<div class="dlpn">'+d.t+"</div>";
-    h+='<div class="dlt2"><div class="dln">'+(d.n||"Sin asignar")+'</div><div class="dlt">'+tn(d.t)+(d.cargo?" &middot; "+d.cargo:"")+"</div>"+(tel?'<div class="dlph">&#128222; '+tel+"</div>":"")+"</div>";
-    if(tel)h+='<a class="dlwha" href="https://wa.me/57'+tel.replace(/\D/g,"")+'" target="_blank" onclick="event.stopPropagation()">&#128233;</a>';
-    h+="</div>";
+  DLG_CACHE=dlgs.slice();
+  var h='';
+  dlgs.forEach(function(d,i){
+    var tel=d.tel||'';
+    h+='<div class="dlc" data-di="'+i+'" onclick="openDlgI(this)">';
+    h+='<div class="dlb">'+bdg(d.t,'')+'</div>';
+    h+='<div class="dlpn">'+d.t+'</div>';
+    h+='<div class="dlt2"><div class="dln">'+(d.n||'Sin asignar')+'</div><div class="dlt">'+tn(d.t)+(d.cargo?' · '+d.cargo:'')+'</div>'+(tel?'<div class="dlph">&#128222; '+tel+'</div>':'')+'</div>';
+    if(tel)h+='<a class="dlwha" href="https://wa.me/57'+tel.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()">&#128233;</a>';
+    h+='</div>';
   });
   document.getElementById("dlgList").innerHTML=h||'<div class="es"><div class="esi">&#128101;</div><p>Sin delegados</p></div>';
 }
 function openDlg(d){
+  if(!d)return;
   document.getElementById("mDlgT").textContent=tn(d.t);
   var mb='<div style="text-align:center;padding:10px 0 14px">'+bdg(d.t,'')+'</div>';
   mb+='<div style="display:flex;flex-direction:column;gap:6px">';
