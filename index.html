@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Atlético Norte">
 <link rel="manifest" href="/manifest.json">
 <title>Liga Interna S2 2026 · Atlético Norte F.C.</title>
+<meta name="version" content="v7.1">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -653,11 +654,12 @@ function rFx(){
     if(cf==="v1")return m.vu===1;if(cf==="v2")return m.vu===2;if(cf==="v3")return m.vu===3;return true;
   });
   var bd={};ms.forEach(function(m){if(!bd[m.fecha])bd[m.fecha]=[];bd[m.fecha].push(m);});
-  var h="";
+  var h="";var first=true;
   Object.keys(bd).sort().forEach(function(dt){
     var dm=bd[dt];var isF=dm[0].festivo;
     var dayFull=["Domingo","Lunes","Martes","Mi\u00e9rcoles","Jueves","Viernes","S\u00e1bado"][new Date(dt+"T12:00:00").getDay()];
-    h+='<div class="wb"><div class="wh" onclick="twk(this)"><div class="whl"><div class="wday">'+dayFull+(isF?' <span class="fest">&#127881; Festivo</span>':"")+'</div><div class="wdate">'+fd(dt)+"</div></div><div class="whc"><div class="whcn">"+dm.length+'</div><div style="font-size:9px">partidos &middot; Sem '+dm[0].week+"</div></div></div><div class="wbdy">";
+    var openCls=first?" open":"";first=false;
+    h+='<div class="wb"><div class="wh" onclick="twk(this)"><div class="whl"><div class="wday">'+dayFull+(isF?' <span class="fest">&#127881; Festivo</span>':"")+'</div><div class="wdate">'+fd(dt)+"</div></div><div class="whc"><div class="whcn">"+dm.length+'</div><div style="font-size:9px">partidos &middot; Sem '+dm[0].week+"</div></div></div><div class="wbdy"+openCls+"">";
     dm.forEach(function(m){
       var r=res[m.id],ip=!!r;
       var cc=m.cancha==="Coveadse"?"cov":m.cancha==="Confanorte"?"cnf":"vls";
