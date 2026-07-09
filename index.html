@@ -613,7 +613,7 @@ const AN_SVG=`<svg viewBox="0 0 100 118" xmlns="http://www.w3.org/2000/svg" styl
 const DATES=["2026-07-13","2026-07-16","2026-07-18","2026-07-20","2026-07-23","2026-07-25","2026-07-27","2026-07-30","2026-08-01","2026-08-03","2026-08-06","2026-08-08","2026-08-10","2026-08-13","2026-08-15","2026-08-17","2026-08-20","2026-08-22","2026-08-24","2026-08-27","2026-08-29","2026-08-31","2026-09-03","2026-09-05","2026-09-07","2026-09-10","2026-09-12","2026-09-14","2026-09-17","2026-09-19","2026-09-21","2026-09-24","2026-09-26","2026-09-28","2026-10-01","2026-10-03","2026-10-05","2026-10-08","2026-10-10","2026-10-12","2026-10-15","2026-10-17","2026-10-19","2026-10-22","2026-10-24","2026-10-26","2026-10-29","2026-10-31","2026-11-02","2026-11-05","2026-11-07","2026-11-09","2026-11-12","2026-11-14","2026-11-16"];
 const HOURS=["06:00","16:30","18:30","19:00","20:00","21:00"];
 const CANCHAS=["Confanorte","Coveadse","Villa Silvania"];
-const RC=[[0,0,1,1,2,6,1,1,1],[1,0,1,0,10,9,2,1,1],[2,0,2,1,8,4,2,1,1],[3,0,2,0,3,1,2,1,1],[4,1,3,2,10,7,2,0,1],[5,1,5,2,9,5,2,0,1],[6,2,0,1,8,2,3,0,1],[7,2,0,2,5,7,1,0,1],[8,3,1,1,5,2,2,1,2],[9,3,1,0,7,8,3,1,2],[10,3,2,1,3,6,3,1,2],[11,3,2,0,4,10,1,1,2],[12,4,3,2,4,1,2,0,2],[13,4,5,2,6,2,2,0,2],[14,5,0,1,9,6,2,0,2],[15,5,0,2,1,2,1,0,2],[16,6,3,1,8,3,2,0,3],[17,6,4,0,7,10,1,0,3],[18,6,5,1,9,4,2,0,3],[19,7,3,2,6,5,2,0,3],[20,7,5,2,1,4,1,0,3],[21,8,0,1,3,7,1,0,3],[22,8,0,2,10,2,3,0,3],[23,9,3,1,5,6,3,0,4],[24,9,4,0,1,7,1,0,4],[25,9,5,1,4,9,1,0,4],[26,10,3,2,2,8,1,0,4],[27,10,5,2,5,3,2,0,4],[28,11,0,1,1,9,1,0,4],[29,11,0,2,3,10,1,0,4],[30,12,3,1,6,2,3,0,5],[31,12,4,0,3,9,1,0,5],[32,12,5,1,8,1,2,0,5],[33,13,3,2,5,10,3,0,5],[34,13,5,2,7,2,2,0,5],[35,14,0,1,4,5,1,0,5],[36,14,0,2,8,6,2,0,5],[37,15,1,1,9,10,1,1,6],[38,15,1,0,8,6,3,1,6],[39,15,2,1,1,5,1,1,6],[40,15,2,0,2,7,1,1,6],[41,16,3,2,5,3,3,0,6],[42,16,5,2,4,8,1,0,6],[43,17,0,1,6,8,1,0,6],[44,17,0,2,1,10,3,0,6],[45,18,3,1,1,3,1,0,7],[46,18,4,0,4,7,1,0,7],[47,18,5,1,6,10,1,0,7],[48,19,3,2,2,5,1,0,7],[49,19,5,2,9,3,3,0,7],[50,20,0,1,5,4,2,0,7],[51,20,0,2,8,7,2,0,7],[52,21,3,1,10,1,2,0,8],[53,21,4,0,6,9,3,0,8],[54,21,5,1,8,2,2,0,8],[55,22,3,2,10,4,2,0,8],[56,22,5,2,7,5,2,0,8],[57,23,0,1,4,5,3,0,8],[58,23,0,2,3,8,3,0,8],[59,24,3,1,6,9,1,0,9],[60,24,4,0,5,8,3,0,9],[61,24,5,1,4,2,3,0,9],[62,25,3,2,9,8,2,0,9],[63,25,5,2,10,6,3,0,9],[64,26,0,1,7,6,2,0,9],[65,26,0,2,3,1,3,0,9],[66,27,3,1,7,4,2,0,10],[67,27,4,0,9,1,2,0,10],[68,27,5,1,10,5,2,0,10],[69,28,3,2,7,1,3,0,10],[70,28,5,2,2,3,3,0,10],[71,29,0,1,8,10,1,0,10],[72,29,0,2,6,7,1,0,10],[73,30,3,1,10,4,3,0,11],[74,30,4,0,1,2,3,0,11],[75,30,5,1,3,5,1,0,11],[76,31,3,2,4,7,3,0,11],[77,31,5,2,8,9,3,0,11],[78,32,0,1,6,7,3,0,11],[79,32,0,2,3,10,3,0,11],[80,33,3,1,2,3,1,0,12],[81,33,4,0,5,8,1,0,12],[82,33,5,1,7,1,2,0,12],[83,34,3,2,10,6,2,0,12],[84,34,5,2,2,4,1,0,12],[85,35,0,1,10,8,3,0,12],[86,35,0,2,5,9,1,0,12],[87,36,3,1,10,8,2,0,13],[88,36,4,0,6,4,3,0,13],[89,36,5,1,7,3,3,0,13],[90,37,3,2,9,2,2,0,13],[91,37,5,2,6,4,2,0,13],[92,38,0,1,2,1,2,0,13],[93,38,0,2,9,5,3,0,13],[94,39,1,1,7,5,3,1,14],[95,39,1,0,3,4,3,1,14],[96,39,2,1,2,9,1,1,14],[97,39,2,0,1,6,1,1,14],[98,40,3,2,1,4,3,0,14],[99,40,5,2,7,10,3,0,14],[100,41,0,1,3,2,2,0,14],[101,41,0,2,8,4,3,0,14],[102,42,3,1,4,9,3,0,15],[103,42,4,0,10,2,2,0,15],[104,42,5,1,5,6,1,0,15],[105,43,3,2,2,7,3,0,15],[106,43,5,2,3,8,1,0,15],[107,44,0,1,5,1,2,0,15],[108,44,0,2,7,9,1,0,15],[109,45,3,1,7,8,1,0,16],[110,45,4,0,2,5,3,0,16],[111,45,5,1,10,3,2,0,16],[112,46,3,2,9,3,2,0,16],[113,46,5,2,6,1,2,0,16],[114,47,0,1,2,10,1,0,16],[115,47,0,2,4,6,1,0,16],[116,48,1,1,1,8,3,1,17],[117,48,1,0,5,10,1,1,17],[118,48,2,1,7,3,2,1,17],[119,48,2,0,2,9,3,1,17],[120,49,3,2,3,6,1,0,17],[121,49,5,2,1,8,1,0,17],[122,50,0,1,4,3,2,0,17],[123,50,0,2,9,1,3,0,17],[124,51,3,1,5,1,3,0,18],[125,51,4,0,6,3,2,0,18],[126,51,5,1,9,7,2,0,18],[127,52,3,2,8,9,1,0,18],[128,52,5,2,1,10,1,0,18],[129,53,0,1,9,7,3,0,18],[130,53,0,2,4,2,2,0,18],[131,54,1,1,1,6,3,1,19],[132,54,1,0,3,4,1,1,19],[133,54,2,1,9,10,3,1,19],[134,54,2,0,8,5,2,1,19]];
+const RC=[[0,0,1,1,2,6,1,1,1],[1,0,1,0,10,9,2,1,1],[2,0,2,1,8,4,2,1,1],[3,0,2,0,3,1,2,1,1],[4,1,3,2,10,7,2,0,1],[5,1,5,2,9,5,2,0,1],[6,2,0,1,8,2,3,0,1],[7,2,0,2,5,7,1,0,1],[8,3,1,1,5,2,2,1,2],[9,3,1,0,7,8,3,1,2],[10,3,2,1,3,6,3,1,2],[11,3,2,0,4,10,1,1,2],[12,4,3,2,4,1,2,0,2],[13,4,5,2,6,2,2,0,2],[14,5,0,1,9,6,2,0,2],[15,5,0,2,1,2,1,0,2],[16,6,3,1,8,3,2,0,3],[17,6,4,0,7,10,1,0,3],[18,8,5,1,9,4,2,0,3],[19,7,3,2,6,5,2,0,3],[20,7,5,2,1,4,1,0,3],[21,6,0,1,3,7,1,0,3],[22,8,0,2,10,2,3,0,3],[23,11,3,1,5,6,3,0,4],[24,9,4,0,1,7,1,0,4],[25,9,5,1,4,9,1,0,4],[26,10,3,2,2,8,1,0,4],[27,10,5,2,5,3,2,0,4],[28,9,0,1,1,9,1,0,4],[29,11,0,2,3,10,1,0,4],[30,14,3,1,6,2,3,0,5],[31,12,4,0,3,9,1,0,5],[32,12,5,1,8,1,2,0,5],[33,13,3,2,5,10,3,0,5],[34,13,5,2,7,2,2,0,5],[35,14,0,1,4,5,1,0,5],[36,12,0,2,8,6,2,0,5],[37,15,1,1,9,10,1,1,6],[38,15,1,0,8,6,3,1,6],[39,15,2,1,1,5,1,1,6],[40,15,2,0,2,7,1,1,6],[41,16,3,2,5,3,3,0,6],[42,16,5,2,4,8,1,0,6],[43,17,0,1,6,8,1,0,6],[44,17,0,2,1,10,3,0,6],[45,20,3,1,1,3,1,0,7],[46,18,4,0,4,7,1,0,7],[47,18,5,1,6,10,1,0,7],[48,19,3,2,2,5,1,0,7],[49,19,5,2,9,3,3,0,7],[50,20,0,1,5,4,2,0,7],[51,18,0,2,8,7,2,0,7],[52,23,3,1,10,1,2,0,8],[53,21,4,0,6,9,3,0,8],[54,21,5,1,8,2,2,0,8],[55,22,3,2,10,4,2,0,8],[56,22,5,2,7,5,2,0,8],[57,23,0,1,4,5,3,0,8],[58,21,0,2,3,8,3,0,8],[59,25,3,1,6,9,1,0,9],[60,24,4,0,5,8,3,0,9],[61,24,5,1,4,2,3,0,9],[62,26,3,2,9,8,2,0,9],[63,25,5,2,10,6,3,0,9],[64,26,0,1,7,6,2,0,9],[65,24,0,2,3,1,3,0,9],[66,27,3,1,7,4,2,0,10],[67,28,4,0,9,1,2,0,10],[68,27,5,1,10,5,2,0,10],[69,29,3,2,7,1,3,0,10],[70,28,5,2,2,3,3,0,10],[71,27,0,1,8,10,1,0,10],[72,29,0,2,6,7,1,0,10],[73,32,3,1,10,4,3,0,11],[74,30,4,0,1,2,3,0,11],[75,30,5,1,3,5,1,0,11],[76,31,3,2,4,7,3,0,11],[77,31,5,2,8,9,3,0,11],[78,32,0,1,6,7,3,0,11],[79,30,0,2,3,10,3,0,11],[80,35,3,1,2,3,1,0,12],[81,33,4,0,5,8,1,0,12],[82,33,5,1,7,1,2,0,12],[83,34,3,2,10,6,2,0,12],[84,34,5,2,2,4,1,0,12],[85,35,0,1,10,8,3,0,12],[86,33,0,2,5,9,1,0,12],[87,36,3,1,10,8,2,0,13],[88,36,4,0,6,4,3,0,13],[89,36,5,1,7,3,3,0,13],[90,37,3,2,9,2,2,0,13],[91,38,5,2,6,4,2,0,13],[92,37,0,1,2,1,2,0,13],[93,38,0,2,9,5,3,0,13],[94,39,1,1,7,5,3,1,14],[95,39,1,0,3,4,3,1,14],[96,39,2,1,2,9,1,1,14],[97,39,2,0,1,6,1,1,14],[98,40,3,2,1,4,3,0,14],[99,40,5,2,7,10,3,0,14],[100,41,0,1,3,2,2,0,14],[101,41,0,2,8,4,3,0,14],[102,42,3,1,4,9,3,0,15],[103,44,4,0,10,2,2,0,15],[104,42,5,1,5,6,1,0,15],[105,43,3,2,2,7,3,0,15],[106,43,5,2,3,8,1,0,15],[107,42,0,1,5,1,2,0,15],[108,44,0,2,7,9,1,0,15],[109,45,3,1,7,8,1,0,16],[110,45,4,0,2,5,3,0,16],[111,47,5,1,10,3,2,0,16],[112,46,3,2,9,3,2,0,16],[113,46,5,2,6,1,2,0,16],[114,45,0,1,2,10,1,0,16],[115,47,0,2,4,6,1,0,16],[116,48,1,1,1,8,3,1,17],[117,48,1,0,5,10,1,1,17],[118,48,2,1,7,3,2,1,17],[119,48,2,0,2,9,3,1,17],[120,49,3,2,3,6,1,0,17],[121,49,5,2,1,8,1,0,17],[122,50,0,1,4,3,2,0,17],[123,50,0,2,9,1,3,0,17],[124,52,3,1,5,1,3,0,18],[125,51,4,0,6,3,2,0,18],[126,51,5,1,9,7,2,0,18],[127,53,3,2,8,9,1,0,18],[128,52,5,2,1,10,1,0,18],[129,53,0,1,9,7,3,0,18],[130,51,0,2,4,2,2,0,18],[131,54,1,1,1,6,3,1,19],[132,54,1,0,3,4,1,1,19],[133,54,2,1,9,10,3,1,19],[134,54,2,0,8,5,2,1,19]];
 const DLG_DEF=[{"t":1,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":2,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":3,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":4,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":5,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":6,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":7,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":8,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":9,"n":"Por asignar","tel":"","cargo":"Delegado"},{"t":10,"n":"Por asignar","tel":"","cargo":"Delegado"}];
 
 const MF=RC.map(r=>({id:r[0],fecha:DATES[r[1]],hora:HOURS[r[2]],cancha:CANCHAS[r[3]],l:r[4],v:r[5],vu:r[6],festivo:!!r[7],week:r[8]}));
@@ -1128,6 +1128,33 @@ function adShowFxAdm(){
   adCnt(h);
 }
 
+// ── REGLA: equipo no juega Lunes+Jueves misma semana (si lunes no es festivo) ──
+function chkReglaLJ(){
+  var byWeek={};
+  RC.forEach(function(m){var wk=m[8];if(!byWeek[wk])byWeek[wk]=[];byWeek[wk].push(m);});
+  var violations=[];
+  Object.keys(byWeek).forEach(function(wk){
+    var wkMs=byWeek[wk];
+    // Lunes NO festivos en esta semana
+    var lunMs=wkMs.filter(function(m){var d=new Date(DATES[m[1]]+'T12:00:00');return d.getDay()===1&&!m[7];});
+    // Jueves en esta semana (festivo o no — la regla aplica sobre el jueves)
+    var jueMs=wkMs.filter(function(m){var d=new Date(DATES[m[1]]+'T12:00:00');return d.getDay()===4;});
+    if(!lunMs.length||!jueMs.length)return;
+    // Equipos que juegan el lunes (no festivo)
+    var lunT={};
+    lunMs.forEach(function(m){lunT[m[4]]={dt:DATES[m[1]],mid:m[0]};lunT[m[5]]={dt:DATES[m[1]],mid:m[0]};});
+    // Equipos que juegan el jueves
+    var jueT={};
+    jueMs.forEach(function(m){jueT[m[4]]={dt:DATES[m[1]],mid:m[0]};jueT[m[5]]={dt:DATES[m[1]],mid:m[0]};});
+    // Intersección
+    Object.keys(lunT).forEach(function(t){
+      t=parseInt(t);
+      if(jueT[t]){violations.push({team:t,wk:parseInt(wk),lunFecha:lunT[t].dt,jueFecha:jueT[t].dt});}
+    });
+  });
+  return violations;
+}
+
 // ── EQUIDAD helpers ──
 function eqCell(v,mn,mx,avg){
   var diff=mx-mn;
@@ -1155,7 +1182,6 @@ function eqScoreBar(diff,label){
 
 // ── TABLA EQUIDAD COMPLETA (admin) ──
 function adShowEqd(){
-  // Collect per-team stats from RC
   var TEAMS=[1,2,3,4,5,6,7,8,9,10];
   var eq={};
   TEAMS.forEach(function(t){eq[t]={tot:0,loc:0,vis:0,fest:0,canchas:{},horas:{},vueltas:{1:0,2:0,3:0},semanas:{}};});
@@ -1175,6 +1201,29 @@ function adShowEqd(){
   function colVals(fn){var vs=TEAMS.map(fn);var mn=Math.min.apply(null,vs),mx=Math.max.apply(null,vs),avg=vs.reduce(function(a,b){return a+b;},0)/vs.length;return{vs:vs,mn:mn,mx:mx,avg:avg,diff:mx-mn};}
 
   var h='';
+
+  // ── 0. VALIDACIÓN DE REGLA: NO LUNES+JUEVES MISMA SEMANA ──
+  var viols=chkReglaLJ();
+  var days=['Dom','Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b'];
+  var months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  function fmtDt(dt){var d=new Date(dt+'T12:00:00');return days[d.getDay()]+' '+d.getDate()+' '+months[d.getMonth()];}
+  h+=eqSectionHd('&#9888;&#65039;','Regla: No Lunes + Jueves','Un equipo NO puede jugar Lunes y Jueves en la misma semana si el Lunes no es festivo');
+  if(viols.length===0){
+    h+='<div style="margin:0 16px 14px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px">';
+    h+='<span style="font-size:26px">&#9989;</span><div><div style="font-size:12px;font-weight:900;color:#34d399">Sin violaciones</div><div style="font-size:9px;color:var(--m);margin-top:3px">Todos los equipos cumplen la regla Lunes+Jueves en todas las semanas</div></div></div>';
+  } else {
+    h+='<div style="margin:0 16px 14px;background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.25);border-radius:10px;padding:12px 14px">';
+    h+='<div style="font-size:10px;font-weight:900;color:#f87171;margin-bottom:10px">&#128308; '+viols.length+' violaci'+(viols.length===1?'\u00f3n':'ones')+' detectadas</div>';
+    viols.forEach(function(v){
+      h+='<div style="background:rgba(200,16,46,.12);border:1px solid rgba(200,16,46,.2);border-radius:8px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px">';
+      h+='<div style="width:24px;height:29px;flex-shrink:0">'+bdg(v.team,'')+'</div>';
+      h+='<div style="flex:1"><div style="font-size:11px;font-weight:900;color:var(--t)">'+tn(v.team)+'</div>';
+      h+='<div style="font-size:9px;color:#f87171;margin-top:3px">Sem '+v.wk+': '+fmtDt(v.lunFecha)+' (Lunes) y '+fmtDt(v.jueFecha)+' (Jueves)</div></div>';
+      h+='<span style="font-size:18px">&#128308;</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
 
   // ── 1. RESUMEN GENERAL ──
   h+=eqSectionHd('&#9878;&#65039;','Equidad General','Distribución total de partidos por equipo — ideal: todos iguales');
@@ -1275,7 +1324,28 @@ function adShowEqd(){
   h+=eqLegend();
   h+=eqScoreBar(Math.max.apply(null,vuD.map(function(d){return d.diff;})),'Equidad por Vuelta');
 
-  // ── 6. TABLA DE POSICIONES ──
+  // ── 6. EQUIDAD POR SEMANA ──
+  h+=eqSectionHd('&#128197;','Equidad por Semana','Partidos por equipo por semana del torneo — ideal: máx 2 por semana');
+  var semanas=Object.keys(RC.reduce(function(o,m){o[m[8]]=1;return o;},{})).map(Number).sort(function(a,b){return a-b;});
+  var semD=semanas.map(function(wk){return colVals(function(t){return eq[t].semanas[wk]||0;});});
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 6px"><table style="width:100%;border-collapse:collapse;min-width:'+Math.max(300,semanas.length*38+80)+'px">';
+  h+='<thead><tr><th style="background:rgba(245,159,11,.1);color:var(--gl);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;padding:8px 8px;text-align:left;border-bottom:1px solid rgba(245,159,11,.2);position:sticky;left:0;z-index:1">Equipo</th>';
+  semanas.forEach(function(wk){h+='<th style="background:rgba(245,159,11,.1);color:var(--gl);font-size:7.5px;font-weight:900;letter-spacing:.5px;padding:8px 4px;text-align:center;border-bottom:1px solid rgba(245,159,11,.2);min-width:32px">S'+wk+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr><td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;background:var(--bg);position:sticky;left:0"><div style="display:flex;align-items:center;gap:5px"><div style="width:14px;height:17px;flex-shrink:0">'+bdg(t,'')+'</div><span style="font-size:9px;font-weight:800">'+ts(t)+'</span></div></td>';
+    semanas.forEach(function(wk,wi){
+      var v=eq[t].semanas[wk]||0;
+      var bg=v===0?'rgba(255,255,255,.02)':v>=3?'rgba(200,16,46,.2)':v===2?'rgba(16,185,129,.1)':'rgba(245,159,11,.1)';
+      var cl=v===0?'var(--m)':v>=3?'#f87171':v===2?'#34d399':'#fbbf24';
+      h+='<td style="background:'+bg+';color:'+cl+';font-weight:900;text-align:center;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px">'+v+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="display:flex;gap:10px;padding:0 16px 10px;flex-wrap:wrap"><span style="font-size:8.5px;color:#34d399;font-weight:700">&#9632; 2 partidos (ideal)</span><span style="font-size:8.5px;color:#fbbf24;font-weight:700">&#9632; 1 partido</span><span style="font-size:8.5px;color:#f87171;font-weight:700">&#9632; 3+ partidos (revisar)</span><span style="font-size:8.5px;color:var(--m);font-weight:700">&#9632; Sin partidos</span></div>';
+
+  // ── 7. TABLA DE POSICIONES ──
   h+=eqSectionHd('&#128202;','Tabla de Posiciones','Clasificación actual del torneo');
   var tb_st=cSt();
   h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 14px"><table class="eqdtbl"><thead><tr>';
