@@ -1128,32 +1128,177 @@ function adShowFxAdm(){
   adCnt(h);
 }
 
-// ── TABLA EQUIDAD (admin standings) ──
+// ── EQUIDAD helpers ──
+function eqCell(v,mn,mx,avg){
+  var diff=mx-mn;
+  var bg,cl;
+  if(diff===0){bg='rgba(16,185,129,.1)';cl='#34d399';}
+  else if(v===mx){bg='rgba(16,185,129,.15)';cl='#34d399';}
+  else if(v===mn){bg='rgba(200,16,46,.15)';cl='#f87171';}
+  else{var d=Math.abs(v-avg);var pct=diff?d/diff:0;bg=pct<.2?'rgba(16,185,129,.08)':'rgba(255,255,255,.03)';cl='var(--t)';}
+  return 'style="background:'+bg+';color:'+cl+';font-weight:900;text-align:center;padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04)"';
+}
+function eqTeamCell(tid){
+  return '<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap"><div style="display:flex;align-items:center;gap:5px"><div style="width:16px;height:19px;flex-shrink:0">'+bdg(tid,'')+'</div><span style="font-size:9.5px;font-weight:800">'+ts(tid)+'</span></div></td>';
+}
+function eqSectionHd(icon,title,sub){
+  return '<div style="margin:18px 16px 10px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">'+icon+'</span><div><div style="font-size:12px;font-weight:900;color:var(--t)">'+title+'</div><div style="font-size:9px;color:var(--m);margin-top:1px">'+sub+'</div></div></div></div>';
+}
+function eqLegend(){
+  return '<div style="display:flex;gap:10px;padding:0 16px 14px;flex-wrap:wrap"><span style="font-size:8.5px;color:#34d399;font-weight:700">&#9632; Mayor</span><span style="font-size:8.5px;color:#f87171;font-weight:700">&#9632; Menor</span><span style="font-size:8.5px;color:var(--m);font-weight:700">&#9632; Intermedio</span><span style="font-size:8.5px;color:var(--m);margin-left:4px">Ideal = todos los valores iguales</span></div>';
+}
+function eqScoreBar(diff,label){
+  var pct=Math.max(0,100-diff*20);
+  var col=pct>=90?'#34d399':pct>=70?'#fbbf24':'#f87171';
+  return '<div style="margin:0 16px 10px;background:var(--b2);border:1px solid var(--bd);border-radius:9px;padding:11px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><span style="font-size:10px;font-weight:700">'+label+'</span><span style="font-size:13px;font-weight:900;color:'+col+'">'+Math.round(pct)+'%</span></div><div style="background:var(--bd);border-radius:6px;height:6px;overflow:hidden"><div style="width:'+Math.round(pct)+'%;height:100%;background:'+col+';border-radius:6px;transition:width 1s ease"></div></div><div style="font-size:8.5px;color:var(--m);margin-top:5px">'+(pct>=90?'Distribución excelente &#9989;':pct>=70?'Distribución aceptable &#9888;&#65039;':'Revisar distribución &#128308;')+'</div></div>';
+}
+
+// ── TABLA EQUIDAD COMPLETA (admin) ──
 function adShowEqd(){
-  var ts=cSt();
-  var h='<div style="padding:14px 16px 4px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">&#128202; Tabla de Equidad</div></div>';
+  // Collect per-team stats from RC
+  var TEAMS=[1,2,3,4,5,6,7,8,9,10];
+  var eq={};
+  TEAMS.forEach(function(t){eq[t]={tot:0,loc:0,vis:0,fest:0,canchas:{},horas:{},vueltas:{1:0,2:0,3:0},semanas:{}};});
+  RC.forEach(function(m){
+    var l=m[4],v=m[5],vu=m[6],fest=m[7],wk=m[8];
+    var cn=CANCHAS[m[3]],hr=HOURS[m[2]];
+    [l,v].forEach(function(t){
+      eq[t].tot++;
+      eq[t].canchas[cn]=(eq[t].canchas[cn]||0)+1;
+      eq[t].horas[hr]=(eq[t].horas[hr]||0)+1;
+      eq[t].vueltas[vu]=(eq[t].vueltas[vu]||0)+1;
+      eq[t].semanas[wk]=(eq[t].semanas[wk]||0)+1;
+      if(fest)eq[t].fest++;
+    });
+    eq[l].loc++;eq[v].vis++;
+  });
+  function colVals(fn){var vs=TEAMS.map(fn);var mn=Math.min.apply(null,vs),mx=Math.max.apply(null,vs),avg=vs.reduce(function(a,b){return a+b;},0)/vs.length;return{vs:vs,mn:mn,mx:mx,avg:avg,diff:mx-mn};}
+
+  var h='';
+
+  // ── 1. RESUMEN GENERAL ──
+  h+=eqSectionHd('&#9878;&#65039;','Equidad General','Distribución total de partidos por equipo — ideal: todos iguales');
+  var totD=colVals(function(t){return eq[t].tot;});
+  var locD=colVals(function(t){return eq[t].loc;});
+  var visD=colVals(function(t){return eq[t].vis;});
+  var festD=colVals(function(t){return eq[t].fest;});
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 6px"><table style="width:100%;border-collapse:collapse;min-width:320px">';
+  h+='<thead><tr><th style="background:rgba(245,159,11,.1);color:var(--gl);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 8px;text-align:left;border-bottom:1px solid rgba(245,159,11,.2)">Equipo</th>';
+  ['Total','Local','Visit.','Festivo'].forEach(function(c){h+='<th style="background:rgba(245,159,11,.1);color:var(--gl);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 6px;text-align:center;border-bottom:1px solid rgba(245,159,11,.2)">'+c+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t,i){
+    h+='<tr>'+eqTeamCell(t);
+    h+='<td '+eqCell(eq[t].tot,totD.mn,totD.mx,totD.avg)+'>'+eq[t].tot+'</td>';
+    h+='<td '+eqCell(eq[t].loc,locD.mn,locD.mx,locD.avg)+'>'+eq[t].loc+'</td>';
+    h+='<td '+eqCell(eq[t].vis,visD.mn,visD.mx,visD.avg)+'>'+eq[t].vis+'</td>';
+    h+='<td '+eqCell(eq[t].fest,festD.mn,festD.mx,festD.avg)+'>'+eq[t].fest+'</td>';
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+=eqLegend();
+  h+=eqScoreBar(totD.diff,'Equidad Total de Partidos');
+  h+=eqScoreBar(locD.diff+visD.diff,'Equidad Local / Visitante');
+
+  // ── 2. EQUIDAD POR CANCHA ──
+  h+=eqSectionHd('&#127960;&#65039;','Equidad por Cancha','Cuántos partidos juega cada equipo en cada cancha');
+  var cnchs=['Confanorte','Coveadse','Villa Silvania'];
+  var cD=cnchs.map(function(c){return colVals(function(t){return eq[t].canchas[c]||0;});});
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 6px"><table style="width:100%;border-collapse:collapse;min-width:320px">';
+  h+='<thead><tr><th style="background:rgba(14,165,233,.08);color:var(--ac);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 8px;text-align:left;border-bottom:1px solid rgba(14,165,233,.2)">Equipo</th>';
+  [{n:'Confanorte',c:'#34d399'},{n:'Coveadse',c:'#38bdf8'},{n:'V.Silvania',c:'#fbbf24'}].forEach(function(cn){
+    h+='<th style="background:rgba(14,165,233,.08);color:'+cn.c+';font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 6px;text-align:center;border-bottom:1px solid rgba(14,165,233,.2)">'+cn.n+'</th>';
+  });
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr>'+eqTeamCell(t);
+    cnchs.forEach(function(cn,ci){var v=eq[t].canchas[cn]||0;h+='<td '+eqCell(v,cD[ci].mn,cD[ci].mx,cD[ci].avg)+'>'+v+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+=eqLegend();
+  var maxCanchaDiff=Math.max.apply(null,cD.map(function(d){return d.diff;}));
+  h+=eqScoreBar(maxCanchaDiff,'Equidad de Canchas');
+
+  // ── 3. EQUIDAD POR HORARIO ──
+  h+=eqSectionHd('&#128336;','Equidad por Horario','Distribución de partidos según el horario del partido');
+  var hrs=HOURS;
+  var hD=hrs.map(function(hr){return colVals(function(t){return eq[t].horas[hr]||0;});});
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 6px"><table style="width:100%;border-collapse:collapse;min-width:480px">';
+  h+='<thead><tr><th style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 8px;text-align:left;border-bottom:1px solid rgba(139,92,246,.2)">Equipo</th>';
+  hrs.forEach(function(hr){h+='<th style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:8px;font-weight:900;letter-spacing:.7px;padding:8px 5px;text-align:center;border-bottom:1px solid rgba(139,92,246,.2)">'+hr+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr>'+eqTeamCell(t);
+    hrs.forEach(function(hr,hi){var v=eq[t].horas[hr]||0;h+='<td '+eqCell(v,hD[hi].mn,hD[hi].mx,hD[hi].avg)+'>'+v+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+=eqLegend();
+  var maxHrDiff=Math.max.apply(null,hD.map(function(d){return d.diff;}));
+  h+=eqScoreBar(maxHrDiff,'Equidad de Horarios');
+
+  // ── 4. EQUIDAD POR FESTIVOS ──
+  h+=eqSectionHd('&#127881;','Equidad en Festivos','Cuántos partidos festivos tiene cada equipo');
+  var festTotal=RC.filter(function(m){return m[7];}).length;
+  h+='<div style="margin:0 16px 10px;background:rgba(245,159,11,.06);border:1px solid rgba(245,159,11,.18);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;color:var(--gl);font-weight:800;margin-bottom:10px">Total partidos en festivos: '+festTotal+' &nbsp;|&nbsp; Ideal por equipo: '+Math.round(festTotal*2/10)+' (aprox.)</div>';
+  var festVals=TEAMS.map(function(t){return eq[t].fest;});
+  var festMn=Math.min.apply(null,festVals),festMx=Math.max.apply(null,festVals),festAvg=festVals.reduce(function(a,b){return a+b;},0)/10;
+  h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">';
+  TEAMS.forEach(function(t){
+    var v=eq[t].fest;
+    var bg=v===festMx?'rgba(16,185,129,.2)':v===festMn?'rgba(200,16,46,.15)':'rgba(255,255,255,.04)';
+    var cl=v===festMx?'#34d399':v===festMn?'#f87171':'var(--t)';
+    var border=v===festMx?'1px solid rgba(16,185,129,.3)':v===festMn?'1px solid rgba(200,16,46,.25)':'1px solid var(--bd)';
+    h+='<div style="background:'+bg+';border:'+border+';border-radius:9px;padding:8px 4px;text-align:center">';
+    h+='<div style="width:22px;height:26px;margin:0 auto 4px">'+bdg(t,'')+'</div>';
+    h+='<div style="font-size:14px;font-weight:900;color:'+cl+'">'+v+'</div>';
+    h+='<div style="font-size:7.5px;color:var(--m);font-weight:700">'+ts(t)+'</div>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+  h+=eqLegend();
+  h+=eqScoreBar(festMx-festMn,'Equidad en Festivos');
+
+  // ── 5. EQUIDAD POR VUELTA ──
+  h+=eqSectionHd('&#9861;&#65039;','Equidad por Vuelta','Partidos que tiene cada equipo en cada vuelta del torneo');
+  var vuD=[1,2,3].map(function(vu){return colVals(function(t){return eq[t].vueltas[vu]||0;});});
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 6px"><table style="width:100%;border-collapse:collapse;min-width:280px">';
+  h+='<thead><tr><th style="background:rgba(200,16,46,.08);color:#f87171;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 8px;text-align:left;border-bottom:1px solid rgba(200,16,46,.2)">Equipo</th>';
+  ['Vuelta 1','Vuelta 2','Vuelta 3'].forEach(function(v){h+='<th style="background:rgba(200,16,46,.08);color:#f87171;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:8px 6px;text-align:center;border-bottom:1px solid rgba(200,16,46,.2)">'+v+'</th>';});
+  h+='</tr></thead><tbody>';
+  TEAMS.forEach(function(t){
+    h+='<tr>'+eqTeamCell(t);
+    [1,2,3].forEach(function(vu,vi){var v=eq[t].vueltas[vu]||0;h+='<td '+eqCell(v,vuD[vi].mn,vuD[vi].mx,vuD[vi].avg)+'>'+v+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+=eqLegend();
+  h+=eqScoreBar(Math.max.apply(null,vuD.map(function(d){return d.diff;})),'Equidad por Vuelta');
+
+  // ── 6. TABLA DE POSICIONES ──
+  h+=eqSectionHd('&#128202;','Tabla de Posiciones','Clasificación actual del torneo');
+  var tb_st=cSt();
   h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 14px"><table class="eqdtbl"><thead><tr>';
   h+='<th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th class="pts">Pts</th></tr></thead><tbody>';
-  ts.forEach(function(t,i){
-    var dg=t.gf-t.gc;
-    var cls=i<8?'':'color:var(--m)';
-    var dgc=dg>0?'pos':dg<0?'neg':'';
-    var rankCls=i===0?'style="color:var(--gl);font-weight:900"':i<8?'style="color:var(--ac)"':'style="color:var(--m)"';
-    h+='<tr style="'+cls+'">';
-    h+='<td '+rankCls+'>'+(i+1)+'</td>';
-    h+='<td><div style="display:flex;align-items:center;gap:7px"><div class="eqdbdg">'+bdg(t.id,'')+'</div><div><div style="font-size:10.5px;font-weight:800">'+tn(t.id)+'</div></div></div></td>';
-    h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
-    h+='<td>'+t.gf+'</td><td>'+t.gc+'</td>';
-    h+='<td class="dg '+dgc+'">'+(dg>0?'+':'')+dg+'</td>';
+  tb_st.forEach(function(t,i){
+    var dg=t.gf-t.gc;var dgc=dg>0?'pos':dg<0?'neg':'';
+    var rc=i===0?'style="color:var(--gl);font-weight:900"':i<8?'style="color:var(--ac)"':'style="color:var(--m)"';
+    h+='<tr>';
+    h+='<td '+rc+'>'+(i+1)+'</td>';
+    h+='<td><div style="display:flex;align-items:center;gap:6px"><div style="width:18px;height:22px">'+bdg(t.id,'')+'</div><span style="font-size:10px;font-weight:800">'+tn(t.id)+'</span></div></td>';
+    h+='<td style="text-align:center">'+t.pj+'</td><td style="text-align:center">'+t.g+'</td><td style="text-align:center">'+t.e+'</td><td style="text-align:center">'+t.p+'</td>';
+    h+='<td style="text-align:center">'+t.gf+'</td><td style="text-align:center">'+t.gc+'</td>';
+    h+='<td class="dg '+dgc+'" style="text-align:center">'+(dg>0?'+':'')+dg+'</td>';
     h+='<td class="pts">'+t.pts+'</td>';
     h+='</tr>';
   });
   h+='</tbody></table></div>';
-  h+='<div style="margin:0 16px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
-  h+='<div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--ac);font-weight:900;text-transform:uppercase;letter-spacing:.8px">Clasifican</div><div style="font-size:20px;font-weight:900;color:var(--ac)">8</div><div style="font-size:8px;color:var(--m)">Playoffs</div></div>';
-  h+='<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:#34d399;font-weight:900;text-transform:uppercase;letter-spacing:.8px">Lider</div><div style="font-size:13px;font-weight:900;color:#34d399">'+(ts[0]?tn(ts[0].id):'—')+'</div><div style="font-size:8px;color:var(--m)">'+(ts[0]?ts[0].pts+' pts':'—')+'</div></div>';
-  h+='<div style="background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--anr);font-weight:900;text-transform:uppercase;letter-spacing:.8px">Último</div><div style="font-size:13px;font-weight:900;color:var(--anr)">'+(ts[9]?tn(ts[9].id):'—')+'</div><div style="font-size:8px;color:var(--m)">'+(ts[9]?ts[9].pts+' pts':'—')+'</div></div>';
+  h+='<div style="margin:0 16px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
+  h+='<div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--ac);font-weight:900;text-transform:uppercase">Clasifican</div><div style="font-size:22px;font-weight:900;color:var(--ac)">8</div><div style="font-size:8px;color:var(--m)">Playoffs</div></div>';
+  h+='<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:#34d399;font-weight:900;text-transform:uppercase">L\u00edder</div><div style="font-size:11px;font-weight:900;color:#34d399;line-height:1.3">'+(tb_st[0]?tn(tb_st[0].id):'—')+'</div><div style="font-size:9px;color:var(--m)">'+(tb_st[0]?tb_st[0].pts+' pts':'')+'</div></div>';
+  h+='<div style="background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:9px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--anr);font-weight:900;text-transform:uppercase">\u00daltimo</div><div style="font-size:11px;font-weight:900;color:var(--anr);line-height:1.3">'+(tb_st[9]?tn(tb_st[9].id):'—')+'</div><div style="font-size:9px;color:var(--m)">'+(tb_st[9]?tb_st[9].pts+' pts':'')+'</div></div>';
   h+='</div>';
+
   adCnt(h);
 }
 
