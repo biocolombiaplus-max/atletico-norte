@@ -795,7 +795,13 @@ const FB={
 };
 
 let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null,cfe=0;
-let sortPos=null,sortAssign={},custBadges={},DLG_CACHE=[],teamInfo={};
+let sortPos=null,sortAssign={},DLG_CACHE=[],teamInfo={};
+// Load badges from localStorage instantly (before Firebase responds)
+var _lsBdg=localStorage.getItem("an_badges");
+var custBadges=_lsBdg?JSON.parse(_lsBdg):{};
+var _lsClub=localStorage.getItem("an_clublogo");
+// Load club logo instantly
+(function(){var sh=document.getElementById("anShield");if(_lsClub&&sh){sh.innerHTML='<img src="'+_lsClub+'" style="width:100%;height:100%;object-fit:contain"/>';}})();
 
 window.addEventListener("load",function(){
   try{
@@ -820,19 +826,23 @@ window.addEventListener("load",function(){
     });
     db.ref("/teamBadges").on("value",function(s){
       custBadges=s.val()||{};
+      try{localStorage.setItem("an_badges",JSON.stringify(custBadges));}catch(e){}
       initFltEq();rFx();rTb();rGl();
     });
     db.ref("/clubLogo").on("value",function(s){
       var img=s.val();
       var sh=document.getElementById("anShield");
       if(img){
+        try{localStorage.setItem("an_clublogo",img);}catch(e){}
         sh.innerHTML='<img src="'+img+'" style="width:100%;height:100%;object-fit:contain"/>';
-        // Update PWA icon dynamically
         var lnk=document.querySelector("link[rel*=\'icon\']")||document.createElement("link");
         lnk.rel="icon";lnk.type="image/png";lnk.href=img;document.head.appendChild(lnk);
         var al=document.querySelector("link[rel=\'apple-touch-icon\']")||document.createElement("link");
         al.rel="apple-touch-icon";al.href=img;document.head.appendChild(al);
-      }else{sh.innerHTML=AN_SVG;}
+      }else{
+        localStorage.removeItem("an_clublogo");
+        sh.innerHTML=AN_SVG;
+      }
     });
     db.ref("/equipos").on("value",function(s){teamInfo=s.val()||{};});
   }catch(e){
