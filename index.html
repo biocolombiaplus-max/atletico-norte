@@ -805,7 +805,11 @@ window.addEventListener("load",function(){
       if(u){
         var c=u.email.replace("@atleticonorte.co","");
         var s=await db.ref("/socios/"+c).get();
-        pf=s.exists()?s.val():{cedula:c};cu=c;cr=pf.rol||"Socio";onIn();
+        pf=s.exists()?s.val():{cedula:c};cu=c;
+        var rawRol=pf.rol||"Socio";
+        var rolMap={"administrador":"Administrador","coordinador deportivo":"Coordinador Deportivo","coordinador financiero":"Coordinador Financiero","socio":"Socio"};
+        cr=rolMap[rawRol.toLowerCase()]||rawRol;
+        onIn();
       }else onOut();
     });
     db.ref("/resultados").on("value",function(s){res=s.val()||{};rGl();rFx();rTb();rGo();rVl();updHdr();});
@@ -1855,28 +1859,35 @@ async function doUd(){
 // ── TEAM BADGE UPLOADS (admin) ──
 function pExEl(){return document.getElementById("pEx")||document.getElementById("admPnCnt");}
 async function shBdg(){
-  var h='<div style="padding:16px">';
-  h+='<div style="font-size:13px;font-weight:900;color:var(--t);margin-bottom:4px">&#127960;&#65039; Escudos de Equipos</div>';
-  h+='<div style="font-size:11px;color:var(--m);margin-bottom:6px;line-height:1.6">Toca <strong style="color:var(--ac)">Subir PNG</strong> para cargar el escudo de cada equipo. Se recomienda fondo transparente.</div>';
-  h+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:8px;padding:5px 10px;margin-bottom:14px;font-size:10px;font-weight:700;color:var(--ac)">&#128196; Formatos: PNG (recomendado) · JPG · WebP &nbsp;&#183;&nbsp; M\u00e1x. 5 MB</div>';
+  var h='<div style="padding:16px 16px 24px">';
+  h+='<div style="font-size:16px;font-weight:900;color:var(--t);margin-bottom:4px;display:flex;align-items:center;gap:8px">&#127960;&#65039; Escudos de Equipos</div>';
+  h+='<div style="font-size:11px;color:var(--m);margin-bottom:12px;line-height:1.7">Toca el escudo o el bot\u00f3n <strong style="color:var(--ac)">Subir PNG</strong> para cargar el logo de cada equipo. Se recomienda PNG con fondo transparente.</div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.18);border-radius:10px;padding:8px 12px;margin-bottom:18px">';
+  h+='<span style="font-size:14px">&#128161;</span><span style="font-size:10px;font-weight:700;color:var(--ac);line-height:1.5">PNG con transparencia (recomendado) &nbsp;&#183;&nbsp; JPG &nbsp;&#183;&nbsp; WebP &nbsp;&#183;&nbsp; M\u00e1x. 5 MB &nbsp;&#183;&nbsp; Se escala autom\u00e1ticamente a 480px</span>';
+  h+='</div>';
+  // Grid 2 columnas
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
   for(var i=1;i<=10;i++){
     var has=!!custBadges[i];
-    h+='<div style="background:var(--cd);border:1px solid '+(has?'rgba(16,185,129,.35)':'var(--bd)')+';border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px">';
-    // Escudo grande clickeable
-    h+='<label style="cursor:pointer;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px">';
-    h+='<div style="width:56px;height:66px;border-radius:8px;overflow:hidden;border:2px solid '+(has?'rgba(16,185,129,.5)':'rgba(255,255,255,.1)')+';background:var(--b3);display:flex;align-items:center;justify-content:center;position:relative">'+bdg(i,'')+'<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);text-align:center;font-size:8px;padding:2px;color:#fff;font-weight:700">&#128247;</div></div>';
-    h+='<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)">';
+    var brdClr=has?'rgba(16,185,129,.4)':'rgba(255,255,255,.08)';
+    var bgClr=has?'rgba(16,185,129,.05)':'var(--cd)';
+    h+='<div style="background:'+bgClr+';border:1.5px solid '+brdClr+';border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">';
+    // Escudo grande clickeable con overlay de cámara
+    h+='<label style="cursor:pointer;position:relative;display:block">';
+    h+='<div id="bdgPrv'+i+'" style="width:72px;height:84px;margin:0 auto;border-radius:10px;overflow:hidden;border:2px solid '+brdClr+';background:var(--b3);display:flex;align-items:center;justify-content:center;transition:.2s">'+bdg(i,'')+'</div>';
+    h+='<div style="position:absolute;bottom:0;right:0;width:22px;height:22px;background:'+(has?'#10b981':'var(--ac)')+';border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 6px rgba(0,0,0,.4)">&#128247;</div>';
+    h+='<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" data-tid="'+i+'" onchange="upBdg(event)">';
     h+='</label>';
-    // Info
-    h+='<div style="flex:1;min-width:0">';
-    h+='<div style="font-size:15px;font-weight:800;color:var(--t);margin-bottom:3px">'+tn(i)+'</div>';
-    h+='<div style="font-size:11px;color:'+(has?'#10b981':'var(--m)')+';margin-bottom:10px">'+(has?'&#9989; Escudo personalizado':'&#128247; Usando escudo por defecto')+'</div>';
-    h+='<div style="display:flex;gap:8px">';
-    h+='<label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--ac);color:#fff;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.2px">&#128196; Subir PNG / JPG<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label>';
-    if(has) h+='<button onclick="rmBdg('+i+')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">&#128465;</button>';
-    h+='</div></div></div>';
+    // Nombre equipo
+    h+='<div style="font-size:12px;font-weight:800;color:var(--t);line-height:1.2">'+tn(i)+'</div>';
+    // Estado
+    h+='<div style="font-size:9px;font-weight:700;color:'+(has?'#10b981':'var(--m)')+';">'+(has?'&#9989; Personalizado':'&#11093; Por defecto')+'</div>';
+    // Botón subir
+    h+='<label style="width:100%;display:flex;align-items:center;justify-content:center;gap:5px;background:linear-gradient(135deg,var(--ac),#0ea5e9);color:#fff;padding:9px 8px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 3px 10px rgba(14,165,233,.3)">&#128196; Subir PNG<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" data-tid="'+i+'" onchange="upBdg(event)"></label>';
+    if(has) h+='<button onclick="rmBdg('+i+')" style="width:100%;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:7px;border-radius:9px;font-size:10px;font-weight:700;cursor:pointer">&#128465; Quitar escudo</button>';
+    h+='</div>';
   }
-  h+='</div>';
+  h+='</div></div>';
   adCnt(h);
 }
 async function upBdg(e){
