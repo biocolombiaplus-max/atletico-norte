@@ -148,52 +148,83 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 
 /* ── PRINT / PDF ── */
 @media print{
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
   .app,.bnv,.hdr,.adb,.admpntabs,.pag,.pph,.no-print,.prmo,.wsp-fab{display:none!important}
-  body,html{background:#fff!important;margin:0;padding:0;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif}
+  body,html{background:#fff!important;margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;color:#111}
   #printArea{display:block!important}
-  @page{margin:10mm 8mm;size:A4}
-  /* Cover */
-  .pr-cover{background:linear-gradient(135deg,#c8102e,#7f0000)!important;color:#fff!important;padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
-  .pr-cover-l h1{font-size:16px;font-weight:900;margin:0 0 2px;letter-spacing:-.3px}
-  .pr-cover-l p{font-size:8.5px;opacity:.85;margin:0;letter-spacing:.4px;text-transform:uppercase}
-  .pr-cover-r{text-align:right;font-size:8px;opacity:.8;line-height:1.6}
-  /* Week block */
-  .pr-wk{margin-top:12px;page-break-inside:avoid}
-  .pr-wk-hd{background:#1c1c1e!important;color:#fff!important;padding:6px 12px;display:flex;align-items:center;gap:8px;page-break-after:avoid}
-  .pr-wk-n{background:#c8102e!important;color:#fff!important;border-radius:4px;padding:1px 8px;font-size:9px;font-weight:900;letter-spacing:.3px}
-  .pr-wk-dates{font-size:8px;opacity:.7;flex:1}
-  .pr-wk-fest{background:#f59e0b!important;color:#fff!important;border-radius:4px;padding:1px 6px;font-size:7.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
-  /* Day separator */
-  .pr-day-row{background:#f7f7f7!important;font-size:7.5px;font-weight:900;color:#666!important;text-transform:uppercase;letter-spacing:.8px}
-  .pr-day-row td{padding:3px 8px!important;border-bottom:1px solid #e8e8e8!important}
-  /* Match table */
-  .pr-tbl{width:100%;border-collapse:collapse;font-size:9px}
-  .pr-tbl td{padding:5px 7px;border-bottom:1px solid #f0f0f0;vertical-align:middle;color:#111}
-  .pr-tbl .c-l{border-left:3px solid #c8102e!important}
-  .pr-tbl .c-j{border-left:3px solid #0ea5e9!important}
-  .pr-tbl .c-s{border-left:3px solid #10b981!important}
-  .pr-id{color:#bbb;font-size:8px;width:22px}
-  .pr-hora{font-weight:800;font-size:9.5px;white-space:nowrap}
-  .pr-teams{font-weight:800;font-size:10px}
-  .pr-vs{color:#bbb;font-weight:400;margin:0 5px}
-  /* Badges */
-  .bdg{display:inline-block;border-radius:3px;padding:1px 5px;font-size:7.5px;font-weight:700;white-space:nowrap}
-  .bdg-cov{background:#dbeafe!important;color:#1e40af!important}
-  .bdg-cnf{background:#dcfce7!important;color:#15803d!important}
-  .bdg-vls{background:#fefce8!important;color:#a16207!important}
-  .bdg-fest{background:#fef3c7!important;color:#b45309!important}
-  .bdg-vu{background:#f3e8ff!important;color:#7c3aed!important}
-  .bdg-loc{background:#fee2e2!important;color:#b91c1c!important}
-  .bdg-vis{background:#f1f5f9!important;color:#64748b!important}
-  /* Team header (per-equipo mode) */
-  .pr-eq-hd{background:linear-gradient(135deg,#1a1a2e,#16213e)!important;color:#fff!important;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:8px}
-  .pr-eq-num{background:#c8102e!important;color:#fff!important;width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex-shrink:0;text-align:center;line-height:38px}
-  .pr-eq-hd h2{font-size:15px;font-weight:900;margin:0 0 3px}
-  .pr-eq-hd p{font-size:8.5px;opacity:.7;margin:0}
-  .pr-tbl-hd td{background:#f3f4f6!important;font-size:7.5px;font-weight:900;color:#555!important;text-transform:uppercase;letter-spacing:.5px;padding:4px 7px!important;border-bottom:2px solid #ddd!important}
-  /* Footer */
-  .pr-footer{text-align:center;font-size:7.5px;color:#bbb;margin-top:18px;padding-top:8px;border-top:1px solid #eee;letter-spacing:.3px}
+  @page{margin:12mm 10mm;size:A4}
+
+  /* ── COVER HEADER ── */
+  .pr-cover{background:linear-gradient(135deg,#c8102e 0%,#8b0000 100%)!important;color:#fff!important;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:0;border-radius:6px 6px 0 0}
+  .pr-cover-logo{width:52px;height:62px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+  .pr-cover-logo img,.pr-cover-logo svg{width:100%;height:100%;object-fit:contain}
+  .pr-cover-txt{flex:1}
+  .pr-cover-txt h1{font-size:17px;font-weight:900;margin:0 0 3px;letter-spacing:-.3px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .pr-cover-txt p{font-size:9px;opacity:.85;margin:0;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+  .pr-cover-meta{text-align:right;font-size:8px;opacity:.8;line-height:1.8;white-space:nowrap}
+  .pr-cover-meta strong{display:block;font-size:10px;opacity:1;font-weight:800;margin-bottom:2px}
+
+  /* ── SECTION BLOCKS ── */
+  .pr-section{margin-top:14px;page-break-inside:avoid}
+  .pr-section h2{background:#1c1c2e!important;color:#fff!important;font-size:10px;font-weight:900;margin:0 0 0;padding:7px 10px;display:flex;align-items:center;gap:6px;letter-spacing:.3px;border-radius:5px 5px 0 0}
+  .pr-section h2 .pr-wk-badge{background:#c8102e!important;border-radius:3px;padding:1px 7px;font-size:8.5px;font-weight:900;margin-left:4px}
+  .pr-section h2 .pr-fest-badge{background:#f59e0b!important;color:#111!important;border-radius:3px;padding:1px 6px;font-size:7.5px;font-weight:800;letter-spacing:.3px}
+
+  /* ── MATCH TABLE ── */
+  .pr-table{width:100%;border-collapse:collapse;font-size:8.5px;border:1px solid #e8e8e8;border-top:none}
+  .pr-table th{background:#f3f4f6!important;color:#555!important;font-size:7.5px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;padding:5px 7px;border-bottom:2px solid #ddd;text-align:left;white-space:nowrap}
+  .pr-table th.tc{text-align:center}
+  .pr-table td{padding:5px 7px;border-bottom:1px solid #f0f0f0;vertical-align:middle;color:#111}
+  .pr-table tr:last-child td{border-bottom:none}
+  .pr-table tr:nth-child(even) td{background:#fafafa!important}
+
+  /* Day separator row */
+  .pr-day-sep td{background:#eef2f7!important;color:#4a5568!important;font-size:7.5px;font-weight:900;text-transform:uppercase;letter-spacing:1px;padding:4px 8px!important;border-bottom:1px solid #dde3ed!important;border-top:1px solid #dde3ed!important}
+
+  /* ── TEAM CELLS ── */
+  .pr-team-cell{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .pr-team-bdg{width:20px;height:24px;flex-shrink:0;display:inline-block;vertical-align:middle}
+  .pr-team-bdg img,.pr-team-bdg svg{width:100%;height:100%;object-fit:contain}
+  .pr-team-name{font-weight:800;font-size:9px}
+  .pr-vs-sep{color:#bbb;font-size:8px;font-weight:400;margin:0 3px}
+
+  /* ── CANCHA / HORA BADGES ── */
+  .pr-tag{display:inline-block;border-radius:3px;padding:1px 5px;font-size:7.5px;font-weight:800;white-space:nowrap}
+  .pr-tag-cov{background:#dbeafe!important;color:#1e40af!important}
+  .pr-tag-cnf{background:#dcfce7!important;color:#15803d!important}
+  .pr-tag-vls{background:#fef3c7!important;color:#92400e!important}
+  .pr-tag-fest{background:#fef3c7!important;color:#b45309!important}
+  .pr-tag-vu{background:#ede9fe!important;color:#5b21b6!important}
+  .pr-tag-loc{background:#fee2e2!important;color:#b91c1c!important;font-size:7px}
+  .pr-tag-vis{background:#f1f5f9!important;color:#475569!important;font-size:7px}
+  .pr-hora{font-weight:900;font-size:9px;color:#111;white-space:nowrap}
+  .pr-id{color:#ccc;font-size:7.5px;width:20px;text-align:center}
+
+  /* ── EQUITY TABLES ── */
+  .pr-eq-cover{background:linear-gradient(135deg,#1a1a2e,#16213e)!important;color:#fff!important;padding:12px 14px;display:flex;align-items:center;gap:14px;border-radius:5px;margin-bottom:10px}
+  .pr-eq-cover-bdg{width:44px;height:53px;flex-shrink:0}
+  .pr-eq-cover-bdg img,.pr-eq-cover-bdg svg{width:100%;height:100%;object-fit:contain}
+  .pr-eq-cover h2{font-size:14px;font-weight:900;margin:0 0 2px}
+  .pr-eq-cover p{font-size:8px;opacity:.7;margin:0}
+  .pr-eq-cover-info{flex:1}
+  .pr-eq-cover-name{font-size:16px;font-weight:900;margin-bottom:3px}
+  .pr-eq-cover-sub{font-size:8px;opacity:.7;font-weight:600;letter-spacing:.3px}
+  .pr-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+  .pr-stat-box{background:#f8f9fa!important;border:1px solid #e5e7eb;border-radius:5px;padding:8px;text-align:center}
+  .pr-stat-box .v{font-size:18px;font-weight:900;color:#111}
+  .pr-stat-box .l{font-size:7px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  .pr-eq-tbl{width:100%;border-collapse:collapse;font-size:8px;margin-bottom:8px}
+  .pr-eq-tbl th{background:#f3f4f6!important;color:#555!important;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:5px 6px;border-bottom:2px solid #ddd;text-align:center}
+  .pr-eq-tbl th:first-child{text-align:left}
+  .pr-eq-tbl td{padding:5px 6px;border-bottom:1px solid #f0f0f0;text-align:center;vertical-align:middle}
+  .pr-eq-tbl td:first-child{text-align:left}
+  .pr-eq-tbl .cell-hi,.pr-table .cell-hi{background:#dcfce7!important;color:#15803d!important;font-weight:900}
+  .pr-eq-tbl .cell-lo,.pr-table .cell-lo{background:#fee2e2!important;color:#b91c1c!important;font-weight:900}
+  .pr-eq-tbl .cell-ok{font-weight:700}
+  .pr-eq-tbl tr:nth-child(even) td{background:#fafafa!important}
+
+  /* ── FOOTER ── */
+  .pr-footer{text-align:center;font-size:7px;color:#bbb;margin-top:16px;padding-top:8px;border-top:1px solid #eee;letter-spacing:.3px}
 }
 #printArea{display:none}
 /* Print modal */
@@ -670,12 +701,20 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- ══════════ PRINT AREA (hidden, shown on print) ══════════ -->
 <div id="printArea">
-  <div class="pr-header">
-    <h1>&#9917; Atl&#233;tico Norte F.C. &#183; Liga Interna S2 2026</h1>
-    <p id="prTitle">Fixture General &#183; 135 partidos &#183; 10 equipos &#183; 3 vueltas</p>
+  <div class="pr-cover">
+    <div class="pr-cover-logo" id="prCoverLogo"></div>
+    <div class="pr-cover-txt">
+      <h1>Atl&#233;tico Norte F.C.</h1>
+      <p id="prTitle">Fixture General &middot; Liga Interna S2 2026</p>
+    </div>
+    <div class="pr-cover-meta">
+      <strong>Liga Interna S2 2026</strong>
+      <span id="prDate"></span><br>
+      fixture.cesarcreps.com
+    </div>
   </div>
   <div id="prContent"></div>
-  <div class="pr-footer">Generado el <span id="prDate"></span> &#183; fixture.cesarcreps.com &#183; Atl&#233;tico Norte F.C.</div>
+  <div class="pr-footer">fixture.cesarcreps.com &nbsp;&middot;&nbsp; Atl&#233;tico Norte F.C. &nbsp;&middot;&nbsp; Liga Interna S2 2026</div>
 </div>
 
 <!-- ══════════ PRINT MODAL ══════════ -->
@@ -2065,62 +2104,106 @@ function prPickEq(tid,el){
   document.querySelectorAll('.pr-eq-btn').forEach(function(b){b.classList.remove('sel');});
   el.classList.add('sel');
 }
+function prTeamName(t){return T[t]?T[t].n:'E'+t;}
+function prTeamCell(tid,sz){
+  sz=sz||20;var h=Math.round(sz*1.2);
+  var img=custBadges[tid];
+  var bHtml=img?'<img src="'+img+'" style="width:'+sz+'px;height:'+h+'px;object-fit:contain;vertical-align:middle;flex-shrink:0"/>'
+    :'<div style="width:'+sz+'px;height:'+h+'px;display:inline-block;vertical-align:middle;flex-shrink:0">'+B[tid]+'</div>';
+  return '<span style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap">'+bHtml+'<span style="font-weight:800;font-size:9px">'+prTeamName(tid)+'</span></span>';
+}
+function prCanchaTag(c){
+  var cl=c==='Coveadse'?'pr-tag-cov':c==='Comfanorte'?'pr-tag-cnf':'pr-tag-vls';
+  return "<span class='pr-tag "+cl+"'>"+c+"</span>";
+}
+function prFmtDate(d){if(!d)return '';var dt=new Date(d+"T12:00:00");return dt.toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"2-digit"});}
+function prGetDia(fecha){var d=new Date(fecha+"T12:00:00");var w=d.getDay();return w===1?"Lunes":w===4?"Jueves":"Sábado";}
 function doPrint(){
   document.getElementById('prDate').textContent=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  // Inject club logo into cover
+  var covLogo=document.getElementById('prCoverLogo');
+  if(covLogo){
+    if(_lsClub){covLogo.innerHTML='<img src="'+_lsClub+'" style="max-width:120px;max-height:120px;object-fit:contain"/>';}
+    else{covLogo.innerHTML='<div style="width:100px;height:100px">'+AN_SVG+'</div>';}
+  }
   var content='', title='';
-  var dayOrd={Lunes:0,Jueves:1,Sabado:2};
-  var dayLabel={Lunes:'Lunes',Jueves:'Jueves',Sabado:'S\u00e1bado'};
-  var canchaClass={Comfanorte:'pr-cancha-cnf',Coveadse:'pr-cancha-cov','Villa Silvania':'pr-cancha-vls'};
-  function prTeamName(t){return T[t]?T[t].n:'E'+t;}
+  var dayOrd={"Lunes":0,"Jueves":1,"Sábado":2};
+  function scoreHtml(m){
+    if(m.gl!=null&&m.gv!=null)return "<span style='font-weight:900;color:#1a1a1a;font-size:10px'>"+m.gl+"-"+m.gv+"</span>";
+    return "<span style='color:#aaa;font-size:9px'>&#8212;</span>";
+  }
   function prRow(m){
-    var festTag=m.festivo?"<span class='pr-badge-fest'>Festivo</span> ":"";
-    var cc=canchaClass[m.cancha]||"";
-    return "<tr><td style='width:28px;color:#888;font-size:9px'>"+m.id+"</td>"
-      +"<td>"+festTag+"<strong>"+dayLabel[m.dia]+"</strong></td>"
-      +"<td style='font-size:9px;color:#555'>"+fmtDate(m.fecha)+"</td>"
-      +"<td><span class='pr-cancha-"+m.cancha.replace(/ /g,"-").toLowerCase()+"' style='border-radius:4px;padding:1px 5px;font-weight:700;font-size:9px'>"+m.hora+"</span></td>"
-      +"<td><span class='"+cc+"'>"+m.cancha+"</span></td>"
-      +"<td style='font-weight:800'>"+prTeamName(m.l)+" <span style='color:#999'>vs</span> "+prTeamName(m.v)+"</td>"
-      +"<td><span style='background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700'>V"+m.vu+"</span></td>"
+    var festTag=m.festivo?"<span class='pr-tag pr-tag-fest'>Festivo</span> ":"";
+    return "<tr>"
+      +"<td style='width:24px;color:#999;font-size:8px;text-align:center'>"+m.id+"</td>"
+      +"<td>"+festTag+"<strong>"+prGetDia(m.fecha)+"</strong></td>"
+      +"<td style='font-size:9px;color:#555;white-space:nowrap'>"+prFmtDate(m.fecha)+"</td>"
+      +"<td style='font-weight:800;white-space:nowrap'>"+m.hora+"</td>"
+      +"<td>"+prCanchaTag(m.cancha)+"</td>"
+      +"<td>"+prTeamCell(m.l,18)+" <span style='color:#bbb;font-size:8px;font-weight:400'>vs</span> "+prTeamCell(m.v,18)+"</td>"
+      +"<td style='text-align:center'>"+scoreHtml(m)+"</td>"
+      +"<td style='text-align:center'><span style='background:#ede9fe;color:#5b21b6;border-radius:3px;padding:1px 4px;font-size:8px;font-weight:700'>V"+m.vu+"</span></td>"
       +"</tr>";
   }
-  function fmtDate(d){if(!d)return '';var dt=new Date(d+"T12:00:00");return dt.toLocaleDateString("es-CO",{day:"2-digit",month:"short"});}
-  function getDia(fecha){var d=new Date(fecha+"T12:00:00");var w=d.getDay();return w===1?"Lunes":w===4?"Jueves":"Sabado";}
-  var allMs=MF.map(function(m){return Object.assign({},m,{semana:m.week,dia:getDia(m.fecha),equipo1:m.l,equipo2:m.v,vuelta:m.vu});}).sort(function(a,b){return a.semana-b.semana||dayOrd[a.dia]-dayOrd[b.dia]||a.hora.localeCompare(b.hora);});
+  function getDia(fecha){var d=new Date(fecha+"T12:00:00");var w=d.getDay();return w===1?"Lunes":w===4?"Jueves":"Sábado";}
+  var allMs=MF.map(function(m){return Object.assign({},m,{semana:m.week,dia:getDia(m.fecha)});}).sort(function(a,b){return a.semana-b.semana||(dayOrd[a.dia]||0)-(dayOrd[b.dia]||0)||a.hora.localeCompare(b.hora);});
   if(prOpt==='fx'){
-    title='Fixture General &#183; 135 partidos &#183; 10 equipos &#183; 3 vueltas';
+    title='Fixture General &#183; '+MF.length+' partidos &#183; 10 equipos &#183; 3 vueltas';
     var byWeek={};
     allMs.forEach(function(m){if(!byWeek[m.semana])byWeek[m.semana]={};if(!byWeek[m.semana][m.dia])byWeek[m.semana][m.dia]=[];byWeek[m.semana][m.dia].push(m);});
     Object.keys(byWeek).sort(function(a,b){return a-b;}).forEach(function(w){
       var byDay=byWeek[w];
-      var firstM=Object.values(byDay)[0][0];
-      var isFest=firstM&&firstM.festivo!==undefined&&Object.values(byDay).flat().some(function(m){return m.festivo;});
+      var allInWeek=Object.values(byDay).flat();
+      var isFest=allInWeek.some(function(m){return m.festivo;});
       content+="<div class='pr-section'>";
       content+="<h2>Semana "+w+(isFest?" &#127881; Festivo":"")+"</h2>";
-      content+="<table class='pr-table'><thead><tr><th>#</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>";
-      ['Lunes','Jueves','Sabado'].forEach(function(day){
-        if(byDay[day])byDay[day].forEach(function(m){content+=prRow(m);});
+      content+="<table class='pr-table'><thead><tr><th>#</th><th>Día</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>Res</th><th>V</th></tr></thead><tbody>";
+      var days=["Lunes","Jueves","Sábado"];
+      var prevDay='';
+      days.forEach(function(day){
+        if(byDay[day]){
+          if(prevDay&&prevDay!==day){
+            content+="<tr class='pr-day-sep'><td colspan='8'><span>"+day+"</span></td></tr>";
+          }
+          byDay[day].forEach(function(m){content+=prRow(m);});
+          prevDay=day;
+        }
       });
       content+='</tbody></table></div>';
     });
   } else if(prOpt==='eq'){
     var tid=prEqSel||1;
-    var tms=allMs.filter(function(m){return m.equipo1===tid||m.equipo2===tid||m.l===tid||m.v===tid;});
-    title='Fixture de '+prTeamName(tid)+' &#183; '+tms.length+' partidos';
+    var tms=allMs.filter(function(m){return m.l===tid||m.v===tid;});
+    title='Fixture: '+prTeamName(tid)+' &#183; '+tms.length+' partidos';
+    // Team cover with badge
+    var eqImg=custBadges[tid];
+    var eqBdg=eqImg?'<img src="'+eqImg+'" style="width:80px;height:96px;object-fit:contain"/>'
+      :'<div style="width:80px;height:80px">'+B[tid]+'</div>';
+    content+="<div class='pr-eq-cover'>"+eqBdg+"<div class='pr-eq-cover-info'><div class='pr-eq-cover-name'>"+prTeamName(tid)+"</div><div class='pr-eq-cover-sub'>"+T[tid].s+" &mdash; "+tms.length+" partidos</div></div></div>";
     content+="<div class='pr-section'>";
-    content+="<table class='pr-table pr-eq-row'><thead><tr><th>#</th><th>Sem</th><th>D\u00eda</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Partido</th><th>V</th></tr></thead><tbody>";
+    content+="<table class='pr-table'><thead><tr><th>#</th><th>Sem</th><th>Día</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Rival</th><th>Cond</th><th>Res</th><th>V</th></tr></thead><tbody>";
     tms.forEach(function(m){
-      var festTag=m.festivo?"<span class='pr-badge-fest'>Fest</span> ":"";
-      var cc=canchaClass[m.cancha]||"";
+      var festTag=m.festivo?"<span class='pr-tag pr-tag-fest'>Fest</span> ":"";
       var rival=m.l===tid?m.v:m.l;
-      var cond=m.l===tid?"<span style='color:#c8102e;font-weight:700'>Local</span>":"<span style='color:#555'>Visita</span>";
-      content+="<tr><td style='font-size:9px;color:#888'>"+m.id+"</td><td style='font-weight:700'>S"+m.week+"</td><td>"+festTag+dayLabel[m.dia]+"</td><td style='font-size:9px;color:#555'>"+fmtDate(m.fecha)+"</td><td><span style='font-weight:800'>"+m.hora+"</span></td><td><span class='"+cc+"'>"+m.cancha+"</span></td><td><strong>"+prTeamName(tid)+"</strong> vs "+prTeamName(rival)+" ("+cond+")</td><td><span style='background:#ede9fe;color:#5b21b6;border-radius:4px;padding:1px 5px;font-size:8px;font-weight:700'>V"+m.vu+"</span></td></tr>";
+      var cond=m.l===tid?"<span style='color:#c8102e;font-weight:700;font-size:8px'>LOC</span>":"<span style='color:#1d4ed8;font-weight:700;font-size:8px'>VIS</span>";
+      content+="<tr>"
+        +"<td style='font-size:8px;color:#999;text-align:center'>"+m.id+"</td>"
+        +"<td style='font-weight:700;text-align:center'>S"+m.week+"</td>"
+        +"<td>"+festTag+prGetDia(m.fecha)+"</td>"
+        +"<td style='font-size:9px;color:#555;white-space:nowrap'>"+prFmtDate(m.fecha)+"</td>"
+        +"<td style='font-weight:800;white-space:nowrap'>"+m.hora+"</td>"
+        +"<td>"+prCanchaTag(m.cancha)+"</td>"
+        +"<td>"+prTeamCell(rival,18)+"</td>"
+        +"<td style='text-align:center'>"+cond+"</td>"
+        +"<td style='text-align:center'>"+scoreHtml(m)+"</td>"
+        +"<td style='text-align:center'><span style='background:#ede9fe;color:#5b21b6;border-radius:3px;padding:1px 4px;font-size:8px;font-weight:700'>V"+m.vu+"</span></td>"
+        +"</tr>";
     });
     content+='</tbody></table></div>';
   } else {
     title='Tablas de Equidad &#183; Liga Interna S2 2026';
     var eq={};
-    for(var t=1;t<=10;t++)eq[t]={canchas:{Comfanorte:0,Coveadse:0,'Villa Silvania':0},horas:{},dias:{Lunes:0,Jueves:0,Sabado:0},fest:0,sat:0,total:0};
+    for(var t=1;t<=10;t++)eq[t]={canchas:{Comfanorte:0,Coveadse:0,'Villa Silvania':0},horas:{},dias:{"Lunes":0,"Jueves":0,"Sábado":0},fest:0,sat:0,total:0};
     allMs.forEach(function(m){
       [m.l,m.v].forEach(function(t){
         if(!eq[t])return;
@@ -2128,22 +2211,49 @@ function doPrint(){
         eq[t].horas[m.hora]=(eq[t].horas[m.hora]||0)+1;
         eq[t].dias[m.dia]=(eq[t].dias[m.dia]||0)+1;
         if(m.festivo)eq[t].fest++;
-        if(m.dia==="Sabado")eq[t].sat++;
+        if(m.dia==="Sábado")eq[t].sat++;
         eq[t].total++;
       });
     });
+    function mnMx(arr){var mn=Math.min.apply(null,arr),mx=Math.max.apply(null,arr);return{mn:mn,mx:mx};}
+    function cellCls(v,mn,mx){if(v===mx)return" class='cell-hi'";if(v===mn)return" class='cell-lo'";return"";}
     var hrs=HOURS;
-    content+="<div class='pr-section'><h2>&#127960;&#65039; Canchas por Equipo</h2>";
+    // Canchas table
+    content+="<div class='pr-section'><h2>Canchas por Equipo</h2>";
     content+="<table class='pr-table'><thead><tr><th>Equipo</th><th>Comfanorte</th><th>Coveadse</th><th>Villa Silvania</th><th>Total</th></tr></thead><tbody>";
-    for(var t=1;t<=10;t++){content+="<tr><td style='font-weight:800'>"+prTeamName(t)+"</td><td style='text-align:center'>"+eq[t].canchas.Comfanorte+"</td><td style='text-align:center'>"+eq[t].canchas.Coveadse+"</td><td style='text-align:center'>"+eq[t].canchas["Villa Silvania"]+"</td><td style='text-align:center;font-weight:900'>"+eq[t].total+"</td></tr>";}
+    var cCnf=[],cCov=[],cVls=[];
+    for(var t=1;t<=10;t++){cCnf.push(eq[t].canchas.Comfanorte);cCov.push(eq[t].canchas.Coveadse);cVls.push(eq[t].canchas["Villa Silvania"]);}
+    var mmCnf=mnMx(cCnf),mmCov=mnMx(cCov),mmVls=mnMx(cVls);
+    for(var t=1;t<=10;t++){
+      content+="<tr><td>"+prTeamCell(t,16)+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].canchas.Comfanorte,mmCnf.mn,mmCnf.mx)+">"+eq[t].canchas.Comfanorte+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].canchas.Coveadse,mmCov.mn,mmCov.mx)+">"+eq[t].canchas.Coveadse+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].canchas["Villa Silvania"],mmVls.mn,mmVls.mx)+">"+eq[t].canchas["Villa Silvania"]+"</td>"
+        +"<td style='text-align:center;font-weight:900'>"+eq[t].total+"</td></tr>";
+    }
     content+="</tbody></table></div>";
-    content+="<div class='pr-section'><h2>&#8986; Horarios por Equipo</h2>";
+    // Horarios table
+    content+="<div class='pr-section'><h2>Horarios por Equipo</h2>";
     content+="<table class='pr-table'><thead><tr><th>Equipo</th>"+hrs.map(function(h){return "<th>"+h+"</th>";}).join("")+"</tr></thead><tbody>";
-    for(var t=1;t<=10;t++){content+="<tr><td style='font-weight:800'>"+prTeamName(t)+"</td>"+hrs.map(function(h){return "<td style='text-align:center'>"+(eq[t].horas[h]||0)+"</td>";}).join("")+"</tr>";}
+    var hCols=hrs.map(function(h){var a=[];for(var t=1;t<=10;t++)a.push(eq[t].horas[h]||0);return mnMx(a);});
+    for(var t=1;t<=10;t++){
+      content+="<tr><td>"+prTeamCell(t,16)+"</td>"+hrs.map(function(h,i){var v=eq[t].horas[h]||0;return "<td style='text-align:center'"+cellCls(v,hCols[i].mn,hCols[i].mx)+">"+v+"</td>";}).join("")+"</tr>";
+    }
     content+="</tbody></table></div>";
-    content+="<div class='pr-section'><h2>&#127881; Festivos y S\u00e1bados por Equipo</h2>";
-    content+="<table class='pr-table'><thead><tr><th>Equipo</th><th>Lunes Festivo</th><th>S\u00e1bados</th><th>Lunes Total</th><th>Jueves Total</th></tr></thead><tbody>";
-    for(var t=1;t<=10;t++){content+="<tr><td style='font-weight:800'>"+prTeamName(t)+"</td><td style='text-align:center;font-weight:700;color:#92400e'>"+eq[t].fest+"</td><td style='text-align:center'>"+eq[t].sat+"</td><td style='text-align:center'>"+eq[t].dias.Lunes+"</td><td style='text-align:center'>"+eq[t].dias.Jueves+"</td></tr>";}
+    // Festivos table
+    var festArr=[],satArr=[],lunArr=[],jueArr=[];
+    for(var t=1;t<=10;t++){festArr.push(eq[t].fest);satArr.push(eq[t].sat);lunArr.push(eq[t].dias["Lunes"]);jueArr.push(eq[t].dias["Jueves"]);}
+    var mmFest=mnMx(festArr),mmSat=mnMx(satArr),mmLun=mnMx(lunArr),mmJue=mnMx(jueArr);
+    content+="<div class='pr-section'><h2>Festivos y Sábados por Equipo</h2>";
+    content+="<table class='pr-table'><thead><tr><th>Equipo</th><th>Festivos</th><th>Sábados</th><th>Lunes</th><th>Jueves</th></tr></thead><tbody>";
+    for(var t=1;t<=10;t++){
+      content+="<tr><td>"+prTeamCell(t,16)+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].fest,mmFest.mn,mmFest.mx)+">"+eq[t].fest+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].sat,mmSat.mn,mmSat.mx)+">"+eq[t].sat+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].dias["Lunes"],mmLun.mn,mmLun.mx)+">"+eq[t].dias["Lunes"]+"</td>"
+        +"<td style='text-align:center'"+cellCls(eq[t].dias["Jueves"],mmJue.mn,mmJue.mx)+">"+eq[t].dias["Jueves"]+"</td>"
+        +"</tr>";
+    }
     content+="</tbody></table></div>";
   }
   document.getElementById('prTitle').innerHTML=title;
@@ -2151,6 +2261,7 @@ function doPrint(){
   cM('mPrint');
   setTimeout(function(){window.print();},300);
 }
+
 
 // ── PLANILLA ──
 function tgPgEl(el){tgPg(el.getAttribute("data-c"));}
