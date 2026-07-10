@@ -927,6 +927,8 @@ function onIn(){
   document.getElementById("admBk").style.display=(isAdm||cEd())?"block":"none";
   document.getElementById("sortBk").style.display=isAdm?"block":"none";
   document.getElementById("admRlTg").textContent=cr;
+  // Re-render fixture and table so edit buttons appear immediately
+  rFx();rTb();
   rPn();
   if(!pf.passChanged)setTimeout(function(){openM("mCp");},1000);
 }
