@@ -182,10 +182,18 @@ let IC={}; // key → {img, src}
 // ─── IMAGE LOADER ───────────────────────────────────
 function loadImg(src,key){
   return new Promise(res=>{
+    if(!src){res(null);return;}
     if(IC[key]&&IC[key].src===src&&IC[key].img.complete&&IC[key].img.naturalWidth>0){res(IC[key].img);return;}
     const img=new Image();
+    // crossOrigin needed for Firebase Storage URLs so canvas stays un-tainted
+    if(!src.startsWith('data:')){img.crossOrigin='anonymous';img.referrerPolicy='no-referrer';}
     img.onload=()=>{IC[key]={img,src};res(img);};
-    img.onerror=()=>{IC[key]=null;res(null);};
+    img.onerror=()=>{
+      // Retry without crossOrigin (some servers reject preflight) — canvas may taint but image shows
+      if(img.crossOrigin){
+        const img2=new Image();img2.onload=()=>{IC[key]={img:img2,src};res(img2);};img2.onerror=()=>{IC[key]=null;res(null);};img2.src=src;
+      }else{IC[key]=null;res(null);}
+    };
     img.src=src;
   });
 }
@@ -197,8 +205,8 @@ function getImg(key){const e=IC[key];return(e&&e.img.complete&&e.img.naturalWidt
     const b=localStorage.getItem('an_badges');
     if(b){
       custBadges=JSON.parse(b);
-      Object.entries(custBadges).forEach(([k,v])=>loadImg(v,'b'+k));
-      updateBadgePreviews();
+      // Wait for all to load before showing previews
+      Promise.all(Object.entries(custBadges).filter(([,v])=>v).map(([k,v])=>loadImg(v,'b'+k))).then(()=>updateBadgePreviews());
     }
     const c=localStorage.getItem('an_clublogo');
     if(c){clubLogoSrc=c;loadImg(c,'club').then(()=>{updateClubPreview();updateTopLogo();});}
@@ -210,8 +218,9 @@ db.ref('/teamBadges').on('value',s=>{
   const v=s.val()||{};
   custBadges=v;
   try{localStorage.setItem('an_badges',JSON.stringify(v));}catch(e){}
-  const ids=Object.keys(v);
+  const ids=Object.keys(v).filter(id=>v[id]);
   if(!ids.length){document.getElementById('bdgDot').className='dot none';document.getElementById('badgePrevRow').innerHTML='<span style="font-size:10px;color:var(--m)">Sin escudos — súbelos desde la app</span>';return;}
+  document.getElementById('bdgDot').className='dot wait';
   Promise.all(ids.map(id=>loadImg(v[id],'b'+id))).then(()=>updateBadgePreviews());
 });
 db.ref('/clubLogo').on('value',s=>{
@@ -262,17 +271,22 @@ function updateTopLogo(){
 // Club logo upload (direct to Firebase from this page)
 function uploadClubLogo(inp){
   const f=inp.files[0];if(!f)return;
+  document.getElementById('clubDetail').textContent='Subiendo…';
   const rd=new FileReader();
   rd.onload=ev=>{
     const img2=new Image();img2.onload=async()=>{
-      const mx=512,sc=Math.min(mx/img2.width,mx/img2.height,1);
+      // Max 600px preserving aspect ratio
+      const mx=600,sc=Math.min(mx/img2.width,mx/img2.height,1);
       const cv2=document.createElement('canvas');cv2.width=Math.round(img2.width*sc);cv2.height=Math.round(img2.height*sc);
       const ctx2=cv2.getContext('2d');
-      if(!f.name.toLowerCase().endsWith('.png')){ctx2.fillStyle='#fff';ctx2.fillRect(0,0,cv2.width,cv2.height);}
+      // Always keep transparency (PNG). For JPEGs fill transparent areas with black not white.
       ctx2.drawImage(img2,0,0,cv2.width,cv2.height);
-      const data=cv2.toDataURL(f.name.toLowerCase().endsWith('.png')?'image/png':'image/jpeg',.92);
-      await db.ref('/clubLogo').set(data);
-      document.getElementById('clubDetail').textContent='Logo actualizado ✓';
+      const isPng=f.type==='image/png'||f.name.toLowerCase().endsWith('.png');
+      const data=cv2.toDataURL(isPng?'image/png':'image/jpeg',.95);
+      try{
+        await db.ref('/clubLogo').set(data);
+        document.getElementById('clubDetail').textContent='Logo actualizado ✓';
+      }catch(err){document.getElementById('clubDetail').textContent='Error al subir: '+err.message;}
     };img2.src=ev.target.result;
   };rd.readAsDataURL(f);inp.value='';
 }
@@ -377,13 +391,13 @@ async function gen(){
 // ── BACKGROUNDS ──────────────────────────────────────
 async function drawBg(ctx){
   if(bgType==='custom'&&customBgImg){
+    // Draw full HD — no filters, no overlays, clean crop-to-fit
     const sr=customBgImg.width/customBgImg.height,dr=W/H;
     let sw,sh,sx,sy;
     if(sr>dr){sh=customBgImg.height;sw=sh*dr;sx=(customBgImg.width-sw)/2;sy=0;}
     else{sw=customBgImg.width;sh=sw/dr;sx=0;sy=(customBgImg.height-sh)/2;}
     ctx.drawImage(customBgImg,sx,sy,sw,sh,0,0,W,H);
-    rGlow(ctx,W/2,H*.18,800,'rgba(200,16,46,.2)');
-    vignette(ctx,.75);return;
+    return;
   }
   ({cinematic:bgCinematic,stadium:bgStadium,pitch:bgPitch,night:bgNight}[bgType]||bgCinematic)(ctx);
 }
