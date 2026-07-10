@@ -820,7 +820,19 @@ window.addEventListener("load",function(){
     });
     db.ref("/teamBadges").on("value",function(s){
       custBadges=s.val()||{};
-      rFx();rTb();rGl();
+      initFltEq();rFx();rTb();rGl();
+    });
+    db.ref("/clubLogo").on("value",function(s){
+      var img=s.val();
+      var sh=document.getElementById("anShield");
+      if(img){
+        sh.innerHTML='<img src="'+img+'" style="width:100%;height:100%;object-fit:contain"/>';
+        // Update PWA icon dynamically
+        var lnk=document.querySelector("link[rel*=\'icon\']")||document.createElement("link");
+        lnk.rel="icon";lnk.type="image/png";lnk.href=img;document.head.appendChild(lnk);
+        var al=document.querySelector("link[rel=\'apple-touch-icon\']")||document.createElement("link");
+        al.rel="apple-touch-icon";al.href=img;document.head.appendChild(al);
+      }else{sh.innerHTML=AN_SVG;}
     });
     db.ref("/equipos").on("value",function(s){teamInfo=s.val()||{};});
   }catch(e){
@@ -1863,6 +1875,20 @@ async function doUd(){
 function pExEl(){return document.getElementById("pEx")||document.getElementById("admPnCnt");}
 async function shBdg(){
   var h='<div style="padding:16px 16px 24px">';
+  // ── LOGO CLUB ──
+  h+='<div style="font-size:16px;font-weight:900;color:var(--t);margin-bottom:4px;display:flex;align-items:center;gap:8px">&#127963;&#65039; Logo Oficial del Club</div>';
+  h+='<div style="font-size:11px;color:var(--m);margin-bottom:12px;line-height:1.6">Este logo aparece en el encabezado de la app y como &#237;cono al agregar a pantalla de inicio.</div>';
+  var clubImg=null;
+  try{if(fbR&&db){var cs=await db.ref("/clubLogo").get();clubImg=cs.val();}}catch(e){}
+  h+='<div style="background:linear-gradient(135deg,rgba(200,16,46,.08),rgba(14,165,233,.06));border:1.5px solid rgba(200,16,46,.25);border-radius:18px;padding:18px;margin-bottom:24px;display:flex;align-items:center;gap:16px">';
+  h+='<div id="clubLogoPrv" style="width:72px;height:84px;flex-shrink:0;border-radius:12px;overflow:hidden;border:2px solid rgba(200,16,46,.3);background:var(--b3);display:flex;align-items:center;justify-content:center">'+(clubImg?'<img src="'+clubImg+'" style="width:100%;height:100%;object-fit:contain"/>':"<span style=\"font-size:30px\">&#127963;&#65039;</span>")+'</div>';
+  h+='<div style="flex:1"><div style="font-size:14px;font-weight:900;color:var(--t);margin-bottom:4px">Atl&#233;tico Norte F.C.</div>';
+  h+='<div style="font-size:10px;color:'+(clubImg?'#10b981':'var(--m)')+';margin-bottom:12px">'+(clubImg?'&#9989; Logo personalizado activo':'&#128247; Usando escudo SVG por defecto')+'</div>';
+  h+='<div style="display:flex;gap:8px">';
+  h+='<label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,var(--anr),#e8192d);color:#fff;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 3px 12px rgba(200,16,46,.35)">&#128196; Subir PNG<input type="file" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="upClubLogo(event)"></label>';
+  if(clubImg)h+='<button onclick="rmClubLogo()" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">&#128465;</button>';
+  h+='</div></div></div>';
+  // ── ESCUDOS EQUIPOS ──
   h+='<div style="font-size:16px;font-weight:900;color:var(--t);margin-bottom:4px;display:flex;align-items:center;gap:8px">&#127960;&#65039; Escudos de Equipos</div>';
   h+='<div style="font-size:11px;color:var(--m);margin-bottom:12px;line-height:1.7">Toca el escudo o el bot\u00f3n <strong style="color:var(--ac)">Subir PNG</strong> para cargar el logo de cada equipo. Se recomienda PNG con fondo transparente.</div>';
   h+='<div style="display:flex;align-items:center;gap:6px;background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.18);border-radius:10px;padding:8px 12px;margin-bottom:18px">';
@@ -1923,6 +1949,37 @@ async function rmBdg(tid){
   if(!confirm("\u00bfEliminar el escudo de "+tn(tid)+"?"))return;
   if(fbR&&db)await db.ref("/teamBadges/"+tid).remove();
   delete custBadges[tid];shBdg();
+}
+async function upClubLogo(e){
+  var f=e.target.files[0];if(!f)return;
+  var prv=document.getElementById("clubLogoPrv");
+  if(prv)prv.style.opacity=".4";
+  var rd=new FileReader();rd.onload=function(ev){
+    var img=new Image();img.onload=async function(){
+      var mx=512,sc=Math.min(mx/img.width,mx/img.height,1);
+      var cv=document.createElement("canvas");
+      cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+      var ctx=cv.getContext("2d");
+      var isPng=f.type==="image/png"||f.name.toLowerCase().endsWith(".png");
+      if(!isPng){ctx.fillStyle="#ffffff";ctx.fillRect(0,0,cv.width,cv.height);}
+      ctx.drawImage(img,0,0,cv.width,cv.height);
+      var comp=cv.toDataURL(isPng?"image/png":"image/jpeg",isPng?1:.9);
+      try{
+        if(fbR&&db)await db.ref("/clubLogo").set(comp);
+        var t=document.createElement("div");
+        t.textContent="\u2705 Logo del club actualizado";
+        t.style.cssText="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4)";
+        document.body.appendChild(t);setTimeout(function(){t.remove();},3000);
+        shBdg();
+      }catch(err){if(prv)prv.style.opacity="";alert("Error: "+err.message);}
+    };img.onerror=function(){if(prv)prv.style.opacity="";alert("No se pudo leer la imagen.");};
+    img.src=ev.target.result;
+  };rd.readAsDataURL(f);
+}
+async function rmClubLogo(){
+  if(!confirm("\u00bfRestaurar el escudo SVG por defecto?"))return;
+  if(fbR&&db)await db.ref("/clubLogo").remove();
+  shBdg();
 }
 
 // ── PRINT / PDF ──
