@@ -27,7 +27,7 @@
 html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;font-size:14px;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
 
 /* ── LAYOUT ── */
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;padding-top:env(safe-area-inset-top)}
 .pgs{flex:1;overflow:hidden;position:relative}
 .pg{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;padding-bottom:calc(var(--nav) + 20px + env(safe-area-inset-bottom))}
 .pg.active{display:block}
@@ -818,7 +818,10 @@ window.addEventListener("load",function(){
       var d=s.val();
       rDlg(d?Object.values(d):DLG_DEF);
     });
-    db.ref("/teamBadges").on("value",function(s){custBadges=s.val()||{};});
+    db.ref("/teamBadges").on("value",function(s){
+      custBadges=s.val()||{};
+      rFx();rTb();rGl();
+    });
     db.ref("/equipos").on("value",function(s){teamInfo=s.val()||{};});
   }catch(e){
     console.warn("Firebase:",e.message);
