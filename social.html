@@ -73,9 +73,41 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
 
 .prev-wrap{display:flex;justify-content:center;padding:20px 0 0}
 #cv{border-radius:20px;box-shadow:0 16px 60px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.06);max-width:100%;max-height:74vh;object-fit:contain;display:none}
+
+/* ── AUTH GATE ── */
+#authGate{position:fixed;inset:0;z-index:999;background:linear-gradient(160deg,#020509,#060e1c,#030710);display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-card{width:100%;max-width:380px;background:rgba(11,20,34,.95);border:1.5px solid rgba(200,16,46,.3);border-radius:22px;padding:36px 28px;box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04)}
+.auth-logo{width:64px;height:76px;margin:0 auto 20px;border-radius:12px;background:rgba(200,16,46,.15);border:1.5px solid rgba(200,16,46,.25);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#c8102e}
+.auth-title{text-align:center;font-size:20px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px}
+.auth-title b{color:var(--rd)}
+.auth-sub{text-align:center;font-size:11px;color:var(--m);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px}
+.auth-lbl{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px}
+.auth-inp{width:100%;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:12px 14px;border-radius:11px;font-size:14px;font-weight:600;margin-bottom:14px;-webkit-appearance:none}
+.auth-inp:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3px rgba(200,16,46,.12)}
+.auth-btn{width:100%;background:linear-gradient(135deg,#9a0a1e,#c8102e,#e01030);color:#fff;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 24px rgba(200,16,46,.5);margin-top:4px}
+.auth-btn:active{opacity:.85}
+.auth-err{background:rgba(200,16,46,.12);border:1px solid rgba(200,16,46,.3);border-radius:9px;padding:10px 14px;font-size:12px;color:#ff6b6b;margin-bottom:14px;display:none}
+.auth-note{text-align:center;font-size:10px;color:var(--m);margin-top:16px;line-height:1.5}
 </style>
 </head>
 <body>
+
+<!-- AUTH GATE — shown until Firebase auth confirmed -->
+<div id="authGate">
+  <div class="auth-card">
+    <div class="auth-logo">AN</div>
+    <div class="auth-title">Atlético <b>Norte</b> F.C</div>
+    <div class="auth-sub">Generador · Redes Sociales</div>
+    <div class="auth-lbl">Cédula</div>
+    <input class="auth-inp" id="authCed" type="text" inputmode="numeric" placeholder="Número de cédula" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="auth-lbl">Contraseña</div>
+    <input class="auth-inp" id="authPas" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="auth-err" id="authErr">Cédula o contraseña incorrecta</div>
+    <button class="auth-btn" id="authBtn" onclick="doLogin()">Ingresar</button>
+    <div class="auth-note">Usa las mismas credenciales<br>que en la app principal</div>
+  </div>
+</div>
+
 <div class="topbar" style="position:relative">
   <canvas id="topLogo" width="42" height="50"></canvas>
   <div>
@@ -161,10 +193,80 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
 const FB={apiKey:"AIzaSyDmKfqnPmEkKmXFwR6GAL39L0N-kHKQx_A",authDomain:"atletico-norte.firebaseapp.com",databaseURL:"https://atletico-norte-default-rtdb.firebaseio.com",projectId:"atletico-norte",storageBucket:"atletico-norte.firebasestorage.app",messagingSenderId:"383457224555",appId:"1:383457224555:web:bc43b5f866c574ca028e2e"};
 firebase.initializeApp(FB);
 const db=firebase.database();
+const auth=firebase.auth();
+
+// ─── AUTH ────────────────────────────────────────────
+function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function safeSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+async function doLogin(){
+  const ced=document.getElementById('authCed').value.trim();
+  const pas=document.getElementById('authPas').value.trim();
+  const err=document.getElementById('authErr');
+  const btn=document.getElementById('authBtn');
+  if(!ced||!pas){err.textContent='Completa los campos';err.style.display='block';return;}
+  btn.textContent='Ingresando…';btn.disabled=true;err.style.display='none';
+  try{
+    await auth.signInWithEmailAndPassword(ced+'@atleticonorte.co',pas);
+  }catch(e){
+    err.textContent=e.code==='auth/wrong-password'||e.code==='auth/user-not-found'?'Cédula o contraseña incorrecta':e.message;
+    err.style.display='block';
+  }
+  btn.textContent='Ingresar';btn.disabled=false;
+}
+
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById('authGate').style.display='none';
+    startApp();
+  }else{
+    document.getElementById('authGate').style.display='flex';
+  }
+});
+
+function startApp(){
+  // Safe localStorage cache for fast first paint
+  try{const b=safeGet('an_badges');if(b){custBadges=JSON.parse(b);}}catch(e){}
+  const lsClub=safeGet('an_clublogo');
+  if(lsClub){clubLogoSrc=lsClub;loadImg(lsClub,'club').then(()=>{updateClubPreview();updateTopLogo();});}
+
+  db.ref('/teamBadges').on('value',s=>{
+    const v=s.val()||{};
+    custBadges=v;
+    safeSet('an_badges',JSON.stringify(v));
+    const ids=Object.keys(v).filter(id=>v[id]);
+    if(!ids.length){document.getElementById('bdgDot').className='dot none';document.getElementById('badgePrevRow').innerHTML='<span style="font-size:10px;color:var(--m)">Sin escudos — súbelos desde la app</span>';return;}
+    document.getElementById('bdgDot').className='dot wait';
+    Promise.all(ids.map(id=>loadImg(v[id],'b'+id))).then(()=>updateBadgePreviews());
+  },err=>{
+    document.getElementById('bdgDot').className='dot none';
+    document.getElementById('badgePrevRow').innerHTML='<span style="font-size:10px;color:#ef4444">Error: '+err.message+'</span>';
+  });
+
+  db.ref('/clubLogo').on('value',s=>{
+    const v=s.val();
+    clubLogoSrc=v;
+    if(v){
+      safeSet('an_clublogo',v);
+      loadImg(v,'club').then(()=>{updateClubPreview();updateTopLogo();});
+    }else{updateClubPreview();updateTopLogo();}
+  });
+
+  db.ref('/resultados').on('value',s=>{results=s.val()||{};});
+
+  // Init week selector
+  const weeks=[...new Set(ALL.map(m=>m.week))].sort((a,b)=>a-b);
+  const s=document.getElementById('selW');
+  s.innerHTML='<option value="all">Todas</option>'+weeks.map(w=>`<option value="${w}">Semana ${w}</option>`).join('');
+  const up=ALL.filter(m=>new Date(m.fecha+'T12:00:00')>=new Date());
+  if(up.length)s.value=up[0].week;
+  loadMs();
+}
 
 const TM={1:{n:"Cúcuta Deportivo",s:"CUC"},2:{n:"At. Bucaramanga",s:"BUC"},3:{n:"Atl. Nacional",s:"NAL"},4:{n:"Ind. Santa Fe",s:"SNF"},5:{n:"Millonarios",s:"MIL"},6:{n:"Dep. Cali",s:"CAL"},7:{n:"Dep. Tolima",s:"TOL"},8:{n:"América de Cali",s:"AME"},9:{n:"Junior F.C.",s:"JUN"},10:{n:"Inter Bogotá",s:"INT"}};
 const tn=id=>TM[id]?TM[id].n:"Equipo "+id,ts=id=>TM[id]?TM[id].s:"T"+id;
@@ -199,39 +301,7 @@ function loadImg(src,key){
 }
 function getImg(key){const e=IC[key];return(e&&e.img.complete&&e.img.naturalWidth>0)?e.img:null;}
 
-// ─── LOAD FROM LOCALSTORAGE FIRST ───────────────────
-(()=>{
-  try{
-    const b=localStorage.getItem('an_badges');
-    if(b){
-      custBadges=JSON.parse(b);
-      // Wait for all to load before showing previews
-      Promise.all(Object.entries(custBadges).filter(([,v])=>v).map(([k,v])=>loadImg(v,'b'+k))).then(()=>updateBadgePreviews());
-    }
-    const c=localStorage.getItem('an_clublogo');
-    if(c){clubLogoSrc=c;loadImg(c,'club').then(()=>{updateClubPreview();updateTopLogo();});}
-  }catch(e){}
-})();
-
-// ─── FIREBASE ────────────────────────────────────────
-db.ref('/teamBadges').on('value',s=>{
-  const v=s.val()||{};
-  custBadges=v;
-  try{localStorage.setItem('an_badges',JSON.stringify(v));}catch(e){}
-  const ids=Object.keys(v).filter(id=>v[id]);
-  if(!ids.length){document.getElementById('bdgDot').className='dot none';document.getElementById('badgePrevRow').innerHTML='<span style="font-size:10px;color:var(--m)">Sin escudos — súbelos desde la app</span>';return;}
-  document.getElementById('bdgDot').className='dot wait';
-  Promise.all(ids.map(id=>loadImg(v[id],'b'+id))).then(()=>updateBadgePreviews());
-});
-db.ref('/clubLogo').on('value',s=>{
-  const v=s.val();
-  clubLogoSrc=v;
-  if(v){
-    try{localStorage.setItem('an_clublogo',v);}catch(e){}
-    loadImg(v,'club').then(()=>{updateClubPreview();updateTopLogo();});
-  }else{updateClubPreview();updateTopLogo();}
-});
-db.ref('/resultados').on('value',s=>{results=s.val()||{};});
+// Firebase listeners and init are started inside startApp() after auth
 
 function updateClubPreview(){
   const d=document.getElementById('clubDot'),detail=document.getElementById('clubDetail');
@@ -291,15 +361,7 @@ function uploadClubLogo(inp){
   };rd.readAsDataURL(f);inp.value='';
 }
 
-// ─── UI ──────────────────────────────────────────────
-(()=>{
-  const weeks=[...new Set(ALL.map(m=>m.week))].sort((a,b)=>a-b);
-  const s=document.getElementById('selW');
-  s.innerHTML='<option value="all">Todas</option>'+weeks.map(w=>`<option value="${w}">Semana ${w}</option>`).join('');
-  const up=ALL.filter(m=>new Date(m.fecha+'T12:00:00')>=new Date());
-  if(up.length)s.value=up[0].week;
-  loadMs();
-})();
+// UI init is called inside startApp() after auth
 
 function loadMs(){
   const wk=document.getElementById('selW').value,vu=parseInt(document.getElementById('selV').value);
