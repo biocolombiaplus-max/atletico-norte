@@ -1169,7 +1169,6 @@ window.addEventListener("load",function(){
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
     au.onAuthStateChanged(async function(u){
       if(u){
-        // Set up data listeners only after auth is confirmed — ensures Firebase rules pass
         setupFirebaseListeners();
         var c=u.email.replace("@atleticonorte.co","");
         var s=await db.ref("/socios/"+c).get();
@@ -1178,6 +1177,14 @@ window.addEventListener("load",function(){
         var rolMap={"administrador":"Administrador","coordinador deportivo":"Coordinador Deportivo","coordinador financiero":"Coordinador Financiero","socio":"Socio"};
         cr=rolMap[rawRol.toLowerCase()]||rawRol;
         onIn();
+        // If socio has no privacy acceptance yet, trigger onboarding after short delay
+        if(!pf.privacyOk){
+          setTimeout(function(){
+            _pendingCedula=c;
+            if(s.exists()){openVerifyModal(c,pf);}
+            else{openRegNewModal(c);}
+          },800);
+        }
       }else onOut();
     });
   }catch(e){
@@ -1243,20 +1250,26 @@ async function doLo(){
     errEl.textContent="Ingresa un número de cédula válido.";errEl.style.display="block";return;
   }
   spin.style.display="block";
+  _pendingCedula=c;
   if(!fbR){cu=c;cr="Socio";pf={cedula:c,nombre:"Demo "+c};spin.style.display="none";cM("mLo");onIn();return;}
+  // Auth first — no DB read before login (avoids Permission denied)
+  var email=c+"@atleticonorte.co",pass=c+"_AN26";
   try{
-    var snap=await db.ref("/socios/"+c).get();
+    await au.signInWithEmailAndPassword(email,pass);
+    // onAuthStateChanged handles the rest
     spin.style.display="none";
-    _pendingCedula=c;
     cM("mLo");
-    if(snap.exists()){
-      openVerifyModal(c,snap.val());
-    }else{
-      openRegNewModal(c);
-    }
   }catch(e){
     spin.style.display="none";
-    errEl.textContent="Error: "+e.message;errEl.style.display="block";
+    if(e.code==="auth/user-not-found"||e.code==="auth/invalid-credential"||e.code==="auth/invalid-login-credentials"){
+      // Possible new socio — let them register
+      cM("mLo");
+      openRegNewModal(c);
+    }else if(e.code==="auth/wrong-password"){
+      errEl.textContent="Error de acceso. Contacta al administrador.";errEl.style.display="block";
+    }else{
+      errEl.textContent="Error: "+e.message;errEl.style.display="block";
+    }
   }
 }
 
