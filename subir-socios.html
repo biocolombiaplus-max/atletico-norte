@@ -52,24 +52,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
 
-  <!-- PASO 1: Login admin -->
   <div class="card" id="step1">
     <h2>Paso 1 — Autenticación Admin</h2>
     <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:#7ab8d4;line-height:1.6">
-      <strong style="color:#38bdf8;display:block;margin-bottom:3px">🚀 Primera vez / Base vacía</strong>
-      Si es la <strong>primera vez</strong> que usas esto, ingresa tu cédula <strong>y tu nombre completo</strong> — el sistema creará tu cuenta de Administrador automáticamente.<br>
-      Si ya estás registrado, solo ingresa la cédula.
+      <strong style="color:#38bdf8;display:block;margin-bottom:3px">🛡️ Acceso de administrador</strong>
+      Ingresa tu cédula. Si tu perfil ya existe en la base de datos, solo necesitas la cédula.<br>
+      Si eres el <strong>administrador de la app</strong> y aún no tienes perfil, ingresa también tu nombre completo — se creará automáticamente.
     </div>
     <div id="authErr" class="err"></div>
     <div id="authOk" class="ok"></div>
     <label>Tu Cédula de Administrador</label>
     <input type="tel" id="adminCed" inputmode="numeric" placeholder="Ej: 88264186">
-    <label>Tu Nombre Completo <span style="color:#7a96b4;font-weight:400">(solo primera vez)</span></label>
+    <label>Tu Nombre Completo <span style="color:#7a96b4;font-weight:400">(si aún no tienes perfil)</span></label>
     <input type="text" id="adminNom" placeholder="Ej: César Augusto Pérez López" autocomplete="name">
     <button class="btn btn-primary" onclick="doAuth()">🔐 Autenticar / Crear Admin</button>
   </div>
 
-  <!-- PASO 2: Cargar archivo -->
   <div class="card" id="step2" style="display:none">
     <h2>Paso 2 — Cargar Archivo Excel / CSV</h2>
     <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Abre el archivo <strong style="color:#eef2f8">SOCIOS_ATLETICO_NORTE_BASE_MAESTRA.xlsx</strong> en Excel, ve a la hoja <strong style="color:#f59e0b">BASE MAESTRA</strong> y guárdala como CSV. Luego sube ese CSV aquí.</p>
@@ -78,15 +76,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="fileErr" class="err"></div>
   </div>
 
-  <!-- PASO 3: Mapeo de columnas -->
   <div class="card" id="step3" style="display:none">
     <h2>Paso 3 — Mapeo de Columnas</h2>
-    <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Asigna qué columna del CSV corresponde a cada campo. Detectamos las columnas disponibles.</p>
+    <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Asigna qué columna del CSV corresponde a cada campo.</p>
     <div id="mapFields"></div>
     <button class="btn btn-primary" onclick="showPreview()" style="margin-top:8px">Vista Previa →</button>
   </div>
 
-  <!-- PASO 4: Preview -->
   <div class="card" id="preview">
     <h2>Paso 4 — Vista Previa <span id="previewCount" class="pill yellow"></span></h2>
     <div id="previewWarn" class="err" style="display:block"></div>
@@ -96,11 +92,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <tbody id="previewBody"></tbody>
       </table>
     </div>
-    <button class="btn btn-primary" onclick="doUpload()" style="margin-top:14px" id="btnUpload">⬆️ Subir a Firebase</button>
+    <button class="btn btn-primary" onclick="doUpload()" style="margin-top:14px">⬆️ Subir a Firebase</button>
     <button class="btn btn-secondary" onclick="resetUpload()">← Atrás</button>
   </div>
 
-  <!-- PASO 5: Subida -->
   <div class="card" id="uploadSec">
     <h2>Subiendo datos...</h2>
     <div class="progress-wrap"><div class="progress-bar" id="pBar"></div></div>
@@ -147,11 +142,12 @@ async function doReset(cedula){
   try{
     await au.sendPasswordResetEmail(email);
     var errEl=document.getElementById('authErr');
-    errEl.innerHTML='📧 Correo de restablecimiento enviado a <strong>'+email+'</strong>. Revisa tu bandeja. Después de restablecer la contraseña, vuelve a intentar con la cédula (sin nombre).';
+    errEl.innerHTML='📧 Se intentó enviar correo a <strong>'+email+'</strong>. Nota: si ese correo no existe en Firebase, el email no llegará. En ese caso ve a Firebase Console → Authentication → elimina la cuenta → vuelve aquí.';
     errEl.style.background='rgba(245,158,11,.1)';
     errEl.style.borderColor='rgba(245,158,11,.3)';
     errEl.style.color='#fbbf24';
-  }catch(e){alert('Error enviando reset: '+e.message);}
+    errEl.style.display='block';
+  }catch(e){alert('Error: '+e.message);}
 }
 
 async function doAuth(){
@@ -164,19 +160,16 @@ async function doAuth(){
 
   var email=c+'@atleticonorte.co',pass=c+'_AN26';
   try{
-    // Try login; if any error, attempt create to distinguish "no account" vs "wrong password"
     try{
       await au.signInWithEmailAndPassword(email,pass);
     }catch(e2){
       try{
         await au.createUserWithEmailAndPassword(email,pass);
-        // Created successfully → new account, continue
       }catch(e3){
         if(e3.code==='auth/email-already-in-use'){
-          // Account exists but signIn failed → wrong password → show reset
-          errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> ya existe en Firebase pero la contraseña no coincide.<br><br>'
-            +'<button onclick="doReset(\''+c+'\')" style="background:#f59e0b;color:#000;border:none;border-radius:8px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:12px">📧 Enviar correo de restablecimiento</button>'
-            +'<span style="display:block;margin-top:8px;font-size:10px;color:#7a96b4">Después de restablecer, la nueva contraseña será <strong style="color:#eef2f8;font-family:monospace">'+pass+'</strong> — ingresa solo la cédula sin nombre.</span>';
+          errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> existe en Firebase Auth pero la contraseña no coincide.<br><br>'
+            +'Ve a <strong>console.firebase.google.com</strong> → Authentication → Users → busca <strong>'+email+'</strong> → elimina esa cuenta → vuelve aquí e intenta de nuevo.<br><br>'
+            +'<button onclick="doReset(\''+c+'\')" style="background:#374151;color:#eef2f8;border:none;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">O intenta enviar reset por correo</button>';
           errEl.style.display='block';return;
         }
         throw e3;
@@ -185,22 +178,22 @@ async function doAuth(){
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
-    if(rol!=='administrador'&&rol!=='coordinador deportivo'){
-      var socSnap=await db.ref('/socios').limitToFirst(2).get();
-      var cnt=0;socSnap.forEach(function(){cnt++;});
-      if(cnt<=1){
-        if(!nom){
-          await au.signOut();
-          errEl.textContent='No tienes rol de Administrador. Ingresa tu nombre completo para crear la primera cuenta.';
-          errEl.style.display='block';return;
-        }
-        await db.ref('/socios/'+c).update({cedula:c,nombre:nom||pf.nombre,rol:'Administrador',privacyOk:true,fuente:'bootstrap'});
-        okEl.textContent='✅ Cuenta admin creada: '+(nom||c)+'. ¡Ahora sube los socios!';
-      }else{
+    var isAdmin=rol==='administrador'||rol==='coordinador deportivo'||rol==='coordinador financiero';
+    if(!isAdmin){
+      if(!nom){
         await au.signOut();
-        errEl.textContent='La cédula '+c+' no tiene rol de Administrador en la base de datos.';
+        errEl.innerHTML='La cédula <strong>'+c+'</strong> no tiene rol de Administrador en la base de datos.<br><br>'
+          +'<span style="color:#fbbf24">Si eres el administrador de la app, ingresa tu nombre completo arriba y vuelve a intentar.</span>';
         errEl.style.display='block';return;
       }
+      await db.ref('/socios/'+c).update({
+        cedula:c,nombre:nom,
+        rol:'Administrador',
+        privacyOk:true,
+        fuente:'bootstrap',
+        importadoTs:Date.now()
+      });
+      okEl.textContent='✅ Perfil admin creado: '+nom+'. ¡Ahora sube los socios!';
     }else{
       if(nom&&!pf.nombre)await db.ref('/socios/'+c+'/nombre').set(nom);
       okEl.textContent='✅ Autenticado: '+(pf.nombre||nom||c)+' · '+pf.rol;
@@ -211,8 +204,7 @@ async function doAuth(){
   }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
 }
 
-var rows=[];
-var headers=[];
+var rows=[],headers=[];
 
 function loadFile(inp){
   var f=inp.files[0];if(!f)return;
@@ -255,7 +247,7 @@ var fieldDefs=[
   {key:'equipo',label:'Equipo (nombre o número)',required:false},
   {key:'telefono',label:'Teléfono',required:false},
   {key:'email',label:'Correo',required:false},
-  {key:'posicion',label:'Posición',required:false}
+  {key:'posicion',label:'Posición / Rol',required:false}
 ];
 
 function buildMapUI(){
@@ -268,7 +260,7 @@ function buildMapUI(){
       if(f.key==='equipo')return n==='equipo'||n.includes('equipo');
       if(f.key==='telefono')return n.includes('celular')||n.includes('tel')||n.includes('cel')||n.includes('phone')||n.includes('whats');
       if(f.key==='email')return n.includes('email')||n.includes('correo')||n.includes('mail');
-      if(f.key==='posicion')return n.includes('posicion')||n.includes('posici')||n.includes('cargo')||n.includes('sorteo');
+      if(f.key==='posicion')return n.includes('posicion')||n.includes('posici')||n.includes('cargo')||n.includes('sorteo')||n.includes('rol');
       return false;
     });
     var options='<option value="">— No mapear —</option>'+headers.map(function(hdr,i){
@@ -312,9 +304,10 @@ function showPreview(){
   if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas ignoradas: '+errs.slice(0,3).join('; ')+(errs.length>3?' ...':'');warnEl.style.display='block';}
   else{warnEl.style.display='none';}
 
+  var tnames=['','Cúcuta','At.Buca','Nacional','Santa Fe','Millonarios','Dep.Cali','Tolima','América','Junior','Inter'];
   var tbody=document.getElementById('previewBody');
   tbody.innerHTML=parsedSocios.slice(0,30).map(function(s){
-    var tname=s.equipo?['','Cúcuta','At.Buca','Nacional','Santa Fe','Millonarios','Dep.Cali','Tolima','América','Junior','Inter'][s.equipo]||'#'+s.equipo:'Sin equipo';
+    var tname=s.equipo?(tnames[s.equipo]||'#'+s.equipo):'Sin equipo';
     var tcolor=s.equipo?'green':'yellow';
     return '<tr><td>'+s.cedula+'</td><td>'+s.nombre+'</td><td><span class="pill '+tcolor+'">'+tname+'</span></td><td>'+s.telefono+'</td><td><span class="pill green">OK</span></td></tr>';
   }).join('');
