@@ -135,19 +135,26 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 
 /* player picker */
 .picker-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:10px}
-.picker-side-label{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.player-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.pchip{padding:9px 12px;border-radius:10px;border:1.5px solid var(--bd2);background:var(--bg3);color:var(--t);font-size:12px;font-weight:700;cursor:pointer;transition:.12s;letter-spacing:.2px}
-.pchip:active{transform:scale(.94)}
-.pchip:disabled{opacity:.25;cursor:default}
-.pchip.on-goal{border-color:var(--green);background:rgba(16,185,129,.18);color:var(--green)}
-.pchip.on-yellow{border-color:var(--amber);background:rgba(245,158,11,.18);color:var(--amber)}
-.pchip.on-red{border-color:#f87171;background:rgba(200,16,46,.18);color:#f87171}
-.picker-divider{height:1px;background:var(--bd);margin:8px 0}
-.picker-manual{display:flex;gap:6px;margin-top:4px}
-.picker-manual input{flex:1;background:var(--bg);border:1.5px solid var(--bd2);border-radius:9px;padding:8px 10px;color:var(--t);font-size:12px;font-weight:600;outline:none}
+.picker-side-label{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:7px;margin-bottom:8px}
+.pchip{padding:0;border-radius:12px;border:2px solid var(--bd2);background:var(--bg3);color:var(--t);cursor:pointer;transition:.12s;text-align:center;overflow:hidden;display:flex;flex-direction:column;align-items:center;min-height:60px;justify-content:center}
+.pchip:active{transform:scale(.93)}
+.pchip:disabled{opacity:.2;cursor:default}
+.pchip .pc-num{font-size:18px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;color:var(--amber)}
+.pchip .pc-name{font-size:9.5px;font-weight:700;line-height:1.2;padding:0 4px;color:rgba(220,235,255,.75);margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pchip .pc-pos{font-size:8px;color:var(--dm);font-weight:600;margin-top:1px}
+.pchip.on-goal{border-color:var(--green);background:rgba(16,185,129,.18)}
+.pchip.on-goal .pc-num{color:var(--green)}
+.pchip.on-goal .pc-name{color:var(--green)}
+.pchip.on-yellow{border-color:var(--amber);background:rgba(245,158,11,.14)}
+.pchip.on-yellow .pc-num,.pchip.on-yellow .pc-name{color:var(--amber)}
+.pchip.on-red{border-color:#f87171;background:rgba(200,16,46,.14)}
+.pchip.on-red .pc-num,.pchip.on-red .pc-name{color:#f87171}
+.picker-divider{height:1px;background:var(--bd);margin:10px 0}
+.picker-manual{display:flex;gap:6px;margin-top:6px}
+.picker-manual input{flex:1;background:var(--bg);border:1.5px solid var(--bd2);border-radius:10px;padding:10px 12px;color:var(--t);font-size:13px;font-weight:600;outline:none}
 .picker-manual input:focus{border-color:var(--blue)}
-.picker-manual button{background:var(--bg3);border:1.5px solid var(--bd2);border-radius:9px;padding:8px 12px;color:var(--t);font-size:13px;cursor:pointer;font-weight:800;transition:.12s}
+.picker-manual button{background:var(--bg3);border:1.5px solid var(--bd2);border-radius:10px;padding:10px 14px;color:var(--t);font-size:15px;cursor:pointer;font-weight:800;transition:.12s}
 .picker-manual button:active{transform:scale(.93)}
 
 /* W/O section */
@@ -806,7 +813,14 @@ function openQuickAssign(side){
   var chipsHtml='';
   if(players.length){
     chipsHtml=players.map(function(p){
-      return '<button class="pchip" style="font-size:14px;padding:12px 16px" onclick="qaPickPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
+      var numLabel=p.num?'#'+p.num:'–';
+      var nameShort=p.corto||p.name||'';
+      if(nameShort.length>13)nameShort=nameShort.substring(0,12)+'…';
+      return '<button class="pchip" style="min-height:68px" onclick="qaPickPlayer(\''+esc(p.name)+'\',\''+esc(p.corto||p.name)+'\','+p.teamId+')">'
+        +'<span class="pc-num" style="font-size:20px">'+numLabel+'</span>'
+        +'<span class="pc-name" style="font-size:10px">'+esc(nameShort)+'</span>'
+        +(p.pos?'<span class="pc-pos">'+esc(p.pos)+'</span>':'')
+        +'</button>';
     }).join('');
   }
 
@@ -929,16 +943,34 @@ function countWL(tid,excludeMid){
 // ── PLAYER ROSTERS ──
 function loadRosters(lId,vId){
   rosters={l:[],v:[]};
-  function load(tid,side){
-    db.ref('/equipos/'+tid+'/jugadores').once('value').then(function(s){
+  db.ref('/socios').once('value').then(function(snap){
+    var so=snap.val()||{};
+    function build(tid,side){
       var pl=[];
-      s.forEach(function(c){var v=c.val();pl.push({name:v.nombre||v.name||c.key,corto:v.corto||(v.nombre||v.name||c.key),teamId:tid});});
-      pl.sort(function(a,b){return a.corto.localeCompare(b.corto);});
+      Object.values(so).forEach(function(sc){
+        if(parseInt(sc.equipo)===tid&&sc.nombre){
+          var nombre=sc.nombre||'';
+          var apellido=nombre.split(' ').slice(1).join(' ')||nombre; // apellido para mostrar corto
+          pl.push({
+            name:nombre,
+            corto:apellido||nombre,
+            num:parseInt(sc.num)||parseInt(sc.dorsal)||0,
+            pos:sc.pos||'',
+            cedula:sc.cedula||'',
+            teamId:tid
+          });
+        }
+      });
+      pl.sort(function(a,b){
+        var na=a.num||99,nb=b.num||99;
+        return na!==nb?na-nb:a.corto.localeCompare(b.corto);
+      });
       rosters[side]=pl;
-      renderPickerPanel();
-    }).catch(function(){renderPickerPanel();});
-  }
-  load(lId,'l');load(vId,'v');
+    }
+    build(lId,'l');
+    build(vId,'v');
+    renderPickerPanel();
+  }).catch(function(){renderPickerPanel();});
 }
 
 // ── EVENT TABS ──
@@ -967,15 +999,25 @@ function renderPickerPanel(){
     var cls='on-'+curEvtTab;
     var chips=players.map(function(p){
       var on=activeArr.findIndex(function(e){return e.name===p.name&&e.teamId===p.teamId;})>=0;
-      return '<button class="pchip'+(on?' '+cls:'')+'"'+(locked?' disabled':'')+' onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
+      var numLabel=p.num?'#'+p.num:'–';
+      var nameShort=p.corto||p.name||'';
+      // Shorten to ~12 chars max
+      if(nameShort.length>12)nameShort=nameShort.substring(0,11)+'…';
+      return '<button class="pchip'+(on?' '+cls:'')+'"'+(locked?' disabled':'')
+        +' onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto||p.name)+'\','+p.teamId+')">'
+        +'<span class="pc-num">'+numLabel+'</span>'
+        +'<span class="pc-name">'+esc(nameShort)+'</span>'
+        +(p.pos?'<span class="pc-pos">'+esc(p.pos)+'</span>':'')
+        +'</button>';
     }).join('');
-    var emptyNote=!players.length?'<div style="font-size:10px;color:var(--dm);margin-bottom:6px">Sin plantel cargado — usa el campo de abajo</div>':'';
     var manualId='pmi_'+s;
+    var emptyNote=!players.length?'<div style="font-size:10.5px;color:var(--m);margin-bottom:8px;background:var(--bg3);border:1px solid var(--bd);border-radius:9px;padding:9px 12px">⚠️ Sin plantel registrado &mdash; escribe el nombre abajo</div>':'';
     var manual=locked?'':'<div class="picker-manual">'
-      +'<input type="text" id="'+manualId+'" placeholder="Nombre del jugador..." autocomplete="off" onkeydown="if(event.key===\'Enter\')pickerManualAdd(\''+s+'\','+tid+')">'
-      +'<button onclick="pickerManualAdd(\''+s+'\','+tid+')">'+evIco+'</button>'
+      +'<input type="text" id="'+manualId+'" placeholder="Otro jugador (nombre)…" autocomplete="off" onkeydown="if(event.key===\'Enter\')pickerManualAdd(\''+s+'\','+tid+')">'
+      +'<button title="Agregar" onclick="pickerManualAdd(\''+s+'\','+tid+')">'+evIco+'</button>'
       +'</div>';
-    return '<div class="picker-side-label">'+label+' &mdash; <span style="color:var(--t);font-weight:900">'+esc(tn(tid))+'</span></div>'
+    var count=players.length?'<span style="font-size:9px;background:var(--bg3);padding:2px 7px;border-radius:10px;color:var(--m)">'+players.length+'</span>':'';
+    return '<div class="picker-side-label">'+label+' &mdash; <span style="color:var(--t);font-weight:900">'+esc(tn(tid))+'</span>'+count+'</div>'
       +emptyNote
       +(chips?'<div class="player-grid">'+chips+'</div>':'')
       +manual;
