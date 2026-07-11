@@ -1210,6 +1210,13 @@ window.addEventListener("load",function(){
         var rawRol=pf.rol||"Socio";
         var rolMap={"administrador":"Administrador","coordinador deportivo":"Coordinador Deportivo","coordinador financiero":"Coordinador Financiero","socio":"Socio"};
         cr=rolMap[rawRol.toLowerCase()]||rawRol;
+        // Super admins always get full admin access regardless of DB role
+        if(SUPER_ADMINS.indexOf(c)>=0) cr='Administrador';
+        // Expire temporal coordinator access
+        else if(cr==='Coordinador Deportivo'&&pf.coordHasta&&pf.coordHasta<Date.now()){
+          cr='Socio';
+          if(fbR&&db){db.ref('/socios/'+c+'/rol').set('Socio');db.ref('/socios/'+c+'/coordHasta').remove();}
+        }
         onIn();
         // Post-login routing (after short delay so UI settles)
         setTimeout(function(){
@@ -1245,6 +1252,7 @@ function bdg(id,cl){
 }
 function fd(d){var p=d.split("-");return p[2]+" "+["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][+p[1]-1]+" "+p[0]}
 function dw(d){return["Dom","Lun","Mar","Mi\u00e9","Jue","Vie","S\u00e1b"][new Date(d+"T12:00:00").getDay()]}
+var SUPER_ADMINS=['88262856','88264186'];
 function cEd(){return cr==="Administrador"||cr==="Coordinador Deportivo";}
 function openL(){
   var b=document.getElementById('invBanner');
@@ -3202,19 +3210,178 @@ async function shPl(){
 async function tgPg(c){if(!fbR||!db)return;var s=await db.ref("/socios/"+c+"/pagado").get();await db.ref("/socios/"+c+"/pagado").set(!s.val());shPl();}
 
 // ── GESTIONAR SOCIOS ──
-function chRlEl(el){chRl(el.getAttribute("data-c"),el.value);}
+var _soAll={},_soFilter='',_assignTipo='fijo';
+
+function chRlEl(el){
+  var c=el.getAttribute('data-c'),r=el.value;
+  chRl(c,r);
+  if(r!=='Coordinador Deportivo'&&fbR&&db)db.ref('/socios/'+c+'/coordHasta').remove();
+}
+async function chRl(c,r){if(fbR&&db)await db.ref('/socios/'+c+'/rol').set(r);}
+
 async function shSo(){
   if(!fbR||!db){adCnt('<div class="es"><p>Firebase no disponible</p></div>');return;}
-  var s=await db.ref("/socios").get();var so=s.val()||{};var ks=Object.keys(so).sort();
-  var h='<div style="padding:14px 16px"><div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">&#128101; Socios ('+ks.length+')</div>';
-  ks.forEach(function(c){
-    var sc=so[c];
-    h+='<div class="pli"><div><div class="pln">'+(sc.nombre||'Sin nombre')+'</div><div class="plc">CC '+c+'</div></div><select data-c="'+c+'" onchange="chRlEl(this)" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:7px;font-size:10px">'+["Socio","Administrador","Coordinador Deportivo","Coordinador Financiero"].map(function(ro){return'<option'+(sc.rol===ro?' selected':'')+'>'+ro+'</option>';}).join('')+'</select></div>';
+  adCnt('<div class="es"><div class="esi" style="font-size:36px">&#9203;</div><p>Cargando socios...</p></div>');
+  var s=await db.ref('/socios').get();
+  _soAll=s.val()||{};_soFilter='';
+  renderSoList();
+}
+
+function renderSoList(){
+  var so=_soAll,now=Date.now();
+  var ks=Object.keys(so).sort(function(a,b){return(so[a].nombre||a).toLowerCase().localeCompare((so[b].nombre||b).toLowerCase());});
+  var coordCed=null,coordSc=null;
+  ks.forEach(function(c){if(SUPER_ADMINS.indexOf(c)>=0)return;var sc=so[c];if((sc.rol||'').toLowerCase()==='coordinador deportivo'){coordCed=c;coordSc=sc;}});
+  var h='<div style="padding:12px 16px 20px">';
+
+  // Coordinator card
+  h+='<div style="margin-bottom:12px;background:rgba(200,16,46,.07);border:1.5px solid rgba(200,16,46,.18);border-radius:16px;overflow:hidden">';
+  h+='<div style="padding:11px 14px;border-bottom:1px solid rgba(200,16,46,.12);display:flex;align-items:center;justify-content:space-between">';
+  h+='<div style="font-size:9px;font-weight:900;color:var(--red);text-transform:uppercase;letter-spacing:1.2px">&#9917; Coordinador Deportivo</div>';
+  h+='<button onclick="shAsignarCoord()" style="padding:6px 12px;border-radius:8px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:900;cursor:pointer">+ Asignar</button>';
+  h+='</div>';
+  if(coordCed&&coordSc){
+    var isTmp=!!coordSc.coordHasta,expired=isTmp&&coordSc.coordHasta<now;
+    var dL=isTmp&&!expired?Math.ceil((coordSc.coordHasta-now)/86400000):0;
+    h+='<div style="padding:12px 14px;display:flex;align-items:center;gap:12px">';
+    h+='<div style="width:38px;height:38px;border-radius:10px;background:rgba(200,16,46,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9917;</div>';
+    h+='<div style="flex:1"><div style="font-size:13px;font-weight:900">'+(coordSc.nombre||coordCed)+'</div>';
+    h+='<div style="font-size:10px;color:var(--m);margin-top:2px">CC '+coordCed+' &middot; ';
+    if(expired)h+='<span style="color:#f87171">&#9888;&#65039; Acceso expirado</span>';
+    else if(isTmp)h+='<span style="color:var(--amber)">&#8987; Temporal &middot; '+dL+' día'+(dL!==1?'s':'')+' restante'+(dL!==1?'s':'')+'</span>';
+    else h+='<span style="color:var(--green)">&#128204; Fijo</span>';
+    h+='</div></div>';
+    h+='<button onclick="quitarCoord(\''+coordCed+'\')" style="padding:6px 10px;border-radius:8px;background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.25);color:var(--red);font-size:10px;font-weight:900;cursor:pointer">Quitar</button>';
+    h+='</div>';
+  }else{
+    h+='<div style="padding:12px 14px;font-size:11px;color:var(--dm)">Sin coordinador asignado.</div>';
+  }
+  h+='</div>';
+
+  // Super-admins card
+  h+='<div style="margin-bottom:12px;background:rgba(14,165,233,.05);border:1px solid rgba(14,165,233,.18);border-radius:14px;padding:10px 14px">';
+  h+='<div style="font-size:9px;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">&#128737;&#65039; Administradores permanentes</div>';
+  SUPER_ADMINS.forEach(function(c){var sc=so[c]||{};
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(14,165,233,.08)">';
+    h+='<span style="font-size:16px">&#128737;&#65039;</span><div><div style="font-size:12px;font-weight:800">'+(sc.nombre||'CC '+c)+'</div>';
+    h+='<div style="font-size:10px;color:var(--m)">CC '+c+' &middot; Acceso total permanente</div></div></div>';
   });
+  h+='</div>';
+
+  // Search
+  h+='<div style="position:relative;margin-bottom:10px">';
+  h+='<span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">&#128269;</span>';
+  h+='<input type="search" id="soSearch" placeholder="Buscar por nombre o cédula..." oninput="filtSo(this.value)" autocomplete="off" style="width:100%;background:var(--b3);border:1.5px solid var(--bd);border-radius:12px;padding:11px 12px 11px 38px;color:var(--t);font-size:13px;outline:none;-webkit-appearance:none">';
+  h+='</div>';
+  h+='<div id="soCntLabel" style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'+ks.length+' socio'+(ks.length!==1?'s':'')+'</div>';
+  h+='<div id="soList">'+renderSoItems(ks,so,'')+'</div></div>';
+  adCnt(h);
+}
+
+function renderSoItems(ks,so,q){
+  var now=Date.now(),f=(q||'').trim().toLowerCase();
+  var filtered=f?ks.filter(function(c){return(so[c].nombre||'').toLowerCase().indexOf(f)>=0||c.indexOf(q.trim())>=0;}):ks;
+  if(!filtered.length)return'<div style="text-align:center;color:var(--dm);padding:20px 0;font-size:12px">Sin resultados para &ldquo;'+esc(q)+'&rdquo;</div>';
+  return filtered.map(function(c){
+    var sc=so[c],isSA=SUPER_ADMINS.indexOf(c)>=0;
+    var rol=isSA?'Administrador':(sc.rol||'Socio');
+    var isCoord=!isSA&&rol==='Coordinador Deportivo';
+    var isTmp=isCoord&&!!sc.coordHasta,expired=isTmp&&sc.coordHasta<now;
+    var dL=isTmp&&!expired?Math.ceil((sc.coordHasta-now)/86400000):0;
+    var badge=isSA?'<span style="margin-left:6px;padding:2px 7px;border-radius:6px;background:rgba(14,165,233,.15);color:var(--blue);font-size:9px;font-weight:900">&#128737;&#65039; Admin</span>'
+      :isCoord?'<span style="margin-left:6px;padding:2px 7px;border-radius:6px;background:rgba(200,16,46,.12);color:var(--red);font-size:9px;font-weight:900">'+(expired?'&#9888; Expirado':isTmp?'&#8987; Coord.':'&#9917; Coord.')+'</span>':'';
+    var extra=isTmp&&!expired?'<div style="font-size:9px;color:var(--amber);margin-top:2px">&#8987; Expira en '+dL+' día'+(dL!==1?'s':'')+'</div>':expired?'<div style="font-size:9px;color:#f87171;margin-top:2px">Acceso expirado</div>':'';
+    var ctrl=isSA?'<span style="font-size:9px;color:var(--dm);padding:4px">Permanente</span>'
+      :'<select data-c="'+c+'" onchange="chRlEl(this)" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:7px;font-size:10px">'+
+      ['Socio','Administrador','Coordinador Deportivo','Coordinador Financiero'].map(function(ro){return'<option'+(rol===ro?' selected':'')+'>'+ro+'</option>';}).join('')+'</select>';
+    return'<div class="pli" style="'+(isCoord&&!expired?'border-color:rgba(200,16,46,.25);background:rgba(200,16,46,.03);':'')+(expired?'opacity:.6;':'')+'">'+
+      '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><div class="pln">'+esc(sc.nombre||'Sin nombre')+'</div>'+badge+'</div>'+
+      '<div class="plc">CC '+c+(sc.equipo&&sc.equipo!=='0'?' &middot; Eq.'+sc.equipo:'')+'</div>'+extra+'</div>'+ctrl+'</div>';
+  }).join('');
+}
+
+function filtSo(q){
+  _soFilter=q;
+  var so=_soAll;
+  var ks=Object.keys(so).sort(function(a,b){return(so[a].nombre||a).toLowerCase().localeCompare((so[b].nombre||b).toLowerCase());});
+  var f=(q||'').trim().toLowerCase();
+  var filtered=f?ks.filter(function(c){return(so[c].nombre||'').toLowerCase().indexOf(f)>=0||c.indexOf(q.trim())>=0;}):ks;
+  var lbl=document.getElementById('soCntLabel');if(lbl)lbl.textContent=filtered.length+' socio'+(filtered.length!==1?'s':'')+(f?' · "'+q+'"':'');
+  var lst=document.getElementById('soList');if(lst)lst.innerHTML=renderSoItems(ks,so,q);
+}
+
+function shAsignarCoord(){
+  var so=_soAll;
+  var ks=Object.keys(so).sort(function(a,b){return(so[a].nombre||a).toLowerCase().localeCompare((so[b].nombre||b).toLowerCase());}).filter(function(c){return SUPER_ADMINS.indexOf(c)<0;});
+  var opts=ks.map(function(c){return'<option value="'+c+'">'+(so[c].nombre||'CC '+c)+' (CC '+c+')</option>';}).join('');
+  var today=new Date().toISOString().split('T')[0];
+  _assignTipo='fijo';
+  var h='<div style="padding:14px 16px">';
+  h+='<button onclick="renderSoList()" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--m);font-size:13px;cursor:pointer;padding:0 0 14px;font-weight:700">‹ Volver</button>';
+  h+='<div style="font-size:15px;font-weight:900;margin-bottom:4px;letter-spacing:-.3px">&#9917; Asignar Coordinador Deportivo</div>';
+  h+='<div style="font-size:11px;color:var(--m);margin-bottom:18px">Elige un socio y define si el acceso es fijo o temporal.</div>';
+  h+='<div class="field" style="margin-bottom:14px"><label>Socio</label>';
+  h+='<select id="coordSel" style="background:var(--b3);border:2px solid var(--bd);border-radius:12px;padding:13px 12px;color:var(--t);font-size:13px;width:100%;outline:none"><option value="">-- Selecciona un socio --</option>'+opts+'</select></div>';
+  h+='<div class="field" style="margin-bottom:14px"><label>Tipo de acceso</label>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  h+='<button id="ctFijo" onclick="setCoordTipo(\'fijo\')" style="padding:14px 10px;border-radius:12px;border:2px solid var(--red);background:rgba(200,16,46,.12);color:var(--red);font-size:13px;font-weight:900;cursor:pointer">&#128204; Fijo</button>';
+  h+='<button id="ctTemp" onclick="setCoordTipo(\'temporal\')" style="padding:14px 10px;border-radius:12px;border:2px solid var(--bd);background:transparent;color:var(--m);font-size:13px;font-weight:900;cursor:pointer">&#8987; Temporal</button>';
+  h+='</div></div>';
+  h+='<div id="hastaWrap" style="display:none" class="field"><label>Fecha hasta (incluyendo ese día)</label>';
+  h+='<input type="date" id="coordHastaDate" min="'+today+'" style="background:var(--b3);border:2px solid var(--bd);border-radius:12px;padding:13px 12px;color:var(--t);font-size:14px;width:100%;outline:none"></div>';
+  h+='<div id="coordErr" style="background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.3);border-radius:10px;padding:10px 12px;font-size:11px;color:#f87171;display:none;margin:10px 0;line-height:1.5"></div>';
+  h+='<button onclick="saveCoord()" style="width:100%;padding:16px;border-radius:14px;background:var(--red);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px">&#9917; Guardar asignación</button>';
   h+='</div>';
   adCnt(h);
 }
-async function chRl(c,r){if(fbR&&db)await db.ref("/socios/"+c+"/rol").set(r);}
+
+function setCoordTipo(t){
+  _assignTipo=t;
+  var fi=document.getElementById('ctFijo'),te=document.getElementById('ctTemp'),wr=document.getElementById('hastaWrap');
+  if(fi){fi.style.borderColor=t==='fijo'?'var(--red)':'var(--bd)';fi.style.background=t==='fijo'?'rgba(200,16,46,.12)':'transparent';fi.style.color=t==='fijo'?'var(--red)':'var(--m)';}
+  if(te){te.style.borderColor=t==='temporal'?'var(--amber)':'var(--bd)';te.style.background=t==='temporal'?'rgba(245,158,11,.12)':'transparent';te.style.color=t==='temporal'?'var(--amber)':'var(--m)';}
+  if(wr)wr.style.display=t==='temporal'?'':'none';
+}
+
+async function saveCoord(){
+  var sel=document.getElementById('coordSel'),err=document.getElementById('coordErr');
+  if(err)err.style.display='none';
+  if(!sel||!sel.value){if(err){err.innerHTML='Selecciona un socio.';err.style.display='block';}return;}
+  var c=sel.value,hasta=null;
+  if(_assignTipo==='temporal'){
+    var dateEl=document.getElementById('coordHastaDate');
+    if(!dateEl||!dateEl.value){if(err){err.innerHTML='Selecciona la fecha de expiración.';err.style.display='block';}return;}
+    var d=new Date(dateEl.value+'T23:59:59');
+    if(d<=new Date()){if(err){err.innerHTML='La fecha debe ser en el futuro.';err.style.display='block';}return;}
+    hasta=d.getTime();
+  }
+  if(!fbR||!db)return;
+  var updates={};
+  // Clear previous coordinator
+  Object.keys(_soAll).forEach(function(k){
+    if(k!==c&&SUPER_ADMINS.indexOf(k)<0&&(_soAll[k].rol||'').toLowerCase()==='coordinador deportivo'){
+      updates['/socios/'+k+'/rol']='Socio';updates['/socios/'+k+'/coordHasta']=null;
+      _soAll[k].rol='Socio';delete _soAll[k].coordHasta;
+    }
+  });
+  updates['/socios/'+c+'/rol']='Coordinador Deportivo';
+  updates['/socios/'+c+'/coordHasta']=hasta||null;
+  await db.ref().update(updates);
+  _soAll[c]=_soAll[c]||{};_soAll[c].rol='Coordinador Deportivo';
+  if(hasta)_soAll[c].coordHasta=hasta;else delete _soAll[c].coordHasta;
+  renderSoList();
+  var sc=_soAll[c];
+  var msg=(sc.nombre||c)+' asignado como Coord. Deportivo '+(hasta?'temporal hasta '+new Date(hasta).toLocaleDateString('es-CO'):'de forma permanente');
+  if(typeof showToast==='function')showToast('info','✅ Coordinador asignado',msg,4000,'#10b981');
+}
+
+async function quitarCoord(c){
+  if(!fbR||!db)return;
+  if(!confirm('¿Quitar a '+((_soAll[c]||{}).nombre||c)+' como Coordinador Deportivo?'))return;
+  await db.ref().update({'/socios/'+c+'/rol':'Socio','/socios/'+c+'/coordHasta':null});
+  if(_soAll[c]){_soAll[c].rol='Socio';delete _soAll[c].coordHasta;}
+  renderSoList();
+}
 
 // ── EXPORT CSV ──
 async function expC(){

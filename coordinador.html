@@ -405,12 +405,13 @@ function tn(id){return T[id]?T[id].n:'Equipo '+id;}
 function ts(id){return T[id]?T[id].s:'T'+id;}
 
 // ── STATE ──
+var SUPER_ADMINS=['88262856','88264186'];
 var curUser=null,curCed=null,curRol=null,res={},rosters={l:[],v:[]};
 var curMatch=null,curRType='normal',curWO=null;
 var evGoals=[],evYellows=[],evReds=[],curEvtTab='goal';
 var curFilter='hoy',resRef=null,_saving=false;
 
-function isAdmin(){return curRol==='administrador';}
+function isAdmin(){return curRol==='administrador'||SUPER_ADMINS.indexOf(curCed)>=0;}
 
 // ── UTILS ──
 function today(){return new Date().toISOString().split('T')[0];}
@@ -465,7 +466,17 @@ async function doLogin(){
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
-    if(rol!=='coordinador deportivo'&&rol!=='administrador'){
+    // Super admins always have admin access
+    if(SUPER_ADMINS.indexOf(c)>=0){
+      rol='administrador';
+    } else if(rol==='coordinador deportivo'&&pf.coordHasta&&pf.coordHasta<Date.now()){
+      // Temporal coordinator expired
+      await au.signOut();
+      await db.ref('/socios/'+c+'/rol').set('Socio');
+      await db.ref('/socios/'+c+'/coordHasta').remove();
+      errEl.innerHTML='&#8987; Tu acceso como Coordinador Deportivo <strong>expiró</strong>.<br>Contacta al administrador para renovarlo.';
+      errEl.style.display='block';btn.disabled=false;btn.innerHTML='🔐 Ingresar';return;
+    } else if(rol!=='coordinador deportivo'&&rol!=='administrador'){
       await au.signOut();
       errEl.innerHTML='La cédula <strong>'+c+'</strong> no tiene rol de Coordinador Deportivo.<br>Contacta al administrador.';
       errEl.style.display='block';btn.disabled=false;btn.innerHTML='🔐 Ingresar';return;
@@ -1039,6 +1050,12 @@ au.onAuthStateChanged(async function(user){
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
+    if(SUPER_ADMINS.indexOf(c)>=0) rol='administrador';
+    else if(rol==='coordinador deportivo'&&pf.coordHasta&&pf.coordHasta<Date.now()){
+      // expired — revoke silently, stay on login screen
+      db.ref('/socios/'+c+'/rol').set('Socio');db.ref('/socios/'+c+'/coordHasta').remove();
+      rol='socio';
+    }
     if(rol==='coordinador deportivo'||rol==='administrador'){
       curUser=pf;curCed=c;curRol=rol;
       document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
