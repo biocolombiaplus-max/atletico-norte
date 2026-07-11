@@ -135,7 +135,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 
 /* player picker */
 .picker-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:10px}
-.picker-side-label{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.picker-side-label{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .player-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .pchip{padding:9px 12px;border-radius:10px;border:1.5px solid var(--bd2);background:var(--bg3);color:var(--t);font-size:12px;font-weight:700;cursor:pointer;transition:.12s;letter-spacing:.2px}
 .pchip:active{transform:scale(.94)}
@@ -144,6 +144,11 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .pchip.on-yellow{border-color:var(--amber);background:rgba(245,158,11,.18);color:var(--amber)}
 .pchip.on-red{border-color:#f87171;background:rgba(200,16,46,.18);color:#f87171}
 .picker-divider{height:1px;background:var(--bd);margin:8px 0}
+.picker-manual{display:flex;gap:6px;margin-top:4px}
+.picker-manual input{flex:1;background:var(--bg);border:1.5px solid var(--bd2);border-radius:9px;padding:8px 10px;color:var(--t);font-size:12px;font-weight:600;outline:none}
+.picker-manual input:focus{border-color:var(--blue)}
+.picker-manual button{background:var(--bg3);border:1.5px solid var(--bd2);border-radius:9px;padding:8px 12px;color:var(--t);font-size:13px;cursor:pointer;font-weight:800;transition:.12s}
+.picker-manual button:active{transform:scale(.93)}
 
 /* W/O section */
 .wo-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -204,6 +209,42 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .pill-red{background:rgba(200,16,46,.15);color:#f87171}
 .pill-blue{background:rgba(14,165,233,.15);color:var(--blue)}
 
+/* ── SWAP HORA OVERLAY ── */
+.swap-sheet{background:var(--bg2);border-radius:24px 24px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:480px;transform:translateY(40px);transition:transform .25s cubic-bezier(.34,1.2,.64,1);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:0}
+.overlay.show .swap-sheet{transform:translateY(0)}
+.swap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.swap-hdr h2{font-size:17px;font-weight:900;letter-spacing:-.3px}
+.swap-close{background:var(--bg3);border:1px solid var(--bd);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--m);flex-shrink:0}
+.swap-current{background:var(--bg3);border:1.5px solid var(--bd2);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.swap-current .sc-label{font-size:9px;font-weight:800;color:var(--m);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.swap-current .sc-match{font-size:13px;font-weight:900}
+.swap-current .sc-meta{font-size:10.5px;color:var(--m);margin-top:3px}
+.swap-section-label{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.swap-option{background:var(--bg3);border:2px solid var(--bd);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.15s;margin-bottom:6px}
+.swap-option:active{transform:scale(.98)}
+.swap-option.selected{border-color:var(--blue);background:rgba(14,165,233,.08)}
+.swap-option .so-teams{font-size:13px;font-weight:800}
+.swap-option .so-meta{font-size:10px;color:var(--m);margin-top:2px}
+.swap-preview{background:rgba(14,165,233,.06);border:1.5px solid rgba(14,165,233,.25);border-radius:12px;padding:12px 14px;margin:10px 0;display:none}
+.swap-preview.show{display:block}
+.swap-preview .sp-row{display:flex;align-items:center;justify-content:center;gap:12px;font-size:14px;font-weight:900;text-align:center}
+.swap-preview .sp-arrow{color:var(--blue);font-size:18px}
+.swap-preview .sp-note{font-size:10px;color:var(--m);text-align:center;margin-top:6px}
+.swap-delegates{display:flex;flex-direction:column;gap:6px;margin:10px 0;display:none}
+.swap-delegates.show{display:flex}
+.swap-del-row{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;cursor:pointer;transition:.12s}
+.swap-del-row.checked{border-color:var(--green);background:rgba(16,185,129,.08)}
+.swap-del-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--bd2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;transition:.15s}
+.swap-del-row.checked .swap-del-check{background:var(--green);border-color:var(--green);color:#fff}
+.swap-del-name{font-size:12px;font-weight:700;flex:1}
+.swap-del-sub{font-size:10px;color:var(--m)}
+.swap-motivo-wrap{margin:10px 0;display:none}
+.swap-motivo-wrap.show{display:block}
+.swap-motivo-wrap label{font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px}
+.swap-motivo-wrap textarea{width:100%;background:var(--bg3);border:2px solid var(--bd2);border-radius:12px;padding:12px;color:var(--t);font-size:13px;font-weight:500;outline:none;resize:none;height:72px;font-family:inherit}
+.swap-motivo-wrap textarea:focus{border-color:var(--blue)}
+.swap-hora-tag{display:inline-block;background:rgba(245,158,11,.15);color:var(--amber);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:900}
+
 /* spinner */
 .spin{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -254,7 +295,11 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
       <div class="topbar-title" id="mpTitle">Partido</div>
       <div class="topbar-sub" id="mpSub"></div>
     </div>
-    <span id="mpSaved" style="font-size:10px;color:var(--green);font-weight:700;display:none">✓ Guardado</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="btnSwapHora" title="Cambiar horario" style="display:none;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.3);color:var(--blue);border-radius:10px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap" onclick="showSwapModal()">⏱ Horario</button>
+      <span id="mpSaved" style="font-size:10px;color:var(--green);font-weight:700;display:none">✓ Guardado</span>
+      <button title="Cerrar" onclick="goBack()" style="background:var(--bg3);border:1px solid var(--bd);color:var(--m);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1">✕</button>
+    </div>
   </div>
 
   <div class="mpanel-scroll" id="mpScroll">
@@ -365,6 +410,45 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
   </div>
 </div>
 
+<!-- ── SWAP HORA OVERLAY ── -->
+<div class="overlay" id="swapOverlay">
+  <div class="swap-sheet">
+    <div class="swap-hdr">
+      <h2>⏱ Cambio de Horario</h2>
+      <span class="swap-close" onclick="closeSwapModal()">✕</span>
+    </div>
+
+    <div class="swap-current">
+      <div class="sc-label">Partido actual</div>
+      <div class="sc-match" id="swCurMatch"></div>
+      <div class="sc-meta" id="swCurMeta"></div>
+    </div>
+
+    <div class="swap-section-label">¿Con cuál partido cambias el horario?</div>
+    <div id="swapOptions"></div>
+
+    <div class="swap-preview" id="swapPreview">
+      <div class="sp-row" id="swapPreviewRow"></div>
+      <div class="sp-note">Solo se intercambian los horarios — mismo día, misma cancha</div>
+    </div>
+
+    <div class="swap-delegates" id="swapDelegates">
+      <div class="swap-section-label" style="margin-top:6px">Los 4 delegados confirman el acuerdo</div>
+      <div id="swDelList"></div>
+    </div>
+
+    <div class="swap-motivo-wrap" id="swapMotivoWrap">
+      <label>Motivo del cambio</label>
+      <textarea id="swMotivo" placeholder="Ej: Lunes festivo, se acuerda entre equipos cambiar horario para mejor asistencia…"></textarea>
+    </div>
+
+    <div id="swapConfirmArea" style="display:none;margin-top:4px">
+      <div id="swapPendNote" style="font-size:11px;color:var(--amber);margin-bottom:8px;text-align:center"></div>
+      <button class="btn btn-red" id="btnDoSwap" onclick="doSwap()">⏱ Confirmar cambio de horario</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── PIN OVERLAY ── -->
 <div class="overlay" id="pinOverlay">
   <div class="modal-sheet">
@@ -410,8 +494,11 @@ var curUser=null,curCed=null,curRol=null,res={},rosters={l:[],v:[]};
 var curMatch=null,curRType='normal',curWO=null;
 var evGoals=[],evYellows=[],evReds=[],curEvtTab='goal';
 var curFilter='hoy',resRef=null,_saving=false;
+var horaOverrides={},swapRef=null; // {matchId: "HH:MM"}
+var _swapTarget=null,_swapDels={};
 
 function isAdmin(){return curRol==='administrador'||SUPER_ADMINS.indexOf(curCed)>=0;}
+function getHora(m){return horaOverrides[m.id]||m.hora;}
 
 // ── UTILS ──
 function today(){return new Date().toISOString().split('T')[0];}
@@ -508,6 +595,17 @@ function startResListener(){
     renderMatchList();
     if(curMatch){renderStandings();renderLockState();}
   });
+  if(swapRef)swapRef.off();
+  swapRef=db.ref('/horariosSwap');
+  swapRef.on('value',function(s){
+    var data=s.val()||{};
+    horaOverrides={};
+    Object.keys(data).forEach(function(k){if(data[k]&&data[k].hora)horaOverrides[parseInt(k)]=data[k].hora;});
+    renderMatchList();
+    if(curMatch){
+      document.getElementById('mpSub').textContent=fd(curMatch.fecha)+' · '+getHora(curMatch);
+    }
+  });
 }
 
 // ── MATCH LIST ──
@@ -537,9 +635,11 @@ function renderMatchList(){
       var hasDone=r&&r.l!==undefined;
       var isWO=r&&r.wo;
       var isLocked=r&&r.locked;
+      var hora=getHora(m);
+      var horaChanged=horaOverrides[m.id]&&horaOverrides[m.id]!==m.hora;
       var scoreHtml=hasDone
         ?'<div class="mc-score">'+(isWO?'W':''+r.l)+' <span>–</span> '+(isWO?'W':''+r.v)+'</div>'
-        :'<div class="mc-score pending">'+m.hora+'</div>';
+        :'<div class="mc-score pending">'+hora+(horaChanged?'<br><span style="font-size:8px;color:var(--blue)">modificado</span>':'')+'</div>';
       var status=isToday?'<span class="mc-status status-hoy">HOY</span>'
         :isLocked?'<span class="mc-status status-lock">🔒 Final</span>'
         :hasDone?'<span class="mc-status status-ok">✓ Listo</span>'
@@ -567,7 +667,7 @@ function openMatch(id){
   curEvtTab='goal';
 
   document.getElementById('mpTitle').textContent=ts(m.l)+' vs '+ts(m.v);
-  document.getElementById('mpSub').textContent=fd(m.fecha)+' · '+m.hora;
+  document.getElementById('mpSub').textContent=fd(m.fecha)+' · '+getHora(m);
   document.getElementById('mpCancha').textContent='🏟 '+m.cancha+' · Vuelta '+m.week;
   document.getElementById('mpTeamL').textContent=tn(m.l);
   document.getElementById('mpTeamV').textContent=tn(m.v);
@@ -585,6 +685,9 @@ function openMatch(id){
     document.getElementById('numL').textContent=r?r.l:0;
     document.getElementById('numV').textContent=r?r.v:0;
   }
+
+  // Swap button only for admins
+  document.getElementById('btnSwapHora').style.display=isAdmin()?'':'none';
 
   loadRosters(m.l,m.v);
   renderEvtTabs();
@@ -659,6 +762,28 @@ function renderAudit(){
 // ── SCORE ──
 function adjScore(side,delta){
   if(curMatch&&res[curMatch.id]&&res[curMatch.id].locked&&!isAdmin())return;
+  if(delta>0&&curRType==='normal'){
+    // Open goal assign sheet directly
+    openQuickAssign(side);return;
+  }
+  if(delta<0&&curRType==='normal'){
+    // Remove last goal for this team
+    var tid=side==='l'?curMatch.l:curMatch.v;
+    var idx=-1;
+    for(var i=evGoals.length-1;i>=0;i--){if(evGoals[i].teamId===tid){idx=i;break;}}
+    if(idx>=0){
+      var p=evGoals[idx];
+      showConfirm({icon:'⚽',title:'¿Quitar gol?',sub:'Se quitará el gol registrado a <strong>'+esc(p.corto||p.name)+'</strong>.',
+        cancelLabel:'Cancelar',confirmLabel:'Sí, quitar',confirmColor:'var(--dm)',
+        onConfirm:function(){evGoals.splice(idx,1);syncScore();renderPickerPanel();renderEvtLog();document.getElementById('mpSaved').style.display='none';}});
+    }else{
+      // No goals registered yet, just decrement raw
+      var el=document.getElementById(side==='l'?'numL':'numV');
+      var n=Math.max(0,(parseInt(el.textContent)||0)-1);
+      el.textContent=n;renderStandings();document.getElementById('mpSaved').style.display='none';
+    }
+    return;
+  }
   var el=document.getElementById(side==='l'?'numL':'numV');
   var n=parseInt(el.textContent)||0;
   n=Math.max(0,n+delta);
@@ -667,6 +792,91 @@ function adjScore(side,delta){
   document.getElementById('mpSaved').style.display='none';
 }
 function getScore(){return{l:parseInt(document.getElementById('numL').textContent)||0,v:parseInt(document.getElementById('numV').textContent)||0};}
+
+// ── QUICK ASSIGN SHEET (Gol) ──
+var _qaOverlay=null,_qaSide=null;
+function openQuickAssign(side){
+  var m=curMatch;if(!m)return;
+  _qaSide=side;
+  var tid=side==='l'?m.l:m.v;
+  var players=rosters[side]||[];
+  var locked=!!(res[m.id]&&res[m.id].locked)&&!isAdmin();
+  if(locked)return;
+
+  var chipsHtml='';
+  if(players.length){
+    chipsHtml=players.map(function(p){
+      return '<button class="pchip" style="font-size:14px;padding:12px 16px" onclick="qaPickPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
+    }).join('');
+  }
+
+  var html='<div class="overlay show" id="qaOverlay" onclick="qaClose(event)">'
+    +'<div class="modal-sheet" style="padding-bottom:calc(20px + env(safe-area-inset-bottom))">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<div><div style="font-size:20px;font-weight:900">⚽ ¿Quién marcó?</div>'
+    +'<div style="font-size:11px;color:var(--m);margin-top:2px">'+esc(tn(tid))+'</div></div>'
+    +'<span onclick="qaClose(null,true)" style="font-size:22px;cursor:pointer;color:var(--m);padding:4px 8px">✕</span>'
+    +'</div>'
+    +(players.length?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Selecciona el jugador</div>'
+      +'<div class="player-grid" style="gap:8px">'+chipsHtml+'</div></div>'
+      +'<div style="height:1px;background:var(--bd);margin:8px 0"></div>':'')
+    +'<div style="margin-bottom:10px">'
+    +'<div style="font-size:9px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(players.length?'O escribe el nombre':'Nombre del jugador')+'</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<input id="qaNameInput" type="text" placeholder="Ej: Pérez, Juan C..." autocomplete="off" '
+    +'style="flex:1;background:var(--bg3);border:2px solid var(--bd2);border-radius:12px;padding:14px;color:var(--t);font-size:15px;font-weight:700;outline:none" '
+    +'oninput="qaInputChange()" onkeydown="if(event.key===\'Enter\')qaConfirmTyped()">'
+    +'<button id="qaTypedBtn" onclick="qaConfirmTyped()" style="background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px 18px;font-size:20px;cursor:pointer;opacity:.4" disabled>✓</button>'
+    +'</div></div>'
+    +'<button class="btn btn-ghost" onclick="qaSkip()" style="margin-top:4px;font-size:12px;color:var(--dm)">Sin asignar jugador (solo sumar gol)</button>'
+    +'</div></div>';
+
+  var wrap=document.createElement('div');wrap.id='qaWrap';wrap.innerHTML=html;
+  document.body.appendChild(wrap);
+  _qaOverlay=wrap;
+  setTimeout(function(){var inp=document.getElementById('qaNameInput');if(inp)inp.focus();},300);
+}
+function qaClose(e,force){
+  if(!force&&e&&e.target&&e.target.id!=='qaOverlay')return;
+  if(_qaOverlay){_qaOverlay.remove();_qaOverlay=null;}
+}
+function qaInputChange(){
+  var v=(document.getElementById('qaNameInput').value||'').trim();
+  var btn=document.getElementById('qaTypedBtn');
+  if(btn){btn.disabled=!v;btn.style.opacity=v?'1':'.4';}
+}
+function qaPickPlayer(name,corto,teamId){
+  if(_qaOverlay){_qaOverlay.remove();_qaOverlay=null;}
+  evGoals.push({name:name,corto:corto,teamId:teamId});
+  // Also add to dynamic roster if not present
+  var side=teamId===curMatch.l?'l':'v';
+  if(!rosters[side].find(function(p){return p.name===name;}))rosters[side].push({name:name,corto:corto,teamId:teamId});
+  syncScore();renderPickerPanel();renderEvtLog();
+  document.getElementById('mpSaved').style.display='none';
+  showToast('⚽ '+corto+' — '+tn(teamId),'var(--green)');
+}
+function qaConfirmTyped(){
+  var name=(document.getElementById('qaNameInput').value||'').trim();
+  if(!name)return;
+  var m=curMatch;if(!m)return;
+  var tid=_qaSide==='l'?m.l:m.v;
+  // Add to dynamic roster
+  var side=_qaSide;
+  if(!rosters[side])rosters[side]=[];
+  if(!rosters[side].find(function(p){return p.name.toLowerCase()===name.toLowerCase();})){
+    rosters[side].push({name:name,corto:name,teamId:tid});
+    rosters[side].sort(function(a,b){return a.corto.localeCompare(b.corto);});
+  }
+  qaPickPlayer(name,name,tid);
+}
+function qaSkip(){
+  if(_qaOverlay){_qaOverlay.remove();_qaOverlay=null;}
+  var el=document.getElementById(_qaSide==='l'?'numL':'numV');
+  var n=(parseInt(el.textContent)||0)+1;
+  el.textContent=n;renderStandings();
+  document.getElementById('mpSaved').style.display='none';
+  showToast('⚽ Gol sumado (sin jugador)','var(--m)');
+}
 
 // ── RESULT TYPE ──
 function setRType(t){
@@ -750,17 +960,42 @@ function renderPickerPanel(){
   var panel=document.getElementById('pickerPanel');if(!panel)return;
   var m=curMatch;if(!m)return;
   var locked=!!(res[m.id]&&res[m.id].locked)&&!isAdmin();
+  var evIco=curEvtTab==='goal'?'⚽':curEvtTab==='yellow'?'🟨':'🟥';
   function side(s,label,tid){
     var players=rosters[s]||[];
     var activeArr=curEvtTab==='goal'?evGoals:curEvtTab==='yellow'?evYellows:evReds;
     var cls='on-'+curEvtTab;
-    var chips=players.length?players.map(function(p){
+    var chips=players.map(function(p){
       var on=activeArr.findIndex(function(e){return e.name===p.name&&e.teamId===p.teamId;})>=0;
       return '<button class="pchip'+(on?' '+cls:'')+'"'+(locked?' disabled':'')+' onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
-    }).join(''):'<span style="font-size:11px;color:var(--dm)">Sin jugadores registrados</span>';
-    return '<div class="picker-side-label">'+label+' — '+esc(tn(tid))+'</div><div class="player-grid">'+chips+'</div>';
+    }).join('');
+    var emptyNote=!players.length?'<div style="font-size:10px;color:var(--dm);margin-bottom:6px">Sin plantel cargado — usa el campo de abajo</div>':'';
+    var manualId='pmi_'+s;
+    var manual=locked?'':'<div class="picker-manual">'
+      +'<input type="text" id="'+manualId+'" placeholder="Nombre del jugador..." autocomplete="off" onkeydown="if(event.key===\'Enter\')pickerManualAdd(\''+s+'\','+tid+')">'
+      +'<button onclick="pickerManualAdd(\''+s+'\','+tid+')">'+evIco+'</button>'
+      +'</div>';
+    return '<div class="picker-side-label">'+label+' &mdash; <span style="color:var(--t);font-weight:900">'+esc(tn(tid))+'</span></div>'
+      +emptyNote
+      +(chips?'<div class="player-grid">'+chips+'</div>':'')
+      +manual;
   }
   panel.innerHTML=side('l','LOCAL',m.l)+'<div class="picker-divider"></div>'+side('v','VISITA',m.v);
+}
+
+function pickerManualAdd(side,tid){
+  var inp=document.getElementById('pmi_'+side);
+  if(!inp)return;
+  var name=inp.value.trim();
+  if(!name)return;
+  // Add to roster if new
+  if(!rosters[side])rosters[side]=[];
+  if(!rosters[side].find(function(p){return p.name.toLowerCase()===name.toLowerCase();})){
+    rosters[side].push({name:name,corto:name,teamId:tid});
+    rosters[side].sort(function(a,b){return a.corto.localeCompare(b.corto);});
+  }
+  inp.value='';
+  tapPlayer(name,name,tid);
 }
 
 // ── TAP PLAYER → CONFIRM ──
@@ -895,6 +1130,166 @@ function calcStandings(resMap){
     if(b.gd!==a.gd)return b.gd-a.gd;
     return b.gf-a.gf;
   });
+}
+
+// ── SWAP HORARIO ──
+function showSwapModal(){
+  if(!isAdmin()){showToast('Solo el Administrador puede cambiar horarios.','var(--red)');return;}
+  var m=curMatch;if(!m)return;
+  _swapTarget=null;_swapDels={};
+
+  document.getElementById('swCurMatch').textContent=tn(m.l)+' vs '+tn(m.v);
+  document.getElementById('swCurMeta').innerHTML='📅 '+fd(m.fecha)+' &middot; ⏰ '+getHora(m)+' &middot; 🏟 '+m.cancha;
+
+  // Find matches on same date + same cancha, different time, no result yet (or unlocked)
+  var candidates=MF.filter(function(x){
+    if(x.id===m.id)return false;
+    if(x.fecha!==m.fecha||x.cancha!==m.cancha)return false;
+    return true;
+  });
+
+  var h='';
+  if(!candidates.length){
+    h='<div style="font-size:12px;color:var(--dm);text-align:center;padding:16px">No hay otros partidos ese día en la misma cancha para intercambiar.</div>';
+  }else{
+    candidates.forEach(function(x){
+      var hr=getHora(x);
+      h+='<div class="swap-option" id="swOpt'+x.id+'" onclick="selectSwapOpt('+x.id+')">'
+        +'<div class="so-teams">'+esc(ts(x.l))+' vs '+esc(ts(x.v))+'</div>'
+        +'<div class="so-meta">⏰ <strong>'+hr+'</strong> &nbsp;·&nbsp; '+esc(tn(x.l))+' vs '+esc(tn(x.v))+'</div>'
+        +'</div>';
+    });
+  }
+  document.getElementById('swapOptions').innerHTML=h;
+  document.getElementById('swapPreview').classList.remove('show');
+  document.getElementById('swapDelegates').classList.remove('show');
+  document.getElementById('swapMotivoWrap').classList.remove('show');
+  document.getElementById('swapConfirmArea').style.display='none';
+  document.getElementById('swMotivo').value='';
+  document.getElementById('swapOverlay').classList.add('show');
+}
+
+function selectSwapOpt(id){
+  var m=curMatch;if(!m)return;
+  var x=MF.find(function(f){return f.id===id;});if(!x)return;
+  _swapTarget=x;_swapDels={};
+
+  // highlight selected
+  document.querySelectorAll('.swap-option').forEach(function(el){el.classList.remove('selected');});
+  var sel=document.getElementById('swOpt'+id);if(sel)sel.classList.add('selected');
+
+  // preview
+  var hM=getHora(m),hX=getHora(x);
+  document.getElementById('swapPreviewRow').innerHTML=
+    '<div style="text-align:center"><div style="font-size:10px;color:var(--m);font-weight:700">'+esc(ts(m.l)+' vs '+ts(m.v))+'</div>'
+    +'<span class="swap-hora-tag">'+hM+'</span><div style="font-size:9px;color:var(--m);margin-top:2px">→ pasará a las <strong>'+hX+'</strong></div></div>'
+    +'<span class="sp-arrow">⇄</span>'
+    +'<div style="text-align:center"><div style="font-size:10px;color:var(--m);font-weight:700">'+esc(ts(x.l)+' vs '+ts(x.v))+'</div>'
+    +'<span class="swap-hora-tag">'+hX+'</span><div style="font-size:9px;color:var(--m);margin-top:2px">→ pasará a las <strong>'+hM+'</strong></div></div>';
+  document.getElementById('swapPreview').classList.add('show');
+
+  // 4 delegate checkboxes — one per team
+  var teams=[
+    {id:m.l,label:'Delegado — '+tn(m.l),sub:'Equipo local del partido '+ts(m.l)+' vs '+ts(m.v)},
+    {id:m.v,label:'Delegado — '+tn(m.v),sub:'Equipo visita del partido '+ts(m.l)+' vs '+ts(m.v)},
+    {id:x.l,label:'Delegado — '+tn(x.l),sub:'Equipo local del partido '+ts(x.l)+' vs '+ts(x.v)},
+    {id:x.v,label:'Delegado — '+tn(x.v),sub:'Equipo visita del partido '+ts(x.l)+' vs '+ts(x.v)},
+  ];
+  // remove duplicates (if a team plays both matches)
+  var seen={};
+  teams=teams.filter(function(t){if(seen[t.id])return false;seen[t.id]=true;return true;});
+
+  var dh='';
+  teams.forEach(function(t){
+    dh+='<div class="swap-del-row" id="swDel'+t.id+'" onclick="toggleSwapDel('+t.id+')">'
+      +'<div class="swap-del-check" id="swDelChk'+t.id+'"></div>'
+      +'<div><div class="swap-del-name">'+esc(t.label)+'</div><div class="swap-del-sub">'+esc(t.sub)+'</div></div>'
+      +'</div>';
+  });
+  document.getElementById('swDelList').innerHTML=dh;
+  document.getElementById('swapDelegates').classList.add('show');
+  document.getElementById('swapMotivoWrap').classList.add('show');
+  document.getElementById('swapConfirmArea').style.display='block';
+  checkSwapReady();
+}
+
+function toggleSwapDel(tid){
+  _swapDels[tid]=!_swapDels[tid];
+  var row=document.getElementById('swDel'+tid);
+  var chk=document.getElementById('swDelChk'+tid);
+  if(row)row.classList.toggle('checked',!!_swapDels[tid]);
+  if(chk)chk.textContent=_swapDels[tid]?'✓':'';
+  checkSwapReady();
+}
+
+function checkSwapReady(){
+  var allChecked=true;
+  document.querySelectorAll('.swap-del-row').forEach(function(el){
+    var tid=parseInt(el.id.replace('swDel',''));
+    if(!_swapDels[tid])allChecked=false;
+  });
+  var motivo=(document.getElementById('swMotivo').value||'').trim();
+  var btn=document.getElementById('btnDoSwap');
+  var note=document.getElementById('swapPendNote');
+  if(!allChecked){
+    note.textContent='⚠️ Todos los delegados deben confirmar el acuerdo';
+    btn.disabled=true;btn.style.opacity='.4';
+  }else if(!motivo){
+    note.textContent='⚠️ Escribe el motivo del cambio';
+    btn.disabled=true;btn.style.opacity='.4';
+  }else{
+    note.textContent='';
+    btn.disabled=false;btn.style.opacity='1';
+  }
+}
+// listen to motivo changes
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='swMotivo')checkSwapReady();});
+
+async function doSwap(){
+  if(!isAdmin()||!curMatch||!_swapTarget)return;
+  var m=curMatch,x=_swapTarget;
+  var motivo=(document.getElementById('swMotivo').value||'').trim();
+  if(!motivo){showToast('Escribe el motivo del cambio.','var(--amber)');return;}
+
+  var horaM=getHora(m),horaX=getHora(x);
+  if(horaM===horaX){showToast('Los horarios ya son iguales, no hay nada que intercambiar.','var(--amber)');return;}
+
+  var btn=document.getElementById('btnDoSwap');
+  btn.disabled=true;btn.innerHTML='<div class="spin"></div> Guardando...';
+
+  try{
+    var auditBy={cedula:curCed,nombre:curUser.nombre||curCed,ts:Date.now()};
+    var delegados=Object.keys(_swapDels).filter(function(k){return _swapDels[k];}).map(function(k){return parseInt(k);});
+    var ts_now=Date.now();
+
+    // Store the new hours for both matches
+    var updates={};
+    updates['/horariosSwap/'+m.id]={hora:horaX,swappedWith:x.id,motivo:motivo,by:auditBy,delegados:delegados,ts:ts_now};
+    updates['/horariosSwap/'+x.id]={hora:horaM,swappedWith:m.id,motivo:motivo,by:auditBy,delegados:delegados,ts:ts_now};
+
+    // Audit log
+    updates['/auditHorarios/'+ts_now]={
+      accion:'cambio_horario',
+      partido1:{id:m.id,equipos:tn(m.l)+' vs '+tn(m.v),horaAntes:horaM,horaDespues:horaX},
+      partido2:{id:x.id,equipos:tn(x.l)+' vs '+tn(x.v),horaAntes:horaX,horaDespues:horaM},
+      motivo:motivo,delegados:delegados,cedula:curCed,nombre:curUser.nombre||curCed,ts:ts_now
+    };
+
+    await db.ref().update(updates);
+
+    closeSwapModal();
+    showToast('✅ Horarios cambiados correctamente','var(--green)',4000);
+    // refresh display
+    document.getElementById('mpSub').textContent=fd(m.fecha)+' · '+horaX;
+  }catch(e){
+    showToast('❌ Error: '+e.message,'var(--red)',4000);
+    btn.disabled=false;btn.innerHTML='⏱ Confirmar cambio de horario';
+  }
+}
+
+function closeSwapModal(){
+  document.getElementById('swapOverlay').classList.remove('show');
+  _swapTarget=null;_swapDels={};
 }
 
 // ── CONFIRM SAVE → PIN FIRST ──
