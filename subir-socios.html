@@ -164,18 +164,22 @@ async function doAuth(){
 
   var email=c+'@atleticonorte.co',pass=c+'_AN26';
   try{
+    // Try login; if any error, attempt create to distinguish "no account" vs "wrong password"
     try{
       await au.signInWithEmailAndPassword(email,pass);
     }catch(e2){
-      var notFound=e2.code==='auth/user-not-found'
-        ||e2.code==='auth/invalid-login-credentials';
-      if(notFound){
+      try{
         await au.createUserWithEmailAndPassword(email,pass);
-      }else{
-        errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> ya existe en Firebase pero la contraseña no coincide.<br><br>'
-          +'<button onclick="doReset(\''+c+'\')" style="background:#f59e0b;color:#000;border:none;border-radius:8px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:12px">📧 Enviar correo de restablecimiento</button>'
-          +'<span style="display:block;margin-top:8px;font-size:10px;color:#7a96b4">Después de restablecer, la nueva contraseña será <strong style="color:#eef2f8;font-family:monospace">'+pass+'</strong> — ingresa solo la cédula sin nombre.</span>';
-        errEl.style.display='block';return;
+        // Created successfully → new account, continue
+      }catch(e3){
+        if(e3.code==='auth/email-already-in-use'){
+          // Account exists but signIn failed → wrong password → show reset
+          errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> ya existe en Firebase pero la contraseña no coincide.<br><br>'
+            +'<button onclick="doReset(\''+c+'\')" style="background:#f59e0b;color:#000;border:none;border-radius:8px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:12px">📧 Enviar correo de restablecimiento</button>'
+            +'<span style="display:block;margin-top:8px;font-size:10px;color:#7a96b4">Después de restablecer, la nueva contraseña será <strong style="color:#eef2f8;font-family:monospace">'+pass+'</strong> — ingresa solo la cédula sin nombre.</span>';
+          errEl.style.display='block';return;
+        }
+        throw e3;
       }
     }
     var snap=await db.ref('/socios/'+c).get();
