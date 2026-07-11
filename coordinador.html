@@ -472,7 +472,7 @@ function renderMatchList(){
       var status=isToday?'<span class="mc-status status-hoy">HOY</span>'
         :hasDone?'<span class="mc-status status-ok">✓ Listo</span>'
         :'<span class="mc-status status-pend">Pendiente</span>';
-      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')'+ onclick="openMatch('+m.id+')">' 
+      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')+' onclick="openMatch('+m.id+')">'  
         +'<div class="mc-top"><div class="mc-meta">'+CANCHAS[RC[m.id-1][3]]+' · Vuelta '+m.week+'</div>'+status+'</div>'
         +'<div class="mc-teams">'
         +'<div class="mc-team">'+esc(ts(m.l))+'<br><span style="font-size:10px;color:var(--m);font-weight:500">'+esc(tn(m.l))+'</span></div>'
@@ -494,7 +494,6 @@ function openMatch(id){
   evReds=r&&r.reds?r.reds.slice():[];
   curEvtTab='goal';
 
-  // header
   document.getElementById('mpTitle').textContent=ts(m.l)+' vs '+ts(m.v);
   document.getElementById('mpSub').textContent=fd(m.fecha)+' · '+m.hora;
   document.getElementById('mpCancha').textContent='🏟 '+m.cancha+' · Vuelta '+m.week;
@@ -619,7 +618,7 @@ function renderPickerPanel(){
     var cls='on-'+curEvtTab;
     var chips=players.length?players.map(function(p){
       var on=activeArr.findIndex(function(e){return e.name===p.name&&e.teamId===p.teamId;})>=0;
-      return '<button class="pchip'+(on?' '+cls:'')'+ onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
+      return '<button class="pchip'+(on?' '+cls:'')+' onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
     }).join(''):'<span style="font-size:11px;color:var(--dm)">Sin jugadores registrados</span>';
     return '<div class="picker-side-label">'+label+' — '+esc(tn(tid))+'</div><div class="player-grid">'+chips+'</div>';
   }
@@ -724,8 +723,6 @@ function renderStandings(){
     simRes[m.id]={l:sc.l,v:sc.v,scorers:sc2,yellows:evYellows.slice(),reds:evReds.slice()};
   }
   var tb=calcStandings(simRes);
-  var lPos=tb.findIndex(function(t){return t.id===m.l;})+1;
-  var vPos=tb.findIndex(function(t){return t.id===m.v;})+1;
   var h='<div class="tb-mini"><div class="tb-row header"><span>#</span><span>Equipo</span><span>PJ</span><span>GD</span><span>PTS</span><span></span></div>';
   tb.forEach(function(t,i){
     var isHL=(t.id===m.l||t.id===m.v);
@@ -749,12 +746,9 @@ function calcStandings(resMap){
     var r=resMap[m.id];if(!r||r.l===undefined)return;
     var l=st[m.l],v=st[m.v];if(!l||!v)return;
     l.pj++;v.pj++;
-    var woPenL=0,woPenV=0;
     if(r.wo){
       var loser=r.woWinner==='l'?v:l;
       loser.wl++;
-      woPenL=r.woWinner==='v'?(loser===l?Math.min(0,-(loser.wl===1?1:loser.wl===2?2:3)):0):0;
-      woPenV=r.woWinner==='l'?(loser===v?Math.min(0,-(loser.wl===1?1:loser.wl===2?2:3)):0):0;
     }
     l.gf+=r.l;l.gc+=r.v;v.gf+=r.v;v.gc+=r.l;
     if(r.l>r.v){l.pts+=3;l.pg++;v.pp++;}
@@ -779,16 +773,14 @@ function confirmSave(){
   if(curRType==='wo'&&!curWO){showToast('⚠️ Selecciona qué equipo gana por W','var(--amber)');return;}
   var m=curMatch;
   var sc=getScore();
-  var icon='💾',title,sub,detail;
+  var icon,title,sub;
   if(curRType==='wo'){
     var winner=curWO==='l'?tn(m.l):tn(m.v);
     icon='🟡';title='¿Guardar resultado por W?';
     sub='<strong>'+esc(winner)+'</strong> gana por Walkover. El equipo perdedor recibirá penalización de puntos.';
-    detail='';
   }else{
     icon='⚽';title='¿Guardar resultado?';
     sub=esc(tn(m.l))+' <strong>'+sc.l+' – '+sc.v+'</strong> '+esc(tn(m.v))+'<br><span style="font-size:11px;color:var(--m)">'+evGoals.length+' goles · '+evYellows.length+' amarillas · '+evReds.length+' rojas</span>';
-    detail='';
   }
   showConfirm({
     icon:icon,title:title,sub:sub,player:null,
@@ -854,7 +846,28 @@ function doConfirm(){
 // ── INIT ──
 _hist=['sLogin'];
 document.getElementById('sLogin').classList.add('active');
-document.getElementById('iCed').focus();
+
+// Auto-login si ya hay sesión activa (viene desde la app principal)
+au.onAuthStateChanged(async function(user){
+  if(!user){document.getElementById('iCed').focus();return;}
+  var c=user.email.replace('@atleticonorte.co','');
+  if(!/^\d{5,12}$/.test(c)){document.getElementById('iCed').focus();return;}
+  try{
+    var snap=await db.ref('/socios/'+c).get();
+    var pf=snap.exists()?snap.val():{};
+    var rol=(pf.rol||'').toLowerCase();
+    if(rol==='coordinador deportivo'||rol==='administrador'){
+      curUser=pf;curCed=c;
+      document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
+      startResListener();
+      document.getElementById('sLogin').classList.remove('active');
+      document.getElementById('sMatches').classList.add('active');
+      _hist=['sLogin','sMatches'];
+    }else{
+      document.getElementById('iCed').focus();
+    }
+  }catch(e){document.getElementById('iCed').focus();}
+});
 </script>
 </body>
 </html>
