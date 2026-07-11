@@ -546,6 +546,20 @@ tbody td:nth-child(2){text-align:left}
 .badge-found{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800}
 .badge-found.full{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
 .badge-found.partial{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+/* ── CONTACT CLUB MODAL ── */
+.contact-hero{text-align:center;padding:8px 0 16px}
+.contact-shield{font-size:52px;margin-bottom:8px;display:block}
+.contact-title{font-size:18px;font-weight:900;color:var(--t);margin-bottom:6px;line-height:1.2}
+.contact-sub{font-size:12px;color:var(--m);line-height:1.6;max-width:280px;margin:0 auto}
+.contact-card{background:var(--b3);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:14px 0;font-size:11.5px;line-height:1.65;color:var(--m)}
+.contact-card strong{color:var(--t);font-size:12px}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px 20px;background:linear-gradient(135deg,#25d366 0%,#128c3e 100%);border-radius:14px;border:none;color:#fff;font-size:14px;font-weight:900;cursor:pointer;text-decoration:none;letter-spacing:.2px;box-shadow:0 4px 20px rgba(37,211,102,.35),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .15s,box-shadow .15s;margin-bottom:10px}
+.wa-btn:active{transform:scale(.97)}
+.wa-btn svg{width:22px;height:22px;fill:#fff;flex-shrink:0}
+.wa-btn-sub{font-size:10px;opacity:.8;font-weight:600;display:block;margin-top:1px}
+.contact-divider{display:flex;align-items:center;gap:10px;margin:10px 0;color:var(--dm);font-size:10px;font-weight:700;letter-spacing:.5px}
+.contact-divider::before,.contact-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.contact-id{display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:20px;padding:3px 10px;font-size:10px;color:#f87171;font-weight:700;margin-bottom:12px}
 /* ── PLAYER PICKER ── */
 .evt-tabs{display:flex;gap:6px;margin-bottom:12px}
 .evt-tab{flex:1;padding:8px 4px;border-radius:9px;border:2px solid var(--bd);background:var(--b3);color:var(--m);font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:.15s}
@@ -1069,6 +1083,26 @@ tbody td:nth-child(2){text-align:left}
   </div></div>
 </div>
 
+<!-- Modal: Contactar al Club -->
+<div class="mo" id="mContact">
+  <div class="md"><div class="mh"><span class="mt" id="mContactT">Atlético Norte F.C.</span><button class="mcl" onclick="cM('mContact')">✕</button></div>
+  <div class="mb">
+    <div class="contact-hero">
+      <span class="contact-shield">🛡️</span>
+      <div class="contact-title" id="contactTitle"></div>
+      <div class="contact-sub" id="contactSub"></div>
+    </div>
+    <div id="contactBadge" style="text-align:center;margin-bottom:2px"></div>
+    <div class="contact-card" id="contactCard"></div>
+    <a class="wa-btn" id="contactWaBtn" href="#" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.27 2 2 8.27 2 16c0 2.44.65 4.73 1.78 6.72L2 30l7.5-1.75A13.93 13.93 0 0016 30c7.73 0 14-6.27 14-14S23.73 2 16 2zm0 25.5c-2.2 0-4.26-.6-6.03-1.63l-.43-.26-4.45 1.04 1.06-4.34-.28-.45A11.47 11.47 0 014.5 16C4.5 9.6 9.6 4.5 16 4.5c6.4 0 11.5 5.1 11.5 11.5 0 6.4-5.1 11.5-11.5 11.5zm6.3-8.62c-.35-.17-2.05-1.01-2.37-1.13-.32-.11-.55-.17-.78.17-.23.35-.89 1.13-1.09 1.36-.2.23-.4.26-.74.09-.35-.17-1.47-.54-2.8-1.73-1.03-.92-1.73-2.06-1.93-2.41-.2-.35-.02-.53.15-.7.15-.15.35-.4.52-.6.17-.2.23-.35.35-.58.11-.23.06-.44-.03-.61-.09-.17-.78-1.87-1.06-2.56-.28-.67-.56-.58-.78-.59H9.8c-.23 0-.61.09-.93.44-.32.35-1.22 1.2-1.22 2.92s1.25 3.38 1.42 3.62c.17.23 2.46 3.76 5.96 5.27.83.36 1.48.57 1.99.73.84.27 1.6.23 2.2.14.67-.1 2.05-.84 2.34-1.65.29-.8.29-1.49.2-1.63-.08-.14-.31-.23-.65-.4z"/></svg>
+      <span><span style="display:block" id="contactWaTx">Escribir al Club</span><span class="wa-btn-sub" id="contactWaSub">Atlético Norte F.C. · WhatsApp</span></span>
+    </a>
+    <div class="contact-divider">o</div>
+    <button class="cb" onclick="cM('mContact')">Volver al inicio</button>
+  </div></div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" defer></script>
@@ -1177,14 +1211,19 @@ window.addEventListener("load",function(){
         var rolMap={"administrador":"Administrador","coordinador deportivo":"Coordinador Deportivo","coordinador financiero":"Coordinador Financiero","socio":"Socio"};
         cr=rolMap[rawRol.toLowerCase()]||rawRol;
         onIn();
-        // If socio has no privacy acceptance yet, trigger onboarding after short delay
-        if(!pf.privacyOk){
-          setTimeout(function(){
-            _pendingCedula=c;
+        // Post-login routing (after short delay so UI settles)
+        setTimeout(function(){
+          _pendingCedula=c;
+          // Red socios: in DB but no team AND not an admin/coordinator
+          var isStaff=cr==='Administrador'||cr==='Coordinador Deportivo'||cr==='Coordinador Financiero';
+          var noTeam=!pf.equipo||pf.equipo===0||pf.equipo==='0';
+          if(!isStaff && noTeam){
+            openContactModal('no_team', c, pf.nombre||null);
+          }else if(!pf.privacyOk){
             if(s.exists()){openVerifyModal(c,pf);}
             else{openRegNewModal(c);}
-          },800);
-        }
+          }
+        },800);
       }else onOut();
     });
   }catch(e){
@@ -1262,9 +1301,8 @@ async function doLo(){
   }catch(e){
     spin.style.display="none";
     if(e.code==="auth/user-not-found"||e.code==="auth/invalid-credential"||e.code==="auth/invalid-login-credentials"){
-      // Possible new socio — let them register
       cM("mLo");
-      openRegNewModal(c);
+      openContactModal('not_found', c, null);
     }else if(e.code==="auth/wrong-password"){
       errEl.textContent="Error de acceso. Contacta al administrador.";errEl.style.display="block";
     }else{
@@ -1332,6 +1370,39 @@ function openRegNewModal(cedula){
   document.getElementById('regPrivOk').checked=false;
   document.getElementById('regNewErr').style.display='none';
   openM('mRegNew');
+}
+
+// ── Contact Club modal ──
+// type: 'no_team' | 'not_found'
+function openContactModal(type, cedula, nombre){
+  var WA='https://wa.me/573171030787?text=';
+  var title,sub,card,waTx,waSub,waMsg,badge='';
+  var nom=nombre?(' - '+nombre):'';
+  if(type==='no_team'){
+    title='Tu registro está en proceso';
+    sub='Tu cédula está en nuestra base de datos, pero aún no tienes equipo asignado para esta temporada.';
+    badge='<span class="contact-id">⚠️ Sin equipo asignado · CC '+cedula+'</span>';
+    card='<strong>¿Qué significa esto?</strong><br>Participaste en el proceso de inscripción de la Liga Interna S2 2026, pero no quedaste asignado a ningún equipo en el sorteo oficial.<br><br>Escríbenos por WhatsApp y un coordinador del club te informará sobre tu situación y los próximos pasos.';
+    waTx='Consultar mi situación';
+    waSub='Respuesta en horario hábil';
+    waMsg='Hola Atlético Norte F.C. 🏆\n\nSoy socio del club' +nom+', cédula CC '+cedula+'.\n\nIngresé a la app de la Liga Interna S2 2026 y aparezco registrado pero *sin equipo asignado*.\n\nQuisiera saber cuál es mi situación para esta temporada y cuáles son los próximos pasos.\n\nGracias.';
+  }else{
+    title='Cédula no encontrada';
+    sub='No encontramos tu cédula en la base de datos de socios del club.';
+    badge='<span class="contact-id">🔍 CC '+cedula+' · No registrada</span>';
+    card='<strong>¿Primera vez en el club?</strong><br>Si eres nuevo o crees que deberías estar registrado, comunícate con nosotros. Un coordinador verificará tu caso y te indicará cómo proceder.<br><br>También puedes escribirnos si tienes alguna duda, trámite o consulta general sobre Atlético Norte F.C.';
+    waTx='Contactar al Club';
+    waSub='Soporte · Información · Trámites';
+    waMsg='Hola Atlético Norte F.C. 🏆\n\nIntenté ingresar a la aplicación oficial de la Liga Interna S2 2026 con la cédula CC '+cedula+' y *no aparezco en el sistema*.\n\nQuisiera información sobre:\n• Cómo registrarme como socio\n• Mi situación con el club\n• Próximos pasos\n\nGracias.';
+  }
+  document.getElementById('contactTitle').textContent=title;
+  document.getElementById('contactSub').textContent=sub;
+  document.getElementById('contactBadge').innerHTML=badge;
+  document.getElementById('contactCard').innerHTML=card;
+  document.getElementById('contactWaTx').textContent=waTx;
+  document.getElementById('contactWaSub').textContent=waSub;
+  document.getElementById('contactWaBtn').href=WA+encodeURIComponent(waMsg);
+  openM('mContact');
 }
 
 async function doRegNew(){
