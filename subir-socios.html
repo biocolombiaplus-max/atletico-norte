@@ -69,16 +69,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
   <div class="card" id="step2" style="display:none">
-    <h2>Paso 2 — Cargar Archivo Excel / CSV</h2>
-    <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Abre el archivo <strong style="color:#eef2f8">SOCIOS_ATLETICO_NORTE_BASE_MAESTRA.xlsx</strong> en Excel, ve a la hoja <strong style="color:#f59e0b">BASE MAESTRA</strong> y guárdala como CSV. Luego sube ese CSV aquí.</p>
-    <label>Archivo CSV o Excel (.csv)</label>
-    <input type="file" id="fileIn" accept=".csv,.xlsx,.xls" onchange="loadFile(this)">
+    <h2>Paso 2 — Cargar Archivo CSV</h2>
+    <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Sube el archivo <strong style="color:#eef2f8">SOCIOS_ATLETICO_NORTE_BASE_MAESTRA.csv</strong> — se detecta automáticamente el formato.</p>
+    <label>Archivo CSV</label>
+    <input type="file" id="fileIn" accept=".csv" onchange="loadFile(this)">
     <div id="fileErr" class="err"></div>
   </div>
 
   <div class="card" id="step3" style="display:none">
     <h2>Paso 3 — Mapeo de Columnas</h2>
-    <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Asigna qué columna del CSV corresponde a cada campo.</p>
+    <p style="font-size:11px;color:#7a96b4;margin-bottom:12px">Verifica que cada campo apunte a la columna correcta.</p>
     <div id="mapFields"></div>
     <button class="btn btn-primary" onclick="showPreview()" style="margin-top:8px">Vista Previa →</button>
   </div>
@@ -87,7 +87,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <h2>Paso 4 — Vista Previa <span id="previewCount" class="pill yellow"></span></h2>
     <div id="previewWarn" class="err" style="display:block"></div>
     <div style="overflow-x:auto">
-      <table id="previewTable">
+      <table>
         <thead><tr><th>Cédula</th><th>Nombre</th><th>Equipo</th><th>Teléfono</th><th>Estado</th></tr></thead>
         <tbody id="previewBody"></tbody>
       </table>
@@ -122,16 +122,16 @@ const db=firebase.database(app);
 const au=firebase.auth(app);
 
 const TEAM_MAP={
-  "cucuta deportivo":1,"cúcuta deportivo":1,"cucuta":1,
-  "at. bucaramanga":2,"bucaramanga":2,"buca":2,"atletico bucaramanga":2,"atlético bucaramanga":2,
-  "atl. nacional":3,"atletico nacional":3,"atlético nacional":3,"nacional":3,
+  "cucuta deportivo":1,"cucuta":1,
+  "at. bucaramanga":2,"atletico bucaramanga":2,"bucaramanga":2,"buca":2,
+  "atl. nacional":3,"atletico nacional":3,"nacional":3,
   "ind. santa fe":4,"santa fe":4,"independiente santa fe":4,"independiente":4,
   "millonarios":5,
   "dep. cali":6,"deportivo cali":6,"cali":6,
   "dep. tolima":7,"deportes tolima":7,"tolima":7,
-  "america de cali":8,"américa de cali":8,"america":8,"américa":8,
+  "america de cali":8,"america":8,
   "junior f.c.":9,"junior":9,"juniors":9,
-  "inter bogota":10,"inter bogotá":10,"inter":10
+  "inter bogota":10,"inter":10
 };
 
 function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').trim();}
@@ -142,7 +142,7 @@ async function doReset(cedula){
   try{
     await au.sendPasswordResetEmail(email);
     var errEl=document.getElementById('authErr');
-    errEl.innerHTML='📧 Se intentó enviar correo a <strong>'+email+'</strong>. Nota: si ese correo no existe en Firebase, el email no llegará. En ese caso ve a Firebase Console → Authentication → elimina la cuenta → vuelve aquí.';
+    errEl.innerHTML='📧 Se intentó enviar correo a <strong>'+email+'</strong>. Si no llega, ve a Firebase Console → Authentication → elimina la cuenta → vuelve aquí.';
     errEl.style.background='rgba(245,158,11,.1)';
     errEl.style.borderColor='rgba(245,158,11,.3)';
     errEl.style.color='#fbbf24';
@@ -157,7 +157,6 @@ async function doAuth(){
   var okEl=document.getElementById('authOk');
   errEl.style.display='none';okEl.style.display='none';
   if(!c||!/^\d{5,12}$/.test(c)){errEl.textContent='Ingresa tu número de cédula.';errEl.style.display='block';return;}
-
   var email=c+'@atleticonorte.co',pass=c+'_AN26';
   try{
     try{
@@ -167,9 +166,9 @@ async function doAuth(){
         await au.createUserWithEmailAndPassword(email,pass);
       }catch(e3){
         if(e3.code==='auth/email-already-in-use'){
-          errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> existe en Firebase Auth pero la contraseña no coincide.<br><br>'
-            +'Ve a <strong>console.firebase.google.com</strong> → Authentication → Users → busca <strong>'+email+'</strong> → elimina esa cuenta → vuelve aquí e intenta de nuevo.<br><br>'
-            +'<button onclick="doReset(\''+c+'\')" style="background:#374151;color:#eef2f8;border:none;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">O intenta enviar reset por correo</button>';
+          errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> existe pero la contraseña no coincide.<br><br>'
+            +'Ve a <strong>console.firebase.google.com</strong> → Authentication → Users → elimina <strong>'+email+'</strong> → vuelve aquí.<br><br>'
+            +'<button onclick="doReset(\''+c+'\')" style="background:#374151;color:#eef2f8;border:none;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">O intentar reset por correo</button>';
           errEl.style.display='block';return;
         }
         throw e3;
@@ -182,17 +181,10 @@ async function doAuth(){
     if(!isAdmin){
       if(!nom){
         await au.signOut();
-        errEl.innerHTML='La cédula <strong>'+c+'</strong> no tiene rol de Administrador en la base de datos.<br><br>'
-          +'<span style="color:#fbbf24">Si eres el administrador de la app, ingresa tu nombre completo arriba y vuelve a intentar.</span>';
+        errEl.innerHTML='La cédula <strong>'+c+'</strong> no tiene rol de Administrador.<br><span style="color:#fbbf24">Ingresa tu nombre completo arriba y vuelve a intentar.</span>';
         errEl.style.display='block';return;
       }
-      await db.ref('/socios/'+c).update({
-        cedula:c,nombre:nom,
-        rol:'Administrador',
-        privacyOk:true,
-        fuente:'bootstrap',
-        importadoTs:Date.now()
-      });
+      await db.ref('/socios/'+c).update({cedula:c,nombre:nom,rol:'Administrador',privacyOk:true,fuente:'bootstrap',importadoTs:Date.now()});
       okEl.textContent='✅ Perfil admin creado: '+nom+'. ¡Ahora sube los socios!';
     }else{
       if(nom&&!pf.nombre)await db.ref('/socios/'+c+'/nombre').set(nom);
@@ -204,7 +196,7 @@ async function doAuth(){
   }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
 }
 
-var rows=[],headers=[];
+var rows=[],headers=[],_delim=',';
 
 function loadFile(inp){
   var f=inp.files[0];if(!f)return;
@@ -214,13 +206,25 @@ function loadFile(inp){
     try{
       var text=e.target.result;
       var lines=text.split(/\r?\n/).filter(function(l){return l.trim();});
-      headers=parseCSVRow(lines[0]);
-      rows=lines.slice(1).map(function(l){
+      // Auto-detect delimiter
+      var sample=lines.slice(0,3).join('\n');
+      var semis=(sample.match(/;/g)||[]).length;
+      var commas=(sample.match(/,/g)||[]).length;
+      _delim=semis>commas?';':',';
+      // Skip title row if first row is not headers (check if col[3] of row1 is a number but col[3] of row0 is not)
+      var r0=parseCSVRow(lines[0]);
+      var r1=parseCSVRow(lines[1]||'');
+      var headerRowIdx=0;
+      if(!/^\d{5,12}$/.test(String(r0[3]||'').replace(/\D/g,''))&&/^\d{5,12}$/.test(String(r1[3]||'').replace(/\D/g,''))){
+        headerRowIdx=1; // row 0 is title, row 1 is header
+      }
+      headers=parseCSVRow(lines[headerRowIdx]);
+      rows=lines.slice(headerRowIdx+1).map(function(l){
         var vals=parseCSVRow(l);
         var obj={};
         headers.forEach(function(h,i){obj[h]=vals[i]||'';});
         return obj;
-      }).filter(function(r){return Object.values(r).some(function(v){return v.trim();});});
+      }).filter(function(r){return Object.values(r).some(function(v){return String(v).trim();});});
       document.getElementById('step3').style.display='block';
       buildMapUI();
     }catch(err){errEl.textContent='Error leyendo archivo: '+err.message;errEl.style.display='block';}
@@ -234,7 +238,7 @@ function parseCSVRow(line){
   for(var i=0;i<line.length;i++){
     var ch=line[i];
     if(ch=='"'){inQ=!inQ;}
-    else if(ch===','&&!inQ){result.push(cur.trim());cur='';}
+    else if(ch===_delim&&!inQ){result.push(cur.trim());cur='';}
     else{cur+=ch;}
   }
   result.push(cur.trim());
@@ -244,8 +248,8 @@ function parseCSVRow(line){
 var fieldDefs=[
   {key:'cedula',label:'Cédula',required:true},
   {key:'nombre',label:'Nombre completo',required:true},
-  {key:'equipo',label:'Equipo (nombre o número)',required:false},
-  {key:'telefono',label:'Teléfono',required:false},
+  {key:'equipo',label:'Equipo',required:false},
+  {key:'telefono',label:'Teléfono / Celular',required:false},
   {key:'email',label:'Correo',required:false},
   {key:'posicion',label:'Posición / Rol',required:false}
 ];
@@ -256,11 +260,11 @@ function buildMapUI(){
     var bestMatch=headers.findIndex(function(hdr){
       var n=norm(hdr);
       if(f.key==='cedula')return n.includes('cedula')||n==='cc'||n.includes('documento')||n.includes('identif');
-      if(f.key==='nombre')return n.includes('nombre')||n.includes('name');
-      if(f.key==='equipo')return n==='equipo'||n.includes('equipo');
-      if(f.key==='telefono')return n.includes('celular')||n.includes('tel')||n.includes('cel')||n.includes('phone')||n.includes('whats');
-      if(f.key==='email')return n.includes('email')||n.includes('correo')||n.includes('mail');
-      if(f.key==='posicion')return n.includes('posicion')||n.includes('posici')||n.includes('cargo')||n.includes('sorteo')||n.includes('rol');
+      if(f.key==='nombre')return n.includes('nombre completo')||n==='nombre';
+      if(f.key==='equipo')return n==='equipo';
+      if(f.key==='telefono')return n.includes('celular')||n.includes('tel');
+      if(f.key==='email')return n.includes('email')||n.includes('correo');
+      if(f.key==='posicion')return n.includes('formulario')||n.includes('posicion');
       return false;
     });
     var options='<option value="">— No mapear —</option>'+headers.map(function(hdr,i){
@@ -287,13 +291,13 @@ function showPreview(){
   rows.forEach(function(r,i){
     var ced=String(r[headers[cedIdx]]||'').replace(/\D/g,'').trim();
     var nom=(r[headers[nomIdx]]||'').trim();
-    if(!ced||!/^\d{5,12}$/.test(ced)){errs.push('Fila '+(i+2)+': cédula inválida "'+ced+'"');return;}
+    if(!ced||!/^\d{5,12}$/.test(ced)){errs.push('Fila '+(i+2)+': sin cédula válida');return;}
     if(!nom){errs.push('Fila '+(i+2)+': nombre vacío');return;}
     var eqRaw=!isNaN(eqIdx)?r[headers[eqIdx]]||'':'';
     var tid=teamId(eqRaw)||parseInt(eqRaw)||0;
     parsedSocios.push({
       cedula:ced,nombre:nom,equipo:tid,
-      telefono:!isNaN(telIdx)?String(r[headers[telIdx]]||'').trim():'',
+      telefono:!isNaN(telIdx)?String(r[headers[telIdx]]||'').replace(/\D/g,'').trim():'',
       email:!isNaN(emlIdx)?String(r[headers[emlIdx]]||'').trim():'',
       posicion:!isNaN(posIdx)?String(r[headers[posIdx]]||'').trim():''
     });
@@ -301,7 +305,7 @@ function showPreview(){
 
   document.getElementById('previewCount').textContent=parsedSocios.length+' socios';
   var warnEl=document.getElementById('previewWarn');
-  if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas ignoradas: '+errs.slice(0,3).join('; ')+(errs.length>3?' ...':'');warnEl.style.display='block';}
+  if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas sin cédula ignoradas (SOLO SORTEO — normal)';warnEl.style.display='block';}
   else{warnEl.style.display='none';}
 
   var tnames=['','Cúcuta','At.Buca','Nacional','Santa Fe','Millonarios','Dep.Cali','Tolima','América','Junior','Inter'];
@@ -362,13 +366,12 @@ async function doUpload(){
       log('ERROR cédula '+s.cedula+': '+e.message,'err');
     }
     done++;
-    var pct=Math.round(done/total*100);
-    document.getElementById('pBar').style.width=pct+'%';
-    document.getElementById('pLabel').textContent=done+'/'+total+' — '+pct+'%';
+    document.getElementById('pBar').style.width=Math.round(done/total*100)+'%';
+    document.getElementById('pLabel').textContent=done+'/'+total+' — '+Math.round(done/total*100)+'%';
     if(i%20===19)await new Promise(function(r){setTimeout(r,300);});
   }
   log('✅ Completado: '+ok+' subidos, '+err+' errores','ok');
-  log('Ahora los socios pueden ingresar con su cédula a fixture.cesarcreps.com','info');
+  log('Los socios ya pueden ingresar a fixture.cesarcreps.com','info');
   document.getElementById('pLabel').textContent='¡Listo! '+ok+'/'+total+' socios subidos.';
 }
 </script>
