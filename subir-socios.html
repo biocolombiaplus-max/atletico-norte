@@ -142,7 +142,18 @@ const TEAM_MAP={
 function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').trim();}
 function teamId(name){return TEAM_MAP[norm(name)]||0;}
 
-// ── AUTH ──
+async function doReset(cedula){
+  var email=cedula+'@atleticonorte.co';
+  try{
+    await au.sendPasswordResetEmail(email);
+    var errEl=document.getElementById('authErr');
+    errEl.innerHTML='📧 Correo de restablecimiento enviado a <strong>'+email+'</strong>. Revisa tu bandeja. Después de restablecer la contraseña, vuelve a intentar con la cédula (sin nombre).';
+    errEl.style.background='rgba(245,158,11,.1)';
+    errEl.style.borderColor='rgba(245,158,11,.3)';
+    errEl.style.color='#fbbf24';
+  }catch(e){alert('Error enviando reset: '+e.message);}
+}
+
 async function doAuth(){
   var c=document.getElementById('adminCed').value.trim();
   var nom=document.getElementById('adminNom').value.trim();
@@ -153,26 +164,27 @@ async function doAuth(){
 
   var email=c+'@atleticonorte.co',pass=c+'_AN26';
   try{
-    // Try login; if account doesn't exist in Auth, create it
     try{
       await au.signInWithEmailAndPassword(email,pass);
     }catch(e2){
-      var noAuth=e2.code==='auth/user-not-found'||e2.code==='auth/invalid-credential'||e2.code==='auth/invalid-login-credentials';
-      if(!noAuth)throw e2;
-      // Auth account missing — check if RTDB has this cedula as admin first (need temp anon read)
-      // We'll try creating the account, then verify role. If not admin, delete + reject.
-      await au.createUserWithEmailAndPassword(email,pass);
+      var notFound=e2.code==='auth/user-not-found'
+        ||e2.code==='auth/invalid-login-credentials';
+      if(notFound){
+        await au.createUserWithEmailAndPassword(email,pass);
+      }else{
+        errEl.innerHTML='⚠️ La cuenta <strong>'+email+'</strong> ya existe en Firebase pero la contraseña no coincide.<br><br>'
+          +'<button onclick="doReset(\''+c+'\')" style="background:#f59e0b;color:#000;border:none;border-radius:8px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:12px">📧 Enviar correo de restablecimiento</button>'
+          +'<span style="display:block;margin-top:8px;font-size:10px;color:#7a96b4">Después de restablecer, la nueva contraseña será <strong style="color:#eef2f8;font-family:monospace">'+pass+'</strong> — ingresa solo la cédula sin nombre.</span>';
+        errEl.style.display='block';return;
+      }
     }
-    // Now authenticated — read role from RTDB
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
     if(rol!=='administrador'&&rol!=='coordinador deportivo'){
-      // Not an admin — check if DB is empty (bootstrap mode)
       var socSnap=await db.ref('/socios').limitToFirst(2).get();
       var cnt=0;socSnap.forEach(function(){cnt++;});
       if(cnt<=1){
-        // Only this record or empty → bootstrap: promote to admin
         if(!nom){
           await au.signOut();
           errEl.textContent='No tienes rol de Administrador. Ingresa tu nombre completo para crear la primera cuenta.';
@@ -186,7 +198,6 @@ async function doAuth(){
         errEl.style.display='block';return;
       }
     }else{
-      // Update nombre if provided and missing
       if(nom&&!pf.nombre)await db.ref('/socios/'+c+'/nombre').set(nom);
       okEl.textContent='✅ Autenticado: '+(pf.nombre||nom||c)+' · '+pf.rol;
     }
@@ -196,7 +207,6 @@ async function doAuth(){
   }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
 }
 
-// ── FILE LOAD ──
 var rows=[];
 var headers=[];
 
@@ -207,7 +217,6 @@ function loadFile(inp){
   reader.onload=function(e){
     try{
       var text=e.target.result;
-      // Parse CSV
       var lines=text.split(/\r?\n/).filter(function(l){return l.trim();});
       headers=parseCSVRow(lines[0]);
       rows=lines.slice(1).map(function(l){
@@ -228,7 +237,7 @@ function parseCSVRow(line){
   var result=[],cur='',inQ=false;
   for(var i=0;i<line.length;i++){
     var ch=line[i];
-    if(ch==='"'){inQ=!inQ;}
+    if(ch=='"'){inQ=!inQ;}
     else if(ch===','&&!inQ){result.push(cur.trim());cur='';}
     else{cur+=ch;}
   }
@@ -236,7 +245,6 @@ function parseCSVRow(line){
   return result;
 }
 
-// ── MAP UI ──
 var fieldDefs=[
   {key:'cedula',label:'Cédula',required:true},
   {key:'nombre',label:'Nombre completo',required:true},
@@ -267,15 +275,12 @@ function buildMapUI(){
   document.getElementById('mapFields').innerHTML=h;
 }
 
-// ── PREVIEW ──
 var parsedSocios=[];
 
 function showPreview(){
   var cedIdx=parseInt(document.getElementById('map_cedula').value);
   var nomIdx=parseInt(document.getElementById('map_nombre').value);
-  if(isNaN(cedIdx)||isNaN(nomIdx)){
-    alert('Cédula y Nombre son obligatorios');return;
-  }
+  if(isNaN(cedIdx)||isNaN(nomIdx)){alert('Cédula y Nombre son obligatorios');return;}
   var eqIdx=parseInt(document.getElementById('map_equipo').value);
   var telIdx=parseInt(document.getElementById('map_telefono').value);
   var emlIdx=parseInt(document.getElementById('map_email').value);
@@ -291,8 +296,7 @@ function showPreview(){
     var eqRaw=!isNaN(eqIdx)?r[headers[eqIdx]]||'':'';
     var tid=teamId(eqRaw)||parseInt(eqRaw)||0;
     parsedSocios.push({
-      cedula:ced,nombre:nom,
-      equipo:tid,
+      cedula:ced,nombre:nom,equipo:tid,
       telefono:!isNaN(telIdx)?String(r[headers[telIdx]]||'').trim():'',
       email:!isNaN(emlIdx)?String(r[headers[emlIdx]]||'').trim():'',
       posicion:!isNaN(posIdx)?String(r[headers[posIdx]]||'').trim():''
@@ -301,7 +305,7 @@ function showPreview(){
 
   document.getElementById('previewCount').textContent=parsedSocios.length+' socios';
   var warnEl=document.getElementById('previewWarn');
-  if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas ignoradas: '+errs.slice(0,3).join('; ')+(errs.length>3?' ...'  :'');warnEl.style.display='block';}
+  if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas ignoradas: '+errs.slice(0,3).join('; ')+(errs.length>3?' ...':'');warnEl.style.display='block';}
   else{warnEl.style.display='none';}
 
   var tbody=document.getElementById('previewBody');
@@ -313,7 +317,6 @@ function showPreview(){
   if(parsedSocios.length>30){
     tbody.innerHTML+='<tr><td colspan="5" style="text-align:center;color:#7a96b4;font-style:italic">... y '+(parsedSocios.length-30)+' más</td></tr>';
   }
-
   document.getElementById('step3').style.display='none';
   document.getElementById('preview').style.display='block';
 }
@@ -323,7 +326,6 @@ function resetUpload(){
   document.getElementById('step3').style.display='block';
 }
 
-// ── UPLOAD ──
 function log(msg,type){
   var el=document.getElementById('uploadLog');
   var line=document.createElement('div');
@@ -337,14 +339,11 @@ async function doUpload(){
   document.getElementById('preview').style.display='none';
   document.getElementById('uploadSec').style.display='block';
   var total=parsedSocios.length;
-  var done=0,ok=0,skip=0,err=0;
-
+  var done=0,ok=0,err=0;
   log('Iniciando carga de '+total+' socios...','info');
-
   for(var i=0;i<parsedSocios.length;i++){
     var s=parsedSocios[i];
     try{
-      // 1. Guardar perfil en /socios (merge con datos existentes)
       var snap=await db.ref('/socios/'+s.cedula).get();
       var existing=snap.exists()?snap.val():{};
       var toWrite={
@@ -369,10 +368,8 @@ async function doUpload(){
     var pct=Math.round(done/total*100);
     document.getElementById('pBar').style.width=pct+'%';
     document.getElementById('pLabel').textContent=done+'/'+total+' — '+pct+'%';
-    // Small delay to avoid rate limiting
     if(i%20===19)await new Promise(function(r){setTimeout(r,300);});
   }
-
   log('✅ Completado: '+ok+' subidos, '+err+' errores','ok');
   log('Ahora los socios pueden ingresar con su cédula a fixture.cesarcreps.com','info');
   document.getElementById('pLabel').textContent='¡Listo! '+ok+'/'+total+' socios subidos.';
