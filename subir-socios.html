@@ -55,11 +55,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <!-- PASO 1: Login admin -->
   <div class="card" id="step1">
     <h2>Paso 1 — Autenticación Admin</h2>
+    <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:#7ab8d4;line-height:1.6">
+      <strong style="color:#38bdf8;display:block;margin-bottom:3px">🚀 Primera vez / Base vacía</strong>
+      Si es la <strong>primera vez</strong> que usas esto, ingresa tu cédula <strong>y tu nombre completo</strong> — el sistema creará tu cuenta de Administrador automáticamente.<br>
+      Si ya estás registrado, solo ingresa la cédula.
+    </div>
     <div id="authErr" class="err"></div>
     <div id="authOk" class="ok"></div>
     <label>Tu Cédula de Administrador</label>
     <input type="tel" id="adminCed" inputmode="numeric" placeholder="Ej: 88264186">
-    <button class="btn btn-primary" onclick="doAuth()">🔐 Autenticar</button>
+    <label>Tu Nombre Completo <span style="color:#7a96b4;font-weight:400">(solo primera vez)</span></label>
+    <input type="text" id="adminNom" placeholder="Ej: César Augusto Pérez López" autocomplete="name">
+    <button class="btn btn-primary" onclick="doAuth()">🔐 Autenticar / Crear Admin</button>
   </div>
 
   <!-- PASO 2: Cargar archivo -->
@@ -138,20 +145,45 @@ function teamId(name){return TEAM_MAP[norm(name)]||0;}
 // ── AUTH ──
 async function doAuth(){
   var c=document.getElementById('adminCed').value.trim();
+  var nom=document.getElementById('adminNom').value.trim();
   var errEl=document.getElementById('authErr');
   var okEl=document.getElementById('authOk');
   errEl.style.display='none';okEl.style.display='none';
   if(!c||!/^\d{5,12}$/.test(c)){errEl.textContent='Ingresa tu número de cédula.';errEl.style.display='block';return;}
+
+  var email=c+'@atleticonorte.co',pass=c+'_AN26';
   try{
-    await au.signInWithEmailAndPassword(c+'@atleticonorte.co',c+'_AN26');
+    // Try login first
+    try{
+      await au.signInWithEmailAndPassword(email,pass);
+    }catch(e2){
+      if(e2.code==='auth/user-not-found'||e2.code==='auth/invalid-credential'||e2.code==='auth/invalid-login-credentials'){
+        // First time — check if DB is empty (bootstrap mode)
+        var socSnap=await db.ref('/socios').limitToFirst(1).get();
+        if(socSnap.exists()){
+          errEl.textContent='Tu cédula no está registrada en Firebase y ya hay otros socios. Contacta al administrador existente.';
+          errEl.style.display='block';return;
+        }
+        // DB vacía = primer admin, crear cuenta
+        if(!nom){errEl.textContent='Es la primera vez. Ingresa también tu nombre completo.';errEl.style.display='block';return;}
+        await au.createUserWithEmailAndPassword(email,pass);
+        await db.ref('/socios/'+c).set({cedula:c,nombre:nom,rol:'Administrador',equipo:0,privacyOk:true,fuente:'bootstrap',importadoTs:Date.now()});
+        okEl.textContent='✅ Primera cuenta creada: '+nom+' (Administrador). ¡Ahora puedes subir los socios!';
+        okEl.style.display='block';
+        document.getElementById('step1').querySelector('button').disabled=true;
+        document.getElementById('step2').style.display='block';
+        return;
+      }else{throw e2;}
+    }
+    // Ya autenticado — verificar rol
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
     if(rol!=='administrador'&&rol!=='coordinador deportivo'){
-      errEl.textContent='Solo administradores pueden subir socios.';errEl.style.display='block';
+      errEl.textContent='Esta cédula no tiene rol de Administrador en la base de datos.';errEl.style.display='block';
       await au.signOut();return;
     }
-    okEl.textContent='✅ Autenticado como '+( pf.nombre||c)+' ('+pf.rol+')';okEl.style.display='block';
+    okEl.textContent='✅ Autenticado como '+(pf.nombre||c)+' ('+pf.rol+')';okEl.style.display='block';
     document.getElementById('step1').querySelector('button').disabled=true;
     document.getElementById('step2').style.display='block';
   }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
@@ -212,12 +244,13 @@ function buildMapUI(){
   fieldDefs.forEach(function(f){
     var bestMatch=headers.findIndex(function(hdr){
       var n=norm(hdr);
-      return n.includes(norm(f.key))||n.includes(norm(f.label))||
-        (f.key==='cedula'&&(n.includes('cedula')||n.includes('cedula')||n.includes('cc')||n.includes('documento')||n.includes('identificacion')))||
-        (f.key==='nombre'&&(n.includes('nombre')||n.includes('name')))||
-        (f.key==='equipo'&&(n.includes('equipo')||n.includes('team')))||
-        (f.key==='telefono'&&(n.includes('tel')||n.includes('cel')||n.includes('phone')||n.includes('whats')))||
-        (f.key==='email'&&(n.includes('email')||n.includes('correo')||n.includes('mail')));
+      if(f.key==='cedula')return n.includes('cedula')||n==='cc'||n.includes('documento')||n.includes('identif');
+      if(f.key==='nombre')return n.includes('nombre')||n.includes('name');
+      if(f.key==='equipo')return n==='equipo'||n.includes('equipo');
+      if(f.key==='telefono')return n.includes('celular')||n.includes('tel')||n.includes('cel')||n.includes('phone')||n.includes('whats');
+      if(f.key==='email')return n.includes('email')||n.includes('correo')||n.includes('mail');
+      if(f.key==='posicion')return n.includes('posicion')||n.includes('posici')||n.includes('cargo')||n.includes('sorteo');
+      return false;
     });
     var options='<option value="">— No mapear —</option>'+headers.map(function(hdr,i){
       return '<option value="'+i+'"'+(i===bestMatch&&bestMatch>=0?' selected':'')+'>'+hdr+'</option>';
@@ -304,21 +337,19 @@ async function doUpload(){
   for(var i=0;i<parsedSocios.length;i++){
     var s=parsedSocios[i];
     try{
-      // Check if already exists to avoid overwriting data
+      // 1. Guardar perfil en /socios (merge con datos existentes)
       var snap=await db.ref('/socios/'+s.cedula).get();
       var existing=snap.exists()?snap.val():{};
-      // Merge: don't overwrite fields the socio has already updated
       var toWrite={
         cedula:s.cedula,
         nombre:existing.nombre||s.nombre,
-        equipo:existing.equipo||s.equipo,
+        equipo:existing.equipo||s.equipo||0,
         telefono:existing.telefono||s.telefono,
         email:existing.email||s.email,
         posicion:existing.posicion||s.posicion,
         importadoTs:existing.importadoTs||Date.now(),
         fuente:'base_maestra'
       };
-      // Preserve existing fields like rol, privacyOk, etc.
       Object.keys(existing).forEach(function(k){if(!(k in toWrite))toWrite[k]=existing[k];});
       await db.ref('/socios/'+s.cedula).set(toWrite);
       ok++;
