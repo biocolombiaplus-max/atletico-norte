@@ -45,6 +45,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .btn:active{transform:scale(.97)}
 .btn-red{background:var(--red);color:#fff}
 .btn-red:hover{background:var(--red2)}
+.btn-amber{background:var(--amber);color:#000}
 .btn-ghost{background:var(--bg3);color:var(--m);border:1px solid var(--bd)}
 .btn:disabled{opacity:.35;pointer-events:none}
 
@@ -61,6 +62,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .match-card .mc-status{font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px}
 .status-hoy{background:rgba(245,158,11,.15);color:var(--amber)}
 .status-ok{background:rgba(16,185,129,.12);color:var(--green)}
+.status-lock{background:rgba(245,158,11,.15);color:var(--amber)}
 .status-pend{background:rgba(122,150,180,.1);color:var(--m)}
 .mc-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
 .mc-team{font-size:14px;font-weight:900;letter-spacing:-.3px}
@@ -83,17 +85,27 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .hero-team{font-size:18px;font-weight:900;text-align:center;letter-spacing:-.3px;line-height:1.2}
 .hero-vs{font-size:12px;color:var(--dm);font-weight:700}
 
+/* lock banner */
+.lock-banner{display:none;margin-bottom:12px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);border-radius:14px;padding:12px 14px;gap:10px;align-items:center}
+.lock-banner.show{display:flex}
+.lock-info{flex:1}
+.lock-info .lock-title{font-size:13px;font-weight:900;color:var(--amber)}
+.lock-info .lock-sub{font-size:10px;color:var(--m);margin-top:2px;line-height:1.4}
+.lock-action{flex-shrink:0;padding:8px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);border-radius:10px;font-size:11px;font-weight:900;color:var(--amber);cursor:pointer}
+
 .score-row{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:12px}
 .score-block{display:flex;flex-direction:column;align-items:center;gap:6px}
 .score-label{font-size:10px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase}
 .score-ctrl{display:flex;align-items:center;gap:0}
 .score-btn{width:52px;height:64px;border:none;background:var(--bg3);color:var(--t);font-size:28px;font-weight:300;cursor:pointer;transition:.12s;border-radius:14px}
 .score-btn:active{background:var(--bd2);transform:scale(.93)}
+.score-btn:disabled{opacity:.25;cursor:default}
 .score-num{font-size:64px;font-weight:900;line-height:1;min-width:72px;text-align:center;letter-spacing:-2px;font-variant-numeric:tabular-nums}
 .score-sep{font-size:40px;font-weight:200;color:var(--dm);padding:0 4px;line-height:1}
 
 .type-row{display:flex;gap:8px;padding:0 16px}
 .type-btn{flex:1;padding:12px;border-radius:12px;border:2px solid var(--bd);background:transparent;color:var(--m);font-size:13px;font-weight:800;cursor:pointer;transition:.15s;letter-spacing:.3px}
+.type-btn:disabled{opacity:.3;cursor:default}
 .type-btn.on.normal{border-color:var(--blue);background:rgba(14,165,233,.12);color:var(--blue)}
 .type-btn.on.wo{border-color:var(--amber);background:rgba(245,158,11,.12);color:var(--amber)}
 
@@ -110,11 +122,13 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .evt-name{font-size:13px;font-weight:700;flex:1}
 .evt-team{font-size:10px;color:var(--m);font-weight:600}
 .evt-del{font-size:18px;color:var(--dm);cursor:pointer;padding:4px;border:none;background:none}
+.evt-del:disabled{opacity:.2;cursor:default}
 .evt-empty{font-size:12px;color:var(--dm);padding:12px 0;text-align:center}
 
 /* event type tabs */
 .evt-tabs{display:flex;gap:6px;margin-bottom:10px}
 .evt-tab{flex:1;padding:10px 6px;border-radius:10px;border:2px solid var(--bd);background:var(--bg3);color:var(--m);font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:.12s}
+.evt-tab:disabled{opacity:.3;cursor:default}
 .evt-tab.on.goal{border-color:var(--green);background:rgba(16,185,129,.12);color:var(--green)}
 .evt-tab.on.yellow{border-color:var(--amber);background:rgba(245,158,11,.12);color:var(--amber)}
 .evt-tab.on.red{border-color:var(--red);background:rgba(200,16,46,.12);color:#f87171}
@@ -125,6 +139,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .player-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .pchip{padding:9px 12px;border-radius:10px;border:1.5px solid var(--bd2);background:var(--bg3);color:var(--t);font-size:12px;font-weight:700;cursor:pointer;transition:.12s;letter-spacing:.2px}
 .pchip:active{transform:scale(.94)}
+.pchip:disabled{opacity:.25;cursor:default}
 .pchip.on-goal{border-color:var(--green);background:rgba(16,185,129,.18);color:var(--green)}
 .pchip.on-yellow{border-color:var(--amber);background:rgba(245,158,11,.18);color:var(--amber)}
 .pchip.on-red{border-color:#f87171;background:rgba(200,16,46,.18);color:#f87171}
@@ -133,6 +148,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 /* W/O section */
 .wo-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .wo-team-btn{padding:18px 12px;border-radius:14px;border:2px solid var(--bd);background:var(--bg3);color:var(--t);font-size:14px;font-weight:900;cursor:pointer;text-align:center;transition:.15s;line-height:1.4}
+.wo-team-btn:disabled{opacity:.25;cursor:default}
 .wo-team-btn.on{border-color:var(--amber);background:rgba(245,158,11,.15);color:var(--amber)}
 .wo-pen{margin-top:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--amber);line-height:1.5;display:none}
 
@@ -163,6 +179,12 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .modal-detail .player{font-size:22px;font-weight:900;letter-spacing:-.4px}
 .modal-detail .team{font-size:11px;color:var(--m);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .modal-btns{display:flex;flex-direction:column;gap:8px}
+
+/* ── PIN MODAL ── */
+#pinOverlay .modal-sheet{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+.pin-input{background:var(--bg3);border:2px solid var(--bd2);border-radius:14px;padding:18px 16px;color:var(--t);font-size:28px;font-weight:700;letter-spacing:3px;outline:none;text-align:center;width:100%;margin-bottom:12px}
+.pin-input:focus{border-color:var(--blue)}
+.pin-input::placeholder{font-size:15px;letter-spacing:0;font-weight:400;color:var(--dm)}
 
 /* ── TOAST ── */
 .toast-wrap{position:fixed;top:0;left:0;right:0;z-index:999;pointer-events:none;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 12px) 16px 0;gap:8px}
@@ -236,9 +258,19 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
   </div>
 
   <div class="mpanel-scroll" id="mpScroll">
-    <!-- hero -->
     <div class="match-hero">
       <div class="hero-cancha" id="mpCancha"></div>
+
+      <!-- lock banner -->
+      <div class="lock-banner" id="lockBanner">
+        <span style="font-size:24px;flex-shrink:0">🔒</span>
+        <div class="lock-info">
+          <div class="lock-title">Resultado finalizado</div>
+          <div class="lock-sub" id="lockSub">Solo el Administrador puede modificarlo</div>
+        </div>
+        <button class="lock-action" id="lockActionBtn" style="display:none" onclick="doUnlock()">🔓 Desbloquear</button>
+      </div>
+
       <div class="hero-teams">
         <div class="hero-team" id="mpTeamL" style="text-align:left"></div>
         <div class="hero-vs">VS</div>
@@ -251,18 +283,18 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
           <div class="score-block">
             <div class="score-label" id="lblL"></div>
             <div class="score-ctrl">
-              <button class="score-btn" onclick="adjScore('l',-1)">−</button>
+              <button class="score-btn" id="sbLm" onclick="adjScore('l',-1)">−</button>
               <div class="score-num" id="numL">0</div>
-              <button class="score-btn" onclick="adjScore('l',1)">+</button>
+              <button class="score-btn" id="sbLp" onclick="adjScore('l',1)">+</button>
             </div>
           </div>
           <div class="score-sep">–</div>
           <div class="score-block">
             <div class="score-label" id="lblV"></div>
             <div class="score-ctrl">
-              <button class="score-btn" onclick="adjScore('v',-1)">−</button>
+              <button class="score-btn" id="sbVm" onclick="adjScore('v',-1)">−</button>
               <div class="score-num" id="numV">0</div>
-              <button class="score-btn" onclick="adjScore('v',1)">+</button>
+              <button class="score-btn" id="sbVp" onclick="adjScore('v',1)">+</button>
             </div>
           </div>
         </div>
@@ -283,16 +315,16 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
       <div class="wo-pen" id="woPen"></div>
     </div>
 
-    <!-- events: goals -->
+    <!-- events -->
     <div class="sec" id="goalSection">
       <div class="sec-hdr">
-        <h3>⚽ Goles</h3>
+        <h3>⚽ Eventos del partido</h3>
         <span class="count" id="goalCount">0</span>
       </div>
       <div class="evt-tabs">
-        <button class="evt-tab goal on" onclick="setEvtTab('goal',this)">⚽ Gol</button>
-        <button class="evt-tab yellow" onclick="setEvtTab('yellow',this)">🟨 Amarilla</button>
-        <button class="evt-tab red" onclick="setEvtTab('red',this)">🟥 Roja</button>
+        <button class="evt-tab goal on" id="tabGoal" onclick="setEvtTab('goal',this)">⚽ Gol</button>
+        <button class="evt-tab yellow" id="tabYellow" onclick="setEvtTab('yellow',this)">🟨 Amarilla</button>
+        <button class="evt-tab red" id="tabRed" onclick="setEvtTab('red',this)">🟥 Roja</button>
       </div>
       <div class="picker-wrap" id="pickerPanel"></div>
       <div class="evt-log" id="evtLog" style="margin-top:10px"></div>
@@ -302,6 +334,14 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
     <div class="sec" style="margin-bottom:8px">
       <div class="sec-hdr"><h3>📊 Tabla de posiciones</h3><span style="font-size:10px;color:var(--m)">En tiempo real</span></div>
       <div id="tbMini"></div>
+    </div>
+
+    <!-- audit info -->
+    <div id="auditInfo" style="display:none;padding:0 16px 8px">
+      <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:10px;color:var(--m);line-height:1.6">
+        <span style="font-weight:800;color:var(--t)">📋 Auditoría</span><br>
+        <span id="auditText"></span>
+      </div>
     </div>
   </div>
 
@@ -322,6 +362,22 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
       <div class="team" id="mTeam"></div>
     </div>
     <div class="modal-btns" id="mBtns"></div>
+  </div>
+</div>
+
+<!-- ── PIN OVERLAY ── -->
+<div class="overlay" id="pinOverlay">
+  <div class="modal-sheet">
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title">Confirma tu identidad</div>
+    <div class="modal-sub">Ingresa tu número de cédula para autorizar este guardado</div>
+    <input type="tel" id="pinInput" class="pin-input" inputmode="numeric" placeholder="Tu cédula"
+      onkeydown="if(event.key==='Enter')checkPin()">
+    <div class="err-box" id="pinErr"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closePinOverlay()">Cancelar</button>
+      <button class="btn btn-red" onclick="checkPin()">✅ Confirmar y guardar</button>
+    </div>
   </div>
 </div>
 
@@ -349,14 +405,17 @@ function tn(id){return T[id]?T[id].n:'Equipo '+id;}
 function ts(id){return T[id]?T[id].s:'T'+id;}
 
 // ── STATE ──
-var curUser=null,curCed=null,res={},rosters={l:[],v:[]};
+var curUser=null,curCed=null,curRol=null,res={},rosters={l:[],v:[]};
 var curMatch=null,curRType='normal',curWO=null;
 var evGoals=[],evYellows=[],evReds=[],curEvtTab='goal';
 var curFilter='hoy',resRef=null,_saving=false;
 
+function isAdmin(){return curRol==='administrador';}
+
 // ── UTILS ──
 function today(){return new Date().toISOString().split('T')[0];}
 function fd(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function fts(ts){if(!ts)return'';var d=new Date(ts);return d.toLocaleDateString('es-CO')+' '+d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]||c;});}
 
 function showToast(msg,color,dur){
@@ -411,7 +470,7 @@ async function doLogin(){
       errEl.innerHTML='La cédula <strong>'+c+'</strong> no tiene rol de Coordinador Deportivo.<br>Contacta al administrador.';
       errEl.style.display='block';btn.disabled=false;btn.innerHTML='🔐 Ingresar';return;
     }
-    curUser=pf;curCed=c;
+    curUser=pf;curCed=c;curRol=rol;
     document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
     startResListener();
     goTo('sMatches');
@@ -421,7 +480,7 @@ async function doLogin(){
   }
 }
 function doLogout(){
-  au.signOut();curUser=null;curCed=null;res={};
+  au.signOut();curUser=null;curCed=null;curRol=null;res={};
   if(resRef)resRef.off();
   var s=document.getElementById('sMatches');s.classList.remove('active');
   document.getElementById('iCed').value='';
@@ -433,7 +492,11 @@ function doLogout(){
 function startResListener(){
   if(resRef)resRef.off();
   resRef=db.ref('/resultados');
-  resRef.on('value',function(s){res=s.val()||{};renderMatchList();if(curMatch)renderStandings();});
+  resRef.on('value',function(s){
+    res=s.val()||{};
+    renderMatchList();
+    if(curMatch){renderStandings();renderLockState();}
+  });
 }
 
 // ── MATCH LIST ──
@@ -457,22 +520,20 @@ function renderMatchList(){
   if(!dates.length){html='<div style="text-align:center;color:var(--dm);padding:40px 0;font-size:13px">No hay partidos en esta vista</div>';}
   dates.forEach(function(d){
     var isToday=d===tod;
-    var label=isToday?'📅 HOY — '+fd(d):fd(d);
-    html+='<div class="day-label">'+label+'</div>';
+    html+='<div class="day-label">'+(isToday?'📅 HOY — ':'')+fd(d)+'</div>';
     grouped[d].forEach(function(m){
       var r=res[m.id];
       var hasDone=r&&r.l!==undefined;
       var isWO=r&&r.wo;
-      var scoreHtml;
-      if(hasDone){
-        scoreHtml='<div class="mc-score">'+(isWO?'W':''+r.l)+' <span>–</span> '+(isWO?'W':''+r.v)+'</div>';
-      }else{
-        scoreHtml='<div class="mc-score pending">'+m.hora+'</div>';
-      }
+      var isLocked=r&&r.locked;
+      var scoreHtml=hasDone
+        ?'<div class="mc-score">'+(isWO?'W':''+r.l)+' <span>–</span> '+(isWO?'W':''+r.v)+'</div>'
+        :'<div class="mc-score pending">'+m.hora+'</div>';
       var status=isToday?'<span class="mc-status status-hoy">HOY</span>'
+        :isLocked?'<span class="mc-status status-lock">🔒 Final</span>'
         :hasDone?'<span class="mc-status status-ok">✓ Listo</span>'
         :'<span class="mc-status status-pend">Pendiente</span>';
-      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')+' onclick="openMatch('+m.id+')">'  
+      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')'" onclick="openMatch('+m.id+')">'  
         +'<div class="mc-top"><div class="mc-meta">'+CANCHAS[RC[m.id-1][3]]+' · Vuelta '+m.week+'</div>'+status+'</div>'
         +'<div class="mc-teams">'
         +'<div class="mc-team">'+esc(ts(m.l))+'<br><span style="font-size:10px;color:var(--m);font-weight:500">'+esc(tn(m.l))+'</span></div>'
@@ -519,12 +580,74 @@ function openMatch(id){
   renderPickerPanel();
   renderEvtLog();
   renderStandings();
+  renderLockState();
+  renderAudit();
   document.getElementById('mpScroll').scrollTop=0;
   goTo('sMatch');
 }
 
+// ── LOCK STATE ──
+function renderLockState(){
+  var r=curMatch?res[curMatch.id]:null;
+  var locked=!!(r&&r.locked);
+  var editable=!locked||isAdmin();
+
+  var banner=document.getElementById('lockBanner');
+  var lockSub=document.getElementById('lockSub');
+  var lockBtn=document.getElementById('lockActionBtn');
+  var btnSave=document.getElementById('btnSave');
+
+  if(locked){
+    banner.classList.add('show');
+    var by=r.savedBy?(' por '+esc(r.savedBy.nombre)):' ';
+    var at=r.savedBy&&r.savedBy.ts?' el '+fts(r.savedBy.ts):'';
+    lockSub.innerHTML='Finalizado'+by+at+'<br>'+(isAdmin()?'Como administrador puedes desbloquear':'Solo el Administrador puede modificarlo');
+    lockBtn.style.display=isAdmin()?'block':'none';
+  }else{
+    banner.classList.remove('show');
+  }
+
+  ['sbLm','sbLp','sbVm','sbVp'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.disabled=!editable;
+  });
+  ['btnNormal','btnWO'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.disabled=!editable;
+  });
+  ['woBtnL','woBtnV'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.disabled=!editable;
+  });
+  ['tabGoal','tabYellow','tabRed'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.disabled=!editable;
+  });
+  if(btnSave){
+    if(locked&&!isAdmin()){
+      btnSave.disabled=true;
+      btnSave.innerHTML='🔒 Resultado bloqueado';
+    }else{
+      btnSave.disabled=false;
+      btnSave.innerHTML='💾 Guardar resultado';
+    }
+  }
+}
+
+// ── AUDIT DISPLAY ──
+function renderAudit(){
+  var r=curMatch?res[curMatch.id]:null;
+  var el=document.getElementById('auditInfo');
+  var txt=document.getElementById('auditText');
+  if(r&&r.savedBy){
+    var sb=r.savedBy;
+    txt.innerHTML='Guardado por: <strong style="color:var(--t)">'+esc(sb.nombre||sb.cedula)+'</strong>'
+      +' (CC '+esc(sb.cedula)+')<br>Fecha: '+fts(sb.ts);
+    el.style.display='block';
+  }else{
+    el.style.display='none';
+  }
+}
+
 // ── SCORE ──
 function adjScore(side,delta){
+  if(curMatch&&res[curMatch.id]&&res[curMatch.id].locked&&!isAdmin())return;
   var el=document.getElementById(side==='l'?'numL':'numV');
   var n=parseInt(el.textContent)||0;
   n=Math.max(0,n+delta);
@@ -536,6 +659,7 @@ function getScore(){return{l:parseInt(document.getElementById('numL').textConten
 
 // ── RESULT TYPE ──
 function setRType(t){
+  if(curMatch&&res[curMatch.id]&&res[curMatch.id].locked&&!isAdmin())return;
   curRType=t;
   document.getElementById('btnNormal').classList.toggle('on',t==='normal');
   document.getElementById('btnWO').classList.toggle('on',t==='wo');
@@ -548,6 +672,7 @@ function setRType(t){
 
 // ── WALKOVER ──
 function setWO(side){
+  if(curMatch&&res[curMatch.id]&&res[curMatch.id].locked&&!isAdmin())return;
   if(curWO===side){curWO=null;}else{curWO=side;}
   updWOBtns();
   renderStandings();
@@ -601,6 +726,7 @@ function renderEvtTabs(){
   var active=document.querySelector('.evt-tab.'+curEvtTab);if(active)active.classList.add('on');
 }
 function setEvtTab(tab,el){
+  if(curMatch&&res[curMatch.id]&&res[curMatch.id].locked&&!isAdmin())return;
   curEvtTab=tab;
   document.querySelectorAll('.evt-tab').forEach(function(b){b.classList.remove('on');});
   el.classList.add('on');
@@ -612,13 +738,14 @@ function setEvtTab(tab,el){
 function renderPickerPanel(){
   var panel=document.getElementById('pickerPanel');if(!panel)return;
   var m=curMatch;if(!m)return;
+  var locked=!!(res[m.id]&&res[m.id].locked)&&!isAdmin();
   function side(s,label,tid){
     var players=rosters[s]||[];
     var activeArr=curEvtTab==='goal'?evGoals:curEvtTab==='yellow'?evYellows:evReds;
     var cls='on-'+curEvtTab;
     var chips=players.length?players.map(function(p){
       var on=activeArr.findIndex(function(e){return e.name===p.name&&e.teamId===p.teamId;})>=0;
-      return '<button class="pchip'+(on?' '+cls:'')+' onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
+      return '<button class="pchip'+(on?' '+cls:'')+'"'+(locked?' disabled':'')+' onclick="tapPlayer(\''+esc(p.name)+'\',\''+esc(p.corto)+'\','+p.teamId+')">'+esc(p.corto)+'</button>';
     }).join(''):'<span style="font-size:11px;color:var(--dm)">Sin jugadores registrados</span>';
     return '<div class="picker-side-label">'+label+' — '+esc(tn(tid))+'</div><div class="player-grid">'+chips+'</div>';
   }
@@ -627,18 +754,19 @@ function renderPickerPanel(){
 
 // ── TAP PLAYER → CONFIRM ──
 function tapPlayer(name,corto,teamId){
+  if(curMatch&&res[curMatch.id]&&res[curMatch.id].locked&&!isAdmin()){
+    showToast('🔒 Resultado bloqueado. Pide al administrador que lo desbloquee.','var(--amber)');return;
+  }
   var activeArr=curEvtTab==='goal'?evGoals:curEvtTab==='yellow'?evYellows:evReds;
   var idx=activeArr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
   if(idx>=0){
     var icon=curEvtTab==='goal'?'⚽':curEvtTab==='yellow'?'🟨':'🟥';
-    var action=curEvtTab==='goal'?'el gol':curEvtTab==='yellow'?'la amarilla':'la roja';
     showConfirm({
-      icon:icon,title:'¿Quitar '+action+'?',
+      icon:icon,title:'¿Quitar '+(curEvtTab==='goal'?'el gol':curEvtTab==='yellow'?'la amarilla':'la roja')+'?',
       sub:'Se eliminará el registro de este evento.',
       player:corto,team:tn(teamId),
       cancelLabel:'No, mantener',
-      confirmLabel:'Sí, quitar',
-      confirmColor:'var(--dm)',
+      confirmLabel:'Sí, quitar',confirmColor:'var(--dm)',
       onConfirm:function(){
         activeArr.splice(idx,1);
         if(curEvtTab==='goal')syncScore();
@@ -650,7 +778,7 @@ function tapPlayer(name,corto,teamId){
   }
   var icon=curEvtTab==='goal'?'⚽':curEvtTab==='yellow'?'🟨':'🟥';
   var verb=curEvtTab==='goal'?'¿Confirmar GOL?':curEvtTab==='yellow'?'¿Confirmar AMARILLA?':'⚠️ ¿Confirmar ROJA?';
-  var sub=curEvtTab==='red'?'La tarjeta roja queda registrada permanentemente. Verifica bien.':'Verifica que el jugador y el equipo sean correctos.';
+  var sub=curEvtTab==='red'?'La tarjeta roja queda registrada. Verifica bien.':'Verifica que el jugador y el equipo sean correctos.';
   showConfirm({
     icon:icon,title:verb,sub:sub,
     player:corto,team:tn(teamId),
@@ -677,6 +805,7 @@ function syncScore(){
 
 // ── EVENT LOG ──
 function renderEvtLog(){
+  var locked=!!(curMatch&&res[curMatch.id]&&res[curMatch.id].locked)&&!isAdmin();
   var h='';
   var allEvts=[];
   evGoals.forEach(function(e){allEvts.push({type:'goal',icon:'⚽',e:e});});
@@ -684,20 +813,17 @@ function renderEvtLog(){
   evReds.forEach(function(e){allEvts.push({type:'red',icon:'🟥',e:e});});
   var count=document.getElementById('goalCount');
   count.textContent=evGoals.length+(evYellows.length?'+'+evYellows.length+'🟨':'')+(evReds.length?'+'+evReds.length+'🟥':'');
-  if(!allEvts.length){
-    document.getElementById('evtLog').innerHTML='<div class="evt-empty">Sin eventos registrados</div>';return;
-  }
+  if(!allEvts.length){document.getElementById('evtLog').innerHTML='<div class="evt-empty">Sin eventos registrados</div>';return;}
   allEvts.forEach(function(ev,i){
     h+='<div class="evt-item">'
       +'<span class="evt-icon">'+ev.icon+'</span>'
       +'<div style="flex:1"><div class="evt-name">'+esc(ev.e.corto||ev.e.name)+'</div>'
       +'<div class="evt-team">'+esc(tn(ev.e.teamId))+'</div></div>'
-      +'<button class="evt-del" onclick="delEvt(\''+ev.type+'\','+i+')">✕</button>'
+      +'<button class="evt-del" '+(locked?'disabled':'')+' onclick="delEvt(\''+ev.type+'\','+i+')">✕</button>'
       +'</div>';
   });
   document.getElementById('evtLog').innerHTML=h;
 }
-var _evtGlobalIdx=0;
 function delEvt(type,gIdx){
   var allEvts=[];
   evGoals.forEach(function(e){allEvts.push({type:'goal',e:e});});
@@ -719,8 +845,7 @@ function renderStandings(){
     simRes[m.id]={l:curWO==='l'?3:0,v:curWO==='v'?3:0,wo:true,woWinner:curWO};
   }else if(curRType==='normal'){
     var sc=getScore();
-    var sc2=evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId};});
-    simRes[m.id]={l:sc.l,v:sc.v,scorers:sc2,yellows:evYellows.slice(),reds:evReds.slice()};
+    simRes[m.id]={l:sc.l,v:sc.v,scorers:evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId};}),yellows:evYellows.slice(),reds:evReds.slice()};
   }
   var tb=calcStandings(simRes);
   var h='<div class="tb-mini"><div class="tb-row header"><span>#</span><span>Equipo</span><span>PJ</span><span>GD</span><span>PTS</span><span></span></div>';
@@ -730,7 +855,7 @@ function renderStandings(){
       +'<span class="tb-pos">'+(i+1)+'</span>'
       +'<span class="tb-name">'+esc(ts(t.id))+'</span>'
       +'<span class="tb-num">'+t.pj+'</span>'
-      +'<span class="tb-num '+(t.gd>0?'style="color:var(--green)"':t.gd<0?'style="color:#f87171"':'')+'">'+(t.gd>0?'+':'')+t.gd+'</span>'
+      +'<span class="tb-num" style="'+(t.gd>0?'color:var(--green)':t.gd<0?'color:#f87171':'')+'">'+( t.gd>0?'+':'')+t.gd+'</span>'
       +'<span class="tb-pts">'+t.pts+'</span>'
       +'<span>'+(t.id===m.l?'<span class="pill pill-blue">L</span>':t.id===m.v?'<span class="pill pill-amber">V</span>':'')+'</span>'
       +'</div>';
@@ -746,19 +871,12 @@ function calcStandings(resMap){
     var r=resMap[m.id];if(!r||r.l===undefined)return;
     var l=st[m.l],v=st[m.v];if(!l||!v)return;
     l.pj++;v.pj++;
-    if(r.wo){
-      var loser=r.woWinner==='l'?v:l;
-      loser.wl++;
-    }
+    if(r.wo){var loser=r.woWinner==='l'?v:l;loser.wl++;}
     l.gf+=r.l;l.gc+=r.v;v.gf+=r.v;v.gc+=r.l;
     if(r.l>r.v){l.pts+=3;l.pg++;v.pp++;}
     else if(r.l<r.v){v.pts+=3;v.pg++;l.pp++;}
     else{l.pts++;v.pts++;l.pe++;v.pe++;}
-    if(r.wo){
-      var loserSt=r.woWinner==='l'?v:l;
-      var pen=loserSt.wl===1?1:loserSt.wl===2?2:3;
-      loserSt.pts=Math.max(0,loserSt.pts-pen);
-    }
+    if(r.wo){var loserSt=r.woWinner==='l'?v:l;var pen=loserSt.wl===1?1:loserSt.wl===2?2:3;loserSt.pts=Math.max(0,loserSt.pts-pen);}
   });
   Object.keys(st).forEach(function(k){var t=st[k];t.gd=t.gf-t.gc;});
   return Object.values(st).sort(function(a,b){
@@ -768,51 +886,116 @@ function calcStandings(resMap){
   });
 }
 
-// ── CONFIRM SAVE ──
+// ── CONFIRM SAVE → PIN FIRST ──
 function confirmSave(){
+  var m=curMatch;
+  var r=res[m.id];
+  if(r&&r.locked&&!isAdmin()){
+    showToast('🔒 Resultado bloqueado. Pide al administrador que lo desbloquee.','var(--amber)');return;
+  }
   if(curRType==='wo'&&!curWO){showToast('⚠️ Selecciona qué equipo gana por W','var(--amber)');return;}
+  showPinOverlay();
+}
+
+// ── PIN OVERLAY ──
+function showPinOverlay(){
+  document.getElementById('pinInput').value='';
+  document.getElementById('pinErr').style.display='none';
+  document.getElementById('pinOverlay').classList.add('show');
+  setTimeout(function(){document.getElementById('pinInput').focus();},320);
+}
+function closePinOverlay(){
+  document.getElementById('pinOverlay').classList.remove('show');
+}
+function checkPin(){
+  var v=document.getElementById('pinInput').value.trim();
+  var err=document.getElementById('pinErr');
+  if(v!==curCed){
+    err.textContent='Cédula incorrecta. Intenta de nuevo.';
+    err.style.display='block';
+    document.getElementById('pinInput').value='';
+    document.getElementById('pinInput').focus();
+    return;
+  }
+  closePinOverlay();
+  _showSaveConfirm();
+}
+
+function _showSaveConfirm(){
   var m=curMatch;
   var sc=getScore();
   var icon,title,sub;
   if(curRType==='wo'){
     var winner=curWO==='l'?tn(m.l):tn(m.v);
     icon='🟡';title='¿Guardar resultado por W?';
-    sub='<strong>'+esc(winner)+'</strong> gana por Walkover. El equipo perdedor recibirá penalización de puntos.';
+    sub='<strong>'+esc(winner)+'</strong> gana por Walkover.<br>El equipo perdedor recibirá penalización. <strong>Este resultado quedará bloqueado.</strong>';
   }else{
-    icon='⚽';title='¿Guardar resultado?';
-    sub=esc(tn(m.l))+' <strong>'+sc.l+' – '+sc.v+'</strong> '+esc(tn(m.v))+'<br><span style="font-size:11px;color:var(--m)">'+evGoals.length+' goles · '+evYellows.length+' amarillas · '+evReds.length+' rojas</span>';
+    icon='⚽';title='¿Guardar y finalizar?';
+    sub=esc(tn(m.l))+' <strong>'+sc.l+' – '+sc.v+'</strong> '+esc(tn(m.v))+'<br><span style="font-size:11px;color:var(--m)">'+evGoals.length+' goles · '+evYellows.length+' amarillas · '+evReds.length+' rojas</span><br><strong style="color:var(--amber);font-size:11px">El resultado quedará bloqueado. Solo Admin puede modificarlo.</strong>';
   }
-  showConfirm({
-    icon:icon,title:title,sub:sub,player:null,
+  showConfirm({icon:icon,title:title,sub:sub,player:null,
     cancelLabel:'Revisar',
-    confirmLabel:'💾 Guardar definitivo',
+    confirmLabel:'💾 Guardar y finalizar',
     confirmColor:'var(--red)',
     onConfirm:doSave
   });
 }
+
 async function doSave(){
   if(_saving)return;_saving=true;
   var btn=document.getElementById('btnSave');
   btn.disabled=true;btn.innerHTML='<div class="spin"></div> Guardando...';
   try{
     var m=curMatch;var data;
+    var auditBy={cedula:curCed,nombre:curUser.nombre||curCed,ts:Date.now()};
     if(curRType==='wo'){
       var l=curWO==='l'?3:0,v=curWO==='v'?3:0;
-      data={l:l,v:v,scorers:[],wo:true,woWinner:curWO,ts:Date.now()};
+      data={l:l,v:v,scorers:[],wo:true,woWinner:curWO,locked:true,savedBy:auditBy,ts:Date.now()};
     }else{
       var sc=getScore();
       data={l:sc.l,v:sc.v,
         scorers:evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId};}),
-        yellows:evYellows.slice(),reds:evReds.slice(),ts:Date.now()};
+        yellows:evYellows.slice(),reds:evReds.slice(),
+        locked:true,savedBy:auditBy,ts:Date.now()};
     }
     await db.ref('/resultados/'+m.id).set(data);
+    var auditKey=Date.now();
+    await db.ref('/auditResultados/'+m.id+'/'+auditKey).set({
+      accion:'guardar',cedula:curCed,nombre:curUser.nombre||curCed,ts:auditKey,
+      local:tn(m.l),visita:tn(m.v),golesL:data.l,golesV:data.v,wo:data.wo||false
+    });
     document.getElementById('mpSaved').style.display='block';
-    showToast('✅ Resultado guardado correctamente','var(--green)',3000);
+    showToast('✅ Resultado guardado y bloqueado','var(--green)',3500);
+    renderLockState();
+    renderAudit();
   }catch(e){
     showToast('❌ Error al guardar: '+e.message,'var(--red)',4000);
   }
-  btn.disabled=false;btn.innerHTML='💾 Guardar resultado';
+  btn.disabled=false;
   _saving=false;
+}
+
+// ── ADMIN: UNLOCK ──
+function doUnlock(){
+  showConfirm({
+    icon:'🔓',title:'¿Desbloquear resultado?',
+    sub:'El Coordinador podrá modificar este resultado. Quedará un registro de auditoría de esta acción.',
+    cancelLabel:'Cancelar',
+    confirmLabel:'🔓 Sí, desbloquear',
+    confirmColor:'var(--amber)',
+    onConfirm:async function(){
+      try{
+        var m=curMatch;
+        await db.ref('/resultados/'+m.id+'/locked').remove();
+        var auditKey=Date.now();
+        await db.ref('/auditResultados/'+m.id+'/'+auditKey).set({
+          accion:'desbloquear',cedula:curCed,nombre:curUser.nombre||curCed,ts:auditKey
+        });
+        showToast('🔓 Resultado desbloqueado. Ya puedes modificarlo.','var(--amber)',3000);
+        renderLockState();
+      }catch(e){showToast('❌ Error: '+e.message,'var(--red)');}
+    }
+  });
 }
 
 // ── CONFIRM OVERLAY ──
@@ -830,7 +1013,7 @@ function showConfirm(opt){
   _onConfirm=opt.onConfirm;
   document.getElementById('mBtns').innerHTML=
     '<button class="btn" style="background:var(--bg3);color:var(--m);border:1px solid var(--bd)" onclick="closeOverlay()">'+esc(opt.cancelLabel||'Cancelar')+'</button>'
-    +'<button class="btn" style="background:'+(opt.confirmColor||'var(--red)')+';color:#fff" onclick="doConfirm()">'+esc(opt.confirmLabel||'Confirmar')+'</button>';
+    +'<button class="btn" style="background:'+(opt.confirmColor||'var(--red)')+';color:'+(opt.confirmColor==='var(--amber)'?'#000':'#fff')+'" onclick="doConfirm()">'+esc(opt.confirmLabel||'Confirmar')+'</button>';
   document.getElementById('overlay').classList.add('show');
 }
 function closeOverlay(e){
@@ -857,7 +1040,7 @@ au.onAuthStateChanged(async function(user){
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
     if(rol==='coordinador deportivo'||rol==='administrador'){
-      curUser=pf;curCed=c;
+      curUser=pf;curCed=c;curRol=rol;
       document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
       startResListener();
       document.getElementById('sLogin').classList.remove('active');
