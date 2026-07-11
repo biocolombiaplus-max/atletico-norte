@@ -519,6 +519,27 @@ tbody td:nth-child(2){text-align:left}
 .rtype-btn.on{background:rgba(14,165,233,.12);border-color:#0ea5e9;color:#38bdf8}
 .wo-team-btn{width:100%;padding:14px 8px;border-radius:12px;border:2px solid var(--bd);background:var(--b3);color:var(--t);font-size:12px;font-weight:800;cursor:pointer;transition:.15s}
 .wo-team-btn.on{border-color:#ef4444;background:rgba(239,68,68,.15);color:#ef4444}
+/* ── BOTTOM INVITE BANNER ── */
+#invBanner{position:fixed;bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:420px;background:linear-gradient(135deg,#0b1a2e 0%,#0f2040 100%);border:1px solid rgba(200,16,46,.35);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:800;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideUp .5s cubic-bezier(.17,.67,.38,1.3) both}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(30px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+#invBanner .inv-ico{font-size:24px;flex-shrink:0}
+#invBanner .inv-tx{flex:1;min-width:0}
+#invBanner .inv-tx strong{font-size:12px;font-weight:900;color:var(--t);display:block;margin-bottom:1px}
+#invBanner .inv-tx span{font-size:10.5px;color:var(--m);line-height:1.3}
+#invBanner .inv-cta{flex-shrink:0;padding:8px 13px;background:var(--anr);border-radius:10px;font-size:11px;font-weight:900;color:#fff;border:none;cursor:pointer;white-space:nowrap}
+#invBanner .inv-cl{flex-shrink:0;color:var(--m);font-size:18px;cursor:pointer;padding:4px;line-height:1}
+/* ── VERIFY / REGISTER MODALS ── */
+.data-row{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--b3);border:1px solid var(--bd);border-radius:10px;margin-bottom:8px}
+.data-lbl{font-size:9px;font-weight:900;letter-spacing:1px;color:var(--m);text-transform:uppercase}
+.data-val{font-size:13px;font-weight:700;color:var(--t)}
+.data-val.editable{border-bottom:1px dashed var(--bd2);padding-bottom:2px;cursor:text}
+.privacy-box{background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.2);border-radius:10px;padding:12px;font-size:10.5px;color:var(--m);line-height:1.55;margin:12px 0}
+.privacy-box strong{color:var(--t);display:block;margin-bottom:4px;font-size:11px}
+.privacy-check{display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px;font-size:11px;color:var(--t);font-weight:700}
+.privacy-check input{width:16px;height:16px;accent-color:var(--anr);cursor:pointer}
+.badge-found{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800}
+.badge-found.full{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.badge-found.partial{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
 /* ── PLAYER PICKER ── */
 .evt-tabs{display:flex;gap:6px;margin-bottom:12px}
 .evt-tab{flex:1;padding:8px 4px;border-radius:9px;border:2px solid var(--bd);background:var(--b3);color:var(--m);font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:.15s}
@@ -969,6 +990,62 @@ tbody td:nth-child(2){text-align:left}
   <button class="goal-dismiss">Continuar</button>
 </div>
 
+<!-- Bottom invite banner (hidden when logged in) -->
+<div id="invBanner" style="display:none">
+  <div class="inv-ico">👤</div>
+  <div class="inv-tx">
+    <strong>¿Eres socio de Atlético Norte?</strong>
+    <span>Accede a tu perfil, equipo y estadísticas</span>
+  </div>
+  <button class="inv-cta" onclick="openL()">Entrar</button>
+  <span class="inv-cl" onclick="document.getElementById('invBanner').style.display='none'" title="Cerrar">×</span>
+</div>
+
+<!-- Modal: Verificación de datos (socio encontrado en BD) -->
+<div class="mo" id="mVerify">
+  <div class="md"><div class="mh"><span class="mt">✅ Bienvenido, socio</span><button class="mcl" onclick="cM('mVerify')">✕</button></div>
+  <div class="mb">
+    <div id="verifyStatus" style="margin-bottom:12px"></div>
+    <div id="verifyFields"></div>
+    <div class="privacy-box">
+      <strong>📋 Política de Tratamiento de Datos</strong>
+      Los datos que nos compartes serán usados exclusivamente para la gestión deportiva y administrativa de Atlético Norte F.C., conforme a la Ley 1581 de 2012. No compartiremos tu información con terceros sin tu autorización.
+      <label class="privacy-check"><input type="checkbox" id="verifyPrivOk"> Acepto la política de tratamiento de datos personales</label>
+    </div>
+    <div class="mer" id="verifyErr" style="display:none"></div>
+    <button class="sb2" onclick="doVerify()">Confirmar y Entrar</button>
+    <button class="cb" onclick="cM('mVerify')">Cancelar</button>
+  </div></div>
+</div>
+
+<!-- Modal: Registro nuevo (cédula no encontrada) -->
+<div class="mo" id="mRegNew">
+  <div class="md"><div class="mh"><span class="mt">📝 Registro de Socio</span><button class="mcl" onclick="cM('mRegNew')">✕</button></div>
+  <div class="mb">
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;color:#fbbf24;line-height:1.55">
+      <strong style="display:block;margin-bottom:4px;font-size:12px">⚠️ Datos no encontrados</strong>
+      Tu cédula no está en nuestra base de datos. En enero de 2026 compartimos un formulario de actualización en la comunidad. Si no lo diligenciaste, debes registrarte ahora — es obligatorio para participar en la liga.
+    </div>
+    <div class="fg"><label class="fl">Nombre completo</label><input class="fi" id="rnNombre" placeholder="Ej: Juan Carlos Pérez Gómez" autocomplete="name"></div>
+    <div class="fg"><label class="fl">Teléfono / WhatsApp</label><input class="fi" id="rnTel" inputmode="tel" type="tel" placeholder="Ej: 3001234567"></div>
+    <div class="fg"><label class="fl">Correo electrónico</label><input class="fi" id="rnEmail" inputmode="email" type="email" placeholder="Ej: juan@correo.com"></div>
+    <div class="fg"><label class="fl">Posición de juego</label>
+      <select class="fi" id="rnPos">
+        <option value="">Seleccionar...</option>
+        <option>ARQUERO</option><option>DEFENSA</option><option>MEDIOCAMPISTA</option><option>DELANTERO</option>
+      </select>
+    </div>
+    <div class="privacy-box">
+      <strong>📋 Política de Tratamiento de Datos</strong>
+      Tus datos serán tratados exclusivamente para la gestión deportiva de Atlético Norte F.C., con base en la Ley 1581 de 2012. Podrás solicitar corrección o eliminación de tus datos en cualquier momento al administrador del club.
+      <label class="privacy-check"><input type="checkbox" id="regPrivOk"> Acepto la política de tratamiento de datos personales</label>
+    </div>
+    <div class="mer" id="regNewErr" style="display:none"></div>
+    <button class="sb2" onclick="doRegNew()">Registrarme y Entrar</button>
+    <button class="cb" onclick="cM('mRegNew')">Cancelar</button>
+  </div></div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" defer></script>
@@ -1082,10 +1159,10 @@ window.addEventListener("load",function(){
     });
   }catch(e){
     console.warn("Firebase init failed:",e.message);
-    // Show static content without Firebase data
     rFx();rTb();rDlg(DLG_DEF);
     var sh=document.getElementById("anShield");
     if(sh&&!_lsClub){sh.className='hshield';sh.innerHTML=AN_SVG;}
+    setTimeout(function(){var b=document.getElementById('invBanner');if(b)b.style.display='flex';},3000);
   }
 });
 
@@ -1133,6 +1210,7 @@ function updHdr(){
 }
 
 // ── AUTH ──
+var _pendingCedula=null,_pendingEdits={};
 async function doLo(){
   var c=document.getElementById("iCed").value.trim();
   var errEl=document.getElementById("lErr");
@@ -1144,27 +1222,109 @@ async function doLo(){
   spin.style.display="block";
   if(!fbR){cu=c;cr="Socio";pf={cedula:c,nombre:"Demo "+c};spin.style.display="none";cM("mLo");onIn();return;}
   try{
-    // 1. Verificar que la cédula está registrada en la base de datos
     var snap=await db.ref("/socios/"+c).get();
-    if(!snap.exists()){
-      spin.style.display="none";
-      errEl.textContent="Cédula no registrada. Contacta al administrador.";errEl.style.display="block";return;
-    }
-    var socio=snap.val();
-    var email=c+"@atleticonorte.co";
-    var pass=c+"_AN26";          // contraseña fija derivada de la cédula
-    // 2. Intentar login; si no existe la cuenta en Auth, crearla automáticamente
-    try{
-      await au.signInWithEmailAndPassword(email,pass);
-    }catch(e2){
-      if(e2.code==="auth/user-not-found"||e2.code==="auth/invalid-credential"||e2.code==="auth/invalid-email"){
-        await au.createUserWithEmailAndPassword(email,pass);
-      }else{throw e2;}
-    }
+    spin.style.display="none";
+    _pendingCedula=c;
     cM("mLo");
+    if(snap.exists()){
+      openVerifyModal(c,snap.val());
+    }else{
+      openRegNewModal(c);
+    }
   }catch(e){
     spin.style.display="none";
-    errEl.textContent="Error al ingresar: "+e.message;errEl.style.display="block";
+    errEl.textContent="Error: "+e.message;errEl.style.display="block";
+  }
+}
+
+function openVerifyModal(cedula,socio){
+  _pendingEdits={};
+  var isFull=!!(socio.nombre&&socio.equipo);
+  var badge=isFull?'<span class="badge-found full">✅ Datos completos</span>':'<span class="badge-found partial">⚠️ Datos parciales</span>';
+  var msg=isFull
+    ?'<div style="font-size:11px;color:var(--m);margin-top:8px;line-height:1.5">Encontramos tus datos registrados en enero 2026. Verifica que todo esté correcto. Si algo cambió, edítalo y guarda.</div>'
+    :'<div style="font-size:11px;color:var(--m);margin-top:8px;line-height:1.5">Tenemos algunos de tus datos. Completa los que faltan para acceder a todas las funciones.</div>';
+  document.getElementById('verifyStatus').innerHTML=badge+msg;
+  var fields=[
+    {key:'nombre',label:'Nombre completo',val:socio.nombre||'',editable:true},
+    {key:'telefono',label:'Teléfono / WhatsApp',val:socio.telefono||'',editable:true},
+    {key:'email',label:'Correo electrónico',val:socio.email||'',editable:true},
+    {key:'equipo',label:'Equipo',val:socio.equipo?tn(socio.equipo):'Por asignar',editable:false},
+    {key:'posicion',label:'Posición',val:socio.posicion||socio.pos||'—',editable:true}
+  ];
+  var h=fields.map(function(f){
+    if(f.editable){
+      return '<div class="data-row"><div class="data-lbl">'+f.label+'</div>'+
+        '<input class="data-val editable" style="background:transparent;border:none;outline:none;width:100%;font-size:13px;font-weight:700;color:var(--t)" '+
+        'data-key="'+f.key+'" value="'+escHtml(f.val)+'" placeholder="Sin datos" oninput="_pendingEdits[this.dataset.key]=this.value"></div>';
+    }
+    return '<div class="data-row"><div class="data-lbl">'+f.label+'</div><div class="data-val">'+escHtml(f.val)+'</div></div>';
+  }).join('');
+  document.getElementById('verifyFields').innerHTML=h;
+  document.getElementById('verifyPrivOk').checked=!!(socio.privacyOk);
+  document.getElementById('verifyErr').style.display='none';
+  openM('mVerify');
+}
+
+async function doVerify(){
+  if(!document.getElementById('verifyPrivOk').checked){
+    var e=document.getElementById('verifyErr');e.textContent='Debes aceptar la política de tratamiento de datos.';e.style.display='block';return;
+  }
+  var c=_pendingCedula;
+  var e=document.getElementById('verifyErr');e.style.display='none';
+  try{
+    // Save edits + audit
+    var updates=Object.assign({},_pendingEdits,{privacyOk:true,privacyTs:Date.now()});
+    if(Object.keys(_pendingEdits).length>0){
+      updates._auditLog=firebase.database.ServerValue.TIMESTAMP; // crude; full audit via push
+      await db.ref('/socios/'+c).update(updates);
+      // Audit trail
+      await db.ref('/auditSocios/'+c).push({ts:Date.now(),cambios:_pendingEdits,cedula:c});
+    }else{
+      await db.ref('/socios/'+c+'/privacyOk').set(true);
+    }
+    await loginWithCedula(c);
+    cM('mVerify');
+  }catch(err){e.textContent='Error: '+err.message;e.style.display='block';}
+}
+
+function openRegNewModal(cedula){
+  document.getElementById('rnNombre').value='';
+  document.getElementById('rnTel').value='';
+  document.getElementById('rnEmail').value='';
+  document.getElementById('rnPos').value='';
+  document.getElementById('regPrivOk').checked=false;
+  document.getElementById('regNewErr').style.display='none';
+  openM('mRegNew');
+}
+
+async function doRegNew(){
+  var nombre=document.getElementById('rnNombre').value.trim();
+  var tel=document.getElementById('rnTel').value.trim();
+  var email=document.getElementById('rnEmail').value.trim();
+  var pos=document.getElementById('rnPos').value;
+  var privOk=document.getElementById('regPrivOk').checked;
+  var e=document.getElementById('regNewErr');e.style.display='none';
+  if(!nombre){e.textContent='El nombre es obligatorio.';e.style.display='block';return;}
+  if(!privOk){e.textContent='Debes aceptar la política de tratamiento de datos.';e.style.display='block';return;}
+  var c=_pendingCedula;
+  try{
+    var data={cedula:c,nombre:nombre,telefono:tel,email:email,posicion:pos,equipo:0,
+      privacyOk:true,privacyTs:Date.now(),registradoTs:Date.now(),fuente:'self-register'};
+    await db.ref('/socios/'+c).set(data);
+    await loginWithCedula(c);
+    cM('mRegNew');
+  }catch(err){e.textContent='Error: '+err.message;e.style.display='block';}
+}
+
+async function loginWithCedula(c){
+  var email=c+"@atleticonorte.co",pass=c+"_AN26";
+  try{
+    await au.signInWithEmailAndPassword(email,pass);
+  }catch(e2){
+    if(e2.code==="auth/user-not-found"||e2.code==="auth/invalid-credential"||e2.code==="auth/invalid-email"||e2.code==="auth/wrong-password"){
+      await au.createUserWithEmailAndPassword(email,pass);
+    }else{throw e2;}
   }
 }
 async function doCp(){
@@ -1186,17 +1346,14 @@ async function doLt(){if(fbR)await au.signOut();onOut();}
 function onIn(){
   document.getElementById("btnIn").style.display="none";
   document.getElementById("btnPn").style.display="flex";
+  document.getElementById("invBanner").style.display="none";
   var isAdm=cr==="Administrador"||cr==="Coordinador Financiero";
   document.getElementById("admBk").style.display=(isAdm||cEd())?"block":"none";
   document.getElementById("sortBk").style.display=isAdm?"block":"none";
   document.getElementById("admRlTg").textContent=cr;
   rFx();rTb();
   rPn();
-  // Init live notifications
-  setTimeout(function(){
-    initLiveGoalListener();
-    initPush();
-  },1500);
+  setTimeout(function(){initLiveGoalListener();initPush();},1500);
   if(!pf.passChanged)setTimeout(function(){openM("mCp");},1000);
 }
 function onOut(){
@@ -1206,6 +1363,11 @@ function onOut(){
   document.getElementById("admBk").style.display="none";
   document.getElementById("sortBk").style.display="none";
   showTab("inicio");
+  // Show invite banner after 3s to let page settle
+  setTimeout(function(){
+    var b=document.getElementById('invBanner');
+    if(b&&!cu)b.style.display='flex';
+  },3000);
 }
 
 // ── FIXTURE ──
