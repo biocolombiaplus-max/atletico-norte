@@ -544,7 +544,7 @@ function renderMatchList(){
         :isLocked?'<span class="mc-status status-lock">🔒 Final</span>'
         :hasDone?'<span class="mc-status status-ok">✓ Listo</span>'
         :'<span class="mc-status status-pend">Pendiente</span>';
-      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')'" onclick="openMatch('+m.id+')">'  
+      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')+'" onclick="openMatch('+m.id+')">'  
         +'<div class="mc-top"><div class="mc-meta">'+CANCHAS[RC[m.id-1][3]]+' · Vuelta '+m.week+'</div>'+status+'</div>'
         +'<div class="mc-teams">'
         +'<div class="mc-team">'+esc(ts(m.l))+'<br><span style="font-size:10px;color:var(--m);font-weight:500">'+esc(tn(m.l))+'</span></div>'

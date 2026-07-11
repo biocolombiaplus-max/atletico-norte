@@ -3378,7 +3378,8 @@ async function saveCoord(){
 async function quitarCoord(c){
   if(!fbR||!db)return;
   if(!confirm('¿Quitar a '+((_soAll[c]||{}).nombre||c)+' como Coordinador Deportivo?'))return;
-  await db.ref().update({'/socios/'+c+'/rol':'Socio','/socios/'+c+'/coordHasta':null});
+  var upd={};upd['/socios/'+c+'/rol']='Socio';upd['/socios/'+c+'/coordHasta']=null;
+  await db.ref().update(upd);
   if(_soAll[c]){_soAll[c].rol='Socio';delete _soAll[c].coordHasta;}
   renderSoList();
 }
