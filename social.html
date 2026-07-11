@@ -796,7 +796,7 @@ async function tJornada(ctx,ms){
   const startY=pY+pH+24,endY=H-178;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
-  const cH=Math.max(120,Math.floor((available-overhead)/Math.max(nCards,1)));
+  const cH=Math.max(195,Math.floor((available-overhead)/Math.max(nCards,1)));
 
   let curY=startY;
   for(let gi=0;gi<grps.length;gi++){
@@ -841,92 +841,122 @@ function jorDayHeader(ctx,fecha,y,h){
   ctx.font=`700 ${Math.round(h*.3)}px sans-serif`;ctx.letterSpacing='1px';
   ctx.fillStyle='rgba(255,255,255,.62)';
   ctx.fillText(dateLbl,mx+28,y+h*.80);
-  // Calendar icon right side
-  ctx.font=`${Math.round(h*.58)}px sans-serif`;ctx.textAlign='right';
-  ctx.fillText('📅',mx+mw-18,y+h*.62);
+  // Right accent: vertical gold bar + day number
+  const bx=mx+mw-52,bw=38,bh=h*.82,by=y+h*.09;
+  ctx.save();
+  const barG=ctx.createLinearGradient(bx,by,bx,by+bh);
+  barG.addColorStop(0,'rgba(255,215,0,.0)');
+  barG.addColorStop(.3,'rgba(255,215,0,.7)');
+  barG.addColorStop(.7,'rgba(255,215,0,.7)');
+  barG.addColorStop(1,'rgba(255,215,0,.0)');
+  ctx.fillStyle=barG;ctx.fillRect(bx,by,3,bh);
+  ctx.font=`900 ${Math.round(h*.38)}px sans-serif`;ctx.textAlign='right';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(255,215,0,.55)';ctx.letterSpacing='0';
+  ctx.fillText(d.getDate(),mx+mw-14,y+h*.5);
+  ctx.restore();
   ctx.textBaseline='alphabetic';ctx.textAlign='center';
 }
 
 async function jorCard(ctx,m,y,h){
   const mx=48,mw=W-96;
-  // Card
+
+  // ── Card background ──
   ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=32;ctx.shadowOffsetY=8;
   const cg=lGrad(ctx,mx,y,mx+mw,y+h,
-    [0,'rgba(255,255,255,.07)'],[.5,'rgba(8,14,26,.80)'],[1,'rgba(2,6,16,.68)']);
+    [0,'rgba(255,255,255,.07)'],[.5,'rgba(8,14,26,.82)'],[1,'rgba(2,6,16,.72)']);
   ctx.fillStyle=cg;ctx.beginPath();ctx.roundRect(mx,y,mw,h,22);ctx.fill();ctx.restore();
-  ctx.strokeStyle='rgba(255,255,255,.11)';ctx.lineWidth=1.5;
+  // Gloss top strip
+  ctx.save();ctx.globalAlpha=.06;ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.roundRect(mx+10,y+5,mw-20,h*.28,18);ctx.fill();ctx.restore();
+  // Subtle divider line at 63% height — separates badge zone from info zone
+  const divY=y+h*.63;
+  const divG=lGrad(ctx,mx+60,divY,mx+mw-60,divY,
+    [0,'transparent'],[.2,'rgba(255,215,0,.28)'],[.8,'rgba(255,215,0,.28)'],[1,'transparent']);
+  ctx.fillStyle=divG;ctx.fillRect(mx+60,divY,mw-120,1);
+  // Border
+  ctx.strokeStyle='rgba(255,255,255,.10)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.roundRect(mx,y,mw,h,22);ctx.stroke();
-  ctx.save();ctx.globalAlpha=.055;ctx.fillStyle='#fff';
-  ctx.beginPath();ctx.roundRect(mx+10,y+5,mw-20,h*.35,18);ctx.fill();ctx.restore();
 
-  // Badges — raised higher to leave room for larger team names below
-  const cy=y+h*.34,bSz=h*.40;
-  const lx=mx+mw*.21,rx=mx+mw*.79;
+  // ── ZONE A: Badge + VS/score (top 63% of card) ──
+  const cy=y+h*.30,bSz=h*.36;
+  const lx=mx+mw*.22,rx=mx+mw*.78;
   await drawBadge(ctx,m.l,lx,cy,bSz);
   await drawBadge(ctx,m.v,rx,cy,bSz);
 
   const r=results[m.id],sc=r&&r.l!==undefined;
   if(sc){
-    const sw=190,sh2=h*.36,sx2=W/2-sw/2,sy2=cy-sh2*.5;
-    ctx.save();ctx.shadowColor='rgba(200,16,46,.7)';ctx.shadowBlur=28;
+    const sw=180,sh2=h*.30,sx2=W/2-sw/2,sy2=cy-sh2*.5;
+    ctx.save();ctx.shadowColor='rgba(200,16,46,.7)';ctx.shadowBlur=24;
     const sbg=lGrad(ctx,sx2,sy2,sx2+sw,sy2+sh2,[0,'rgba(140,10,22,.95)'],[1,'rgba(200,16,46,.9)']);
-    ctx.fillStyle=sbg;ctx.beginPath();ctx.roundRect(sx2,sy2,sw,sh2,14);ctx.fill();ctx.restore();
-    ctx.strokeStyle='rgba(255,215,0,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(sx2,sy2,sw,sh2,14);ctx.stroke();
-    ctx.font=`900 ${h*.34}px sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
-    ctx.save();ctx.shadowColor='rgba(255,255,255,.25)';ctx.shadowBlur=12;ctx.fillText(`${r.l}-${r.v}`,W/2,sy2+sh2*.52);ctx.restore();
+    ctx.fillStyle=sbg;ctx.beginPath();ctx.roundRect(sx2,sy2,sw,sh2,12);ctx.fill();ctx.restore();
+    ctx.strokeStyle='rgba(255,215,0,.5)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.roundRect(sx2,sy2,sw,sh2,12);ctx.stroke();
+    ctx.font=`900 ${h*.28}px sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
+    ctx.save();ctx.shadowColor='rgba(255,255,255,.2)';ctx.shadowBlur=10;ctx.fillText(`${r.l}-${r.v}`,W/2,sy2+sh2*.52);ctx.restore();
     ctx.textBaseline='alphabetic';
   }else{
-    const vg=ctx.createRadialGradient(W/2,cy,0,W/2,cy,h*.28);
-    vg.addColorStop(0,'rgba(200,16,46,.38)');vg.addColorStop(1,'rgba(200,16,46,.0)');
-    ctx.fillStyle=vg;ctx.beginPath();ctx.arc(W/2,cy,h*.28,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(W/2,cy,h*.2,0,Math.PI*2);ctx.stroke();
-    ctx.font=`900 ${h*.18}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.88)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='4px';
-    ctx.save();ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=18;ctx.fillText('VS',W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
+    const vg=ctx.createRadialGradient(W/2,cy,0,W/2,cy,h*.22);
+    vg.addColorStop(0,'rgba(200,16,46,.35)');vg.addColorStop(1,'rgba(200,16,46,.0)');
+    ctx.fillStyle=vg;ctx.beginPath();ctx.arc(W/2,cy,h*.22,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(W/2,cy,h*.15,0,Math.PI*2);ctx.stroke();
+    ctx.font=`900 ${h*.15}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.90)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='3px';
+    ctx.save();ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=14;
+    ctx.fillText('VS',W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
   }
 
-  // ── Team abbreviations ── bold gold, well below badge bottom
-  const afs=Math.max(Math.round(h*.20),28);
+  // ── Team abbreviations — bold gold, just above divider ──
+  const afs=Math.max(Math.round(h*.165),26);
   ctx.font=`900 ${afs}px sans-serif`;ctx.letterSpacing='2px';ctx.textAlign='center';
   const ag=lGrad(ctx,0,0,W,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
   ctx.fillStyle=ag;
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=10;ctx.shadowOffsetY=2;
-  ctx.fillText(ts(m.l),lx,y+h*.72);ctx.fillText(ts(m.v),rx,y+h*.72);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=8;ctx.shadowOffsetY=2;
+  ctx.fillText(ts(m.l),lx,y+h*.58);ctx.fillText(ts(m.v),rx,y+h*.58);
   ctx.restore();
 
-  // ── Bottom info zone ── split into 3 clear rows
-  ctx.letterSpacing='0';ctx.textAlign='center';
+  // ── ZONE B: Info (bottom 37% of card) ──
+  // Precise pixel anchors so nothing overlaps
+  const infoTop=divY+8;
+  const infoH=y+h-infoTop-10;          // available px in info zone
+  const row1Y=infoTop+infoH*.28;       // day+date
+  const row2Y=infoTop+infoH*.60;       // time
+  const pillY=infoTop+infoH*.72;       // venue pill top
 
-  // Row 1 — Day + Date (gold, medium)
-  const dfs=Math.max(Math.round(h*.115),18);
-  ctx.font=`700 ${dfs}px sans-serif`;
-  ctx.fillStyle='rgba(255,210,0,.90)';
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=6;
-  // Build "LUN 13 JUL" label
+  // Row 1 — Day + Date — gold
+  const dfs=Math.max(Math.round(infoH*.22),18);
   const d=new Date(m.fecha+'T12:00:00');
-  const dayLabel=`${DS[d.getDay()].toUpperCase()} ${d.getDate()} ${MS2[d.getMonth()].toUpperCase()}`;
-  ctx.fillText(dayLabel,W/2,y+h*.810);
+  const dayLabel=`${DS[d.getDay()].toUpperCase()}  ${d.getDate()} ${MS2[d.getMonth()].toUpperCase()}`;
+  ctx.font=`700 ${dfs}px sans-serif`;ctx.letterSpacing='1px';ctx.textAlign='center';
+  ctx.fillStyle='rgba(255,210,0,.92)';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=6;
+  ctx.fillText(dayLabel,W/2,row1Y);
   ctx.restore();
 
-  // Row 2 — Time (white, slightly larger)
-  const tfs=Math.max(Math.round(h*.125),20);
-  ctx.font=`800 ${tfs}px sans-serif`;
-  ctx.fillStyle='rgba(255,255,255,.95)';
+  // Row 2 — Time — white, bold, larger
+  const tfs=Math.max(Math.round(infoH*.28),22);
+  ctx.font=`800 ${tfs}px sans-serif`;ctx.letterSpacing='0';
+  ctx.fillStyle='rgba(255,255,255,.97)';
   ctx.save();ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=8;
-  ctx.fillText(m.hora,W/2,y+h*.895);
+  ctx.fillText(m.hora,W/2,row2Y);
   ctx.restore();
 
-  // Row 3 — Venue pill (accent red chip, white label)
-  const pW=Math.min(mw*.72,420),pH2=Math.max(Math.round(h*.13),20);
-  const pX=W/2-pW/2,pY2=y+h*.930;
+  // Row 3 — Venue pill — red chip, bright white text
+  const pillH=Math.max(Math.round(infoH*.30),22);
+  const pillW=Math.min(mw*.65,380);
+  const pillX=W/2-pillW/2;
   ctx.save();
-  ctx.shadowColor='rgba(200,16,46,.55)';ctx.shadowBlur=14;
-  ctx.fillStyle='rgba(200,16,46,.88)';
-  ctx.beginPath();ctx.roundRect(pX,pY2,pW,pH2,pH2/2);ctx.fill();
+  ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=16;
+  ctx.fillStyle='rgba(200,16,46,.90)';
+  ctx.beginPath();ctx.roundRect(pillX,pillY,pillW,pillH,pillH/2);ctx.fill();
   ctx.restore();
-  const vfs=Math.max(Math.round(h*.095),15);
-  ctx.font=`700 ${vfs}px sans-serif`;ctx.letterSpacing='1px';
+  // Gold border on pill
+  ctx.strokeStyle='rgba(255,215,0,.40)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.roundRect(pillX,pillY,pillW,pillH,pillH/2);ctx.stroke();
+  const vfs=Math.max(Math.round(infoH*.22),17);
+  ctx.font=`700 ${vfs}px sans-serif`;ctx.letterSpacing='1.5px';
   ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(m.cancha.toUpperCase(),W/2,pY2+pH2/2);
+  ctx.fillText(m.cancha.toUpperCase(),W/2,pillY+pillH/2);
   ctx.textBaseline='alphabetic';
 }
 
