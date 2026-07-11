@@ -483,91 +483,200 @@ function hexPat(ctx,alpha=.02){
 }
 
 function bgCinematic(ctx){
-  // Deep black with dramatic red spotlight from top + subtle film-grain look
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#080006'],[.35,'#0a000a'],[.7,'#040008'],[1,'#020004']));
-  rGlow(ctx,W/2,-60,1100,'rgba(200,16,46,.42)');
-  rGlow(ctx,W*.08,H*.38,700,'rgba(180,10,30,.18)');
-  rGlow(ctx,W*.92,H*.42,600,'rgba(90,0,160,.16)');
-  rGlow(ctx,W/2,H*.85,650,'rgba(255,215,0,.09)');
-  // Wide diagonal light rays
-  ctx.save();ctx.globalAlpha=.04;ctx.fillStyle='#fff';
-  for(let i=0;i<6;i++){const x=W*.05+i*W*.16,w=22+i*12;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+w,0);ctx.lineTo(x+w+H*.5,H);ctx.lineTo(x+H*.5,H);ctx.closePath();ctx.fill();}
-  ctx.restore();
-  // Fine dot grain
-  ctx.save();ctx.globalAlpha=.04;ctx.fillStyle='#ff4444';
-  for(let x=0;x<W;x+=44)for(let y=0;y<H;y+=44){ctx.beginPath();ctx.arc(x+(y%88<44?22:0),y,1,0,Math.PI*2);ctx.fill();}
-  ctx.restore();
-  vignette(ctx,.7);
-}
-function bgStadium(ctx){
-  // Warm amber stadium floodlights — looks like a real night match
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#0e0800'],[.3,'#1a0e02'],[.7,'#0e0a04'],[1,'#060400']));
-  // Four corner floodlights
-  rGlow(ctx,W*.12,H*.08,680,'rgba(255,185,30,.26)');
-  rGlow(ctx,W*.88,H*.08,680,'rgba(255,185,30,.26)');
-  rGlow(ctx,W*.06,H*.92,480,'rgba(255,140,0,.14)');
-  rGlow(ctx,W*.94,H*.92,480,'rgba(255,140,0,.14)');
-  // Center warm glow
-  rGlow(ctx,W/2,H*.18,820,'rgba(255,165,20,.18)');
-  rGlow(ctx,W/2,H*.55,600,'rgba(200,16,46,.24)');
-  // Subtle crowd rows pattern
-  ctx.save();ctx.globalAlpha=.018;ctx.fillStyle='#f5b800';
-  for(let y=H*.6;y<H*.88;y+=18)for(let x=20;x<W-20;x+=24){ctx.beginPath();ctx.arc(x+(y%36<18?12:0),y,4,0,Math.PI*2);ctx.fill();}
-  ctx.restore();
-  hexPat(ctx,.014);vignette(ctx,.55);
-}
-function bgPitch(ctx){
-  // Vivid green pitch — clearly a football field
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#012604'],[.4,'#01380a'],[.8,'#022e08'],[1,'#01200a']));
-  // Grass stripes (alternating green)
-  for(let i=0;i<20;i++){ctx.fillStyle=i%2?'rgba(255,255,255,.028)':'rgba(0,0,0,.04)';ctx.fillRect(0,i*(H/20),W,H/20);}
-  // Pitch markings — visible white lines
-  ctx.save();ctx.globalAlpha=.22;ctx.strokeStyle='#fff';ctx.lineWidth=5;
-  // Center circle
-  ctx.beginPath();ctx.arc(W/2,H*.5,320,0,Math.PI*2);ctx.stroke();
-  // Center line
-  ctx.beginPath();ctx.moveTo(80,H*.5);ctx.lineTo(W-80,H*.5);ctx.stroke();
-  // Penalty areas
-  ctx.strokeRect(W/2-260,H*.12,520,200);
-  ctx.strokeRect(W/2-260,H*.88-200,520,200);
-  // Corner arcs
-  for(const[cx,cy]of[[80,H*.12],[W-80,H*.12],[80,H*.88],[W-80,H*.88]]){
-    ctx.beginPath();ctx.arc(cx,cy,90,0,Math.PI*2);ctx.stroke();
+  // Rich deep crimson-black — theatrical, dramatic
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#0a0006'],[.3,'#0e0008'],[.7,'#060004'],[1,'#020002']));
+  rGlow(ctx,W/2,-80,1200,'rgba(200,16,46,.52)');
+  rGlow(ctx,W*.1,H*.36,780,'rgba(180,10,30,.22)');
+  rGlow(ctx,W*.9,H*.38,680,'rgba(100,0,180,.18)');
+  rGlow(ctx,W/2,H,780,'rgba(255,215,0,.1)');
+  // Wide light rays — like a cinema spotlight
+  ctx.save();ctx.globalAlpha=.05;
+  for(let i=0;i<7;i++){
+    const x=W*.04+i*W*.14,w=16+i*14;
+    const rg=lGrad(ctx,x+w/2,0,x+w/2+H*.42,H,[0,'rgba(255,255,255,1)'],[1,'rgba(255,255,255,0)']);
+    ctx.fillStyle=rg;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+w,0);ctx.lineTo(x+w+H*.44,H);ctx.lineTo(x+H*.44,H);ctx.closePath();ctx.fill();
   }
   ctx.restore();
-  rGlow(ctx,W/2,H*.08,640,'rgba(200,16,46,.32)');
-  rGlow(ctx,W/2,H*.5,500,'rgba(255,255,255,.06)');
-  vignette(ctx,.68);
-}
-function bgNight(ctx){
-  // Deep night sky with stars and aurora — very different from others
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#000514'],[.45,'#000b24'],[.7,'#000612'],[1,'#000308']));
-  // Aurora bands (top third)
-  ctx.save();ctx.globalAlpha=.18;
-  const a1=lGrad(ctx,0,0,W,0,[0,'rgba(0,200,120,.0)'],[.3,'rgba(0,220,150,.8)'],[.6,'rgba(80,60,220,.6)'],[1,'rgba(200,0,80,.0)']);
-  ctx.fillStyle=a1;ctx.fillRect(0,H*.04,W,H*.12);
-  const a2=lGrad(ctx,0,0,W,0,[0,'rgba(80,0,200,.0)'],[.4,'rgba(120,20,200,.5)'],[.7,'rgba(0,180,140,.4)'],[1,'rgba(80,0,200,.0)']);
-  ctx.fillStyle=a2;ctx.fillRect(0,H*.12,W,H*.1);
+  // Diagonal scan-line texture
+  ctx.save();ctx.globalAlpha=.028;ctx.fillStyle='#cc0020';
+  for(let x=0;x<W;x+=40)for(let y=0;y<H;y+=40){ctx.beginPath();ctx.arc(x+(y%80<40?20:0),y,1.2,0,Math.PI*2);ctx.fill();}
   ctx.restore();
-  // Stars — bright and dense
+  vignette(ctx,.72);
+}
+
+function bgStadium(ctx){
+  // Professional stadium — cold LED floodlights (blue-white, not amber)
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#000810'],[.4,'#000c1c'],[.8,'#000918'],[1,'#000408']));
+
+  // Four corner floodlight towers — COLD WHITE/BLUE (modern LED)
+  const fp=[[W*.05,H*.05],[W*.95,H*.05],[W*.04,H*.95],[W*.96,H*.95]];
+  fp.forEach(([fx,fy])=>{
+    rGlow(ctx,fx,fy,760,'rgba(160,200,255,.24)');
+    const cg=ctx.createRadialGradient(fx,fy,0,fx,fy,140);
+    cg.addColorStop(0,'rgba(255,255,255,.62)');cg.addColorStop(.25,'rgba(200,225,255,.22)');cg.addColorStop(1,'rgba(140,180,255,.0)');
+    ctx.fillStyle=cg;ctx.fillRect(0,0,W,H);
+  });
+
+  // Light beam shafts from top corners — subtle triangular beams
   ctx.save();
-  for(let i=0;i<320;i++){
-    const sx=Math.random()*W,sy=Math.random()*(H*.72),sz=Math.random()*2.4+.2,al=Math.random()*.8+.2;
-    ctx.fillStyle=`rgba(255,255,255,${al})`;
-    ctx.beginPath();ctx.arc(sx,sy,sz,0,Math.PI*2);ctx.fill();
-    if(sz>1.8){// Twinkle cross for bright stars
-      ctx.globalAlpha=al*.5;ctx.fillRect(sx-sz*3,sy-.5,sz*6,1);ctx.fillRect(sx-.5,sy-sz*3,1,sz*6);ctx.globalAlpha=1;
+  const beamGrad=lGrad(ctx,W/2,0,W/2,H*.7,[0,'rgba(180,215,255,.12)'],[1,'rgba(180,215,255,.0)']);
+  ctx.fillStyle=beamGrad;
+  // Left beam
+  ctx.beginPath();ctx.moveTo(W*.05,H*.05);ctx.lineTo(W*.38,H*.7);ctx.lineTo(W*.22,H*.7);ctx.closePath();ctx.fill();
+  // Right beam
+  ctx.beginPath();ctx.moveTo(W*.95,H*.05);ctx.lineTo(W*.78,H*.7);ctx.lineTo(W*.62,H*.7);ctx.closePath();ctx.fill();
+  ctx.restore();
+
+  // Central pitch overhead fill — cold blue-white bath
+  rGlow(ctx,W/2,H*.38,820,'rgba(180,220,255,.12)');
+  // Faint green pitch suggestion in lower half
+  rGlow(ctx,W/2,H*.65,440,'rgba(40,140,60,.14)');
+  // Brand identity red
+  rGlow(ctx,W/2,H*.5,360,'rgba(200,16,46,.20)');
+
+  // Stadium crowd texture — rows of seats (red/blue/grey)
+  ctx.save();
+  for(let row=0;row<12;row++){
+    const ry=H*.62+row*H*.026;
+    const rowW=W*Math.min(.92,.42+row*.052),sx=(W-rowW)/2;
+    ctx.globalAlpha=.018+row*.002;
+    for(let x=sx;x<sx+rowW;x+=20){
+      const col=Math.floor((x-sx)/20)%4;
+      ctx.fillStyle=col===0?'rgba(200,20,40,1)':col===1?'rgba(30,60,180,1)':col===2?'rgba(160,160,180,1)':'rgba(80,20,20,1)';
+      ctx.beginPath();ctx.arc(x+(row%2?10:0),ry,4.5,0,Math.PI*2);ctx.fill();
     }
   }
   ctx.restore();
-  // Moon
-  ctx.save();ctx.shadowColor='rgba(255,240,180,.8)';ctx.shadowBlur=80;
-  const mg=ctx.createRadialGradient(W*.82,H*.08,0,W*.82,H*.08,90);
-  mg.addColorStop(0,'rgba(255,248,220,.95)');mg.addColorStop(.7,'rgba(255,230,150,.6)');mg.addColorStop(1,'rgba(255,215,0,.0)');
-  ctx.fillStyle=mg;ctx.beginPath();ctx.arc(W*.82,H*.08,90,0,Math.PI*2);ctx.fill();
-  ctx.restore();
-  rGlow(ctx,W/2,H*.55,580,'rgba(200,16,46,.28)');
+
+  hexPat(ctx,.012);
   vignette(ctx,.58);
+}
+
+function bgPitch(ctx){
+  // PREMIUM HD GRASS PITCH — rich professional emerald green
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#042e0a'],[.3,'#065814'],[.6,'#075e16'],[.85,'#054e10'],[1,'#032808']));
+
+  // Alternating mow-stripe pattern — tight, like a Premier League pitch
+  const sH=H/20;
+  for(let i=0;i<20;i++){
+    const ev=i%2===0;
+    ctx.fillStyle=ev?'rgba(255,255,255,.048)':'rgba(0,0,0,.055)';
+    ctx.fillRect(0,i*sH,W,sH);
+    // Extra fine highlight on top edge of each light stripe
+    if(ev){ctx.fillStyle='rgba(255,255,255,.025)';ctx.fillRect(0,i*sH,W,sH*.18);}
+  }
+
+  // Overhead stadium lights — strong white from top (floodlights above)
+  rGlow(ctx,W*.18,H*.01,620,'rgba(255,255,255,.22)');
+  rGlow(ctx,W*.82,H*.01,620,'rgba(255,255,255,.22)');
+  rGlow(ctx,W/2,H*.0,800,'rgba(220,255,220,.16)');
+
+  // PITCH MARKINGS — full professional layout, high contrast
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.72)';
+  ctx.lineWidth=8;ctx.lineCap='round';ctx.lineJoin='round';
+
+  const pad=80;
+  // Outer boundary
+  ctx.strokeRect(pad,H*.07,W-pad*2,H*.86);
+
+  // Halfway line
+  ctx.beginPath();ctx.moveTo(pad,H*.5);ctx.lineTo(W-pad,H*.5);ctx.stroke();
+
+  // Center circle
+  ctx.beginPath();ctx.arc(W/2,H*.5,280,0,Math.PI*2);ctx.stroke();
+  // Center dot
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(W/2,H*.5,20,0,Math.PI*2);ctx.fill();
+
+  // === TOP HALF ===
+  const paW=480,paH=195,paX=(W-paW)/2,paY=H*.07;
+  // Penalty area
+  ctx.strokeRect(paX,paY,paW,paH);
+  // Goal area
+  const gaW=210,gaH=82,gaX=(W-gaW)/2;
+  ctx.strokeRect(gaX,paY,gaW,gaH);
+  // Penalty spot
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(W/2,paY+paH*.72,16,0,Math.PI*2);ctx.fill();
+  // Penalty arc (outside box)
+  ctx.beginPath();ctx.arc(W/2,paY+paH*.72,188,0.2*Math.PI,0.8*Math.PI);ctx.stroke();
+
+  // === BOTTOM HALF ===
+  const pbY=H*.93-paH;
+  ctx.strokeRect(paX,pbY,paW,paH);
+  ctx.strokeRect(gaX,H*.93-gaH,gaW,gaH);
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(W/2,pbY+paH*.28,16,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(W/2,pbY+paH*.28,188,1.2*Math.PI,1.8*Math.PI);ctx.stroke();
+
+  // Corner arcs
+  ctx.lineWidth=6;
+  const ca=58;
+  ctx.beginPath();ctx.arc(pad,H*.07,ca,0,Math.PI*.5);ctx.stroke();
+  ctx.beginPath();ctx.arc(W-pad,H*.07,ca,Math.PI*.5,Math.PI);ctx.stroke();
+  ctx.beginPath();ctx.arc(pad,H*.93,ca,-Math.PI*.5,0);ctx.stroke();
+  ctx.beginPath();ctx.arc(W-pad,H*.93,ca,Math.PI,Math.PI*1.5);ctx.stroke();
+
+  ctx.restore();
+
+  // Brand red identity glow — AN colors
+  rGlow(ctx,W/2,H*.28,540,'rgba(200,16,46,.30)');
+  // Subtle green rim light on edges
+  rGlow(ctx,0,H*.5,380,'rgba(20,120,30,.18)');
+  rGlow(ctx,W,H*.5,380,'rgba(20,120,30,.18)');
+
+  vignette(ctx,.52);
+}
+
+function bgNight(ctx){
+  // Deep cosmos — midnight blue-black sky
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#000310'],[.4,'#00071e'],[.75,'#000510'],[1,'#000108']));
+
+  // Aurora borealis — subtle, elegant bands
+  ctx.save();
+  ctx.globalAlpha=.16;
+  const a1=lGrad(ctx,0,0,W,0,[0,'rgba(0,200,130,.0)'],[.2,'rgba(0,230,160,.9)'],[.55,'rgba(60,50,220,.75)'],[.85,'rgba(200,0,100,.4)'],[1,'rgba(0,0,0,.0)']);
+  ctx.fillStyle=a1;ctx.fillRect(0,H*.02,W,H*.08);
+  ctx.globalAlpha=.11;
+  const a2=lGrad(ctx,0,0,W,0,[0,'rgba(80,0,200,.0)'],[.3,'rgba(120,20,200,.85)'],[.65,'rgba(0,190,140,.65)'],[1,'rgba(80,0,200,.0)']);
+  ctx.fillStyle=a2;ctx.fillRect(0,H*.09,W,H*.065);
+  ctx.restore();
+
+  // Stars — dense field, varied sizes
+  ctx.save();ctx.globalAlpha=1;
+  for(let i=0;i<420;i++){
+    const sx=Math.random()*W,sy=Math.random()*(H*.76),sz=Math.random()*2.8+.15,al=Math.random()*.88+.12;
+    ctx.globalAlpha=al;ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(sx,sy,sz,0,Math.PI*2);ctx.fill();
+    if(sz>2.2){// 4-point star cross for bright ones
+      ctx.globalAlpha=al*.38;
+      ctx.fillRect(sx-sz*4.5,sy-.45,sz*9,.9);
+      ctx.fillRect(sx-.45,sy-sz*4.5,.9,sz*9);
+    }
+  }
+  ctx.restore();
+
+  // Moon — crisp, photo-real (NO shadowBlur on circle itself)
+  const moonX=W*.79,moonY=H*.095,moonR=92;
+  // Outer atmospheric glow (separate from moon disk)
+  rGlow(ctx,moonX,moonY,moonR*5,'rgba(200,220,160,.12)');
+  rGlow(ctx,moonX,moonY,moonR*2.2,'rgba(240,240,200,.16)');
+  // Moon disk — sharp edge, realistic gradient
+  const mg=ctx.createRadialGradient(moonX-moonR*.28,moonY-moonR*.22,moonR*.04,moonX,moonY,moonR);
+  mg.addColorStop(0,'rgba(255,252,238,1)');
+  mg.addColorStop(.45,'rgba(248,244,220,.99)');
+  mg.addColorStop(.78,'rgba(228,222,195,.98)');
+  mg.addColorStop(.95,'rgba(198,192,168,.95)');
+  mg.addColorStop(1,'rgba(160,155,135,.0)');
+  ctx.fillStyle=mg;ctx.beginPath();ctx.arc(moonX,moonY,moonR,0,Math.PI*2);ctx.fill();
+  // Shadow limb — gives 3D crescent depth
+  ctx.save();ctx.globalAlpha=.38;
+  const sh=ctx.createRadialGradient(moonX+moonR*.32,moonY+moonR*.28,moonR*.1,moonX,moonY,moonR*.98);
+  sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.55,'rgba(0,0,0,0)');
+  sh.addColorStop(.82,'rgba(15,12,8,.75)');sh.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=sh;ctx.beginPath();ctx.arc(moonX,moonY,moonR,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  rGlow(ctx,W/2,H*.55,560,'rgba(200,16,46,.28)');
+  vignette(ctx,.55);
 }
 
 // ── CHROME ───────────────────────────────────────────
@@ -750,8 +859,8 @@ async function jorCard(ctx,m,y,h){
   ctx.save();ctx.globalAlpha=.055;ctx.fillStyle='#fff';
   ctx.beginPath();ctx.roundRect(mx+10,y+5,mw-20,h*.35,18);ctx.fill();ctx.restore();
 
-  // Badges — center top 60% of card
-  const cy=y+h*.40,bSz=h*.43;
+  // Badges — raised higher to leave room for larger team names below
+  const cy=y+h*.34,bSz=h*.40;
   const lx=mx+mw*.21,rx=mx+mw*.79;
   await drawBadge(ctx,m.l,lx,cy,bSz);
   await drawBadge(ctx,m.v,rx,cy,bSz);
@@ -775,24 +884,26 @@ async function jorCard(ctx,m,y,h){
     ctx.save();ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=18;ctx.fillText('VS',W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
   }
 
-  // Team abbreviations — golden
-  const afs=Math.max(Math.round(h*.14),22);
+  // Team abbreviations — golden, bigger font, clear gap below badge
+  const afs=Math.max(Math.round(h*.22),30);
   ctx.font=`900 ${afs}px sans-serif`;ctx.letterSpacing='2px';ctx.textAlign='center';
   const ag=lGrad(ctx,0,0,W,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
   ctx.fillStyle=ag;
-  ctx.fillText(ts(m.l),lx,y+h*.69);ctx.fillText(ts(m.v),rx,y+h*.69);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=10;ctx.shadowOffsetY=2;
+  ctx.fillText(ts(m.l),lx,y+h*.76);ctx.fillText(ts(m.v),rx,y+h*.76);
+  ctx.restore();
 
   // Meta info — 2 lines, BIG and readable
-  const mfs=Math.max(Math.round(h*.135),24);
+  const mfs=Math.max(Math.round(h*.13),22);
   ctx.letterSpacing='0';ctx.textAlign='center';
   // Line 1: date — gold
   ctx.font=`800 ${mfs}px sans-serif`;
   ctx.fillStyle='rgba(255,215,0,.82)';
-  ctx.fillText(fD(m.fecha,false),W/2,y+h*.82);
+  ctx.fillText(fD(m.fecha,false),W/2,y+h*.88);
   // Line 2: time · venue
   ctx.font=`700 ${Math.round(mfs*.9)}px sans-serif`;
   ctx.fillStyle='rgba(255,255,255,.60)';
-  ctx.fillText(`${m.hora}  ·  ${m.cancha}`,W/2,y+h*.96);
+  ctx.fillText(`${m.hora}  ·  ${m.cancha}`,W/2,y+h*.97);
 }
 
 // ═══ PARTIDO ════════════════════════════════════════
