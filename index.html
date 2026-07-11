@@ -54,29 +54,35 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .pg.active{display:block}
 
 /* ── AD BANNER ── */
-.adb{background:linear-gradient(180deg,#08101f 0%,#050d1a 100%);border-bottom:1px solid rgba(255,255,255,.07);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
-/* Ticker */
-.adticker{overflow:hidden;position:relative;height:34px;mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-.adtrack{display:flex;gap:52px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 40s linear infinite}
-.adtrack:hover{animation-play-state:paused}
-.admsg{display:inline-flex;align-items:center;gap:7px;height:34px}
-.admsg .ic{font-size:13px;opacity:.75}
-.admsg .tx{font-size:11px;font-weight:600;color:rgba(200,215,235,.75);letter-spacing:.1px}
-.admsg .hl{color:rgba(220,232,250,.95);font-weight:800}
-/* Promo ad pill */
-.admsg.promo-ad .tx{display:none}
-.adpromo{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:20px;padding:0 12px;height:24px;font-size:10.5px;font-weight:900;color:#fff;letter-spacing:.3px;text-shadow:0 1px 2px rgba(0,0,0,.3);box-shadow:0 0 10px rgba(245,158,11,.4);white-space:nowrap;cursor:pointer;text-decoration:none}
-.adpromo .pip{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s step-end infinite;flex-shrink:0}
+.adb{background:linear-gradient(180deg,#060d1b 0%,#08111f 100%);border-bottom:1px solid rgba(255,255,255,.06);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
+.adb::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(200,16,46,.03) 0,rgba(200,16,46,.03) 1px,transparent 1px,transparent 48px);pointer-events:none}
+/* Sponsor bar */
+.adspbar{display:flex;align-items:center;gap:0;height:30px;border-bottom:1px solid rgba(255,255,255,.05);position:relative;overflow:hidden}
+.adspbar-label{font-size:8px;font-weight:900;letter-spacing:2px;color:rgba(200,16,46,.7);text-transform:uppercase;padding:0 10px;flex-shrink:0;border-right:1px solid rgba(255,255,255,.07)}
+.adsp-slot{display:flex;align-items:center;gap:6px;padding:0 14px;border-right:1px solid rgba(255,255,255,.05);height:100%;flex-shrink:0;cursor:pointer;transition:background .2s;text-decoration:none}
+.adsp-slot:hover{background:rgba(255,255,255,.04)}
+.adsp-dot{width:5px;height:5px;border-radius:50%;background:var(--ac);opacity:.7}
+.adsp-name{font-size:10px;font-weight:800;color:rgba(220,235,255,.8);letter-spacing:.2px}
+.adsp-tag{font-size:8px;color:rgba(150,175,210,.5);font-weight:600}
+.adsp-cta{margin-left:auto;flex-shrink:0;display:flex;align-items:center;height:100%;padding:0 10px}
+.adpromo{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#c8102e 0%,#a00c24 100%);border-radius:6px;padding:4px 10px;font-size:9.5px;font-weight:900;color:#fff;letter-spacing:.4px;text-shadow:0 1px 3px rgba(0,0,0,.4);box-shadow:0 2px 8px rgba(200,16,46,.35),inset 0 1px 0 rgba(255,255,255,.15);white-space:nowrap;cursor:pointer;text-decoration:none;border:none;transition:transform .15s,box-shadow .15s}
+.adpromo:active{transform:scale(.96)}
+.adpromo .pip{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 1.2s step-end infinite;flex-shrink:0;box-shadow:0 0 4px rgba(255,255,255,.6)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+/* Ticker */
+.adticker{overflow:hidden;position:relative;height:28px;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.adtrack{display:flex;gap:44px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 42s linear infinite}
+.adtrack:hover{animation-play-state:paused}
+.admsg{display:inline-flex;align-items:center;gap:6px;height:28px}
+.admsg .ic{font-size:12px;opacity:.65}
+.admsg .tx{font-size:10.5px;font-weight:600;color:rgba(180,205,230,.65);letter-spacing:.05px}
+.admsg .hl{color:rgba(220,235,255,.92);font-weight:800}
+.admsg.promo-ad .tx{display:none}
 @keyframes adscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ── DESKTOP OVERRIDES ── */
 @media(min-width:600px){
   .adb{flex-direction:column}
-  .adsponsors{padding:12px 32px 11px;gap:0}
-  .adsp{max-width:340px}
-  .adsp-name{font-size:15px!important}
-  .adsp-tag{font-size:10px}
   .adticker{height:28px}
   .admsg .tx{font-size:11px}
 }
@@ -519,6 +525,76 @@ tbody td:nth-child(2){text-align:left}
 .rtype-btn.on{background:rgba(14,165,233,.12);border-color:#0ea5e9;color:#38bdf8}
 .wo-team-btn{width:100%;padding:14px 8px;border-radius:12px;border:2px solid var(--bd);background:var(--b3);color:var(--t);font-size:12px;font-weight:800;cursor:pointer;transition:.15s}
 .wo-team-btn.on{border-color:#ef4444;background:rgba(239,68,68,.15);color:#ef4444}
+/* ── BOTTOM INVITE BANNER ── */
+#invBanner{position:fixed;bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:420px;background:linear-gradient(135deg,#0b1a2e 0%,#0f2040 100%);border:1px solid rgba(200,16,46,.35);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:800;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideUp .5s cubic-bezier(.17,.67,.38,1.3) both}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(30px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+#invBanner .inv-ico{font-size:24px;flex-shrink:0}
+#invBanner .inv-tx{flex:1;min-width:0}
+#invBanner .inv-tx strong{font-size:12px;font-weight:900;color:var(--t);display:block;margin-bottom:1px}
+#invBanner .inv-tx span{font-size:10.5px;color:var(--m);line-height:1.3}
+#invBanner .inv-cta{flex-shrink:0;padding:8px 13px;background:var(--anr);border-radius:10px;font-size:11px;font-weight:900;color:#fff;border:none;cursor:pointer;white-space:nowrap}
+#invBanner .inv-cl{flex-shrink:0;color:var(--m);font-size:18px;cursor:pointer;padding:4px;line-height:1}
+/* ── VERIFY / REGISTER MODALS ── */
+.data-row{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--b3);border:1px solid var(--bd);border-radius:10px;margin-bottom:8px}
+.data-lbl{font-size:9px;font-weight:900;letter-spacing:1px;color:var(--m);text-transform:uppercase}
+.data-val{font-size:13px;font-weight:700;color:var(--t)}
+.data-val.editable{border-bottom:1px dashed var(--bd2);padding-bottom:2px;cursor:text}
+.privacy-box{background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.2);border-radius:10px;padding:12px;font-size:10.5px;color:var(--m);line-height:1.55;margin:12px 0}
+.privacy-box strong{color:var(--t);display:block;margin-bottom:4px;font-size:11px}
+.privacy-check{display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px;font-size:11px;color:var(--t);font-weight:700}
+.privacy-check input{width:16px;height:16px;accent-color:var(--anr);cursor:pointer}
+.badge-found{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800}
+.badge-found.full{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.badge-found.partial{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+/* ── CONTACT CLUB MODAL ── */
+.contact-hero{text-align:center;padding:8px 0 16px}
+.contact-shield{font-size:52px;margin-bottom:8px;display:block}
+.contact-title{font-size:18px;font-weight:900;color:var(--t);margin-bottom:6px;line-height:1.2}
+.contact-sub{font-size:12px;color:var(--m);line-height:1.6;max-width:280px;margin:0 auto}
+.contact-card{background:var(--b3);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:14px 0;font-size:11.5px;line-height:1.65;color:var(--m)}
+.contact-card strong{color:var(--t);font-size:12px}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px 20px;background:linear-gradient(135deg,#25d366 0%,#128c3e 100%);border-radius:14px;border:none;color:#fff;font-size:14px;font-weight:900;cursor:pointer;text-decoration:none;letter-spacing:.2px;box-shadow:0 4px 20px rgba(37,211,102,.35),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .15s,box-shadow .15s;margin-bottom:10px}
+.wa-btn:active{transform:scale(.97)}
+.wa-btn svg{width:22px;height:22px;fill:#fff;flex-shrink:0}
+.wa-btn-sub{font-size:10px;opacity:.8;font-weight:600;display:block;margin-top:1px}
+.contact-divider{display:flex;align-items:center;gap:10px;margin:10px 0;color:var(--dm);font-size:10px;font-weight:700;letter-spacing:.5px}
+.contact-divider::before,.contact-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.contact-id{display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:20px;padding:3px 10px;font-size:10px;color:#f87171;font-weight:700;margin-bottom:12px}
+/* ── PLAYER PICKER ── */
+.evt-tabs{display:flex;gap:6px;margin-bottom:12px}
+.evt-tab{flex:1;padding:8px 4px;border-radius:9px;border:2px solid var(--bd);background:var(--b3);color:var(--m);font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:.15s}
+.evt-tab.on{border-color:#0ea5e9;background:rgba(14,165,233,.12);color:#38bdf8}
+.evt-tab.goal-tab.on{border-color:#10b981;background:rgba(16,185,129,.12);color:#34d399}
+.evt-tab.yellow-tab.on{border-color:#f59e0b;background:rgba(245,158,11,.12);color:#fbbf24}
+.evt-tab.red-tab.on{border-color:#ef4444;background:rgba(239,68,68,.12);color:#f87171}
+.picker-team{margin-bottom:10px}
+.picker-team-hdr{font-size:9px;font-weight:900;letter-spacing:1.2px;color:var(--m);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.picker-chips{display:flex;flex-wrap:wrap;gap:5px}
+.pchip{padding:5px 9px;border-radius:20px;border:1.5px solid var(--bd);background:var(--b3);color:var(--t);font-size:10.5px;font-weight:700;cursor:pointer;transition:.15s;user-select:none}
+.pchip.sel-goal{border-color:#10b981;background:rgba(16,185,129,.18);color:#34d399}
+.pchip.sel-yellow{border-color:#f59e0b;background:rgba(245,158,11,.18);color:#fbbf24}
+.pchip.sel-red{border-color:#ef4444;background:rgba(239,68,68,.18);color:#f87171}
+.evt-log{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;min-height:20px}
+.evt-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:14px;font-size:10px;font-weight:700}
+.evt-pill .rmv{cursor:pointer;opacity:.6;margin-left:2px;font-size:12px}
+.evt-pill.goal-pill{background:rgba(16,185,129,.18);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.evt-pill.yellow-pill{background:rgba(245,158,11,.18);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.evt-pill.red-pill{background:rgba(239,68,68,.18);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+/* ── GOAL ANIMATION ── */
+#goalAnim{position:fixed;inset:0;z-index:9999;display:none;pointer-events:none;overflow:hidden}
+#goalAnim.show{display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:all;background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
+.goal-anim-bg{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(16,185,129,.22) 0%,transparent 70%)}
+.goal-ball{font-size:72px;animation:ballArc 1s cubic-bezier(.17,.67,.38,1.0) forwards}
+@keyframes ballArc{0%{transform:translateY(60px) scale(.5);opacity:0}40%{transform:translateY(-30px) scale(1.15);opacity:1}70%{transform:translateY(0) scale(1) rotate(360deg)}100%{transform:translateY(0) scale(1) rotate(720deg)}}
+.goal-net{width:min(90vw,320px);height:80px;margin-top:6px;position:relative;overflow:hidden}
+.goal-net svg{width:100%;height:100%;animation:netShake .4s .7s ease-in-out}
+@keyframes netShake{0%,100%{transform:skewX(0deg)}25%{transform:skewX(-4deg)}75%{transform:skewX(4deg)}}
+.goal-text{font-size:clamp(52px,14vw,80px);font-weight:900;color:#10b981;text-shadow:0 0 40px rgba(16,185,129,.8),0 4px 24px rgba(0,0,0,.6);letter-spacing:2px;animation:goalPop .5s .3s cubic-bezier(.17,.67,.38,1.3) both}
+@keyframes goalPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.goal-scorer{font-size:16px;font-weight:800;color:#fff;margin-top:6px;animation:fadeUp .4s .6s both}
+.goal-score{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;animation:fadeUp .4s .7s both;font-weight:600}
+@keyframes fadeUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.goal-dismiss{margin-top:24px;padding:10px 28px;border-radius:24px;border:2px solid rgba(16,185,129,.5);background:rgba(16,185,129,.12);color:#34d399;font-size:13px;font-weight:800;cursor:pointer;animation:fadeUp .4s .9s both}
 /* W penalty badge in table */
 .wpen{display:inline-block;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:5px;padding:1px 5px;font-size:9px;font-weight:900;margin-left:3px}
 /* ── TOAST NOTIFICATIONS ── */
@@ -561,25 +637,42 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- AD BANNER -->
 <div class="adb">
+  <!-- Sponsor bar -->
+  <div class="adspbar">
+    <span class="adspbar-label">Sponsors</span>
+    <a class="adsp-slot" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%2C%20me%20interesa%20la%20alianza%20de%20Comfanorte%20con%20el%20club." target="_blank" rel="noopener noreferrer">
+      <span class="adsp-dot" style="background:#0ea5e9"></span>
+      <span><span class="adsp-name">Comfanorte</span><span class="adsp-tag" style="display:block">Aliado deportivo</span></span>
+    </a>
+    <a class="adsp-slot" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%2C%20me%20interesa%20la%20alianza%20de%20Comfaoriente%20con%20el%20club." target="_blank" rel="noopener noreferrer">
+      <span class="adsp-dot" style="background:#10b981"></span>
+      <span><span class="adsp-name">Comfaoriente</span><span class="adsp-tag" style="display:block">Apoyo comunitario</span></span>
+    </a>
+    <a class="adsp-slot" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%2C%20me%20interesa%20la%20alianza%20de%20Villa%20Silvania%20con%20el%20club." target="_blank" rel="noopener noreferrer">
+      <span class="adsp-dot" style="background:#8b5cf6"></span>
+      <span><span class="adsp-name">Villa Silvania</span><span class="adsp-tag" style="display:block">Sede oficial</span></span>
+    </a>
+    <div class="adsp-cta">
+      <a class="adpromo" href="https://wa.me/573171030787?text=Hola%2C%20soy%20del%20equipo%20de%20Atl%C3%A9tico%20Norte%20F.C.%20%F0%9F%8F%86%20Me%20interesa%20pautar%20GRATIS%20en%20la%20aplicaci%C3%B3n%20oficial%20de%20la%20liga%20y%20llegar%20a%20todos%20los%20socios%20y%20sus%20familias.%20%C2%BFMe%20pueden%20dar%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer"><span class="pip"></span>Pautar Gratis</a>
+    </div>
+  </div>
   <!-- Ticker -->
   <div class="adticker">
     <div class="adtrack" id="adTrack">
       <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &nbsp;&middot;&nbsp; 135 partidos &middot; 10 equipos &middot; 3 vueltas</span></span>
-      <span class="admsg"><span class="ic">&#128293;</span><span class="tx">&#161;<span class="hl">PAUTE AQU&#205; GRATIS</span> &nbsp;&#183;&nbsp; Ofrece tu producto o servicio a toda la comunidad de Atl&#233;tico Norte</span></span>
+      <span class="admsg"><span class="ic">&#128293;</span><span class="tx">&#161;<span class="hl">ESPACIO PUBLICITARIO DISPONIBLE</span> &nbsp;&#183;&nbsp; Llega a toda la comunidad de Atl&#233;tico Norte &mdash; es gratis</span></span>
       <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
-      <span class="admsg promo-ad"><span class="ic">&#128176;</span><a class="adpromo" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%2C%20quiero%20publicar%20mi%20negocio%20en%20la%20app%20de%20la%20liga." target="_blank" rel="noopener noreferrer"><span class="pip"></span>&#128293; &iexcl;PAUTE GRATIS! Contactar ahora</a></span>
       <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Playoffs mata-mata &nbsp;&middot;&nbsp; <span class="hl">El campe&oacute;n se corona en cancha</span></span></span>
-      <span class="admsg"><span class="ic">&#127919;</span><span class="tx">&#161;Tienes un negocio? &nbsp;<span class="hl">Llega a cientos de socios</span> &mdash; pautar es GRATIS</span></span>
+      <span class="admsg"><span class="ic">&#127919;</span><span class="tx">&#191;Tienes un negocio? &nbsp;<span class="hl">Llega a cientos de socios y familias</span> &mdash; pautar es GRATIS</span></span>
       <span class="admsg"><span class="ic">&#9829;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
       <span class="admsg"><span class="ic">&#128197;</span><span class="tx">Fixture optimizado &nbsp;&middot;&nbsp; S&aacute;bados distribuidos equitativamente</span></span>
       <span class="admsg"><span class="ic">&#127963;&#65039;</span><span class="tx"><span class="hl">Atl&eacute;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
       <!-- duplicate for seamless loop -->
       <span class="admsg"><span class="ic">&#9917;</span><span class="tx"><span class="hl">Liga Interna S2 2026</span> &nbsp;&middot;&nbsp; 135 partidos &middot; 10 equipos &middot; 3 vueltas</span></span>
-      <span class="admsg"><span class="ic">&#128293;</span><span class="tx">&#161;<span class="hl">PAUTE AQU&#205; GRATIS</span> &nbsp;&#183;&nbsp; Ofrece tu producto o servicio a toda la comunidad de Atl&#233;tico Norte</span></span>
+      <span class="admsg"><span class="ic">&#128293;</span><span class="tx">&#161;<span class="hl">ESPACIO PUBLICITARIO DISPONIBLE</span> &nbsp;&#183;&nbsp; Llega a toda la comunidad de Atl&#233;tico Norte &mdash; es gratis</span></span>
       <span class="admsg"><span class="ic">&#9733;</span><span class="tx"><span class="hl">Comfaoriente</span> &mdash; aliado del deporte nortesantandereano</span></span>
-      <span class="admsg promo-ad"><span class="ic">&#128176;</span><a class="adpromo" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%2C%20quiero%20publicar%20mi%20negocio%20en%20la%20app%20de%20la%20liga." target="_blank" rel="noopener noreferrer"><span class="pip"></span>&#128293; &iexcl;PAUTE GRATIS! Contactar ahora</a></span>
       <span class="admsg"><span class="ic">&#127942;</span><span class="tx">Playoffs mata-mata &nbsp;&middot;&nbsp; <span class="hl">El campe&oacute;n se corona en cancha</span></span></span>
-      <span class="admsg"><span class="ic">&#127919;</span><span class="tx">&#161;Tienes un negocio? &nbsp;<span class="hl">Llega a cientos de socios</span> &mdash; pautar es GRATIS</span></span>
+      <span class="admsg"><span class="ic">&#127919;</span><span class="tx">&#191;Tienes un negocio? &nbsp;<span class="hl">Llega a cientos de socios y familias</span> &mdash; pautar es GRATIS</span></span>
       <span class="admsg"><span class="ic">&#9829;</span><span class="tx"><span class="hl">Comfanorte</span> &mdash; comprometida con el f&uacute;tbol local</span></span>
       <span class="admsg"><span class="ic">&#128197;</span><span class="tx">Fixture optimizado &nbsp;&middot;&nbsp; S&aacute;bados distribuidos equitativamente</span></span>
       <span class="admsg"><span class="ic">&#127963;&#65039;</span><span class="tx"><span class="hl">Atl&eacute;tico Norte F.C.</span> &mdash; orgullo de Norte de Santander</span></span>
@@ -863,8 +956,16 @@ tbody td:nth-child(2){text-align:left}
         <div class="fg"><label class="fl">Goles Local</label><input type="number" class="fi" id="rL" min="0" max="30" value="0" style="font-size:28px;font-weight:900;text-align:center;padding:8px"></div>
         <div class="fg"><label class="fl">Goles Visitante</label><input type="number" class="fi" id="rV" min="0" max="30" value="0" style="font-size:28px;font-weight:900;text-align:center;padding:8px"></div>
       </div>
-      <div class="fg"><label class="fl">Goleadores (Nombre, Equipo, Goles)</label>
-        <textarea class="fi" id="rSc" rows="4" placeholder="Juan P&#233;rez, Local, 2&#10;Carlos L&#243;pez, Visitante, 1"></textarea>
+      <!-- Player event picker -->
+      <div class="fg" style="margin-top:6px">
+        <label class="fl" style="margin-bottom:8px">Eventos del Partido</label>
+        <div class="evt-tabs">
+          <button class="evt-tab goal-tab on" onclick="setEvtTab('goal',this)">⚽ Goles</button>
+          <button class="evt-tab yellow-tab" onclick="setEvtTab('yellow',this)">🟨 Amarillas</button>
+          <button class="evt-tab red-tab" onclick="setEvtTab('red',this)">🟥 Rojas</button>
+        </div>
+        <div id="pickerPanel"></div>
+        <div id="evtLog" class="evt-log"></div>
       </div>
     </div>
     <!-- W/Walkover section -->
@@ -891,9 +992,8 @@ tbody td:nth-child(2){text-align:left}
       <button class="rtype-btn" style="width:100%;background:rgba(14,165,233,.12);border-color:#0ea5e9;color:#0ea5e9;font-size:12px"
         onclick="shInicioPartido()">🏁 Notificar Inicio del Partido</button>
       <div id="evtForm" style="display:none;margin-top:10px">
-        <input class="fi" id="evtJugador" placeholder="Nombre del jugador" style="margin-bottom:8px">
-        <select class="fi" id="evtEquipo" style="margin-bottom:8px"></select>
-        <button class="sb2" id="evtBtn" onclick="doEvt()" style="padding:10px"></button>
+        <div id="evtChipPanel"></div>
+        <button class="sb2" id="evtBtn" onclick="doEvt()" style="padding:10px;margin-top:8px;display:none"></button>
       </div>
     </div>
     <button class="cb" onclick="cM('mRs')">Cancelar</button>
@@ -903,6 +1003,104 @@ tbody td:nth-child(2){text-align:left}
 <div class="mo" id="mDlg">
   <div class="md"><div class="mh"><span class="mt" id="mDlgT">Delegado</span><button class="mcl" onclick="cM('mDlg')">&#10005;</button></div>
   <div class="mb" id="mDlgB"></div></div>
+</div>
+<!-- Goal Celebration Overlay -->
+<div id="goalAnim" onclick="hideGoalAnim()">
+  <div class="goal-anim-bg"></div>
+  <div class="goal-ball">⚽</div>
+  <div class="goal-net">
+    <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="316" height="76" rx="4" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3"/>
+      <line x1="0" y1="20" x2="320" y2="20" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="0" y1="40" x2="320" y2="40" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="0" y1="60" x2="320" y2="60" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="53" y1="0" x2="53" y2="80" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="106" y1="0" x2="106" y2="80" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="160" y1="0" x2="160" y2="80" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="213" y1="0" x2="213" y2="80" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <line x1="266" y1="0" x2="266" y2="80" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+    </svg>
+  </div>
+  <div class="goal-text">¡GOL!</div>
+  <div class="goal-scorer" id="goalAnimScorer"></div>
+  <div class="goal-score" id="goalAnimScore"></div>
+  <button class="goal-dismiss">Continuar</button>
+</div>
+
+<!-- Bottom invite banner (hidden when logged in) -->
+<div id="invBanner" style="display:none">
+  <div class="inv-ico">👤</div>
+  <div class="inv-tx">
+    <strong>¿Eres socio de Atlético Norte?</strong>
+    <span>Accede a tu perfil, equipo y estadísticas</span>
+  </div>
+  <button class="inv-cta" onclick="openL()">Entrar</button>
+  <span class="inv-cl" onclick="document.getElementById('invBanner').style.display='none'" title="Cerrar">×</span>
+</div>
+
+<!-- Modal: Verificación de datos (socio encontrado en BD) -->
+<div class="mo" id="mVerify">
+  <div class="md"><div class="mh"><span class="mt">✅ Bienvenido, socio</span><button class="mcl" onclick="cM('mVerify')">✕</button></div>
+  <div class="mb">
+    <div id="verifyStatus" style="margin-bottom:12px"></div>
+    <div id="verifyFields"></div>
+    <div class="privacy-box">
+      <strong>📋 Política de Tratamiento de Datos</strong>
+      Los datos que nos compartes serán usados exclusivamente para la gestión deportiva y administrativa de Atlético Norte F.C., conforme a la Ley 1581 de 2012. No compartiremos tu información con terceros sin tu autorización.
+      <label class="privacy-check"><input type="checkbox" id="verifyPrivOk"> Acepto la política de tratamiento de datos personales</label>
+    </div>
+    <div class="mer" id="verifyErr" style="display:none"></div>
+    <button class="sb2" onclick="doVerify()">Confirmar y Entrar</button>
+    <button class="cb" onclick="cM('mVerify')">Cancelar</button>
+  </div></div>
+</div>
+
+<!-- Modal: Registro nuevo (cédula no encontrada) -->
+<div class="mo" id="mRegNew">
+  <div class="md"><div class="mh"><span class="mt">📝 Registro de Socio</span><button class="mcl" onclick="cM('mRegNew')">✕</button></div>
+  <div class="mb">
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;color:#fbbf24;line-height:1.55">
+      <strong style="display:block;margin-bottom:4px;font-size:12px">⚠️ Datos no encontrados</strong>
+      Tu cédula no está en nuestra base de datos. En enero de 2026 compartimos un formulario de actualización en la comunidad. Si no lo diligenciaste, debes registrarte ahora — es obligatorio para participar en la liga.
+    </div>
+    <div class="fg"><label class="fl">Nombre completo</label><input class="fi" id="rnNombre" placeholder="Ej: Juan Carlos Pérez Gómez" autocomplete="name"></div>
+    <div class="fg"><label class="fl">Teléfono / WhatsApp</label><input class="fi" id="rnTel" inputmode="tel" type="tel" placeholder="Ej: 3001234567"></div>
+    <div class="fg"><label class="fl">Correo electrónico</label><input class="fi" id="rnEmail" inputmode="email" type="email" placeholder="Ej: juan@correo.com"></div>
+    <div class="fg"><label class="fl">Posición de juego</label>
+      <select class="fi" id="rnPos">
+        <option value="">Seleccionar...</option>
+        <option>ARQUERO</option><option>DEFENSA</option><option>MEDIOCAMPISTA</option><option>DELANTERO</option>
+      </select>
+    </div>
+    <div class="privacy-box">
+      <strong>📋 Política de Tratamiento de Datos</strong>
+      Tus datos serán tratados exclusivamente para la gestión deportiva de Atlético Norte F.C., con base en la Ley 1581 de 2012. Podrás solicitar corrección o eliminación de tus datos en cualquier momento al administrador del club.
+      <label class="privacy-check"><input type="checkbox" id="regPrivOk"> Acepto la política de tratamiento de datos personales</label>
+    </div>
+    <div class="mer" id="regNewErr" style="display:none"></div>
+    <button class="sb2" onclick="doRegNew()">Registrarme y Entrar</button>
+    <button class="cb" onclick="cM('mRegNew')">Cancelar</button>
+  </div></div>
+</div>
+
+<!-- Modal: Contactar al Club -->
+<div class="mo" id="mContact">
+  <div class="md"><div class="mh"><span class="mt" id="mContactT">Atlético Norte F.C.</span><button class="mcl" onclick="cM('mContact')">✕</button></div>
+  <div class="mb">
+    <div class="contact-hero">
+      <span class="contact-shield">🛡️</span>
+      <div class="contact-title" id="contactTitle"></div>
+      <div class="contact-sub" id="contactSub"></div>
+    </div>
+    <div id="contactBadge" style="text-align:center;margin-bottom:2px"></div>
+    <div class="contact-card" id="contactCard"></div>
+    <a class="wa-btn" id="contactWaBtn" href="#" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.27 2 2 8.27 2 16c0 2.44.65 4.73 1.78 6.72L2 30l7.5-1.75A13.93 13.93 0 0016 30c7.73 0 14-6.27 14-14S23.73 2 16 2zm0 25.5c-2.2 0-4.26-.6-6.03-1.63l-.43-.26-4.45 1.04 1.06-4.34-.28-.45A11.47 11.47 0 014.5 16C4.5 9.6 9.6 4.5 16 4.5c6.4 0 11.5 5.1 11.5 11.5 0 6.4-5.1 11.5-11.5 11.5zm6.3-8.62c-.35-.17-2.05-1.01-2.37-1.13-.32-.11-.55-.17-.78.17-.23.35-.89 1.13-1.09 1.36-.2.23-.4.26-.74.09-.35-.17-1.47-.54-2.8-1.73-1.03-.92-1.73-2.06-1.93-2.41-.2-.35-.02-.53.15-.7.15-.15.35-.4.52-.6.17-.2.23-.35.35-.58.11-.23.06-.44-.03-.61-.09-.17-.78-1.87-1.06-2.56-.28-.67-.56-.58-.78-.59H9.8c-.23 0-.61.09-.93.44-.32.35-1.22 1.2-1.22 2.92s1.25 3.38 1.42 3.62c.17.23 2.46 3.76 5.96 5.27.83.36 1.48.57 1.99.73.84.27 1.6.23 2.2.14.67-.1 2.05-.84 2.34-1.65.29-.8.29-1.49.2-1.63-.08-.14-.31-.23-.65-.4z"/></svg>
+      <span><span style="display:block" id="contactWaTx">Escribir al Club</span><span class="wa-btn-sub" id="contactWaSub">Atlético Norte F.C. · WhatsApp</span></span>
+    </a>
+    <div class="contact-divider">o</div>
+    <button class="cb" onclick="cM('mContact')">Volver al inicio</button>
+  </div></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
@@ -1005,7 +1203,6 @@ window.addEventListener("load",function(){
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
     au.onAuthStateChanged(async function(u){
       if(u){
-        // Set up data listeners only after auth is confirmed — ensures Firebase rules pass
         setupFirebaseListeners();
         var c=u.email.replace("@atleticonorte.co","");
         var s=await db.ref("/socios/"+c).get();
@@ -1014,14 +1211,27 @@ window.addEventListener("load",function(){
         var rolMap={"administrador":"Administrador","coordinador deportivo":"Coordinador Deportivo","coordinador financiero":"Coordinador Financiero","socio":"Socio"};
         cr=rolMap[rawRol.toLowerCase()]||rawRol;
         onIn();
+        // Post-login routing (after short delay so UI settles)
+        setTimeout(function(){
+          _pendingCedula=c;
+          // Red socios: in DB but no team AND not an admin/coordinator
+          var isStaff=cr==='Administrador'||cr==='Coordinador Deportivo'||cr==='Coordinador Financiero';
+          var noTeam=!pf.equipo||pf.equipo===0||pf.equipo==='0';
+          if(!isStaff && noTeam){
+            openContactModal('no_team', c, pf.nombre||null);
+          }else if(!pf.privacyOk){
+            if(s.exists()){openVerifyModal(c,pf);}
+            else{openRegNewModal(c);}
+          }
+        },800);
       }else onOut();
     });
   }catch(e){
     console.warn("Firebase init failed:",e.message);
-    // Show static content without Firebase data
     rFx();rTb();rDlg(DLG_DEF);
     var sh=document.getElementById("anShield");
     if(sh&&!_lsClub){sh.className='hshield';sh.innerHTML=AN_SVG;}
+    setTimeout(function(){var b=document.getElementById('invBanner');if(b)b.style.display='flex';},3000);
   }
 });
 
@@ -1069,6 +1279,7 @@ function updHdr(){
 }
 
 // ── AUTH ──
+var _pendingCedula=null,_pendingEdits={};
 async function doLo(){
   var c=document.getElementById("iCed").value.trim();
   var errEl=document.getElementById("lErr");
@@ -1078,29 +1289,149 @@ async function doLo(){
     errEl.textContent="Ingresa un número de cédula válido.";errEl.style.display="block";return;
   }
   spin.style.display="block";
+  _pendingCedula=c;
   if(!fbR){cu=c;cr="Socio";pf={cedula:c,nombre:"Demo "+c};spin.style.display="none";cM("mLo");onIn();return;}
+  // Auth first — no DB read before login (avoids Permission denied)
+  var email=c+"@atleticonorte.co",pass=c+"_AN26";
   try{
-    // 1. Verificar que la cédula está registrada en la base de datos
-    var snap=await db.ref("/socios/"+c).get();
-    if(!snap.exists()){
-      spin.style.display="none";
-      errEl.textContent="Cédula no registrada. Contacta al administrador.";errEl.style.display="block";return;
-    }
-    var socio=snap.val();
-    var email=c+"@atleticonorte.co";
-    var pass=c+"_AN26";          // contraseña fija derivada de la cédula
-    // 2. Intentar login; si no existe la cuenta en Auth, crearla automáticamente
-    try{
-      await au.signInWithEmailAndPassword(email,pass);
-    }catch(e2){
-      if(e2.code==="auth/user-not-found"||e2.code==="auth/invalid-credential"||e2.code==="auth/invalid-email"){
-        await au.createUserWithEmailAndPassword(email,pass);
-      }else{throw e2;}
-    }
+    await au.signInWithEmailAndPassword(email,pass);
+    // onAuthStateChanged handles the rest
+    spin.style.display="none";
     cM("mLo");
   }catch(e){
     spin.style.display="none";
-    errEl.textContent="Error al ingresar: "+e.message;errEl.style.display="block";
+    if(e.code==="auth/user-not-found"||e.code==="auth/invalid-credential"||e.code==="auth/invalid-login-credentials"){
+      cM("mLo");
+      openContactModal('not_found', c, null);
+    }else if(e.code==="auth/wrong-password"){
+      errEl.textContent="Error de acceso. Contacta al administrador.";errEl.style.display="block";
+    }else{
+      errEl.textContent="Error: "+e.message;errEl.style.display="block";
+    }
+  }
+}
+
+function openVerifyModal(cedula,socio){
+  _pendingEdits={};
+  var isFull=!!(socio.nombre&&socio.equipo);
+  var badge=isFull?'<span class="badge-found full">✅ Datos completos</span>':'<span class="badge-found partial">⚠️ Datos parciales</span>';
+  var msg=isFull
+    ?'<div style="font-size:11px;color:var(--m);margin-top:8px;line-height:1.5">Encontramos tus datos registrados en enero 2026. Verifica que todo esté correcto. Si algo cambió, edítalo y guarda.</div>'
+    :'<div style="font-size:11px;color:var(--m);margin-top:8px;line-height:1.5">Tenemos algunos de tus datos. Completa los que faltan para acceder a todas las funciones.</div>';
+  document.getElementById('verifyStatus').innerHTML=badge+msg;
+  var fields=[
+    {key:'nombre',label:'Nombre completo',val:socio.nombre||'',editable:true},
+    {key:'telefono',label:'Teléfono / WhatsApp',val:socio.telefono||'',editable:true},
+    {key:'email',label:'Correo electrónico',val:socio.email||'',editable:true},
+    {key:'equipo',label:'Equipo',val:socio.equipo?tn(socio.equipo):'Por asignar',editable:false},
+    {key:'posicion',label:'Posición',val:socio.posicion||socio.pos||'—',editable:true}
+  ];
+  var h=fields.map(function(f){
+    if(f.editable){
+      return '<div class="data-row"><div class="data-lbl">'+f.label+'</div>'+
+        '<input class="data-val editable" style="background:transparent;border:none;outline:none;width:100%;font-size:13px;font-weight:700;color:var(--t)" '+
+        'data-key="'+f.key+'" value="'+escHtml(f.val)+'" placeholder="Sin datos" oninput="_pendingEdits[this.dataset.key]=this.value"></div>';
+    }
+    return '<div class="data-row"><div class="data-lbl">'+f.label+'</div><div class="data-val">'+escHtml(f.val)+'</div></div>';
+  }).join('');
+  document.getElementById('verifyFields').innerHTML=h;
+  document.getElementById('verifyPrivOk').checked=!!(socio.privacyOk);
+  document.getElementById('verifyErr').style.display='none';
+  openM('mVerify');
+}
+
+async function doVerify(){
+  if(!document.getElementById('verifyPrivOk').checked){
+    var e=document.getElementById('verifyErr');e.textContent='Debes aceptar la política de tratamiento de datos.';e.style.display='block';return;
+  }
+  var c=_pendingCedula;
+  var e=document.getElementById('verifyErr');e.style.display='none';
+  try{
+    // Save edits + audit
+    var updates=Object.assign({},_pendingEdits,{privacyOk:true,privacyTs:Date.now()});
+    if(Object.keys(_pendingEdits).length>0){
+      updates._auditLog=firebase.database.ServerValue.TIMESTAMP; // crude; full audit via push
+      await db.ref('/socios/'+c).update(updates);
+      // Audit trail
+      await db.ref('/auditSocios/'+c).push({ts:Date.now(),cambios:_pendingEdits,cedula:c});
+    }else{
+      await db.ref('/socios/'+c+'/privacyOk').set(true);
+    }
+    await loginWithCedula(c);
+    cM('mVerify');
+  }catch(err){e.textContent='Error: '+err.message;e.style.display='block';}
+}
+
+function openRegNewModal(cedula){
+  document.getElementById('rnNombre').value='';
+  document.getElementById('rnTel').value='';
+  document.getElementById('rnEmail').value='';
+  document.getElementById('rnPos').value='';
+  document.getElementById('regPrivOk').checked=false;
+  document.getElementById('regNewErr').style.display='none';
+  openM('mRegNew');
+}
+
+// ── Contact Club modal ──
+// type: 'no_team' | 'not_found'
+function openContactModal(type, cedula, nombre){
+  var WA='https://wa.me/573171030787?text=';
+  var title,sub,card,waTx,waSub,waMsg,badge='';
+  var nom=nombre?(' - '+nombre):'';
+  if(type==='no_team'){
+    title='Tu registro está en proceso';
+    sub='Tu cédula está en nuestra base de datos, pero aún no tienes equipo asignado para esta temporada.';
+    badge='<span class="contact-id">⚠️ Sin equipo asignado · CC '+cedula+'</span>';
+    card='<strong>¿Qué significa esto?</strong><br>Participaste en el proceso de inscripción de la Liga Interna S2 2026, pero no quedaste asignado a ningún equipo en el sorteo oficial.<br><br>Escríbenos por WhatsApp y un coordinador del club te informará sobre tu situación y los próximos pasos.';
+    waTx='Consultar mi situación';
+    waSub='Respuesta en horario hábil';
+    waMsg='Hola Atlético Norte F.C. 🏆\n\nSoy socio del club' +nom+', cédula CC '+cedula+'.\n\nIngresé a la app de la Liga Interna S2 2026 y aparezco registrado pero *sin equipo asignado*.\n\nQuisiera saber cuál es mi situación para esta temporada y cuáles son los próximos pasos.\n\nGracias.';
+  }else{
+    title='Cédula no encontrada';
+    sub='No encontramos tu cédula en la base de datos de socios del club.';
+    badge='<span class="contact-id">🔍 CC '+cedula+' · No registrada</span>';
+    card='<strong>¿Primera vez en el club?</strong><br>Si eres nuevo o crees que deberías estar registrado, comunícate con nosotros. Un coordinador verificará tu caso y te indicará cómo proceder.<br><br>También puedes escribirnos si tienes alguna duda, trámite o consulta general sobre Atlético Norte F.C.';
+    waTx='Contactar al Club';
+    waSub='Soporte · Información · Trámites';
+    waMsg='Hola Atlético Norte F.C. 🏆\n\nIntenté ingresar a la aplicación oficial de la Liga Interna S2 2026 con la cédula CC '+cedula+' y *no aparezco en el sistema*.\n\nQuisiera información sobre:\n• Cómo registrarme como socio\n• Mi situación con el club\n• Próximos pasos\n\nGracias.';
+  }
+  document.getElementById('contactTitle').textContent=title;
+  document.getElementById('contactSub').textContent=sub;
+  document.getElementById('contactBadge').innerHTML=badge;
+  document.getElementById('contactCard').innerHTML=card;
+  document.getElementById('contactWaTx').textContent=waTx;
+  document.getElementById('contactWaSub').textContent=waSub;
+  document.getElementById('contactWaBtn').href=WA+encodeURIComponent(waMsg);
+  openM('mContact');
+}
+
+async function doRegNew(){
+  var nombre=document.getElementById('rnNombre').value.trim();
+  var tel=document.getElementById('rnTel').value.trim();
+  var email=document.getElementById('rnEmail').value.trim();
+  var pos=document.getElementById('rnPos').value;
+  var privOk=document.getElementById('regPrivOk').checked;
+  var e=document.getElementById('regNewErr');e.style.display='none';
+  if(!nombre){e.textContent='El nombre es obligatorio.';e.style.display='block';return;}
+  if(!privOk){e.textContent='Debes aceptar la política de tratamiento de datos.';e.style.display='block';return;}
+  var c=_pendingCedula;
+  try{
+    var data={cedula:c,nombre:nombre,telefono:tel,email:email,posicion:pos,equipo:0,
+      privacyOk:true,privacyTs:Date.now(),registradoTs:Date.now(),fuente:'self-register'};
+    await db.ref('/socios/'+c).set(data);
+    await loginWithCedula(c);
+    cM('mRegNew');
+  }catch(err){e.textContent='Error: '+err.message;e.style.display='block';}
+}
+
+async function loginWithCedula(c){
+  var email=c+"@atleticonorte.co",pass=c+"_AN26";
+  try{
+    await au.signInWithEmailAndPassword(email,pass);
+  }catch(e2){
+    if(e2.code==="auth/user-not-found"||e2.code==="auth/invalid-credential"||e2.code==="auth/invalid-email"||e2.code==="auth/wrong-password"){
+      await au.createUserWithEmailAndPassword(email,pass);
+    }else{throw e2;}
   }
 }
 async function doCp(){
@@ -1122,17 +1453,14 @@ async function doLt(){if(fbR)await au.signOut();onOut();}
 function onIn(){
   document.getElementById("btnIn").style.display="none";
   document.getElementById("btnPn").style.display="flex";
+  document.getElementById("invBanner").style.display="none";
   var isAdm=cr==="Administrador"||cr==="Coordinador Financiero";
   document.getElementById("admBk").style.display=(isAdm||cEd())?"block":"none";
   document.getElementById("sortBk").style.display=isAdm?"block":"none";
   document.getElementById("admRlTg").textContent=cr;
   rFx();rTb();
   rPn();
-  // Init live notifications
-  setTimeout(function(){
-    initLiveGoalListener();
-    initPush();
-  },1500);
+  setTimeout(function(){initLiveGoalListener();initPush();},1500);
   if(!pf.passChanged)setTimeout(function(){openM("mCp");},1000);
 }
 function onOut(){
@@ -1142,6 +1470,11 @@ function onOut(){
   document.getElementById("admBk").style.display="none";
   document.getElementById("sortBk").style.display="none";
   showTab("inicio");
+  // Show invite banner after 3s to let page settle
+  setTimeout(function(){
+    var b=document.getElementById('invBanner');
+    if(b&&!cu)b.style.display='flex';
+  },3000);
 }
 
 // ── FIXTURE ──
@@ -1311,11 +1644,17 @@ function oRs(id){
   cri=id;var m=MF.find(function(x){return x.id===id;});if(!m)return;
   document.getElementById("rMI").innerHTML=tn(m.l)+' <span style="color:var(--dm)">vs</span> '+tn(m.v)+'<br><small style="font-weight:400;color:var(--m)">'+dw(m.fecha)+' '+fd(m.fecha)+' &middot; '+m.hora+' &middot; '+m.cancha+"</small>";
   var r=res[id];
-  // Reset to normal mode
   curWOWinner=null;
   if(r&&r.wo){setRType('wo');curWOWinner=r.woWinner;updWOBtns();}
-  else{setRType('normal');document.getElementById("rL").value=r?r.l:0;document.getElementById("rV").value=r?r.v:0;
-    document.getElementById("rSc").value=r&&r.scorers?r.scorers.map(function(s){return s.name+", "+s.team+", "+s.goals;}).join("\n"):"";}
+  else{
+    setRType('normal');
+    document.getElementById("rL").value=r?r.l:0;
+    document.getElementById("rV").value=r?r.v:0;
+    // Restore saved events
+    _evGoals=r&&r.scorers?r.scorers.map(function(s){return{name:s.name,teamId:s.teamId||0,corto:s.name};}):[];
+    _evYellows=r&&r.yellows?r.yellows.slice():[]; _evReds=r&&r.reds?r.reds.slice():[];
+    loadPickerRosters(m.l,m.v);
+  }
   shEvtPanel();
   openM("mRs");
 }
@@ -1323,42 +1662,36 @@ async function doSR(){
   var data;
   if(curRType==='wo'){
     if(!curWOWinner){alert('Selecciona qué equipo gana por W');return;}
-    // Winner gets 3-0, loser gets 0-3 (standard walkover score)
     var l=curWOWinner==='l'?3:0,v=curWOWinner==='v'?3:0;
     data={l:l,v:v,scorers:[],wo:true,woWinner:curWOWinner,ts:Date.now()};
   }else{
     var l=parseInt(document.getElementById("rL").value)||0,v=parseInt(document.getElementById("rV").value)||0;
-    var sc=document.getElementById("rSc").value.trim();
-    var sc2=sc?sc.split("\n").filter(Boolean).map(function(ln){var p=ln.split(",").map(function(s){return s.trim();});return{name:p[0]||"",team:p[1]||"",goals:parseInt(p[2])||1};}):[];
-    data={l:l,v:v,scorers:sc2,ts:Date.now()};
+    var m=MF.find(function(x){return x.id===cri;});
+    // Build scorers from _evGoals array
+    var sc2=_evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
+    data={l:l,v:v,scorers:sc2,yellows:_evYellows.slice(),reds:_evReds.slice(),ts:Date.now()};
   }
   if(fbR&&db){
     await db.ref("/resultados/"+cri).set(data);
-    // Disparar push y toast para goles nuevos
-    if(!curRType||curRType!=='wo'){
+    if(curRType!=='wo'){
       var m=MF.find(function(x){return x.id===cri;});
       if(m&&data.scorers&&data.scorers.length){
         var prev=res[cri];var prevSc=prev&&prev.scorers?prev.scorers:[];
         var newSc=data.scorers.slice(prevSc.length);
         if(newSc.length){
-          // Toast en pantalla para quien tenga la app abierta
+          var scoreStr=data.l+'-'+data.v;
           newSc.forEach(function(s){
-            showToast('goal','⚽ GOL — '+tn(s.team==='Local'?m.l:m.v),
-              s.name+' · '+data.l+'-'+data.v+' ('+tn(m.l)+' vs '+tn(m.v)+')',6000,'#10b981');
+            var tId=s.teamId||(s.team==='Local'?m.l:m.v);
+            showToast('goal','⚽ GOL — '+tn(tId),s.name+' · '+scoreStr+' ('+tn(m.l)+' vs '+tn(m.v)+')',6000,'#10b981');
           });
-          // Push a /liveGoals (para socios con app abierta)
-          await db.ref("/liveGoals").push({mid:cri,scorer:data.scorers[data.scorers.length-1],
-            lTeam:m.l,vTeam:m.v,score:data.l+'-'+data.v,ts:Date.now()});
-          // Push a /pushQueue → Cloud Function lo envía a quienes tengan app cerrada
+          var lastScorer=newSc[newSc.length-1];
+          triggerGoalAnim(lastScorer.name||(lastScorer.corto||''),data.l+'-'+data.v,tn(m.l)+' vs '+tn(m.v));
+          await db.ref("/liveGoals").push({mid:cri,scorer:lastScorer,lTeam:m.l,vTeam:m.v,score:scoreStr,ts:Date.now()});
           newSc.forEach(function(s){
-            var tId=s.team==='Local'?m.l:m.v;
-            db.ref('/pushQueue').push({
-              type:'goal',
-              title:'⚽ GOL — '+tn(tId),
-              body:s.name+' anota · '+tn(m.l)+' '+data.l+' - '+data.v+' '+tn(m.v),
-              tag:'goal-'+cri+'-'+Date.now(),
-              teamId:0          // 0 = todos los socios reciben
-            });
+            var tId=s.teamId||(s.team==='Local'?m.l:m.v);
+            db.ref('/pushQueue').push({type:'goal',title:'⚽ GOL — '+tn(tId),
+              body:(s.name||s.corto)+' anota · '+tn(m.l)+' '+data.l+' - '+data.v+' '+tn(m.v),
+              tag:'goal-'+cri+'-'+Date.now(),teamId:0});
           });
         }
       }
@@ -2990,38 +3323,137 @@ async function pushInicioPartido(m){
     tag:'kickoff-'+m.id,teamId:0,ts:Date.now()});
 }
 
+// ── Event arrays for result modal ──
+var _evGoals=[],_evYellows=[],_evReds=[];
+var _curEvtTab='goal';
+var _pickerRosters={l:[],v:[]};  // {name,corto,teamId}
+var _evtType=null,_evtPickerSel=null;
+
+function loadPickerRosters(lId,vId){
+  _pickerRosters={l:[],v:[]};
+  _evGoals=[];_evYellows=[];_evReds=[];
+  _curEvtTab='goal';
+  // Load from Firebase, fallback to empty
+  var done=0;
+  function tryLoad(teamId,side){
+    if(!fbR||!db){renderPickerPanel();return;}
+    db.ref('/equipos/'+teamId+'/jugadores').once('value').then(function(s){
+      var pl=[];
+      s.forEach(function(c){var v=c.val();pl.push({name:v.nombre||v.name||c.key,corto:v.corto||(v.nombre||v.name||c.key),teamId:teamId});});
+      pl.sort(function(a,b){return a.corto.localeCompare(b.corto);});
+      _pickerRosters[side]=pl;
+      if(++done===2)renderPickerPanel();
+    }).catch(function(){if(++done===2)renderPickerPanel();});
+  }
+  tryLoad(lId,'l'); tryLoad(vId,'v');
+}
+
+function setEvtTab(tab,btn){
+  _curEvtTab=tab;
+  document.querySelectorAll('.evt-tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  renderPickerPanel();
+}
+
+function renderPickerPanel(){
+  var m=MF.find(function(x){return x.id===cri;});if(!m)return;
+  var panel=document.getElementById('pickerPanel');if(!panel)return;
+  var selClass='sel-'+_curEvtTab;
+  var arr=_curEvtTab==='goal'?_evGoals:_curEvtTab==='yellow'?_evYellows:_evReds;
+  var selectedNames=arr.map(function(e){return e.name+e.teamId;});
+  function teamSection(side,label){
+    var players=_pickerRosters[side];
+    var teamId=side==='l'?m.l:m.v;
+    var chips=players.length?players.map(function(p){
+      var isOn=selectedNames.indexOf(p.name+p.teamId)>=0;
+      return '<button class="pchip'+(isOn?' '+selClass:'')+'" onclick="toggleEvtChip(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+')">'+escHtml(p.corto)+'</button>';
+    }).join(''):'<span style="font-size:10px;color:var(--m)">Sin jugadores registrados</span>';
+    return '<div class="picker-team"><div class="picker-team-hdr"><span style="color:var(--ac)">'+label+'</span> '+escHtml(tn(teamId))+'</div><div class="picker-chips">'+chips+'</div></div>';
+  }
+  panel.innerHTML=teamSection('l','LOCAL')+'<div style="height:2px;background:var(--bd);margin:6px 0;border-radius:2px"></div>'+teamSection('v','VISITA');
+  renderEvtLog();
+}
+
+function escHtml(s){return String(s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]||c;});}
+
+function toggleEvtChip(name,corto,teamId){
+  var arr=_curEvtTab==='goal'?_evGoals:_curEvtTab==='yellow'?_evYellows:_evReds;
+  var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
+  if(idx>=0){arr.splice(idx,1);}else{arr.push({name:name,corto:corto,teamId:teamId});}
+  renderPickerPanel();
+}
+
+function renderEvtLog(){
+  var log=document.getElementById('evtLog');if(!log)return;
+  var all=[];
+  _evGoals.forEach(function(e){all.push('<span class="evt-pill goal-pill">⚽ '+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'goal\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
+  _evYellows.forEach(function(e){all.push('<span class="evt-pill yellow-pill">🟨 '+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'yellow\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
+  _evReds.forEach(function(e){all.push('<span class="evt-pill red-pill">🟥 '+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'red\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
+  log.innerHTML=all.join('');
+}
+
+function removeEvt(type,name,teamId){
+  var arr=type==='goal'?_evGoals:type==='yellow'?_evYellows:_evReds;
+  var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
+  if(idx>=0){arr.splice(idx,1);}
+  renderPickerPanel();
+}
+
+// ── Goal Celebration ──
+function triggerGoalAnim(scorerName,scoreStr,matchStr){
+  var el=document.getElementById('goalAnim');if(!el)return;
+  document.getElementById('goalAnimScorer').textContent=scorerName;
+  document.getElementById('goalAnimScore').textContent=scoreStr+' · '+matchStr;
+  // Reset animations by replacing node
+  var ball=el.querySelector('.goal-ball');
+  var clone=ball.cloneNode(true);ball.parentNode.replaceChild(clone,ball);
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},5000);
+}
+function hideGoalAnim(){document.getElementById('goalAnim').classList.remove('show');}
+
 // ── Panel eventos en vivo (tarjetas / inicio) ──
-var _evtType=null;
 function shEvtPanel(){
   var isAdm=cr==='Administrador'||cr==='Coordinador Deportivo';
   document.getElementById('evtLive').style.display=isAdm?'block':'none';
   document.getElementById('evtForm').style.display='none';
-  _evtType=null;
-  // Poblar select de equipos con los 2 del partido actual
-  var m=MF.find(function(x){return x.id===cri;});
-  if(!m)return;
-  var sel=document.getElementById('evtEquipo');
-  sel.innerHTML='<option value="'+m.l+'">'+tn(m.l)+' (Local)</option>'+
-                '<option value="'+m.v+'">'+tn(m.v)+' (Visitante)</option>';
+  _evtType=null;_evtPickerSel=null;
 }
 function shTarjeta(tipo){
-  _evtType=tipo;
-  document.getElementById('evtJugador').value='';
-  document.getElementById('evtBtn').textContent=tipo==='yellow'?'Enviar 🟨 Tarjeta Amarilla':'Enviar 🟥 Tarjeta Roja';
+  _evtType=tipo;_evtPickerSel=null;
+  var m=MF.find(function(x){return x.id===cri;});if(!m)return;
+  var panel=document.getElementById('evtChipPanel');if(!panel)return;
+  var lPlayers=_pickerRosters.l||[];var vPlayers=_pickerRosters.v||[];
+  function chipRow(players,teamId,label){
+    if(!players.length)return '<div style="font-size:10px;color:var(--m);margin-bottom:6px">'+escHtml(label)+': sin jugadores</div>';
+    return '<div class="picker-team"><div class="picker-team-hdr">'+escHtml(label)+'</div><div class="picker-chips">'+
+      players.map(function(p){return '<button class="pchip" id="ecp-'+teamId+'-'+escHtml(p.name).replace(/\s/g,'_')+'" onclick="selEvtChip(this,\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+teamId+')">'+escHtml(p.corto)+'</button>';}).join('')+
+      '</div></div>';
+  }
+  panel.innerHTML=chipRow(lPlayers,m.l,tn(m.l)+' (Local)')+chipRow(vPlayers,m.v,tn(m.v)+' (Visita)');
+  var btn=document.getElementById('evtBtn');
+  btn.textContent=tipo==='yellow'?'Enviar 🟨 Amarilla':'Enviar 🟥 Expulsión';
+  btn.style.display='none';
   document.getElementById('evtForm').style.display='block';
+}
+function selEvtChip(el,name,corto,teamId){
+  document.querySelectorAll('#evtChipPanel .pchip').forEach(function(b){b.classList.remove('sel-yellow','sel-red');});
+  var cls=_evtType==='yellow'?'sel-yellow':'sel-red';
+  el.classList.add(cls);
+  _evtPickerSel={name:name,corto:corto,teamId:teamId};
+  document.getElementById('evtBtn').style.display='block';
 }
 function shInicioPartido(){
   var m=MF.find(function(x){return x.id===cri;});
   if(m)pushInicioPartido(m);
 }
 async function doEvt(){
-  var jugador=document.getElementById('evtJugador').value.trim();
-  var equipoId=parseInt(document.getElementById('evtEquipo').value);
-  if(!jugador){alert('Escribe el nombre del jugador');return;}
-  if(_evtType==='yellow')await pushTarjetaAmarilla(jugador,equipoId);
-  else if(_evtType==='red')await pushTarjetaRoja(jugador,equipoId);
+  if(!_evtPickerSel){alert('Selecciona un jugador');return;}
+  var p=_evtPickerSel,name=p.name,corto=p.corto,teamId=p.teamId;
+  if(_evtType==='yellow')await pushTarjetaAmarilla(corto||name,teamId);
+  else if(_evtType==='red')await pushTarjetaRoja(corto||name,teamId);
   document.getElementById('evtForm').style.display='none';
-  document.getElementById('evtJugador').value='';
+  _evtPickerSel=null;_evtType=null;
 }
 
 async function sendAdminPush(title,body,targetTeam){
