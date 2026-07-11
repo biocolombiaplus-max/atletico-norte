@@ -219,6 +219,9 @@ async function doAuth(){
       if(nom&&!pf.nombre)await db.ref('/socios/'+c+'/nombre').set(nom);
       okEl.textContent='✅ Autenticado: '+(pf.nombre||nom||c)+' · '+pf.rol;
     }
+    // Register UID in /admins index — security rules use auth.uid to check admin access
+    var uid=au.currentUser.uid;
+    await db.ref('/admins/'+uid).set(true);
     okEl.style.display='block';
     document.getElementById('step1').querySelector('button').disabled=true;
     document.getElementById('step2').style.display='block';
@@ -284,7 +287,7 @@ function parseCSVRow(line){
   var result=[],cur='',inQ=false;
   for(var i=0;i<line.length;i++){
     var ch=line[i];
-    if(ch==='"'){inQ=!inQ;}
+    if(ch=='"'){inQ=!inQ;}
     else if(ch===_delim&&!inQ){result.push(cur.trim());cur='';}
     else{cur+=ch;}
   }
@@ -357,7 +360,7 @@ function showPreview(){
 
   document.getElementById('previewCount').textContent=parsedSocios.length+' socios';
   var warnEl=document.getElementById('previewWarn');
-  if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas ignoradas: '+errs.slice(0,3).join('; ')+(errs.length>3?' ...'  :'');warnEl.style.display='block';}
+  if(errs.length){warnEl.textContent='⚠️ '+errs.length+' filas ignoradas: '+errs.slice(0,3).join('; ')+(errs.length>3?' ...':'');warnEl.style.display='block';}
   else{warnEl.style.display='none';}
 
   var tbody=document.getElementById('previewBody');
