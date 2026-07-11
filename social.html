@@ -478,36 +478,91 @@ function hexPat(ctx,alpha=.02){
 }
 
 function bgCinematic(ctx){
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#030508'],[.4,'#06090f'],[.8,'#04070c'],[1,'#020408']));
-  rGlow(ctx,W/2,-120,960,'rgba(200,16,46,.3)');
-  rGlow(ctx,W*.12,H*.48,640,'rgba(180,10,30,.12)');
-  rGlow(ctx,W*.88,H*.52,560,'rgba(0,80,160,.14)');
-  rGlow(ctx,W/2,H*1.05,700,'rgba(255,215,0,.07)');
-  ctx.save();ctx.globalAlpha=.035;
-  for(let i=0;i<8;i++){ctx.fillStyle='#fff';ctx.beginPath();const x=W*.05+i*W*.13,w=18+i*8;ctx.moveTo(x,0);ctx.lineTo(x+w,0);ctx.lineTo(x+w+H*.45,H);ctx.lineTo(x+H*.45,H);ctx.closePath();ctx.fill();}
+  // Deep black with dramatic red spotlight from top + subtle film-grain look
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#080006'],[.35,'#0a000a'],[.7,'#040008'],[1,'#020004']));
+  rGlow(ctx,W/2,-60,1100,'rgba(200,16,46,.42)');
+  rGlow(ctx,W*.08,H*.38,700,'rgba(180,10,30,.18)');
+  rGlow(ctx,W*.92,H*.42,600,'rgba(90,0,160,.16)');
+  rGlow(ctx,W/2,H*.85,650,'rgba(255,215,0,.09)');
+  // Wide diagonal light rays
+  ctx.save();ctx.globalAlpha=.04;ctx.fillStyle='#fff';
+  for(let i=0;i<6;i++){const x=W*.05+i*W*.16,w=22+i*12;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+w,0);ctx.lineTo(x+w+H*.5,H);ctx.lineTo(x+H*.5,H);ctx.closePath();ctx.fill();}
   ctx.restore();
-  ctx.save();ctx.globalAlpha=.05;ctx.fillStyle='#fff';for(let x=0;x<W;x+=52)for(let y=0;y<H;y+=52){ctx.beginPath();ctx.arc(x,y,1,0,Math.PI*2);ctx.fill();}ctx.restore();
-  vignette(ctx,.65);
+  // Fine dot grain
+  ctx.save();ctx.globalAlpha=.04;ctx.fillStyle='#ff4444';
+  for(let x=0;x<W;x+=44)for(let y=0;y<H;y+=44){ctx.beginPath();ctx.arc(x+(y%88<44?22:0),y,1,0,Math.PI*2);ctx.fill();}
+  ctx.restore();
+  vignette(ctx,.7);
 }
 function bgStadium(ctx){
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#030810'],[.5,'#060e1e'],[1,'#030810']));
-  rGlow(ctx,W/2,0,820,'rgba(200,16,46,.22)');rGlow(ctx,W/2,H,600,'rgba(0,60,130,.16)');
-  ctx.save();ctx.globalAlpha=.028;ctx.strokeStyle='#fff';ctx.lineWidth=1;
-  for(let x=-H;x<W+H;x+=55){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+H,H);ctx.stroke();}ctx.restore();
-  hexPat(ctx,.022);vignette(ctx,.6);
+  // Warm amber stadium floodlights — looks like a real night match
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#0e0800'],[.3,'#1a0e02'],[.7,'#0e0a04'],[1,'#060400']));
+  // Four corner floodlights
+  rGlow(ctx,W*.12,H*.08,680,'rgba(255,185,30,.26)');
+  rGlow(ctx,W*.88,H*.08,680,'rgba(255,185,30,.26)');
+  rGlow(ctx,W*.06,H*.92,480,'rgba(255,140,0,.14)');
+  rGlow(ctx,W*.94,H*.92,480,'rgba(255,140,0,.14)');
+  // Center warm glow
+  rGlow(ctx,W/2,H*.18,820,'rgba(255,165,20,.18)');
+  rGlow(ctx,W/2,H*.55,600,'rgba(200,16,46,.24)');
+  // Subtle crowd rows pattern
+  ctx.save();ctx.globalAlpha=.018;ctx.fillStyle='#f5b800';
+  for(let y=H*.6;y<H*.88;y+=18)for(let x=20;x<W-20;x+=24){ctx.beginPath();ctx.arc(x+(y%36<18?12:0),y,4,0,Math.PI*2);ctx.fill();}
+  ctx.restore();
+  hexPat(ctx,.014);vignette(ctx,.55);
 }
 function bgPitch(ctx){
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#010d04'],[.5,'#041408'],[1,'#010d04']));
-  for(let i=0;i<16;i++){ctx.fillStyle=i%2?'rgba(255,255,255,.014)':'rgba(0,0,0,.02)';ctx.fillRect(0,i*(H/16),W,H/16);}
-  ctx.save();ctx.globalAlpha=.055;ctx.strokeStyle='#fff';ctx.lineWidth=3;
-  ctx.beginPath();ctx.arc(W/2,H/2,290,0,Math.PI*2);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.restore();
-  rGlow(ctx,W/2,H*.28,520,'rgba(200,16,46,.22)');hexPat(ctx,.015);vignette(ctx,.62);
+  // Vivid green pitch — clearly a football field
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#012604'],[.4,'#01380a'],[.8,'#022e08'],[1,'#01200a']));
+  // Grass stripes (alternating green)
+  for(let i=0;i<20;i++){ctx.fillStyle=i%2?'rgba(255,255,255,.028)':'rgba(0,0,0,.04)';ctx.fillRect(0,i*(H/20),W,H/20);}
+  // Pitch markings — visible white lines
+  ctx.save();ctx.globalAlpha=.22;ctx.strokeStyle='#fff';ctx.lineWidth=5;
+  // Center circle
+  ctx.beginPath();ctx.arc(W/2,H*.5,320,0,Math.PI*2);ctx.stroke();
+  // Center line
+  ctx.beginPath();ctx.moveTo(80,H*.5);ctx.lineTo(W-80,H*.5);ctx.stroke();
+  // Penalty areas
+  ctx.strokeRect(W/2-260,H*.12,520,200);
+  ctx.strokeRect(W/2-260,H*.88-200,520,200);
+  // Corner arcs
+  for(const[cx,cy]of[[80,H*.12],[W-80,H*.12],[80,H*.88],[W-80,H*.88]]){
+    ctx.beginPath();ctx.arc(cx,cy,90,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.restore();
+  rGlow(ctx,W/2,H*.08,640,'rgba(200,16,46,.32)');
+  rGlow(ctx,W/2,H*.5,500,'rgba(255,255,255,.06)');
+  vignette(ctx,.68);
 }
 function bgNight(ctx){
-  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#010310'],[.6,'#040920'],[1,'#010310']));
-  ctx.save();for(let i=0;i<200;i++){const sx=Math.random()*W,sy=Math.random()*(H*.65),sz=Math.random()*1.8+.3;ctx.fillStyle=`rgba(255,255,255,${Math.random()*.65+.12})`;ctx.beginPath();ctx.arc(sx,sy,sz,0,Math.PI*2);ctx.fill();}ctx.restore();
-  rGlow(ctx,W/2,-80,740,'rgba(255,215,0,.15)');rGlow(ctx,W/2,H*.42,530,'rgba(200,16,46,.24)');hexPat(ctx,.016);vignette(ctx,.62);
+  // Deep night sky with stars and aurora — very different from others
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#000514'],[.45,'#000b24'],[.7,'#000612'],[1,'#000308']));
+  // Aurora bands (top third)
+  ctx.save();ctx.globalAlpha=.18;
+  const a1=lGrad(ctx,0,0,W,0,[0,'rgba(0,200,120,.0)'],[.3,'rgba(0,220,150,.8)'],[.6,'rgba(80,60,220,.6)'],[1,'rgba(200,0,80,.0)']);
+  ctx.fillStyle=a1;ctx.fillRect(0,H*.04,W,H*.12);
+  const a2=lGrad(ctx,0,0,W,0,[0,'rgba(80,0,200,.0)'],[.4,'rgba(120,20,200,.5)'],[.7,'rgba(0,180,140,.4)'],[1,'rgba(80,0,200,.0)']);
+  ctx.fillStyle=a2;ctx.fillRect(0,H*.12,W,H*.1);
+  ctx.restore();
+  // Stars — bright and dense
+  ctx.save();
+  for(let i=0;i<320;i++){
+    const sx=Math.random()*W,sy=Math.random()*(H*.72),sz=Math.random()*2.4+.2,al=Math.random()*.8+.2;
+    ctx.fillStyle=`rgba(255,255,255,${al})`;
+    ctx.beginPath();ctx.arc(sx,sy,sz,0,Math.PI*2);ctx.fill();
+    if(sz>1.8){// Twinkle cross for bright stars
+      ctx.globalAlpha=al*.5;ctx.fillRect(sx-sz*3,sy-.5,sz*6,1);ctx.fillRect(sx-.5,sy-sz*3,1,sz*6);ctx.globalAlpha=1;
+    }
+  }
+  ctx.restore();
+  // Moon
+  ctx.save();ctx.shadowColor='rgba(255,240,180,.8)';ctx.shadowBlur=80;
+  const mg=ctx.createRadialGradient(W*.82,H*.08,0,W*.82,H*.08,90);
+  mg.addColorStop(0,'rgba(255,248,220,.95)');mg.addColorStop(.7,'rgba(255,230,150,.6)');mg.addColorStop(1,'rgba(255,215,0,.0)');
+  ctx.fillStyle=mg;ctx.beginPath();ctx.arc(W*.82,H*.08,90,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  rGlow(ctx,W/2,H*.55,580,'rgba(200,16,46,.28)');
+  vignette(ctx,.58);
 }
 
 // ── CHROME ───────────────────────────────────────────
@@ -616,23 +671,17 @@ async function tJornada(ctx,ms){
   const tg=lGrad(ctx,W/2-200,0,W/2+200,0,[0,'#ffd700'],[.5,'#fff'],[1,'#ffd700']);
   ctx.fillStyle=tg;ctx.font='900 36px sans-serif';ctx.textAlign='center';ctx.letterSpacing='5px';ctx.fillText(wkLbl,W/2,pY+pH*.65);
 
-  // Group matches by day
+  // Group all matches by day — no artificial cap
   const byD={};ms.forEach(m=>{if(!byD[m.fecha])byD[m.fecha]=[];byD[m.fecha].push(m);});
   const days=Object.keys(byD).sort();
-  // Limit to max 6 matches total
-  const MAX=6;const grps=[];let tot=0;
-  for(const dt of days){
-    if(tot>=MAX)break;
-    const dm=byD[dt].slice(0,MAX-tot);
-    grps.push({dt,ms:dm});tot+=dm.length;
-  }
-  const nCards=tot,nGrps=grps.length;
-  // Calculate card height to fill available space
-  const dhH=72,cardGap=10,grpGap=20,hcGap=10;
+  const grps=days.map(dt=>({dt,ms:byD[dt]}));
+  const nCards=ms.length,nGrps=grps.length;
+  // Fit all cards in available space
+  const dhH=72,cardGap=8,grpGap=18,hcGap=8;
   const startY=pY+pH+24,endY=H-178;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
-  const cH=Math.max(138,Math.floor((available-overhead)/nCards));
+  const cH=Math.max(120,Math.floor((available-overhead)/Math.max(nCards,1)));
 
   let curY=startY;
   for(let gi=0;gi<grps.length;gi++){
@@ -644,10 +693,6 @@ async function tJornada(ctx,ms){
       curY+=cH+(i<gms.length-1?cardGap:0);
     }
     if(gi<grps.length-1)curY+=grpGap;
-  }
-  if(ms.length>MAX){
-    ctx.font='600 26px sans-serif';ctx.fillStyle='rgba(255,255,255,.3)';ctx.textAlign='center';ctx.letterSpacing='0';
-    ctx.fillText(`+ ${ms.length-MAX} partidos más`,W/2,curY+34);
   }
   footer(ctx);
 }

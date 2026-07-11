@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Atlético Norte">
 <link rel="manifest" href="/manifest.json">
 <title>Liga Interna S2 2026 · Atlético Norte F.C.</title>
-<meta name="version" content="v7.6">
+<meta name="version" content="v7.7">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -514,6 +514,30 @@ tbody td:nth-child(2){text-align:left}
 .sb2{width:100%;background:var(--anr);color:#fff;border:none;padding:13px;border-radius:11px;font-size:14px;font-weight:900;cursor:pointer;margin-top:6px;letter-spacing:.3px;transition:.15s}
 .sb2:active{transform:scale(.98);background:#a00d26}
 .cb{width:100%;background:transparent;color:var(--m);border:1px solid var(--bd);padding:11px;border-radius:11px;font-size:12px;cursor:pointer;margin-top:8px;font-weight:700}
+/* W/Walkover result modal */
+.rtype-btn{flex:1;padding:10px 8px;border-radius:10px;border:2px solid var(--bd);background:var(--b3);color:var(--m);font-size:12px;font-weight:800;cursor:pointer;transition:.15s}
+.rtype-btn.on{background:rgba(14,165,233,.12);border-color:#0ea5e9;color:#38bdf8}
+.wo-team-btn{width:100%;padding:14px 8px;border-radius:12px;border:2px solid var(--bd);background:var(--b3);color:var(--t);font-size:12px;font-weight:800;cursor:pointer;transition:.15s}
+.wo-team-btn.on{border-color:#ef4444;background:rgba(239,68,68,.15);color:#ef4444}
+/* W penalty badge in table */
+.wpen{display:inline-block;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:5px;padding:1px 5px;font-size:9px;font-weight:900;margin-left:3px}
+/* ── TOAST NOTIFICATIONS ── */
+#toastWrap{position:fixed;top:0;left:0;right:0;z-index:9999;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:56px 12px 0}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(6,13,26,.97),rgba(10,18,36,.97));border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 16px;box-shadow:0 16px 48px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(16px);max-width:420px;width:calc(100vw - 24px);animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.toast.out{animation:toastOut .3s ease-in both}
+.toast-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.toast-icon.goal{background:linear-gradient(135deg,rgba(16,185,129,.3),rgba(0,200,100,.15));border:1px solid rgba(16,185,129,.4)}
+.toast-icon.info{background:linear-gradient(135deg,rgba(14,165,233,.3),rgba(0,150,255,.15));border:1px solid rgba(14,165,233,.4)}
+.toast-icon.warn{background:linear-gradient(135deg,rgba(245,159,11,.3),rgba(255,180,0,.15));border:1px solid rgba(245,159,11,.4)}
+.toast-icon.red{background:linear-gradient(135deg,rgba(200,16,46,.3),rgba(180,0,30,.15));border:1px solid rgba(200,16,46,.4)}
+.toast-body{flex:1;min-width:0}
+.toast-title{font-size:13px;font-weight:900;color:#fff;margin-bottom:2px;line-height:1.2}
+.toast-sub{font-size:11px;color:rgba(255,255,255,.58);line-height:1.4}
+.toast-prog{position:absolute;bottom:0;left:16px;right:16px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.toast-prog-bar{height:100%;border-radius:2px;animation:toastProg linear both}
+@keyframes toastIn{from{opacity:0;transform:translateY(-22px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-12px) scale(.96)}}
+@keyframes toastProg{from{width:100%}to{width:0}}
 .mhi{font-size:10px;color:var(--gl);background:rgba(245,159,11,.07);border:1px solid rgba(245,159,11,.2);border-radius:9px;padding:10px 12px;margin-bottom:14px}
 .mer{font-size:10px;color:var(--rd);background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:10px 12px;margin-bottom:14px;display:none}
 
@@ -531,6 +555,8 @@ tbody td:nth-child(2){text-align:left}
 </style>
 </head>
 <body>
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="toastWrap"></div>
 <div class="app">
 
 <!-- AD BANNER -->
@@ -819,12 +845,31 @@ tbody td:nth-child(2){text-align:left}
   <div class="md"><div class="mh"><span class="mt">&#9917; Resultado</span><button class="mcl" onclick="cM('mRs')">&#10005;</button></div>
   <div class="mb">
     <div id="rMI" style="background:var(--b3);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;font-weight:700;text-align:center;line-height:1.6"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="fg"><label class="fl">Goles Local</label><input type="number" class="fi" id="rL" min="0" max="30" value="0" style="font-size:28px;font-weight:900;text-align:center;padding:8px"></div>
-      <div class="fg"><label class="fl">Goles Visitante</label><input type="number" class="fi" id="rV" min="0" max="30" value="0" style="font-size:28px;font-weight:900;text-align:center;padding:8px"></div>
+    <!-- Tipo de resultado -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button id="btnNormal" class="rtype-btn on" onclick="setRType('normal')">&#9917; Normal</button>
+      <button id="btnWO" class="rtype-btn" onclick="setRType('wo')" style="border-color:#ef4444;color:#ef4444">&#9888;&#65039; W / Walkover</button>
     </div>
-    <div class="fg"><label class="fl">Goleadores (Nombre, Equipo, Goles)</label>
-      <textarea class="fi" id="rSc" rows="4" placeholder="Juan P&#233;rez, Local, 2&#10;Carlos L&#243;pez, Visitante, 1"></textarea>
+    <!-- Resultado normal -->
+    <div id="rNormalSec">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="fg"><label class="fl">Goles Local</label><input type="number" class="fi" id="rL" min="0" max="30" value="0" style="font-size:28px;font-weight:900;text-align:center;padding:8px"></div>
+        <div class="fg"><label class="fl">Goles Visitante</label><input type="number" class="fi" id="rV" min="0" max="30" value="0" style="font-size:28px;font-weight:900;text-align:center;padding:8px"></div>
+      </div>
+      <div class="fg"><label class="fl">Goleadores (Nombre, Equipo, Goles)</label>
+        <textarea class="fi" id="rSc" rows="4" placeholder="Juan P&#233;rez, Local, 2&#10;Carlos L&#243;pez, Visitante, 1"></textarea>
+      </div>
+    </div>
+    <!-- W/Walkover section -->
+    <div id="rWOSec" style="display:none">
+      <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:900;color:#ef4444;text-transform:uppercase;margin-bottom:10px;letter-spacing:.5px">&#9888;&#65039; &nbsp;&#191;Qu&#233; equipo GANA por W?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button id="woL" class="wo-team-btn" onclick="setWOWinner('l')"></button>
+          <button id="woV" class="wo-team-btn" onclick="setWOWinner('v')"></button>
+        </div>
+      </div>
+      <div id="woPenInfo" style="display:none;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:10px;font-size:11px;text-align:center;color:#ef4444;font-weight:700"></div>
     </div>
     <button class="sb2" onclick="doSR()">Guardar Resultado</button>
     <button class="cb" onclick="cM('mRs')">Cancelar</button>
@@ -1032,9 +1077,13 @@ function onIn(){
   document.getElementById("admBk").style.display=(isAdm||cEd())?"block":"none";
   document.getElementById("sortBk").style.display=isAdm?"block":"none";
   document.getElementById("admRlTg").textContent=cr;
-  // Re-render fixture and table so edit buttons appear immediately
   rFx();rTb();
   rPn();
+  // Init live notifications
+  setTimeout(function(){
+    initLiveGoalListener();
+    initPush();
+  },1500);
   if(!pf.passChanged)setTimeout(function(){openM("mCp");},1000);
 }
 function onOut(){
@@ -1101,8 +1150,9 @@ function rFx(){
 }
 
 // ── STANDINGS ──
+function wlPenalty(n){if(n<=0)return 0;if(n===1)return-1;if(n===2)return-3;return-6-(n-3)*3;}
 function cSt(){
-  var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[],ww:0,wl:0};
+  var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[],ww:0,wl:0,wpen:0};
   MF.forEach(function(m){
     var r=res[m.id];if(!r||r.l===undefined)return;
     st[m.l].pj++;st[m.v].pj++;
@@ -1111,6 +1161,11 @@ function cSt(){
     if(r.l>r.v){st[m.l].g++;st[m.l].pts+=3;st[m.l].fm.push("W");st[m.v].p++;st[m.v].fm.push("L");if(wo){st[m.l].ww++;st[m.v].wl++;}}
     else if(r.l===r.v){st[m.l].e++;st[m.l].pts++;st[m.l].fm.push("D");st[m.v].e++;st[m.v].pts++;st[m.v].fm.push("D");}
     else{st[m.v].g++;st[m.v].pts+=3;st[m.v].fm.push("W");st[m.l].p++;st[m.l].fm.push("L");if(wo){st[m.v].ww++;st[m.l].wl++;}}
+  });
+  // Apply W-loss penalties: 1st=-1, 2nd=-2, 3rd+=-3 each
+  Object.values(st).forEach(function(t){
+    t.wpen=wlPenalty(t.wl);
+    t.pts=Math.max(0,t.pts+t.wpen);
   });
   return Object.values(st).sort(function(a,b){return b.pts!==a.pts?b.pts-a.pts:(b.gf-b.gc)-(a.gf-a.gc)||b.gf-a.gf;});
 }
@@ -1122,7 +1177,8 @@ function rTb(){
     h+='<td><div class="trn">'+bdg(t.id,'bs')+'<span>'+tn(t.id)+'</span></div></td>';
     h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
     h+='<td style="color:#f59e0b;font-weight:800">'+(t.ww||0)+'</td><td style="color:#ef4444;font-weight:800">'+(t.wl||0)+'</td>';
-    h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+'</td>';
+    var penTxt=t.wpen<0?'<span class="wpen">'+t.wpen+'</span>':'';
+    h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+penTxt+'</td>';
     h+='<td><div class="fd2">'+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join('')+'</div></td></tr>';
   });
   document.getElementById("tb").innerHTML=h;
@@ -1172,21 +1228,79 @@ function rVl(){
 
 // ── RESULTS EDIT ──
 function oRsEl(el){oRs(parseInt(el.getAttribute("data-mid")));}
+var curRType='normal',curWOWinner=null;
+function setRType(t){
+  curRType=t;
+  document.getElementById('btnNormal').classList.toggle('on',t==='normal');
+  document.getElementById('btnWO').classList.toggle('on',t==='wo');
+  document.getElementById('rNormalSec').style.display=t==='normal'?'':'none';
+  document.getElementById('rWOSec').style.display=t==='wo'?'':'none';
+  if(t==='wo'){curWOWinner=null;updWOBtns();}
+}
+function updWOBtns(){
+  var m=MF.find(function(x){return x.id===cri;});if(!m)return;
+  var bL=document.getElementById('woL'),bV=document.getElementById('woV');
+  if(!bL||!bV)return;
+  bL.innerHTML='&#127942; '+tn(m.l)+'<br><span style="font-size:10px;opacity:.7">GANA POR W</span>';
+  bV.innerHTML='&#127942; '+tn(m.v)+'<br><span style="font-size:10px;opacity:.7">GANA POR W</span>';
+  bL.classList.toggle('on',curWOWinner==='l');
+  bV.classList.toggle('on',curWOWinner==='v');
+  // Show penalty info for the loser
+  var st=cSt();
+  var loserTid=curWOWinner==='l'?m.v:curWOWinner==='v'?m.l:null;
+  var info=document.getElementById('woPenInfo');
+  if(loserTid&&info){
+    var loser=st.find(function(t){return t.id===loserTid;});
+    var nextWl=(loser?loser.wl:0)+1;
+    var pen=nextWl===1?-1:nextWl===2?-2:-3;
+    info.style.display='block';
+    info.innerHTML='&#9888;&#65039; '+tn(loserTid)+' recibirá <b>'+pen+' punto'+(pen<-1?'s':'')+'</b> de penalización ('+nextWl+'.&#170; derrota por W)';
+  }else if(info){info.style.display='none';}
+}
+function setWOWinner(side){curWOWinner=side;updWOBtns();}
 function oRs(id){
   cri=id;var m=MF.find(function(x){return x.id===id;});if(!m)return;
   document.getElementById("rMI").innerHTML=tn(m.l)+' <span style="color:var(--dm)">vs</span> '+tn(m.v)+'<br><small style="font-weight:400;color:var(--m)">'+dw(m.fecha)+' '+fd(m.fecha)+' &middot; '+m.hora+' &middot; '+m.cancha+"</small>";
   var r=res[id];
-  document.getElementById("rL").value=r?r.l:0;document.getElementById("rV").value=r?r.v:0;
-  document.getElementById("rSc").value=r&&r.scorers?r.scorers.map(function(s){return s.name+", "+s.team+", "+s.goals;}).join("\n"):"";
+  // Reset to normal mode
+  curWOWinner=null;
+  if(r&&r.wo){setRType('wo');curWOWinner=r.woWinner;updWOBtns();}
+  else{setRType('normal');document.getElementById("rL").value=r?r.l:0;document.getElementById("rV").value=r?r.v:0;
+    document.getElementById("rSc").value=r&&r.scorers?r.scorers.map(function(s){return s.name+", "+s.team+", "+s.goals;}).join("\n"):"";}
   openM("mRs");
 }
 async function doSR(){
-  var l=parseInt(document.getElementById("rL").value)||0,v=parseInt(document.getElementById("rV").value)||0;
-  var sc=document.getElementById("rSc").value.trim();
-  var sc2=sc?sc.split("\n").filter(Boolean).map(function(ln){var p=ln.split(",").map(function(s){return s.trim();});return{name:p[0]||"",team:p[1]||"",goals:parseInt(p[2])||1};}):[];
-  var data={l:l,v:v,scorers:sc2,ts:Date.now()};
-  if(fbR&&db)await db.ref("/resultados/"+cri).set(data);
-  else{res[cri]=data;rGl();rFx();rTb();rGo();rVl();updHdr();}
+  var data;
+  if(curRType==='wo'){
+    if(!curWOWinner){alert('Selecciona qué equipo gana por W');return;}
+    // Winner gets 3-0, loser gets 0-3 (standard walkover score)
+    var l=curWOWinner==='l'?3:0,v=curWOWinner==='v'?3:0;
+    data={l:l,v:v,scorers:[],wo:true,woWinner:curWOWinner,ts:Date.now()};
+  }else{
+    var l=parseInt(document.getElementById("rL").value)||0,v=parseInt(document.getElementById("rV").value)||0;
+    var sc=document.getElementById("rSc").value.trim();
+    var sc2=sc?sc.split("\n").filter(Boolean).map(function(ln){var p=ln.split(",").map(function(s){return s.trim();});return{name:p[0]||"",team:p[1]||"",goals:parseInt(p[2])||1};}):[];
+    data={l:l,v:v,scorers:sc2,ts:Date.now()};
+  }
+  if(fbR&&db){
+    await db.ref("/resultados/"+cri).set(data);
+    // Fire in-app goal notification if scorers present
+    if(!curRType||curRType!=='wo'){
+      var m=MF.find(function(x){return x.id===cri;});
+      if(m&&data.scorers&&data.scorers.length){
+        var prev=res[cri];var prevSc=prev&&prev.scorers?prev.scorers.length:0;
+        if(data.scorers.length>prevSc){
+          var newSc=data.scorers.slice(prevSc);
+          newSc.forEach(function(s){
+            showToast('goal','&#9917; Gol '+s.team+'!',s.name+' — '+tn(m.l)+' vs '+tn(m.v),5000,'var(--gn)');
+          });
+          // Push live goal to Firebase for subscribers
+          await db.ref("/liveGoals").push({mid:cri,scorer:data.scorers[data.scorers.length-1],lTeam:m.l,vTeam:m.v,ts:Date.now()});
+          sendPushGoal(m,data.scorers[data.scorers.length-1]);
+        }
+      }
+    }
+  }else{res[cri]=data;rGl();rFx();rTb();rGo();rVl();updHdr();}
   cM("mRs");
 }
 
@@ -1271,7 +1385,11 @@ function rPn(){
   var nm=pf.nombre||"Socio "+cu;
   var isAdm=cr==="Administrador";
   var h='<div class="pph"><div class="pav" onclick="trgPh()" id="avD">'+(pf.photoURL?'<img src="'+pf.photoURL+'" style="width:100%;height:100%;object-fit:cover">':'&#128100;')+'</div><input type="file" id="phF" accept="image/*" style="display:none" onchange="upPh(event)"><div class="pnm">'+nm+'</div><div class="prl">'+cr+'</div><div class="pcd">CC '+cu+'</div></div>';
+  var notifPerm=('Notification' in window)?Notification.permission:'denied';
+  var notifLbl=notifPerm==='granted'?'&#128276; Notif. ON':'&#128276; Activar Notif.';
+  var notifStyle=notifPerm==='granted'?'background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);':'';
   h+='<div class="pag"><div class="ab" onclick="openMData()"><div class="ai">&#128221;</div><div class="al">Mis Datos</div></div><div class="ab" onclick="openM(\'mCp\')"><div class="ai">&#128273;</div><div class="al">Cambiar Clave</div></div>';
+  h+='<div class="ab" onclick="initPush()" style="'+notifStyle+'"><div class="ai">&#128276;</div><div class="al">Notificaciones</div></div>';
   if(cEd())h+='<div class="ab" onclick="showTab(\'fixture\')"><div class="ai">&#9917;</div><div class="al">Resultados</div></div>';
   if(cr==="Administrador"||cr==="Coordinador Financiero")h+='<div class="ab" onclick="adNav(\'planilla\')"><div class="ai">&#128176;</div><div class="al">Planilla</div></div>';
   h+='</div>';
@@ -1296,6 +1414,8 @@ function adNav(tab){
   else if(tab==='equidad') adShowEqd();
   else if(tab==='stats') adShowSt();
   else if(tab==='planilla') adShowPl();
+  else if(tab==='socios-eq') shSociosEq();
+  else if(tab==='notif') shNotifSender();
 }
 
 function adCnt(h){var el=document.getElementById('admPnCnt');if(el)el.innerHTML=h;}
@@ -1307,6 +1427,8 @@ function adShowOverview(){
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(14,165,233,.2);background:rgba(14,165,233,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shSo()"><span class="aico">&#128101;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios</div><div class="atxt">Gestionar roles</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'equipos\')"><span class="aico">&#127960;&#65039;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Equipos</div><div class="atxt">Editar y escudos</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="expC()"><span class="aico">&#128228;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Exportar</div><div class="atxt">CSV socios</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(99,102,241,.2);background:rgba(99,102,241,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px;grid-column:1" onclick="shSociosEq()"><span class="aico">&#127942;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios &amp; Equipos</div><div class="atxt">Asignar equipo a cada socio</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(200,16,46,.25);background:rgba(200,16,46,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shNotifSender()"><span class="aico">&#128276;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Notificaciones</div><div class="atxt">Avisos a socios</div></div></button>';
   h+='</div>';
   h+='<button onclick="openM(\'mPrint\')" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(14,165,233,.12));border:1px solid rgba(200,16,46,.3);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;-webkit-appearance:none"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#8b0000);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#128438;</div><div style="text-align:left"><div style="font-size:14px;font-weight:900;color:var(--t);letter-spacing:-.2px">Imprimir / PDF</div><div style="font-size:10px;color:var(--m);margin-top:2px">Fixture general &#183; Por equipo &#183; Tablas de equidad</div></div><div style="margin-left:auto;font-size:18px;color:var(--m)">&#8250;</div></button>';
   h+='<div id="pEx" style="margin-top:14px"></div>';
@@ -2697,6 +2819,217 @@ async function expC(){
 // ── INIT ──
 initFltEq();rFx();rTb();rEqd();rDlg(DLG_DEF);updHdr();
 setTimeout(function(){rSortGrd();},100);
+
+// ═══════════════════════════════════════════════
+// ── TOAST NOTIFICATION SYSTEM ──
+// ═══════════════════════════════════════════════
+var _toastTimers={};
+function showToast(type,title,sub,dur,accentColor){
+  dur=dur||5000;
+  var id='t'+Date.now();
+  var iconMap={goal:'⚽',info:'ℹ️',warn:'⚠️',red:'🔔'};
+  var icon=iconMap[type]||'🔔';
+  var ac=accentColor||'#0ea5e9';
+  var el=document.createElement('div');
+  el.className='toast';el.id=id;el.style.borderColor=ac+'44';el.style.position='relative';el.style.overflow='hidden';
+  el.innerHTML='<div class="toast-icon '+type+'">'+icon+'</div><div class="toast-body"><div class="toast-title">'+title+'</div><div class="toast-sub">'+sub+'</div></div><div class="toast-prog"><div class="toast-prog-bar" style="background:'+ac+';animation-duration:'+dur+'ms"></div></div>';
+  el.onclick=function(){rmToast(id);};
+  document.getElementById('toastWrap').appendChild(el);
+  _toastTimers[id]=setTimeout(function(){rmToast(id);},dur);
+  return id;
+}
+function rmToast(id){
+  clearTimeout(_toastTimers[id]);
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('out');
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},320);
+}
+
+// ═══════════════════════════════════════════════
+// ── PUSH NOTIFICATIONS (FCM) ──
+// ═══════════════════════════════════════════════
+var _fcmToken=null;
+var FCM_VAPID_KEY='BIpjVNJbSU4VCcWbwMY2Lw2Qe3YfqjDjQ0OJ_FQFPYGbhSaUGhpQ8e7YhUoFAPN44MXe5JZ8y2u0b6e1KYXCV4'; // placeholder — set real VAPID key in Firebase /config/vapidKey
+
+async function initPush(){
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return;
+  var perm=Notification.permission;
+  if(perm==='denied')return;
+  if(perm==='default'){
+    var p=await Notification.requestPermission();
+    if(p!=='granted')return;
+  }
+  try{
+    // Get VAPID key from Firebase config
+    var vapidKey=FCM_VAPID_KEY;
+    if(fbR&&db){
+      var cfgSnap=await db.ref('/config/vapidKey').get();
+      if(cfgSnap.exists())vapidKey=cfgSnap.val();
+    }
+    var reg=await navigator.serviceWorker.ready;
+    var sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(vapidKey)});
+    _fcmToken=JSON.stringify(sub);
+    // Store subscription in Firebase
+    if(fbR&&db&&cu){
+      await db.ref('/subscriptions/'+cu).set({sub:_fcmToken,ts:Date.now(),uid:cu,team:pf&&pf.equipo?pf.equipo:null});
+      showToast('info','Notificaciones activadas','Recibirás alertas de goles y partidos',3500,'#0ea5e9');
+    }
+  }catch(e){console.warn('Push setup:',e.message);}
+}
+function urlB64ToUint8Array(b64){var p=(b64+'===').slice(0,b64.length+(4-b64.length%4)%4).replace(/-/g,'+').replace(/_/g,'/');var r=atob(p);var o=new Uint8Array(r.length);for(var i=0;i<r.length;++i)o[i]=r.charCodeAt(i);return o;}
+
+async function sendPushGoal(m,scorer){
+  // Admin's browser sends push via service worker message to all subscribers
+  if(!fbR||!db)return;
+  var title='⚽ Gol! '+tn(scorer.team==='Local'?m.l:m.v);
+  var body=scorer.name+' marca en '+tn(m.l)+' vs '+tn(m.v);
+  try{
+    await db.ref('/pushQueue').push({type:'goal',title:title,body:body,teams:[m.l,m.v],ts:Date.now()});
+  }catch(e){}
+}
+
+async function sendAdminPush(title,body,targetTeam){
+  if(!fbR||!db)return;
+  var payload={type:'admin',title:title,body:body,ts:Date.now(),sender:cu};
+  if(targetTeam)payload.team=targetTeam;
+  await db.ref('/pushQueue').push(payload);
+  showToast('info','Notificación enviada',body,4000,'#10b981');
+}
+
+// ── LISTEN FOR LIVE GOALS (in-app, when app is open) ──
+function initLiveGoalListener(){
+  if(!fbR||!db)return;
+  var lastTs=Date.now();
+  db.ref('/liveGoals').orderByChild('ts').startAt(lastTs).on('child_added',function(s){
+    var g=s.val();if(!g)return;
+    var teamName=g.scorer&&g.scorer.team?g.scorer.team:'';
+    showToast('goal','⚽ ¡GOL! '+(g.scorer?g.scorer.name:''),tn(g.lTeam)+' vs '+tn(g.vTeam),6000,'#10b981');
+  });
+  // Listen for admin push messages
+  db.ref('/pushQueue').orderByChild('ts').startAt(lastTs).on('child_added',function(s){
+    var n=s.val();if(!n||n.type==='goal')return;
+    // Show to relevant users
+    if(n.type==='admin'){
+      if(!n.team||!pf||n.team===pf.equipo){
+        showToast('info',n.title||'Aviso Atlético Norte',n.body||'',7000,'#0ea5e9');
+      }
+    }
+  });
+  // Match day reminders
+  checkMatchDayReminder();
+}
+
+function checkMatchDayReminder(){
+  var today=new Date().toISOString().slice(0,10);
+  var todayMs=MF.filter(function(m){return m.fecha===today;});
+  if(!todayMs.length)return;
+  var h=new Date().getHours();
+  var shown=safeGet('an_remind_'+today);
+  if(!shown){
+    var myMs=pf&&pf.equipo?todayMs.filter(function(m){return m.l===pf.equipo||m.v===pf.equipo;}):[];
+    var msg=myMs.length?'Tu equipo juega hoy: '+tn(myMs[0].l)+' vs '+tn(myMs[0].v)+' · '+myMs[0].hora+' · '+myMs[0].cancha:'Hay '+todayMs.length+' partido'+(todayMs.length>1?'s':'+')+' hoy';
+    if(h>=10){
+      showToast('warn','📅 Partidos hoy',msg,8000,'#f59e0b');
+      safeSet('an_remind_'+today,'1');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ── SOCIOS CON EQUIPO (admin) ──
+// ═══════════════════════════════════════════════
+async function shSociosEq(){
+  if(!cEd()||!fbR||!db){adCnt('<div class="es"><p>Sin acceso</p></div>');return;}
+  var s=await db.ref('/socios').get();
+  var so=s.val()||{};
+  var h='<div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:900;color:var(--t)">&#128100; Socios · Equipos</div><button class="btns" onclick="adSocioForm()">+ Agregar</button></div>';
+  h+='<div style="display:flex;flex-direction:column;gap:8px">';
+  Object.entries(so).sort().forEach(function(en){
+    var c=en[0],sc=en[1];
+    var teamBadgeHtml=sc.equipo?bdg(parseInt(sc.equipo),'bs'):'<span style="font-size:16px">👤</span>';
+    var teamName=sc.equipo?tn(parseInt(sc.equipo)):'Sin equipo';
+    h+='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    h+=teamBadgeHtml;
+    h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--t)">'+(sc.nombre||c)+'</div>';
+    h+='<div style="font-size:10px;color:var(--m)">'+(sc.rol||'Socio')+' · '+teamName+'</div></div>';
+    h+='<button class="btns" onclick="edSocioEq(\''+c+'\','+JSON.stringify(sc.equipo||null)+')" style="font-size:10px;padding:5px 10px">Equipo</button>';
+    h+='</div>';
+  });
+  h+='</div>';
+  adCnt(h);
+}
+async function edSocioEq(ced,curTeam){
+  var h='<div style="font-size:12px;font-weight:900;margin-bottom:12px">Equipo de <b>'+ced+'</b></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  for(var i=1;i<=10;i++){
+    var sel=curTeam===i||curTeam===String(i);
+    h+='<button onclick="setSocioEq(\''+ced+'\','+i+')" style="display:flex;align-items:center;gap:7px;padding:9px 12px;border-radius:10px;border:2px solid '+(sel?'#0ea5e9':'var(--bd)')+';background:'+(sel?'rgba(14,165,233,.12)':'var(--b3)')+';color:var(--t);cursor:pointer;font-size:11px;font-weight:700">';
+    h+=bdg(i,'bs')+'<span>'+tn(i)+'</span></button>';
+  }
+  h+='</div>';
+  document.getElementById('mDlgT').textContent='Asignar Equipo';
+  document.getElementById('mDlgB').innerHTML=h;openM('mDlg');
+}
+async function setSocioEq(ced,tid){
+  await db.ref('/socios/'+ced+'/equipo').set(tid);
+  cM('mDlg');showToast('info','Equipo asignado',tn(tid)+' → '+ced,3000,'#10b981');
+  shSociosEq();
+}
+
+// ═══════════════════════════════════════════════
+// ── ADMIN NOTIFICATION SENDER ──
+// ═══════════════════════════════════════════════
+function shNotifSender(){
+  if(!cEd()){adCnt('<div class="es"><p>Sin acceso</p></div>');return;}
+  var h='';
+  h+='<div style="font-size:13px;font-weight:900;color:var(--t);margin-bottom:14px">&#128276; Enviar Notificaci&#243;n</div>';
+  // Destinatario
+  h+='<div class="fg"><label class="fl">Destinatario</label>';
+  h+='<select class="fi" id="notifDest" onchange="updNotifDest()"><option value="all">Todos los socios</option>';
+  for(var i=1;i<=10;i++)h+='<option value="t'+i+'">Equipo: '+tn(i)+'</option>';
+  h+='<option value="custom">Socio específico (cédula)</option></select></div>';
+  h+='<div id="notifCedSec" style="display:none" class="fg"><label class="fl">Cédula del socio</label><input class="fi" id="notifCed" placeholder="Número de cédula"></div>';
+  h+='<div class="fg"><label class="fl">Título</label><input class="fi" id="notifTitle" placeholder="Ej: Aviso Importante"></div>';
+  h+='<div class="fg"><label class="fl">Mensaje</label><textarea class="fi" id="notifMsg" rows="3" placeholder="Escribe el mensaje aquí..."></textarea></div>';
+  h+='<button class="sb2" onclick="doSendNotif()" style="margin-top:4px">&#128228; Enviar</button>';
+  // History
+  h+='<div style="margin-top:18px;font-size:11px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Enviadas recientemente</div>';
+  h+='<div id="notifHist"><div class="es" style="padding:20px"><p>Cargando...</p></div></div>';
+  adCnt(h);
+  loadNotifHist();
+}
+function updNotifDest(){
+  var v=document.getElementById('notifDest').value;
+  document.getElementById('notifCedSec').style.display=v==='custom'?'':'none';
+}
+async function doSendNotif(){
+  var dest=document.getElementById('notifDest').value;
+  var title=document.getElementById('notifTitle').value.trim();
+  var msg=document.getElementById('notifMsg').value.trim();
+  if(!title||!msg){alert('Completa título y mensaje');return;}
+  var payload={type:'admin',title:title,body:msg,ts:Date.now(),sender:cu,dest:dest};
+  if(dest.startsWith('t')){payload.team=parseInt(dest.slice(1));}
+  if(dest==='custom'){var ced=document.getElementById('notifCed').value.trim();if(!ced){alert('Ingresa la cédula');return;}payload.socio=ced;}
+  await db.ref('/pushQueue').push(payload);
+  // Also persist to notifLog
+  await db.ref('/notifLog').push(payload);
+  showToast('info','✅ Notificación enviada',title,4000,'#10b981');
+  document.getElementById('notifTitle').value='';document.getElementById('notifMsg').value='';
+  loadNotifHist();
+}
+async function loadNotifHist(){
+  var el=document.getElementById('notifHist');if(!el)return;
+  var s=await db.ref('/notifLog').orderByChild('ts').limitToLast(10).get();
+  var logs=s.val()||{};
+  var items=Object.values(logs).sort(function(a,b){return b.ts-a.ts;});
+  if(!items.length){el.innerHTML='<div style="font-size:10px;color:var(--m);text-align:center;padding:10px">Sin notificaciones enviadas aún</div>';return;}
+  el.innerHTML=items.map(function(n){
+    var d=new Date(n.ts),fmt=d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+    var destLbl=n.dest==='all'?'Todos':n.dest&&n.dest.startsWith('t')?'Equipo: '+tn(parseInt(n.dest.slice(1))):n.socio||n.dest||'?';
+    return'<div style="background:var(--b3);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:7px"><div style="font-size:11px;font-weight:800;color:var(--t)">'+n.title+'</div><div style="font-size:9.5px;color:var(--m);margin-top:3px">'+n.body+'</div><div style="font-size:8.5px;color:var(--dm);margin-top:4px">'+fmt+' → '+destLbl+'</div></div>';
+  }).join('');
+}
 </script>
 </body>
 </html>

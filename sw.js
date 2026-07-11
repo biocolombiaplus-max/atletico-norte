@@ -1,6 +1,6 @@
 // Atlético Norte FC — Service Worker
 // Increment SW_VER on every deploy to force cache invalidation
-const SW_VER = 'v7.6-2026-07-10';
+const SW_VER = 'v7.7-2026-07-11';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 
 // Firebase SDK scripts — heavy, rarely change, cache aggressively
@@ -28,6 +28,34 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('message', e => {
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// ── PUSH NOTIFICATIONS ──
+self.addEventListener('push', e => {
+  if (!e.data) return;
+  let payload;
+  try { payload = e.data.json(); } catch(x) { payload = {title:'Atlético Norte', body: e.data.text()}; }
+  const title = payload.title || '⚽ Atlético Norte F.C.';
+  const options = {
+    body: payload.body || '',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: payload.tag || 'an-notif-' + Date.now(),
+    data: payload.data || {},
+    vibrate: [100, 50, 100],
+    requireInteraction: payload.type === 'goal'
+  };
+  e.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({type:'window', includeUncontrolled:true}).then(cs => {
+      for (const c of cs) { if ('focus' in c) return c.focus(); }
+      return clients.openWindow('/');
+    })
+  );
 });
 
 self.addEventListener('fetch', e => {
