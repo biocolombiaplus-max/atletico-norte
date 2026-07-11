@@ -884,26 +884,50 @@ async function jorCard(ctx,m,y,h){
     ctx.save();ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=18;ctx.fillText('VS',W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
   }
 
-  // Team abbreviations — golden, bigger font, clear gap below badge
-  const afs=Math.max(Math.round(h*.22),30);
+  // ── Team abbreviations ── bold gold, well below badge bottom
+  const afs=Math.max(Math.round(h*.20),28);
   ctx.font=`900 ${afs}px sans-serif`;ctx.letterSpacing='2px';ctx.textAlign='center';
   const ag=lGrad(ctx,0,0,W,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
   ctx.fillStyle=ag;
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=10;ctx.shadowOffsetY=2;
-  ctx.fillText(ts(m.l),lx,y+h*.76);ctx.fillText(ts(m.v),rx,y+h*.76);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=10;ctx.shadowOffsetY=2;
+  ctx.fillText(ts(m.l),lx,y+h*.72);ctx.fillText(ts(m.v),rx,y+h*.72);
   ctx.restore();
 
-  // Meta info — 2 lines, BIG and readable
-  const mfs=Math.max(Math.round(h*.13),22);
+  // ── Bottom info zone ── split into 3 clear rows
   ctx.letterSpacing='0';ctx.textAlign='center';
-  // Line 1: date — gold
-  ctx.font=`800 ${mfs}px sans-serif`;
-  ctx.fillStyle='rgba(255,215,0,.82)';
-  ctx.fillText(fD(m.fecha,false),W/2,y+h*.88);
-  // Line 2: time · venue
-  ctx.font=`700 ${Math.round(mfs*.9)}px sans-serif`;
-  ctx.fillStyle='rgba(255,255,255,.60)';
-  ctx.fillText(`${m.hora}  ·  ${m.cancha}`,W/2,y+h*.97);
+
+  // Row 1 — Day + Date (gold, medium)
+  const dfs=Math.max(Math.round(h*.115),18);
+  ctx.font=`700 ${dfs}px sans-serif`;
+  ctx.fillStyle='rgba(255,210,0,.90)';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=6;
+  // Build "LUN 13 JUL" label
+  const d=new Date(m.fecha+'T12:00:00');
+  const dayLabel=`${DS[d.getDay()].toUpperCase()} ${d.getDate()} ${MS2[d.getMonth()].toUpperCase()}`;
+  ctx.fillText(dayLabel,W/2,y+h*.810);
+  ctx.restore();
+
+  // Row 2 — Time (white, slightly larger)
+  const tfs=Math.max(Math.round(h*.125),20);
+  ctx.font=`800 ${tfs}px sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,.95)';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=8;
+  ctx.fillText(m.hora,W/2,y+h*.895);
+  ctx.restore();
+
+  // Row 3 — Venue pill (accent red chip, white label)
+  const pW=Math.min(mw*.72,420),pH2=Math.max(Math.round(h*.13),20);
+  const pX=W/2-pW/2,pY2=y+h*.930;
+  ctx.save();
+  ctx.shadowColor='rgba(200,16,46,.55)';ctx.shadowBlur=14;
+  ctx.fillStyle='rgba(200,16,46,.88)';
+  ctx.beginPath();ctx.roundRect(pX,pY2,pW,pH2,pH2/2);ctx.fill();
+  ctx.restore();
+  const vfs=Math.max(Math.round(h*.095),15);
+  ctx.font=`700 ${vfs}px sans-serif`;ctx.letterSpacing='1px';
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(m.cancha.toUpperCase(),W/2,pY2+pH2/2);
+  ctx.textBaseline='alphabetic';
 }
 
 // ═══ PARTIDO ════════════════════════════════════════
