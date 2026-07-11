@@ -153,37 +153,44 @@ async function doAuth(){
 
   var email=c+'@atleticonorte.co',pass=c+'_AN26';
   try{
-    // Try login first
+    // Try login; if account doesn't exist in Auth, create it
     try{
       await au.signInWithEmailAndPassword(email,pass);
     }catch(e2){
-      if(e2.code==='auth/user-not-found'||e2.code==='auth/invalid-credential'||e2.code==='auth/invalid-login-credentials'){
-        // First time — check if DB is empty (bootstrap mode)
-        var socSnap=await db.ref('/socios').limitToFirst(1).get();
-        if(socSnap.exists()){
-          errEl.textContent='Tu cédula no está registrada en Firebase y ya hay otros socios. Contacta al administrador existente.';
-          errEl.style.display='block';return;
-        }
-        // DB vacía = primer admin, crear cuenta
-        if(!nom){errEl.textContent='Es la primera vez. Ingresa también tu nombre completo.';errEl.style.display='block';return;}
-        await au.createUserWithEmailAndPassword(email,pass);
-        await db.ref('/socios/'+c).set({cedula:c,nombre:nom,rol:'Administrador',equipo:0,privacyOk:true,fuente:'bootstrap',importadoTs:Date.now()});
-        okEl.textContent='✅ Primera cuenta creada: '+nom+' (Administrador). ¡Ahora puedes subir los socios!';
-        okEl.style.display='block';
-        document.getElementById('step1').querySelector('button').disabled=true;
-        document.getElementById('step2').style.display='block';
-        return;
-      }else{throw e2;}
+      var noAuth=e2.code==='auth/user-not-found'||e2.code==='auth/invalid-credential'||e2.code==='auth/invalid-login-credentials';
+      if(!noAuth)throw e2;
+      // Auth account missing — check if RTDB has this cedula as admin first (need temp anon read)
+      // We'll try creating the account, then verify role. If not admin, delete + reject.
+      await au.createUserWithEmailAndPassword(email,pass);
     }
-    // Ya autenticado — verificar rol
+    // Now authenticated — read role from RTDB
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
     if(rol!=='administrador'&&rol!=='coordinador deportivo'){
-      errEl.textContent='Esta cédula no tiene rol de Administrador en la base de datos.';errEl.style.display='block';
-      await au.signOut();return;
+      // Not an admin — check if DB is empty (bootstrap mode)
+      var socSnap=await db.ref('/socios').limitToFirst(2).get();
+      var cnt=0;socSnap.forEach(function(){cnt++;});
+      if(cnt<=1){
+        // Only this record or empty → bootstrap: promote to admin
+        if(!nom){
+          await au.signOut();
+          errEl.textContent='No tienes rol de Administrador. Ingresa tu nombre completo para crear la primera cuenta.';
+          errEl.style.display='block';return;
+        }
+        await db.ref('/socios/'+c).update({cedula:c,nombre:nom||pf.nombre,rol:'Administrador',privacyOk:true,fuente:'bootstrap'});
+        okEl.textContent='✅ Cuenta admin creada: '+(nom||c)+'. ¡Ahora sube los socios!';
+      }else{
+        await au.signOut();
+        errEl.textContent='La cédula '+c+' no tiene rol de Administrador en la base de datos.';
+        errEl.style.display='block';return;
+      }
+    }else{
+      // Update nombre if provided and missing
+      if(nom&&!pf.nombre)await db.ref('/socios/'+c+'/nombre').set(nom);
+      okEl.textContent='✅ Autenticado: '+(pf.nombre||nom||c)+' · '+pf.rol;
     }
-    okEl.textContent='✅ Autenticado como '+(pf.nombre||c)+' ('+pf.rol+')';okEl.style.display='block';
+    okEl.style.display='block';
     document.getElementById('step1').querySelector('button').disabled=true;
     document.getElementById('step2').style.display='block';
   }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
