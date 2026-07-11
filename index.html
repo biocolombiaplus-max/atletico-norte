@@ -797,13 +797,20 @@ tbody td:nth-child(2){text-align:left}
 </div>
 <!-- ══════════ MODALS ══════════ -->
 <div class="mo" id="mLo">
-  <div class="md"><div class="mh"><span class="mt">&#128272; Ingresar</span><button class="mcl" onclick="cM('mLo')">&#10005;</button></div>
+  <div class="md"><div class="mh"><span class="mt">&#9917; Atlético Norte FC</span><button class="mcl" onclick="cM('mLo')">&#10005;</button></div>
   <div class="mb">
-    <div class="mhi">&#128274; Usuario: c&#233;dula &nbsp;&middot;&nbsp; Contrase&#241;a: c&#233;dula completa</div>
-    <div class="mer" id="lErr">C&#233;dula o contrase&#241;a incorrectos.</div>
-    <div class="fg"><label class="fl">C&#233;dula</label><input class="fi" id="iCed" inputmode="numeric" placeholder="Ingresa tu c&#233;dula" autocomplete="username"></div>
-    <div class="fg"><label class="fl">Contrase&#241;a</label><input type="password" class="fi" id="iPas" placeholder="Tu c&#233;dula completa" autocomplete="current-password"></div>
-    <button class="sb2" onclick="doLo()">Ingresar al Sistema</button>
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--gl);margin-bottom:4px">Liga Interna S2 2026</div>
+      <div style="font-size:12px;color:var(--m)">Ingresa tu número de cédula</div>
+    </div>
+    <div class="mer" id="lErr" style="display:none"></div>
+    <div class="fg">
+      <label class="fl">Número de Cédula</label>
+      <input class="fi" id="iCed" inputmode="numeric" type="tel" placeholder="Ej: 1090123456" autocomplete="username"
+        onkeydown="if(event.key==='Enter')doLo()">
+    </div>
+    <div id="loSpinner" style="display:none;text-align:center;padding:10px;color:var(--m);font-size:13px">Verificando...</div>
+    <button class="sb2" onclick="doLo()">Entrar</button>
     <button class="cb" onclick="cM('mLo')">Cancelar</button>
   </div></div>
 </div>
@@ -872,6 +879,23 @@ tbody td:nth-child(2){text-align:left}
       <div id="woPenInfo" style="display:none;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:10px;font-size:11px;text-align:center;color:#ef4444;font-weight:700"></div>
     </div>
     <button class="sb2" onclick="doSR()">Guardar Resultado</button>
+    <!-- Eventos en vivo — solo admin, solo si hay partido activo -->
+    <div id="evtLive" style="display:none;margin-top:14px;border-top:1px solid var(--bd);padding-top:14px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1px;color:var(--m);margin-bottom:10px">EVENTOS EN VIVO</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <button class="rtype-btn" style="background:rgba(245,158,11,.12);border-color:#f59e0b;color:#f59e0b;font-size:12px"
+          onclick="shTarjeta('yellow')">🟨 Tarjeta Amarilla</button>
+        <button class="rtype-btn" style="background:rgba(239,68,68,.12);border-color:#ef4444;color:#ef4444;font-size:12px"
+          onclick="shTarjeta('red')">🟥 Tarjeta Roja</button>
+      </div>
+      <button class="rtype-btn" style="width:100%;background:rgba(14,165,233,.12);border-color:#0ea5e9;color:#0ea5e9;font-size:12px"
+        onclick="shInicioPartido()">🏁 Notificar Inicio del Partido</button>
+      <div id="evtForm" style="display:none;margin-top:10px">
+        <input class="fi" id="evtJugador" placeholder="Nombre del jugador" style="margin-bottom:8px">
+        <select class="fi" id="evtEquipo" style="margin-bottom:8px"></select>
+        <button class="sb2" id="evtBtn" onclick="doEvt()" style="padding:10px"></button>
+      </div>
+    </div>
     <button class="cb" onclick="cM('mRs')">Cancelar</button>
   </div></div>
 </div>
@@ -1046,13 +1070,38 @@ function updHdr(){
 
 // ── AUTH ──
 async function doLo(){
-  var c=document.getElementById("iCed").value.trim(),p=document.getElementById("iPas").value.trim();
-  document.getElementById("lErr").style.display="none";
+  var c=document.getElementById("iCed").value.trim();
+  var errEl=document.getElementById("lErr");
+  var spin=document.getElementById("loSpinner");
+  errEl.style.display="none";
+  if(!c||!/^\d{5,12}$/.test(c)){
+    errEl.textContent="Ingresa un número de cédula válido.";errEl.style.display="block";return;
+  }
+  spin.style.display="block";
+  if(!fbR){cu=c;cr="Socio";pf={cedula:c,nombre:"Demo "+c};spin.style.display="none";cM("mLo");onIn();return;}
   try{
-    if(fbR)await au.signInWithEmailAndPassword(c+"@atleticonorte.co",p);
-    else{cu=c;cr="Socio";pf={cedula:c,nombre:"Demo "+c};onIn();}
+    // 1. Verificar que la cédula está registrada en la base de datos
+    var snap=await db.ref("/socios/"+c).get();
+    if(!snap.exists()){
+      spin.style.display="none";
+      errEl.textContent="Cédula no registrada. Contacta al administrador.";errEl.style.display="block";return;
+    }
+    var socio=snap.val();
+    var email=c+"@atleticonorte.co";
+    var pass=c+"_AN26";          // contraseña fija derivada de la cédula
+    // 2. Intentar login; si no existe la cuenta en Auth, crearla automáticamente
+    try{
+      await au.signInWithEmailAndPassword(email,pass);
+    }catch(e2){
+      if(e2.code==="auth/user-not-found"||e2.code==="auth/invalid-credential"||e2.code==="auth/invalid-email"){
+        await au.createUserWithEmailAndPassword(email,pass);
+      }else{throw e2;}
+    }
     cM("mLo");
-  }catch(e){document.getElementById("lErr").style.display="block";}
+  }catch(e){
+    spin.style.display="none";
+    errEl.textContent="Error al ingresar: "+e.message;errEl.style.display="block";
+  }
 }
 async function doCp(){
   var o=document.getElementById("pOl").value,n=document.getElementById("pNw").value,c2=document.getElementById("pCf").value;
@@ -1267,6 +1316,7 @@ function oRs(id){
   if(r&&r.wo){setRType('wo');curWOWinner=r.woWinner;updWOBtns();}
   else{setRType('normal');document.getElementById("rL").value=r?r.l:0;document.getElementById("rV").value=r?r.v:0;
     document.getElementById("rSc").value=r&&r.scorers?r.scorers.map(function(s){return s.name+", "+s.team+", "+s.goals;}).join("\n"):"";}
+  shEvtPanel();
   openM("mRs");
 }
 async function doSR(){
@@ -1284,19 +1334,32 @@ async function doSR(){
   }
   if(fbR&&db){
     await db.ref("/resultados/"+cri).set(data);
-    // Fire in-app goal notification if scorers present
+    // Disparar push y toast para goles nuevos
     if(!curRType||curRType!=='wo'){
       var m=MF.find(function(x){return x.id===cri;});
       if(m&&data.scorers&&data.scorers.length){
-        var prev=res[cri];var prevSc=prev&&prev.scorers?prev.scorers.length:0;
-        if(data.scorers.length>prevSc){
-          var newSc=data.scorers.slice(prevSc);
+        var prev=res[cri];var prevSc=prev&&prev.scorers?prev.scorers:[];
+        var newSc=data.scorers.slice(prevSc.length);
+        if(newSc.length){
+          // Toast en pantalla para quien tenga la app abierta
           newSc.forEach(function(s){
-            showToast('goal','&#9917; Gol '+s.team+'!',s.name+' — '+tn(m.l)+' vs '+tn(m.v),5000,'var(--gn)');
+            showToast('goal','⚽ GOL — '+tn(s.team==='Local'?m.l:m.v),
+              s.name+' · '+data.l+'-'+data.v+' ('+tn(m.l)+' vs '+tn(m.v)+')',6000,'#10b981');
           });
-          // Push live goal to Firebase for subscribers
-          await db.ref("/liveGoals").push({mid:cri,scorer:data.scorers[data.scorers.length-1],lTeam:m.l,vTeam:m.v,ts:Date.now()});
-          sendPushGoal(m,data.scorers[data.scorers.length-1]);
+          // Push a /liveGoals (para socios con app abierta)
+          await db.ref("/liveGoals").push({mid:cri,scorer:data.scorers[data.scorers.length-1],
+            lTeam:m.l,vTeam:m.v,score:data.l+'-'+data.v,ts:Date.now()});
+          // Push a /pushQueue → Cloud Function lo envía a quienes tengan app cerrada
+          newSc.forEach(function(s){
+            var tId=s.team==='Local'?m.l:m.v;
+            db.ref('/pushQueue').push({
+              type:'goal',
+              title:'⚽ GOL — '+tn(tId),
+              body:s.name+' anota · '+tn(m.l)+' '+data.l+' - '+data.v+' '+tn(m.v),
+              tag:'goal-'+cri+'-'+Date.now(),
+              teamId:0          // 0 = todos los socios reciben
+            });
+          });
         }
       }
     }
@@ -2869,24 +2932,96 @@ async function initPush(){
     }
     var reg=await navigator.serviceWorker.ready;
     var sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(vapidKey)});
-    _fcmToken=JSON.stringify(sub);
-    // Store subscription in Firebase
+    var sj=sub.toJSON();
+    // Store subscription in Firebase with flat structure expected by Cloud Function
     if(fbR&&db&&cu){
-      await db.ref('/subscriptions/'+cu).set({sub:_fcmToken,ts:Date.now(),uid:cu,team:pf&&pf.equipo?pf.equipo:null});
-      showToast('info','Notificaciones activadas','Recibirás alertas de goles y partidos',3500,'#0ea5e9');
+      await db.ref('/subscriptions/'+cu).set({
+        endpoint:sj.endpoint,
+        p256dh:sj.keys.p256dh,
+        auth:sj.keys.auth,
+        equipo:pf&&pf.equipo?pf.equipo:0,
+        nombre:pf&&pf.nombre?pf.nombre:'',
+        ts:Date.now()
+      });
+      showToast('info','🔔 Notificaciones activadas','Recibirás alertas de goles y partidos en tiempo real',3500,'#0ea5e9');
     }
   }catch(e){console.warn('Push setup:',e.message);}
 }
 function urlB64ToUint8Array(b64){var p=(b64+'===').slice(0,b64.length+(4-b64.length%4)%4).replace(/-/g,'+').replace(/_/g,'/');var r=atob(p);var o=new Uint8Array(r.length);for(var i=0;i<r.length;++i)o[i]=r.charCodeAt(i);return o;}
 
 async function sendPushGoal(m,scorer){
-  // Admin's browser sends push via service worker message to all subscribers
   if(!fbR||!db)return;
-  var title='⚽ Gol! '+tn(scorer.team==='Local'?m.l:m.v);
-  var body=scorer.name+' marca en '+tn(m.l)+' vs '+tn(m.v);
+  var tId=scorer.team==='Local'?m.l:m.v;
   try{
-    await db.ref('/pushQueue').push({type:'goal',title:title,body:body,teams:[m.l,m.v],ts:Date.now()});
+    await db.ref('/pushQueue').push({type:'goal',
+      title:'⚽ GOL — '+tn(tId),
+      body:scorer.name+' anota · '+tn(m.l)+' vs '+tn(m.v),
+      tag:'goal-'+m.id+'-'+Date.now(),teamId:0,ts:Date.now()});
   }catch(e){}
+}
+
+// Tarjeta amarilla — llamar desde panel admin
+async function pushTarjetaAmarilla(jugador,equipo){
+  if(!fbR||!db)return;
+  showToast('warn','🟨 Tarjeta Amarilla',jugador+' · '+tn(equipo),4000,'#f59e0b');
+  await db.ref('/pushQueue').push({type:'card',
+    title:'🟨 Tarjeta Amarilla',
+    body:jugador+' · '+tn(equipo),
+    tag:'yellow-'+Date.now(),teamId:0,ts:Date.now()});
+}
+
+// Tarjeta roja — llamar desde panel admin
+async function pushTarjetaRoja(jugador,equipo){
+  if(!fbR||!db)return;
+  showToast('warn','🟥 Expulsión',jugador+' fue expulsado · '+tn(equipo),5000,'#ef4444');
+  await db.ref('/pushQueue').push({type:'red',
+    title:'🟥 Expulsión — '+tn(equipo),
+    body:jugador+' fue expulsado del partido',
+    tag:'red-'+Date.now(),teamId:0,ts:Date.now()});
+}
+
+// Inicio de partido — llamar cuando el admin activa el partido
+async function pushInicioPartido(m){
+  if(!fbR||!db)return;
+  showToast('info','🏁 ¡Comienza el partido!',tn(m.l)+' vs '+tn(m.v)+' · '+m.cancha,5000,'#0ea5e9');
+  await db.ref('/pushQueue').push({type:'kickoff',
+    title:'🏁 ¡Arranca el partido!',
+    body:tn(m.l)+' vs '+tn(m.v)+' · '+m.hora+' · '+m.cancha,
+    tag:'kickoff-'+m.id,teamId:0,ts:Date.now()});
+}
+
+// ── Panel eventos en vivo (tarjetas / inicio) ──
+var _evtType=null;
+function shEvtPanel(){
+  var isAdm=cr==='Administrador'||cr==='Coordinador Deportivo';
+  document.getElementById('evtLive').style.display=isAdm?'block':'none';
+  document.getElementById('evtForm').style.display='none';
+  _evtType=null;
+  // Poblar select de equipos con los 2 del partido actual
+  var m=MF.find(function(x){return x.id===cri;});
+  if(!m)return;
+  var sel=document.getElementById('evtEquipo');
+  sel.innerHTML='<option value="'+m.l+'">'+tn(m.l)+' (Local)</option>'+
+                '<option value="'+m.v+'">'+tn(m.v)+' (Visitante)</option>';
+}
+function shTarjeta(tipo){
+  _evtType=tipo;
+  document.getElementById('evtJugador').value='';
+  document.getElementById('evtBtn').textContent=tipo==='yellow'?'Enviar 🟨 Tarjeta Amarilla':'Enviar 🟥 Tarjeta Roja';
+  document.getElementById('evtForm').style.display='block';
+}
+function shInicioPartido(){
+  var m=MF.find(function(x){return x.id===cri;});
+  if(m)pushInicioPartido(m);
+}
+async function doEvt(){
+  var jugador=document.getElementById('evtJugador').value.trim();
+  var equipoId=parseInt(document.getElementById('evtEquipo').value);
+  if(!jugador){alert('Escribe el nombre del jugador');return;}
+  if(_evtType==='yellow')await pushTarjetaAmarilla(jugador,equipoId);
+  else if(_evtType==='red')await pushTarjetaRoja(jugador,equipoId);
+  document.getElementById('evtForm').style.display='none';
+  document.getElementById('evtJugador').value='';
 }
 
 async function sendAdminPush(title,body,targetTeam){
