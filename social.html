@@ -1410,18 +1410,43 @@ async function tResultado(ctx,m){
     ctx.textAlign='center';ctx.letterSpacing='5px';ctx.fillText('⚖️  EMPATE',W/2,bY2+bH*.67);ctx.restore();
   }
 
-  // ── ANOTADORES ──
+  // ── ANOTADORES (2 columnas: local izq, visitante der) ──
   const scorers=r.scorers||[];
   if(scorers.length){
-    goldRule(ctx,1528);
-    ctx.font='800 24px sans-serif';ctx.letterSpacing='4px';ctx.fillStyle='rgba(255,215,0,.65)';ctx.textAlign='center';ctx.letterSpacing='4px';
-    ctx.fillText('ANOTADORES',W/2,1570);
-    scorers.forEach((s,i)=>{
-      const sY=1612+i*50;if(sY>H-280)return;
-      const tid=s.teamId||(s.team==='Local'?m.l:m.v);
-      ctx.font='600 28px sans-serif';ctx.letterSpacing='0';ctx.fillStyle='rgba(255,255,255,.84)';ctx.textAlign='center';
-      ctx.fillText(`⚽  ${s.name||s.corto||''}  ·  ${tn(tid===m.l?m.l:m.v)}`,W/2,sY);
+    const scTop=1510;
+    goldRule(ctx,scTop);
+    ctx.font='700 22px sans-serif';ctx.letterSpacing='4px';ctx.fillStyle='rgba(255,215,0,.60)';ctx.textAlign='center';
+    ctx.fillText('ANOTADORES',W/2,scTop+36);
+    const scL=[],scR=[];
+    scorers.forEach(s=>{
+      const tid=s.teamId||(s.team==='Local'?m.l:(s.team==='Visitante'?m.v:null));
+      if(tid===m.l)scL.push(s);else scR.push(s);
     });
+    const colW=W/2-mx-30,lColX=mx+20,rColX=W/2+10;
+    const rowH=44,startY=scTop+58,nfs=24;
+    const maxRows=Math.min(Math.max(scL.length,scR.length),5);
+    for(let i=0;i<maxRows;i++){
+      const rowY=startY+i*rowH;if(rowY>H-270)break;
+      if(scL[i]){
+        const ag=scL[i].autogol?' (AG)':'';
+        let txt=`⚽ ${scL[i].name||scL[i].corto||''}${ag}`;
+        ctx.font=`600 ${nfs}px sans-serif`;ctx.letterSpacing='0';
+        while(ctx.measureText(txt).width>colW-8&&txt.length>4)txt=txt.slice(0,-1);
+        ctx.fillStyle='rgba(255,255,255,.82)';ctx.textAlign='left';
+        ctx.fillText(txt,lColX,rowY);
+      }
+      if(scR[i]){
+        const ag=scR[i].autogol?' (AG)':'';
+        let txt=`${scR[i].name||scR[i].corto||''}${ag} ⚽`;
+        ctx.font=`600 ${nfs}px sans-serif`;ctx.letterSpacing='0';
+        while(ctx.measureText(txt).width>colW-8&&txt.length>4)txt=txt.slice(0,-1);
+        ctx.fillStyle='rgba(255,255,255,.82)';ctx.textAlign='right';
+        ctx.fillText(txt,rColX+colW,rowY);
+      }
+    }
+    // Divisor vertical central
+    ctx.strokeStyle='rgba(255,215,0,.18)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(W/2,startY-14);ctx.lineTo(W/2,startY+maxRows*rowH-8);ctx.stroke();
   }
 
   // ── PIE ──
