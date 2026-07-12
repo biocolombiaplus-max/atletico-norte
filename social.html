@@ -1058,11 +1058,11 @@ async function tJornada(ctx,ms){
   const grps=days.map(dt=>({dt,ms:byD[dt]}));
   const nCards=ms.length,nGrps=grps.length;
   // Fit all cards in available space
-  const dhH=72,cardGap=8,grpGap=18,hcGap=8;
-  const startY=pY+pH+24,endY=H-178;
+  const dhH=62,cardGap=7,grpGap=14,hcGap=6;
+  const startY=pY+pH+18,endY=H-160;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
-  const cH=Math.max(240,Math.floor((available-overhead)/Math.max(nCards,1)));
+  const cH=Math.max(170,Math.floor((available-overhead)/Math.max(nCards,1)));
 
   let curY=startY;
   for(let gi=0;gi<grps.length;gi++){
@@ -1129,9 +1129,9 @@ async function jorCard(ctx,m,y,h){
   ctx.beginPath();ctx.roundRect(mx,y,mw,h,18);ctx.stroke();
 
   // ── LAYOUT: horizontal (logo | nombre | VS/score | nombre | logo) ──
-  // Meta strip con tamaños FIJOS para que siempre sea legible
-  const CHIP_H=50,CHIP_FS=30,FECHA_FS=28,META_PAD=14;
-  const metaH=FECHA_FS+CHIP_H*2+META_PAD*4; // fecha + 2 filas chips
+  // Meta strip: 2 líneas de texto multicolor — compacto pero legible
+  const INFO_FS=32,DATE_FS=30,META_PAD=10;
+  const metaH=DATE_FS+INFO_FS+META_PAD*3+4; // ~106px
   const topH=h-metaH;
   const cy=y+topH*.5;
   const logoSz=topH*.84,logoR=logoSz*.5;
@@ -1174,45 +1174,44 @@ async function jorCard(ctx,m,y,h){
   }
   drawTN(m.l,ncl,nameW);drawTN(m.v,ncr,nameW);
 
-  // ── META STRIP — 2 filas para que no se solapen ──
+  // ── META STRIP — 2 líneas de texto multicolor ──
   const metaTop=y+topH;
-  ctx.strokeStyle='rgba(255,215,0,.22)';ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(255,215,0,.28)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(mx+40,metaTop);ctx.lineTo(mx+mw-40,metaTop);ctx.stroke();
 
-  // Función chip genérica — dibuja donde se le diga
-  function chip(label,bg,border,chipX,chipY){
-    ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
-    const tw=ctx.measureText(label).width;
-    const cw=tw+30,cx0=chipX-cw/2;
-    ctx.save();ctx.shadowColor=border;ctx.shadowBlur=14;
-    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(cx0,chipY,cw,CHIP_H,CHIP_H/2);ctx.fill();ctx.restore();
-    ctx.strokeStyle=border;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(cx0,chipY,cw,CHIP_H,CHIP_H/2);ctx.stroke();
-    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(label,chipX,chipY+CHIP_H/2);ctx.textBaseline='alphabetic';
+  // Helper: dibuja una fila de segmentos [{text,color}] centrada en X
+  function drawRow(segs,rowY,fs){
+    ctx.font=`700 ${fs}px sans-serif`;ctx.letterSpacing='.4px';
+    const total=segs.reduce((s,g)=>s+ctx.measureText(g.text).width,0);
+    let sx=W/2-total/2;
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+    for(const g of segs){
+      ctx.fillStyle=g.color;
+      ctx.fillText(g.text,sx,rowY);
+      sx+=ctx.measureText(g.text).width;
+    }
   }
 
-  // Fecha centrada — primera línea
-  const fechaY=metaTop+META_PAD+FECHA_FS;
-  ctx.font=`700 ${FECHA_FS}px sans-serif`;ctx.letterSpacing='1.5px';
-  ctx.fillStyle='rgba(255,215,0,.88)';ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillText(fD(m.fecha,false),W/2,fechaY);
+  // Línea 1: fecha completa en dorado
+  const dateY=metaTop+META_PAD+DATE_FS;
+  const DOT='rgba(255,255,255,.28)';
+  drawRow([{text:fD(m.fecha,false).toUpperCase(),color:'rgba(255,215,0,.95)'}],dateY,DATE_FS);
 
-  // Fila 1 de chips: [🕐 hora]  [V1] — centrados con gap
-  const row1Y=fechaY+META_PAD;
-  const horaLbl=`🕐 ${m.hora}`;
-  const vueltaLbl=`V${m.vu}`;
-  ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
-  const wH=ctx.measureText(horaLbl).width+30;
-  const wV=ctx.measureText(vueltaLbl).width+30;
-  const gap1=20;
-  const row1W=wH+wV+gap1;
-  chip(horaLbl,'rgba(20,60,180,.65)','rgba(80,140,255,.80)',W/2-row1W/2+wH/2,row1Y);
-  chip(vueltaLbl,'rgba(130,55,0,.65)','rgba(255,140,40,.75)',W/2+row1W/2-wV/2,row1Y);
-
-  // Fila 2 de chips: [📍 cancha] — ancho completo centrado
-  const row2Y=row1Y+CHIP_H+META_PAD;
-  const canchaLbl=`📍 ${m.cancha}`;
-  chip(canchaLbl,'rgba(10,90,50,.65)','rgba(40,190,110,.75)',W/2,row2Y);
+  // Línea 2: hora · cancha · vuelta — cada dato con su color
+  const infoY=dateY+META_PAD+INFO_FS;
+  const segs2=[
+    {text:`🕐 ${m.hora}`,color:'rgba(120,180,255,1)'},
+    {text:'   ·   ',color:DOT},
+    {text:`📍 ${m.cancha}`,color:'rgba(80,210,140,1)'},
+    {text:'   ·   ',color:DOT},
+    {text:`V${m.vu}`,color:'rgba(255,160,60,1)'},
+  ];
+  // auto-shrink si la línea no cabe
+  let ifs=INFO_FS;
+  ctx.font=`700 ${ifs}px sans-serif`;ctx.letterSpacing='.4px';
+  let tw2=segs2.reduce((s,g)=>s+ctx.measureText(g.text).width,0);
+  while(tw2>mw-80&&ifs>20){ifs-=1;ctx.font=`700 ${ifs}px sans-serif`;tw2=segs2.reduce((s,g)=>s+ctx.measureText(g.text).width,0);}
+  drawRow(segs2,infoY,ifs);
 }
 function sc_half(h){return Math.round(h*.13);}
 
