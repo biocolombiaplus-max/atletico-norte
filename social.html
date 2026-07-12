@@ -869,18 +869,17 @@ function rrStroke(ctx,x,y,w,h,r,c,lw){ctx.strokeStyle=c;ctx.lineWidth=lw||2;ctx.
 
 async function tMVP(ctx){
   // ═══════════════════════════════════════════════════════════════
-  // MVP DEL PARTIDO — Award Card Premium v3
-  // Estructura: foto 1080×1080 full-width (zona superior)
-  //             sección oscura de contenido (zona inferior Y=1080+)
+  // MVP DEL PARTIDO — Award Card Premium v4
+  // ZONA FOTO   : Y=0–1080  (sin texto encima, solo viñetas)
+  // ZONA CONTENIDO: Y=1080–1920 (todo el texto aquí)
   // Instagram safe zone: top Y=270, bottom Y=1560
   // ═══════════════════════════════════════════════════════════════
-  const PH=1082; // altura zona foto (ligeramente solapada con contenido)
+  const PH=1080;
 
-  // 1 ── BACKGROUND CANVAS
-  await drawBg(ctx);
-  ctx.fillStyle='rgba(0,0,0,.52)';ctx.fillRect(0,0,W,H);
+  // 1 ── FONDO BASE
+  ctx.fillStyle='#02050c';ctx.fillRect(0,0,W,H);
 
-  // 2 ── FOTO DEL JUGADOR (cuadrada → full-width)
+  // 2 ── FOTO DEL JUGADOR (cuadrada centrada, full-width)
   if(mvpPhotoImg){
     const pi=mvpPhotoImg;
     let sx=0,sy=0,sw=pi.width,sh=pi.height;
@@ -888,157 +887,144 @@ async function tMVP(ctx){
     else if(pi.height>pi.width){sh=pi.width;sy=(pi.height-pi.width)/2;}
     ctx.drawImage(pi,sx,sy,sw,sh,0,0,W,PH);
   }else{
-    const ph=lGrad(ctx,0,0,0,PH,[0,'#0c0305'],[.5,'#1a0408'],[1,'#080102']);
+    const ph=lGrad(ctx,0,0,0,PH,[0,'#0c1a2e'],[1,'#071020']);
     ctx.fillStyle=ph;ctx.fillRect(0,0,W,PH);
-    ctx.save();ctx.globalAlpha=.06;ctx.font='200 280px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffd700';ctx.fillText('⭐',W/2,PH*.47);ctx.restore();
+    ctx.save();ctx.globalAlpha=.07;ctx.font='200 320px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffd700';ctx.fillText('⭐',W/2,PH*.46);ctx.restore();
   }
 
-  // 3 ── OVERLAYS SOBRE LA FOTO
-  // Vignette superior (legibilidad del header)
-  const tv=lGrad(ctx,0,0,0,480,[0,'rgba(0,0,0,.86)'],[.48,'rgba(0,0,0,.32)'],[.78,'rgba(0,0,0,.06)'],[1,'rgba(0,0,0,0)']);
-  ctx.fillStyle=tv;ctx.fillRect(0,0,W,480);
-  // Fade inferior (transición al contenido)
-  const bv=lGrad(ctx,0,PH-280,0,PH+60,[0,'rgba(0,0,0,0)'],[.30,'rgba(2,5,12,.70)'],[.68,'rgba(2,5,12,.97)'],[1,'rgba(2,5,12,1)']);
-  ctx.fillStyle=bv;ctx.fillRect(0,PH-280,W,340);
-  // Vignette lateral cinemática
-  const sv=ctx.createRadialGradient(W/2,PH*.44,W*.20,W/2,PH*.44,W*.78);
-  sv.addColorStop(0,'rgba(0,0,0,0)');sv.addColorStop(1,'rgba(0,0,0,.48)');
+  // 3 ── VIÑETAS SOBRE LA FOTO (sin texto, solo efectos de luz)
+  // Fade inferior para transición suave al contenido
+  const bv=lGrad(ctx,0,PH-320,0,PH,[0,'rgba(2,5,12,0)'],[.55,'rgba(2,5,12,.82)'],[1,'rgba(2,5,12,1)']);
+  ctx.fillStyle=bv;ctx.fillRect(0,PH-320,W,320);
+  // Viñeta lateral cinemática
+  const sv=ctx.createRadialGradient(W/2,PH*.4,W*.18,W/2,PH*.4,W*.72);
+  sv.addColorStop(0,'rgba(0,0,0,0)');sv.addColorStop(1,'rgba(0,0,0,.42)');
   ctx.fillStyle=sv;ctx.fillRect(0,0,W,PH);
-  // Glow cálido en área de cara
-  const fg=ctx.createRadialGradient(W/2,PH*.36,0,W/2,PH*.36,480);
-  fg.addColorStop(0,'rgba(255,175,50,.08)');fg.addColorStop(.5,'rgba(180,70,10,.04)');fg.addColorStop(1,'rgba(0,0,0,0)');
+  // Glow dorado sutil en zona facial
+  const fg=ctx.createRadialGradient(W/2,PH*.35,0,W/2,PH*.35,460);
+  fg.addColorStop(0,'rgba(255,180,40,.07)');fg.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=fg;ctx.fillRect(0,0,W,PH);
 
-  // 4 ── SECCIÓN CONTENIDO (fondo oscuro profundo)
-  ctx.fillStyle='#02050c';ctx.fillRect(0,PH-18,W,H-PH+18);
-  // Sutil gradiente azul-oscuro en el fondo del contenido
-  const cbg=lGrad(ctx,0,PH,W,H,[0,'rgba(8,18,38,.0)'],[1,'rgba(2,5,14,.0)']);
-  ctx.fillStyle=cbg;ctx.fillRect(0,PH,W,H-PH);
-
-  // 5 ── FRANJA DECORATIVA + REGLA DORADA SAFE ZONE
-  topStripe(ctx);
-  goldRule(ctx,266);
-
-  // 6 ── BADGE MVP (Y=274 — primera línea de safe zone)
-  const bH=70,bW=590,bX=(W-bW)/2,bY=274;
-  // Relleno gradiente dorado
-  const bFill=lGrad(ctx,bX,bY,bX+bW,bY+bH,[0,'rgba(88,52,0,.52)'],[.5,'rgba(255,215,0,.22)'],[1,'rgba(88,52,0,.52)']);
-  ctx.fillStyle=bFill;ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,bH/2);ctx.fill();
-  // Sheen superior
-  ctx.save();ctx.globalAlpha=.13;
-  ctx.fillStyle=lGrad(ctx,bX,bY,bX+bW,bY+bH*.5,[0,'transparent'],[.5,'#fff'],[1,'transparent']);
-  ctx.beginPath();ctx.roundRect(bX,bY,bW,bH*.46,bH/2);ctx.fill();ctx.restore();
-  // Borde dorado con glow
-  ctx.save();ctx.shadowColor='rgba(255,212,0,.68)';ctx.shadowBlur=26;
-  ctx.strokeStyle='rgba(255,215,0,.90)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,bH/2);ctx.stroke();ctx.restore();
-  // Texto
-  ctx.save();ctx.shadowColor='rgba(255,200,0,.55)';ctx.shadowBlur=16;
-  ctx.font='900 33px Arial Black,sans-serif';ctx.letterSpacing='2px';
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffd700';
-  ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);ctx.restore();
-
-  goldRule(ctx,bY+bH+14);
-
-  // 7 ── LOGO + NOMBRE DEL CLUB (centrado, debajo del badge)
-  const lY=bY+bH+30,LH=82,LW=69;
-  const logoI=getImg('club');
-  if(logoI){
-    ctx.save();ctx.shadowColor='rgba(255,185,0,.58)';ctx.shadowBlur=32;
-    ctx.drawImage(logoI,W/2-LW/2,lY,LW,LH);ctx.restore();
-  }else{
-    rrFill(ctx,W/2-LW/2,lY,LW,LH,13,'rgba(180,20,40,.88)');
-    ctx.font='900 28px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('AN',W/2,lY+LH/2);
-  }
-  ctx.textAlign='center';ctx.textBaseline='top';
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=16;
-  ctx.font='900 40px Arial Black,sans-serif';ctx.letterSpacing='.5px';ctx.fillStyle='#fff';
-  ctx.fillText('ATLÉTICO NORTE F.C.',W/2,lY+LH+8);ctx.restore();
-  ctx.font='600 19px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle='rgba(255,215,0,.72)';
-  ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,lY+LH+56);
-  goldRule(ctx,lY+LH+82);
-  ctx.letterSpacing='0';
-
-  // 8 ── ORNAMENTOS DE ESQUINA (marcos dorados sobre la foto)
-  const cs=56,cm=28;
-  ctx.save();ctx.strokeStyle='rgba(255,215,0,.52)';ctx.lineWidth=3;ctx.lineCap='square';
+  // 4 ── ORNAMENTOS DE ESQUINA DORADOS (sobre la foto, solo decorativos)
+  const cs=52,cm=30;
+  ctx.save();ctx.strokeStyle='rgba(255,215,0,.55)';ctx.lineWidth=3;ctx.lineCap='square';
   ctx.beginPath();ctx.moveTo(cm+cs,cm);ctx.lineTo(cm,cm);ctx.lineTo(cm,cm+cs);ctx.stroke();
   ctx.beginPath();ctx.moveTo(W-cm-cs,cm);ctx.lineTo(W-cm,cm);ctx.lineTo(W-cm,cm+cs);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cm+cs,PH-cm);ctx.lineTo(cm,PH-cm);ctx.lineTo(cm,PH-cm-cs);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W-cm-cs,PH-cm);ctx.lineTo(W-cm,PH-cm);ctx.lineTo(W-cm,PH-cm-cs);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cm+cs,PH-cm-40);ctx.lineTo(cm,PH-cm-40);ctx.lineTo(cm,PH-cm-40-cs);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(W-cm-cs,PH-cm-40);ctx.lineTo(W-cm,PH-cm-40);ctx.lineTo(W-cm,PH-cm-40-cs);ctx.stroke();
   ctx.restore();
 
-  // 9 ── NOMBRE DEL JUGADOR (sección contenido, Y=PH+26)
+  // 5 ── ZONA CONTENIDO (Y=1080–1920, fondo oscuro profundo)
+  ctx.fillStyle='#02050c';ctx.fillRect(0,PH,W,H-PH);
+  // Acento azul muy sutil en la zona de contenido
+  const cac=lGrad(ctx,0,PH,0,H,[0,'rgba(10,20,50,.55)'],[1,'rgba(2,5,12,.0)']);
+  ctx.fillStyle=cac;ctx.fillRect(0,PH,W,H-PH);
+
+  // ─── CABECERA DEL CLUB (compacta, Y≈1090) ───
+  let cy=PH+10;
+  goldRule(ctx,cy);cy+=14;
+
+  const logoI=getImg('club'),LH=54,LW=45;
+  if(logoI){
+    ctx.save();ctx.shadowColor='rgba(255,185,0,.5)';ctx.shadowBlur=28;
+    ctx.drawImage(logoI,W/2-LW/2,cy,LW,LH);ctx.restore();
+  }else{
+    rrFill(ctx,W/2-LW/2,cy,LW,LH,10,'rgba(180,20,40,.85)');
+    ctx.font='900 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('AN',W/2,cy+LH/2);
+  }
+  cy+=LH+8;
+
+  ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=12;
+  ctx.font='900 32px Arial Black,sans-serif';ctx.letterSpacing='.5px';ctx.fillStyle='#fff';
+  ctx.fillText('ATLÉTICO NORTE F.C.',W/2,cy);ctx.restore();cy+=38;
+
+  ctx.font='600 16px sans-serif';ctx.letterSpacing='3.5px';ctx.fillStyle='rgba(255,215,0,.75)';
+  ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,cy);ctx.restore();cy+=22;
+  ctx.letterSpacing='0';
+  goldRule(ctx,cy);cy+=18;
+
+  // ─── BADGE MVP ───
+  const bH=72,bW=610,bX=(W-bW)/2,bY=cy;
+  const bFill=lGrad(ctx,bX,bY,bX+bW,bY+bH,[0,'rgba(90,55,0,.58)'],[.5,'rgba(255,215,0,.20)'],[1,'rgba(90,55,0,.58)']);
+  ctx.fillStyle=bFill;ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,bH/2);ctx.fill();
+  ctx.save();ctx.globalAlpha=.14;
+  ctx.fillStyle=lGrad(ctx,bX,bY,bX+bW,bY+bH*.5,[0,'transparent'],[.5,'#fff'],[1,'transparent']);
+  ctx.beginPath();ctx.roundRect(bX+1,bY+1,bW-2,bH*.44,bH/2);ctx.fill();ctx.restore();
+  ctx.save();ctx.shadowColor='rgba(255,212,0,.72)';ctx.shadowBlur=28;
+  ctx.strokeStyle='rgba(255,215,0,.92)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,bH/2);ctx.stroke();ctx.restore();
+  ctx.save();ctx.shadowColor='rgba(255,200,0,.6)';ctx.shadowBlur=18;
+  ctx.font='900 32px Arial Black,sans-serif';ctx.letterSpacing='2px';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffd700';
+  ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);ctx.restore();
+  cy=bY+bH+20;
+
+  // ─── NOMBRE DEL JUGADOR ───
   const nomDisplay=(mvpNombreS||'JUGADOR').toUpperCase();
   ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
-  let fs=94;ctx.font='900 '+fs+'px Arial Black,sans-serif';
-  while(ctx.measureText(nomDisplay).width>W-56&&fs>32){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
-  const nameY=PH+26;
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.92)';ctx.shadowBlur=24;ctx.fillStyle='#fff';
-  ctx.fillText(nomDisplay,W/2,nameY);ctx.restore();
+  let fs=88;ctx.font='900 '+fs+'px Arial Black,sans-serif';
+  while(ctx.measureText(nomDisplay).width>W-48&&fs>32){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=22;ctx.fillStyle='#fff';
+  ctx.fillText(nomDisplay,W/2,cy);ctx.restore();
+  cy+=fs+8;
 
-  // 10 ── EQUIPO
+  // ─── EQUIPO ───
   if(mvpEquipoS){
-    ctx.save();ctx.shadowColor='rgba(255,160,0,.28)';ctx.shadowBlur=10;
-    ctx.font='700 34px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle='#ffd700';
-    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,nameY+fs+12);ctx.restore();
-    ctx.letterSpacing='0';
-  }
+    ctx.save();ctx.shadowColor='rgba(255,160,0,.25)';ctx.shadowBlur=8;
+    ctx.font='700 30px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle='#ffd700';
+    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,cy);ctx.restore();
+    cy+=38;
+  }else{cy+=12;}
+  ctx.letterSpacing='0';
 
-  // 11 ── CAJA RESULTADO Y FECHA (posición fija Y=1328)
-  const SBY=1328,SBH=198,SBW=928,SBX=(W-SBW)/2;
-  // Fondo glass dorado
-  ctx.fillStyle=lGrad(ctx,SBX,SBY,SBX+SBW,SBY+SBH,[0,'rgba(255,215,0,.07)'],[.5,'rgba(255,255,255,.07)'],[1,'rgba(255,215,0,.07)']);
-  ctx.beginPath();ctx.roundRect(SBX,SBY,SBW,SBH,24);ctx.fill();
-  // Borde
-  ctx.save();ctx.strokeStyle='rgba(255,215,0,.32)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(SBX,SBY,SBW,SBH,24);ctx.stroke();ctx.restore();
-  // Shine interno
-  ctx.save();ctx.globalAlpha=.08;
+  // ─── CAJA RESULTADO Y FECHA ───
+  const SBY=Math.max(cy+16,1390),SBH=144,SBW=940,SBX=(W-SBW)/2;
+  ctx.fillStyle=lGrad(ctx,SBX,SBY,SBX+SBW,SBY+SBH,[0,'rgba(255,215,0,.08)'],[.5,'rgba(255,255,255,.07)'],[1,'rgba(255,215,0,.08)']);
+  ctx.beginPath();ctx.roundRect(SBX,SBY,SBW,SBH,22);ctx.fill();
+  ctx.save();ctx.strokeStyle='rgba(255,215,0,.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(SBX,SBY,SBW,SBH,22);ctx.stroke();ctx.restore();
+  ctx.save();ctx.globalAlpha=.09;
   ctx.fillStyle=lGrad(ctx,SBX,SBY,SBX+SBW,SBY+SBH*.45,[0,'transparent'],[.5,'#fff'],[1,'transparent']);
-  ctx.beginPath();ctx.roundRect(SBX+2,SBY+2,SBW-4,SBH*.4,24);ctx.fill();ctx.restore();
-  // Línea separadora horizontal interna
-  ctx.save();ctx.strokeStyle='rgba(255,215,0,.12)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(SBX+40,SBY+SBH*.68);ctx.lineTo(SBX+SBW-40,SBY+SBH*.68);ctx.stroke();ctx.restore();
+  ctx.beginPath();ctx.roundRect(SBX+2,SBY+2,SBW-4,SBH*.4,22);ctx.fill();ctx.restore();
 
   if(mvpSelectedMid){
     const mm=ALL.find(x=>x.id===mvpSelectedMid),rr=results[mvpSelectedMid];
     if(mm&&rr){
       const sc=rr.wo?'W / O':`${rr.l}  –  ${rr.v}`;
-      // Marcador grande
-      ctx.save();ctx.shadowColor='rgba(255,210,0,.62)';ctx.shadowBlur=20;
-      ctx.font='900 88px Arial Black,sans-serif';ctx.fillStyle='#ffd700';
-      ctx.textBaseline='middle';ctx.fillText(sc,W/2,SBY+SBH*.40);ctx.restore();
-      // Equipos flanqueando
+      ctx.save();ctx.shadowColor='rgba(255,210,0,.65)';ctx.shadowBlur=20;
+      ctx.font='900 80px Arial Black,sans-serif';ctx.fillStyle='#ffd700';
+      ctx.textBaseline='middle';ctx.fillText(sc,W/2,SBY+SBH*.38);ctx.restore();
       const lN=tn(mm.l).toUpperCase(),vN=tn(mm.v).toUpperCase();
-      let tfs=23;ctx.font='700 '+tfs+'px sans-serif';
-      while((ctx.measureText(lN).width>380||ctx.measureText(vN).width>380)&&tfs>12){tfs--;ctx.font='700 '+tfs+'px sans-serif';}
-      ctx.fillStyle='rgba(200,218,240,.72)';ctx.letterSpacing='.5px';
-      ctx.textAlign='right';ctx.fillText(lN,W/2-14,SBY+SBH*.78);
-      ctx.textAlign='left';ctx.fillText(vN,W/2+14,SBY+SBH*.78);
+      let tfs=22;ctx.font='700 '+tfs+'px sans-serif';
+      while((ctx.measureText(lN).width>390||ctx.measureText(vN).width>390)&&tfs>11){tfs--;ctx.font='700 '+tfs+'px sans-serif';}
+      ctx.fillStyle='rgba(200,218,240,.75)';ctx.letterSpacing='.5px';
+      ctx.textAlign='right';ctx.fillText(lN,W/2-16,SBY+SBH*.73);
+      ctx.textAlign='left';ctx.fillText(vN,W/2+16,SBY+SBH*.73);
       ctx.textAlign='center';
-      ctx.font='600 16px sans-serif';ctx.fillStyle='rgba(255,215,0,.42)';ctx.letterSpacing='1px';
-      ctx.fillText('VS',W/2,SBY+SBH*.78);
-      // Fecha · hora · semana
-      ctx.letterSpacing='.5px';
-      ctx.font='500 21px sans-serif';ctx.fillStyle='rgba(148,175,212,.52)';ctx.textBaseline='middle';
-      ctx.fillText(fD(mm.fecha,false)+'  ·  '+mm.hora+'  ·  Semana '+mm.week,W/2,SBY+SBH*.92);
+      ctx.font='700 15px sans-serif';ctx.fillStyle='rgba(255,215,0,.45)';ctx.letterSpacing='1px';
+      ctx.fillText('VS',W/2,SBY+SBH*.73);
+      ctx.letterSpacing='.3px';
+      ctx.font='500 19px sans-serif';ctx.fillStyle='rgba(148,175,212,.55)';ctx.textBaseline='middle';
+      ctx.fillText(fD(mm.fecha,false)+'  ·  '+mm.hora+'  ·  Semana '+mm.week,W/2,SBY+SBH*.91);
       ctx.letterSpacing='0';
     }
   }else{
-    ctx.font='600 23px sans-serif';ctx.fillStyle='rgba(255,255,255,.18)';
+    ctx.font='600 22px sans-serif';ctx.fillStyle='rgba(255,255,255,.18)';
     ctx.textBaseline='middle';ctx.fillText('Selecciona el partido',W/2,SBY+SBH*.5);
   }
 
-  // 12 ── LÍNEA DORADA + WEBSITE (dentro de safe zone)
-  goldRule(ctx,SBY+SBH+18);
+  // ─── PIE DE PÁGINA ───
+  const footY=SBY+SBH+14;
+  goldRule(ctx,footY);
   ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
-  ctx.font='900 40px Arial Black,sans-serif';ctx.fillStyle='#fff';
   ctx.save();ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;
-  ctx.fillText('¡FELICITACIONES! 🎉',W/2,SBY+SBH+30);ctx.restore();
-  ctx.font='600 20px sans-serif';ctx.letterSpacing='1.5px';ctx.fillStyle='rgba(200,16,46,.88)';
-  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,SBY+SBH+80);
-  ctx.font='500 17px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.20)';
-  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,SBY+SBH+110);
+  ctx.font='900 36px Arial Black,sans-serif';ctx.fillStyle='#fff';
+  ctx.fillText('¡FELICITACIONES! 🎉',W/2,footY+12);ctx.restore();
+  ctx.font='600 18px sans-serif';ctx.letterSpacing='1.5px';ctx.fillStyle='rgba(200,16,46,.90)';
+  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,footY+58);
+  ctx.font='500 16px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.22)';
+  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,footY+88);
+  ctx.letterSpacing='0';
 
   botStripe(ctx);
 }
