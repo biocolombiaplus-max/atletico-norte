@@ -1605,7 +1605,7 @@ function rFx(){
   var bd={};ms.forEach(function(m){if(!bd[m.fecha])bd[m.fecha]=[];bd[m.fecha].push(m);});
   var h="";var first=true;
   Object.keys(bd).sort().forEach(function(dt){
-    var dm=bd[dt];var isF=dm[0].festivo;
+    var dm=bd[dt].slice().sort(function(a,b){return a.hora.localeCompare(b.hora);});var isF=dm[0].festivo;
     var dayFull=["Domingo","Lunes","Martes","Mi\u00e9rcoles","Jueves","Viernes","S\u00e1bado"][new Date(dt+"T12:00:00").getDay()];
     var openCls=first?" open":"";first=false;
     var wk=dm[0].week;
