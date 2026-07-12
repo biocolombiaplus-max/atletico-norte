@@ -648,11 +648,9 @@ async function doLogin(){
       errEl.innerHTML='La cédula <strong>'+c+'</strong> no tiene rol de Coordinador Deportivo.<br>Contacta al administrador.';
       errEl.style.display='block';btn.disabled=false;btn.innerHTML='🔐 Ingresar';return;
     }
-    curUser=pf;curCed=c;curRol=rol;
-    document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
-    startResListener();
-
-    goTo('sMatches');
+    // onAuthStateChanged handles startResListener + screen transition
+    // Setting btn back to normal; onAuthStateChanged will fire and transition
+    btn.disabled=false;btn.innerHTML='🔐 Ingresar';
   }catch(e){
     errEl.textContent='Error: '+e.message;errEl.style.display='block';
     btn.disabled=false;btn.innerHTML='🔐 Ingresar';
@@ -1712,10 +1710,9 @@ au.onAuthStateChanged(async function(user){
       curUser=pf;curCed=c;curRol=rol;
       document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
       startResListener();
-  
-      document.getElementById('sLogin').classList.remove('active');
-      document.getElementById('sMatches').classList.add('active');
-      _hist=['sLogin','sMatches'];
+      if(!document.getElementById('sMatches').classList.contains('active')){
+        goTo('sMatches');
+      }
     }else{
       document.getElementById('iCed').focus();
     }
