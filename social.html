@@ -202,7 +202,7 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
   <input type="text" id="hash" value="#AtléticoNorte #LigaInterna #FútbolLocal #NorteDeSantander" style="margin-bottom:14px">
 
   <button class="btn-gen" onclick="gen()">⚡ Generar Imagen</button>
-  <button class="btn-dl" id="btnDl" onclick="dl()">⬇️ Descargar PNG</button>
+  <button class="btn-dl" id="btnDl" onclick="shareOrDownload()">📤 Compartir / Guardar</button>
   <button class="btn-cp" id="btnCp" onclick="cpCaption()">📋 Copiar Caption</button>
 
   <div class="ms" id="matchSec">
@@ -279,7 +279,8 @@ function startApp(){
     }else{updateClubPreview();updateTopLogo();}
   });
 
-  db.ref('/resultados').on('value',s=>{results=s.val()||{};});
+  let _urlInit=false;
+  db.ref('/resultados').on('value',s=>{results=s.val()||{};if(!_urlInit){_urlInit=true;setTimeout(applyUrlParams,120);}});
 
   // Init week selector
   const weeks=[...new Set(ALL.map(m=>m.week))].sort((a,b)=>a-b);
@@ -954,11 +955,11 @@ async function tMVP(ctx){
   ctx.fillStyle=botFade;ctx.fillRect(0,CY+CR-220,W,H-(CY+CR-220));
 
   // ── MVP BADGE ──
-  const bY=CY+CR+28,bW=530,bH=74;
+  const bY=CY+CR+22,bW=530,bH=68;
   rrFill(ctx,(W-bW)/2,bY,bW,bH,37,'rgba(245,159,11,.16)');
   rrStroke(ctx,(W-bW)/2,bY,bW,bH,37,'rgba(245,159,11,.75)',2.5);
   ctx.save();ctx.shadowColor='rgba(245,159,11,.4)';ctx.shadowBlur=20;
-  ctx.font='900 38px Arial Black,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fbbf24';ctx.letterSpacing='1px';
+  ctx.font='900 36px Arial Black,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fbbf24';ctx.letterSpacing='1px';
   ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);
   ctx.restore();
 
@@ -966,15 +967,15 @@ async function tMVP(ctx){
   ctx.letterSpacing='0';
   const nomDisplay=(mvpNombreS||'JUGADOR').toUpperCase();
   ctx.textAlign='center';ctx.textBaseline='top';
-  let fs=92;ctx.font='900 '+fs+'px Arial Black,sans-serif';
-  while(ctx.measureText(nomDisplay).width>W-56&&fs>40){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=16;ctx.fillStyle='#fff';ctx.fillText(nomDisplay,W/2,bY+bH+24);ctx.restore();
-  let curY=bY+bH+24+fs+12;
+  let fs=86;ctx.font='900 '+fs+'px Arial Black,sans-serif';
+  while(ctx.measureText(nomDisplay).width>W-56&&fs>38){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=16;ctx.fillStyle='#fff';ctx.fillText(nomDisplay,W/2,bY+bH+18);ctx.restore();
+  let curY=bY+bH+18+fs+10;
 
   // ── TEAM NAME ──
   if(mvpEquipoS){
-    ctx.font='700 36px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(245,159,11,.88)';
-    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,curY);curY+=54;ctx.letterSpacing='0';
+    ctx.font='700 32px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(245,159,11,.88)';
+    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,curY);curY+=48;ctx.letterSpacing='0';
   }
 
   // ── MATCH INFO ──
@@ -983,30 +984,35 @@ async function tMVP(ctx){
     if(mm&&rr){
       const sc=rr.wo?'Walkover':`${rr.l} – ${rr.v}`;
       const txt=`${tn(mm.l)}  ${sc}  ${tn(mm.v)}`;
-      ctx.font='600 27px sans-serif';
-      const iW=Math.min(ctx.measureText(txt).width+64,W-80);
-      rrFill(ctx,(W-iW)/2,curY+8,iW,54,14,'rgba(255,255,255,.07)');
-      rrStroke(ctx,(W-iW)/2,curY+8,iW,54,14,'rgba(255,255,255,.08)',1);
+      ctx.font='600 25px sans-serif';
+      const iW=Math.min(ctx.measureText(txt).width+60,W-80);
+      rrFill(ctx,(W-iW)/2,curY+6,iW,50,13,'rgba(255,255,255,.07)');
+      rrStroke(ctx,(W-iW)/2,curY+6,iW,50,13,'rgba(255,255,255,.08)',1);
       ctx.fillStyle='rgba(200,220,255,.72)';ctx.textBaseline='middle';
-      ctx.fillText(txt,W/2,curY+8+27);curY+=72;
+      ctx.fillText(txt,W/2,curY+6+25);curY+=64;
       // Semana line
-      ctx.font='500 22px sans-serif';ctx.fillStyle='rgba(150,175,210,.5)';ctx.textBaseline='top';
-      ctx.fillText('Semana '+mm.week+' · Liga Interna S2 2026',W/2,curY+4);curY+=34;
+      ctx.font='500 20px sans-serif';ctx.fillStyle='rgba(150,175,210,.5)';ctx.textBaseline='top';
+      ctx.fillText('Semana '+mm.week+' · Liga Interna S2 2026',W/2,curY+2);curY+=30;
     }
   }
 
-  // ── GOLD DIVIDER ──
-  const dy=Math.max(curY+32,H-340);
+  // ── GOLD DIVIDER — keep well inside Instagram safe zone (top 250 / bottom 350) ──
+  const safeBot=H-380; // Y=1540 — last safe content line
+  const dy=Math.min(Math.max(curY+28,1380),safeBot-200);
   goldRule(ctx,dy);
 
-  // ── FOOTER ──
+  // ── FOOTER CONTENT — all within safe zone ──
   ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
-  ctx.font='900 50px Arial Black,sans-serif';ctx.fillStyle='#ffffff';
-  ctx.fillText('¡FELICITACIONES! 🎉',W/2,dy+22);
-  ctx.font='600 26px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(200,16,46,.92)';
-  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,dy+88);
+  ctx.font='900 46px Arial Black,sans-serif';ctx.fillStyle='#ffffff';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=10;
+  ctx.fillText('¡FELICITACIONES! 🎉',W/2,dy+20);ctx.restore();
+  ctx.font='600 24px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(200,16,46,.88)';
+  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,dy+82);
+  ctx.font='500 20px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.28)';
+  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,dy+120);
 
-  footer(ctx);
+  // Decorative stripes at very bottom (outside safe zone intentionally — just color bars)
+  botStripe(ctx);
 }
 
 // ═══ JORNADA ════════════════════════════════════════
@@ -1407,8 +1413,50 @@ async function tTabla(ctx){
   footer(ctx);
 }
 
-// ── DOWNLOAD / COPY ──────────────────────────────────
-function dl(){const cv=document.getElementById('cv');const a=document.createElement('a');a.download=`atletico-norte-${curTpl}-${Date.now()}.png`;a.href=cv.toDataURL('image/png',1);a.click();}
+// ── URL PARAM AUTO-SELECT (from coordinador) ──────────
+function applyUrlParams(){
+  const p=new URLSearchParams(location.search);
+  const pMatch=parseInt(p.get('match'))||0;
+  const pTpl=p.get('tpl')||'';
+  if(!pTpl||!pMatch)return;
+  if(pTpl==='mvp'){
+    const pill=[...document.querySelectorAll('.pill')].find(b=>(b.getAttribute('onclick')||'').includes("'mvp'"));
+    if(pill)setTpl('mvp',pill);
+    setTimeout(()=>{
+      const card=document.getElementById('mvpC'+pMatch);
+      if(card){mvpPickCard(pMatch,card);card.scrollIntoView({behavior:'smooth',block:'nearest'});}
+    },200);
+  }else if(pTpl==='resultado'){
+    const pill=[...document.querySelectorAll('.pill')].find(b=>(b.getAttribute('onclick')||'').includes("'resultado'"));
+    if(pill)setTpl('resultado',pill);
+    selMs.clear();selMs.add(pMatch);loadMs();
+    setTimeout(()=>{
+      const el=document.getElementById('mi'+pMatch);
+      if(el){el.classList.add('on');el.querySelector('.mi-chk').textContent='✓';}
+    },200);
+  }
+  // Scroll up so user sees the form controls
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── DOWNLOAD / SHARE ──────────────────────────────────
+async function shareOrDownload(){
+  const cv=document.getElementById('cv');
+  const name='atletico-norte-'+curTpl+'-'+Date.now()+'.png';
+  if(navigator.share&&navigator.canShare){
+    cv.toBlob(async function(blob){
+      const file=new File([blob],name,{type:'image/png'});
+      if(navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'Atlético Norte F.C.',text:'Liga Interna S2 2026'});return;}
+        catch(e){if(e&&e.name!=='AbortError'){/*fallthrough*/}}
+      }
+      const a=document.createElement('a');a.download=name;a.href=cv.toDataURL('image/png',1);a.click();
+    },'image/png',1);
+  }else{
+    const a=document.createElement('a');a.download=name;a.href=cv.toDataURL('image/png',1);a.click();
+  }
+}
+function dl(){shareOrDownload();}
 function cpCaption(){
   const ms=ALL.filter(m=>selMs.has(m.id));const hash=document.getElementById('hash').value;let txt='';
   if(curTpl==='resultado'){const m=ms[0],r=results[m?.id];if(m&&r)txt=`⚽ RESULTADO FINAL\n${tn(m.l)} ${r.l} - ${r.v} ${tn(m.v)}\n📅 ${fD(m.fecha,false)} · ${m.hora}\n\n`;}
