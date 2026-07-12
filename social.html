@@ -109,8 +109,9 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
 </div>
 
 <div class="topbar" style="position:relative">
+  <a href="index.html" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;text-decoration:none;font-size:18px;flex-shrink:0;transition:.15s" title="Volver a la app">&#8592;</a>
   <canvas id="topLogo" width="42" height="50"></canvas>
-  <div>
+  <div style="flex:1">
     <div class="t-title">Atlético <b>Norte</b> F.C</div>
     <div class="t-sub">Generador · Redes Sociales 9:16</div>
   </div>
@@ -870,23 +871,64 @@ async function tMVP(ctx){
     const tr=W/PH,sr=pi.width/pi.height;
     let sx=0,sy=0,sw=pi.width,sh=pi.height;
     if(sr>tr){sw=pi.height*tr;sx=(pi.width-sw)/2;}else{sh=pi.width/tr;sy=(pi.height-sh)/2;}
-    ctx.save();
-    // Clip to rect
-    ctx.beginPath();ctx.rect(0,PY,W,PH);ctx.clip();
+    ctx.save();ctx.beginPath();ctx.rect(0,PY,W,PH);ctx.clip();
     ctx.drawImage(pi,sx,sy,sw,sh,0,PY,W,PH);
     ctx.restore();
-  } else {
-    // Placeholder
-    const pg=ctx.createLinearGradient(0,PY,0,PY+PH);
-    pg.addColorStop(0,'rgba(200,16,46,.08)');pg.addColorStop(1,'rgba(245,159,11,.05)');
-    ctx.fillStyle=pg;ctx.fillRect(0,PY,W,PH);
-    ctx.font='300 180px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(255,255,255,.05)';ctx.fillText('⭐',W/2,PY+PH/2);
-  }
 
-  // Gradient fade from photo into lower section
-  const fg=ctx.createLinearGradient(0,PY+PH-500,0,PY+PH);
-  fg.addColorStop(0,'rgba(0,0,0,0)');fg.addColorStop(1,'rgba(0,0,0,.92)');
-  ctx.fillStyle=fg;ctx.fillRect(0,PY+PH-500,W,500);
+    // ── PREMIUM PHOTO EFFECTS ──
+    // 1. Cinematic vignette — radial dark rings from edges
+    const vig=ctx.createRadialGradient(W/2,PY+PH*.42,PH*.08,W/2,PY+PH*.42,PH*.82);
+    vig.addColorStop(0,'rgba(0,0,0,0)');
+    vig.addColorStop(.55,'rgba(0,0,0,.08)');
+    vig.addColorStop(.82,'rgba(0,0,0,.52)');
+    vig.addColorStop(1,'rgba(0,0,0,.82)');
+    ctx.fillStyle=vig;ctx.fillRect(0,PY,W,PH);
+
+    // 2. Side shadow bars (left & right) — cinema aspect
+    const lBar=ctx.createLinearGradient(0,0,160,0);
+    lBar.addColorStop(0,'rgba(0,0,0,.72)');lBar.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=lBar;ctx.fillRect(0,PY,160,PH);
+    const rBar=ctx.createLinearGradient(W-160,0,W,0);
+    rBar.addColorStop(0,'rgba(0,0,0,0)');rBar.addColorStop(1,'rgba(0,0,0,.72)');
+    ctx.fillStyle=rBar;ctx.fillRect(W-160,PY,160,PH);
+
+    // 3. Golden light-leak from top-right corner (warm cinematic flare)
+    const flare=ctx.createRadialGradient(W*.82,PY,0,W*.82,PY,560);
+    flare.addColorStop(0,'rgba(245,180,60,.22)');
+    flare.addColorStop(.35,'rgba(200,120,20,.08)');
+    flare.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=flare;ctx.fillRect(0,PY,W,PH*.6);
+
+    // 4. Bottom fog fade — dissolves into content area
+    const fog=ctx.createLinearGradient(0,PY+PH-560,0,PY+PH);
+    fog.addColorStop(0,'rgba(0,0,0,0)');
+    fog.addColorStop(.45,'rgba(0,0,0,.35)');
+    fog.addColorStop(1,'rgba(0,0,0,.97)');
+    ctx.fillStyle=fog;ctx.fillRect(0,PY+PH-560,W,560);
+
+    // 5. Thin golden frame line at photo boundary top
+    ctx.save();
+    const frameGrad=ctx.createLinearGradient(0,0,W,0);
+    frameGrad.addColorStop(0,'rgba(245,159,11,0)');
+    frameGrad.addColorStop(.3,'rgba(245,159,11,.55)');
+    frameGrad.addColorStop(.7,'rgba(245,159,11,.55)');
+    frameGrad.addColorStop(1,'rgba(245,159,11,0)');
+    ctx.strokeStyle=frameGrad;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,PY+1);ctx.lineTo(W,PY+1);ctx.stroke();
+    ctx.restore();
+
+  } else {
+    // Placeholder — elegant dark gradient
+    const pg=ctx.createLinearGradient(0,PY,0,PY+PH);
+    pg.addColorStop(0,'rgba(200,16,46,.10)');pg.addColorStop(.5,'rgba(100,8,23,.06)');pg.addColorStop(1,'rgba(245,159,11,.04)');
+    ctx.fillStyle=pg;ctx.fillRect(0,PY,W,PH);
+    // Star watermark
+    ctx.save();ctx.globalAlpha=.06;ctx.font='500 240px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#f59e0b';ctx.fillText('⭐',W/2,PY+PH/2);ctx.restore();
+    // Bottom fade
+    const fog=ctx.createLinearGradient(0,PY+PH-400,0,PY+PH);
+    fog.addColorStop(0,'rgba(0,0,0,0)');fog.addColorStop(1,'rgba(0,0,0,.95)');
+    ctx.fillStyle=fog;ctx.fillRect(0,PY+PH-400,W,400);
+  }
 
   // ── MVP BADGE ──
   const bW=520,bH=76,bX=(W-bW)/2,bY=1060;
