@@ -1042,7 +1042,7 @@ async function tJornada(ctx,ms){
   const weeks=[...new Set(ms.map(m=>m.week))];
   const wkLbl=weeks.length===1?`JORNADA ${weeks[0]}`:`SEMANAS ${Math.min(...weeks)}–${Math.max(...weeks)}`;
   // Week pill
-  const pW=520,pH=76,pX=W/2-pW/2,pY=442;
+  const pW=520,pH=72,pX=W/2-pW/2,pY=400;
   const pg=lGrad(ctx,pX,pY,pX+pW,pY+pH,[0,'rgba(200,16,46,.18)'],[.5,'rgba(200,16,46,.3)'],[1,'rgba(200,16,46,.18)']);
   ctx.fillStyle=pg;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.fill();
   ctx.save();ctx.globalAlpha=.1;ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(pX+8,pY+4,pW-16,pH*.45,pH*.45);ctx.fill();ctx.restore();
@@ -1134,7 +1134,7 @@ async function jorCard(ctx,m,y,h){
   const metaH=DATE_FS+INFO_FS+META_PAD*3+2; // ~80px
   const topH=h-metaH;
   const cy=y+topH*.5;
-  const logoSz=topH*.94,logoR=logoSz*.5;
+  const logoSz=topH*1.02,logoR=logoSz*.5;
   const lx=mx+logoR+10,rx=mx+mw-logoR-10;
 
   await drawBadge(ctx,m.l,lx,cy,logoSz);
