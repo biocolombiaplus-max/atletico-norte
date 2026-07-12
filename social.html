@@ -1147,11 +1147,11 @@ async function jorCard(ctx,m,y,h){
   }
 
   // Team abbreviations — golden
-  const afs=Math.max(Math.round(h*.14),22);
-  ctx.font=`900 ${afs}px sans-serif`;ctx.letterSpacing='2px';ctx.textAlign='center';
+  const afs=Math.max(Math.round(h*.18),28);
+  ctx.font=`900 ${afs}px sans-serif`;ctx.letterSpacing='3px';ctx.textAlign='center';
   const ag=lGrad(ctx,0,0,W,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
   ctx.fillStyle=ag;
-  ctx.fillText(ts(m.l),lx,y+h*.69);ctx.fillText(ts(m.v),rx,y+h*.69);
+  ctx.fillText(ts(m.l),lx,y+h*.77);ctx.fillText(ts(m.v),rx,y+h*.77);
 
   // Meta info — 2 lines, BIG and readable
   const mfs=Math.max(Math.round(h*.135),24);
@@ -1159,11 +1159,11 @@ async function jorCard(ctx,m,y,h){
   // Line 1: date — gold
   ctx.font=`800 ${mfs}px sans-serif`;
   ctx.fillStyle='rgba(255,215,0,.82)';
-  ctx.fillText(fD(m.fecha,false),W/2,y+h*.82);
+  ctx.fillText(fD(m.fecha,false),W/2,y+h*.88);
   // Line 2: time · venue
   ctx.font=`700 ${Math.round(mfs*.9)}px sans-serif`;
   ctx.fillStyle='rgba(255,255,255,.60)';
-  ctx.fillText(`${m.hora}  ·  ${m.cancha}`,W/2,y+h*.96);
+  ctx.fillText(`${m.hora}  ·  ${m.cancha}`,W/2,y+h*.97);
 }
 
 // ═══ PARTIDO ════════════════════════════════════════
