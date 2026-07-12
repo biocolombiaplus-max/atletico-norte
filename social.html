@@ -129,18 +129,20 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
 
   <!-- MVP PANEL — shown only when MVP template selected -->
   <div id="mvpPanel" style="display:none;background:rgba(245,159,11,.06);border:1.5px solid rgba(245,159,11,.22);border-radius:14px;padding:16px;margin-bottom:14px">
-    <div class="sec" style="margin-top:0;margin-bottom:10px">Jugador MVP</div>
-    <input id="mvpCed" type="number" inputmode="numeric" placeholder="Cédula del jugador" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:10px 12px;border-radius:10px;font-size:14px;font-weight:600;-webkit-appearance:none;margin-bottom:8px" oninput="mvpAutoSocial()">
-    <div id="mvpNom" style="font-size:12px;font-weight:700;min-height:18px;margin-bottom:10px"></div>
-    <div class="ctrl-l" style="margin-bottom:6px">Partido (para el marcador)</div>
-    <select id="mvpMatchSelS" onchange="mvpMatchPickS()" style="width:100%;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:12px;font-weight:600;-webkit-appearance:none;appearance:none;margin-bottom:8px">
-      <option value="">— Sin partido seleccionado —</option>
-    </select>
-    <div id="mvpMatchInfoS" style="font-size:11px;color:var(--m);margin-bottom:10px"></div>
-    <div class="ctrl-l" style="margin-bottom:6px">Foto del jugador (opcional)</div>
+    <div class="sec" style="margin-top:0;margin-bottom:10px">⭐ Jugador MVP</div>
+    <input id="mvpCed" type="number" inputmode="numeric" placeholder="Cédula del jugador" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;-webkit-appearance:none;margin-bottom:8px" oninput="mvpAutoSocial()">
+    <div id="mvpNom" style="font-size:12px;font-weight:700;min-height:18px;margin-bottom:12px"></div>
+
+    <div class="ctrl-l" style="margin-bottom:6px">Partido · toca para seleccionar</div>
+    <div id="mvpMatchCards" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px">
+      <div style="font-size:11px;color:var(--m);padding:8px 0">Cargando partidos con resultado…</div>
+    </div>
+    <div id="mvpMatchInfoS" style="font-size:11px;color:var(--gn);font-weight:700;min-height:16px;margin-bottom:12px"></div>
+
+    <div class="ctrl-l" style="margin-bottom:6px">Foto del jugador</div>
     <label style="display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.35);border-radius:10px;padding:12px 14px">
       <span style="font-size:22px">📷</span>
-      <div><div style="font-size:12px;font-weight:700;color:var(--t)">Subir foto</div><div id="mvpPhNm" style="font-size:10px;color:var(--m);margin-top:2px">Ninguna seleccionada</div></div>
+      <div><div style="font-size:12px;font-weight:700;color:var(--t)">Subir foto</div><div id="mvpPhNm" style="font-size:10px;color:var(--m);margin-top:2px">Recomendado: foto cuadrada, cara centrada</div></div>
       <input type="file" accept="image/*" id="mvpPhFile" onchange="mvpLoadPhoto(this)" style="display:none">
     </label>
   </div>
@@ -430,25 +432,45 @@ function togM(id,el){
     else{selMs.add(id);el.classList.add('on');el.querySelector('.mi-chk').textContent='✓';}
   }
 }
+let mvpSelectedMid=0;
 function setTpl(t,b){
   curTpl=t;
   document.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   const isMvp=t==='mvp';
   document.getElementById('mvpPanel').style.display=isMvp?'block':'none';
   document.getElementById('matchSec').style.display=isMvp?'none':'block';
-  if(isMvp){
-    // Populate match selector with matches that have results
-    const sel=document.getElementById('mvpMatchSelS');
-    if(sel&&sel.options.length<=1){
-      const withRes=ALL.filter(m=>results[m.id]&&results[m.id].l!==undefined);
-      withRes.sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id-a.id);
-      withRes.forEach(m=>{
-        const r=results[m.id],sc=r.wo?'W/O':`${r.l}-${r.v}`;
-        const opt=document.createElement('option');opt.value=m.id;opt.textContent=`${tn(m.l)} ${sc} ${tn(m.v)} · S${m.week}`;
-        sel.appendChild(opt);
-      });
-    }
-  } else {loadMs();}
+  if(isMvp){ mvpBuildCards(); } else { loadMs(); }
+}
+function mvpBuildCards(){
+  const el=document.getElementById('mvpMatchCards');
+  if(!el)return;
+  const withRes=ALL.filter(m=>results[m.id]&&results[m.id].l!==undefined);
+  withRes.sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id-a.id);
+  if(!withRes.length){el.innerHTML='<div style="font-size:11px;color:var(--m);padding:8px 0">Sin partidos con resultado guardado.</div>';return;}
+  el.innerHTML=withRes.map(m=>{
+    const r=results[m.id],sc=r.wo?'W/O':`${r.l}–${r.v}`;
+    const local=tn(m.l).length>12?ts(m.l):tn(m.l);
+    const visit=tn(m.v).length>12?ts(m.v):tn(m.v);
+    return `<div onclick="mvpPickCard(${m.id},this)" id="mvpC${m.id}" style="display:flex;align-items:center;gap:8px;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;padding:8px 12px;cursor:pointer;transition:.15s">
+      <div style="flex:1;font-size:12px;font-weight:800;color:var(--t)">${local} <span style="color:var(--gn);font-weight:900">${sc}</span> ${visit}</div>
+      <div style="font-size:10px;color:var(--m);white-space:nowrap">S${m.week}</div>
+      <div class="mi-chk" id="mvpCk${m.id}" style="width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bd);flex-shrink:0;font-size:11px;display:flex;align-items:center;justify-content:center"></div>
+    </div>`;
+  }).join('');
+}
+function mvpPickCard(mid,el){
+  mvpSelectedMid=mvpSelectedMid===mid?0:mid;
+  document.querySelectorAll('[id^="mvpC"]').forEach(c=>{c.style.borderColor='var(--bd)';c.style.background='var(--b3)';});
+  document.querySelectorAll('[id^="mvpCk"]').forEach(c=>{c.textContent='';c.style.background='';c.style.borderColor='var(--bd)';});
+  const infoEl=document.getElementById('mvpMatchInfoS');
+  if(mvpSelectedMid){
+    el.style.borderColor='rgba(245,159,11,.6)';el.style.background='rgba(245,159,11,.07)';
+    document.getElementById('mvpCk'+mid).textContent='✓';
+    document.getElementById('mvpCk'+mid).style.background='rgba(245,159,11,.8)';
+    document.getElementById('mvpCk'+mid).style.borderColor='rgba(245,159,11,.8)';
+    const m=ALL.find(x=>x.id===mid),r=results[mid];
+    if(m&&r){const sc=r.wo?'Walkover':`${r.l} – ${r.v}`;infoEl.textContent=`⚽ ${tn(m.l)} ${sc} ${tn(m.v)} · Semana ${m.week}`;}
+  } else { infoEl.textContent=''; }
 }
 function setBg(t,b){bgType=t;document.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
 function loadBgImg(inp){
@@ -833,17 +855,6 @@ function mvpAutoSocial(){
   },600);
 }
 
-function mvpMatchPickS(){
-  const sel=document.getElementById('mvpMatchSelS');
-  const mid=parseInt(sel.value)||0;
-  const infoEl=document.getElementById('mvpMatchInfoS');
-  if(!mid){infoEl.textContent='';return;}
-  const m=ALL.find(x=>x.id===mid);
-  const r=results[mid];
-  if(!m||!r){infoEl.textContent='';return;}
-  const sc=r.wo?'Walkover':`${r.l} – ${r.v}`;
-  infoEl.innerHTML=`<span style="color:var(--gn)">⚽ ${tn(m.l)} <strong>${sc}</strong> ${tn(m.v)}</span> <span style="color:var(--m)">· Semana ${m.week}</span>`;
-}
 
 function mvpLoadPhoto(inp){
   const f=inp.files[0];if(!f)return;
@@ -856,132 +867,146 @@ function rrFill(ctx,x,y,w,h,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x
 function rrStroke(ctx,x,y,w,h,r,c,lw){ctx.strokeStyle=c;ctx.lineWidth=lw||2;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.stroke();}
 
 async function tMVP(ctx){
+  // ── BACKGROUND ──
   await drawBg(ctx);
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,0,W,H);
 
-  // Extra dark overlay so player photo pops
-  ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W,H);
+  // ── CIRCULAR PHOTO — Champions League style ──
+  // Circle centered at W/2, Y=590. Diameter 880px (radius 440).
+  const CX=W/2,CY=590,CR=440;
 
-  topStripe(ctx);
-  clubHeader(ctx,52);
-
-  // ── PHOTO AREA (Y 220 → 1140) ──
-  const PY=220,PH=920;
   if(mvpPhotoImg){
     const pi=mvpPhotoImg;
-    const tr=W/PH,sr=pi.width/pi.height;
+    // Crop photo to square (center crop)
     let sx=0,sy=0,sw=pi.width,sh=pi.height;
-    if(sr>tr){sw=pi.height*tr;sx=(pi.width-sw)/2;}else{sh=pi.width/tr;sy=(pi.height-sh)/2;}
-    ctx.save();ctx.beginPath();ctx.rect(0,PY,W,PH);ctx.clip();
-    ctx.drawImage(pi,sx,sy,sw,sh,0,PY,W,PH);
+    if(pi.width>pi.height){sw=pi.height;sx=(pi.width-pi.height)/2;}
+    else if(pi.height>pi.width){sh=pi.width;sy=(pi.height-pi.width)/2;}
+
+    // 1. Outer soft glow halo behind circle
+    const halo=ctx.createRadialGradient(CX,CY,CR*.75,CX,CY,CR+180);
+    halo.addColorStop(0,'rgba(200,16,46,.35)');
+    halo.addColorStop(.4,'rgba(200,16,46,.12)');
+    halo.addColorStop(.8,'rgba(245,159,11,.06)');
+    halo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=halo;ctx.fillRect(0,0,W,H);
+
+    // 2. Draw photo clipped to circle
+    ctx.save();
+    ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.clip();
+    ctx.drawImage(pi,sx,sy,sw,sh,CX-CR,CY-CR,CR*2,CR*2);
+
+    // 3. Vignette inside circle (darkens edges, spotlights face)
+    const innerVig=ctx.createRadialGradient(CX,CY-CR*.08,CR*.3,CX,CY,CR);
+    innerVig.addColorStop(0,'rgba(0,0,0,0)');
+    innerVig.addColorStop(.5,'rgba(0,0,0,.04)');
+    innerVig.addColorStop(.78,'rgba(0,0,0,.28)');
+    innerVig.addColorStop(1,'rgba(0,0,0,.68)');
+    ctx.fillStyle=innerVig;ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fill();
+
+    // 4. Warm light leak from top-right inside circle (stadium floodlight)
+    const flare=ctx.createRadialGradient(CX+CR*.55,CY-CR*.62,0,CX+CR*.3,CY-CR*.3,CR*.9);
+    flare.addColorStop(0,'rgba(255,220,120,.20)');
+    flare.addColorStop(.4,'rgba(220,160,40,.07)');
+    flare.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=flare;ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fill();
+
     ctx.restore();
 
-    // ── PREMIUM PHOTO EFFECTS ──
-    // 1. Cinematic vignette — radial dark rings from edges
-    const vig=ctx.createRadialGradient(W/2,PY+PH*.42,PH*.08,W/2,PY+PH*.42,PH*.82);
-    vig.addColorStop(0,'rgba(0,0,0,0)');
-    vig.addColorStop(.55,'rgba(0,0,0,.08)');
-    vig.addColorStop(.82,'rgba(0,0,0,.52)');
-    vig.addColorStop(1,'rgba(0,0,0,.82)');
-    ctx.fillStyle=vig;ctx.fillRect(0,PY,W,PH);
-
-    // 2. Side shadow bars (left & right) — cinema aspect
-    const lBar=ctx.createLinearGradient(0,0,160,0);
-    lBar.addColorStop(0,'rgba(0,0,0,.72)');lBar.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=lBar;ctx.fillRect(0,PY,160,PH);
-    const rBar=ctx.createLinearGradient(W-160,0,W,0);
-    rBar.addColorStop(0,'rgba(0,0,0,0)');rBar.addColorStop(1,'rgba(0,0,0,.72)');
-    ctx.fillStyle=rBar;ctx.fillRect(W-160,PY,160,PH);
-
-    // 3. Golden light-leak from top-right corner (warm cinematic flare)
-    const flare=ctx.createRadialGradient(W*.82,PY,0,W*.82,PY,560);
-    flare.addColorStop(0,'rgba(245,180,60,.22)');
-    flare.addColorStop(.35,'rgba(200,120,20,.08)');
-    flare.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=flare;ctx.fillRect(0,PY,W,PH*.6);
-
-    // 4. Bottom fog fade — dissolves into content area
-    const fog=ctx.createLinearGradient(0,PY+PH-560,0,PY+PH);
-    fog.addColorStop(0,'rgba(0,0,0,0)');
-    fog.addColorStop(.45,'rgba(0,0,0,.35)');
-    fog.addColorStop(1,'rgba(0,0,0,.97)');
-    ctx.fillStyle=fog;ctx.fillRect(0,PY+PH-560,W,560);
-
-    // 5. Thin golden frame line at photo boundary top
+    // 5. Double ring frame — outer gold, inner subtle white
     ctx.save();
-    const frameGrad=ctx.createLinearGradient(0,0,W,0);
-    frameGrad.addColorStop(0,'rgba(245,159,11,0)');
-    frameGrad.addColorStop(.3,'rgba(245,159,11,.55)');
-    frameGrad.addColorStop(.7,'rgba(245,159,11,.55)');
-    frameGrad.addColorStop(1,'rgba(245,159,11,0)');
-    ctx.strokeStyle=frameGrad;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(0,PY+1);ctx.lineTo(W,PY+1);ctx.stroke();
+    ctx.shadowColor='rgba(245,159,11,.55)';ctx.shadowBlur=32;
+    ctx.strokeStyle='rgba(245,159,11,.82)';ctx.lineWidth=3.5;
+    ctx.beginPath();ctx.arc(CX,CY,CR+1,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.strokeStyle='rgba(255,255,255,.16)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(CX,CY,CR-7,0,Math.PI*2);ctx.stroke();
     ctx.restore();
 
   } else {
-    // Placeholder — elegant dark gradient
-    const pg=ctx.createLinearGradient(0,PY,0,PY+PH);
-    pg.addColorStop(0,'rgba(200,16,46,.10)');pg.addColorStop(.5,'rgba(100,8,23,.06)');pg.addColorStop(1,'rgba(245,159,11,.04)');
-    ctx.fillStyle=pg;ctx.fillRect(0,PY,W,PH);
-    // Star watermark
-    ctx.save();ctx.globalAlpha=.06;ctx.font='500 240px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#f59e0b';ctx.fillText('⭐',W/2,PY+PH/2);ctx.restore();
-    // Bottom fade
-    const fog=ctx.createLinearGradient(0,PY+PH-400,0,PY+PH);
-    fog.addColorStop(0,'rgba(0,0,0,0)');fog.addColorStop(1,'rgba(0,0,0,.95)');
-    ctx.fillStyle=fog;ctx.fillRect(0,PY+PH-400,W,400);
+    // No photo — elegant placeholder circle
+    const noPhG=ctx.createRadialGradient(CX,CY-CR*.2,0,CX,CY,CR);
+    noPhG.addColorStop(0,'rgba(200,16,46,.15)');
+    noPhG.addColorStop(.6,'rgba(100,8,23,.10)');
+    noPhG.addColorStop(1,'rgba(0,0,0,.5)');
+    ctx.save();ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fillStyle=noPhG;ctx.fill();ctx.restore();
+    ctx.save();ctx.strokeStyle='rgba(245,159,11,.45)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(CX,CY,CR+1,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.globalAlpha=.07;ctx.font='300 220px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffd700';ctx.fillText('⭐',CX,CY+20);ctx.restore();
   }
+
+  // ── COMPACT HEADER OVERLAY (floats over background) ──
+  // Dark fade at top for readability
+  const hFade=lGrad(ctx,0,0,0,200,[0,'rgba(0,0,0,.72)'],[.65,'rgba(0,0,0,.18)'],[1,'rgba(0,0,0,0)']);
+  ctx.fillStyle=hFade;ctx.fillRect(0,0,W,200);
+  topStripe(ctx);
+  // Logo left-aligned compact
+  const logoI=getImg('club');const LW=72,LH=86;
+  if(logoI){ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=18;ctx.drawImage(logoI,44,20,LW,LH);ctx.restore();}
+  else{rrFill(ctx,44,20,LW,LH,12,'rgba(200,16,46,.85)');ctx.font='900 24px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('AN',44+LW/2,20+LH/2);}
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;
+  ctx.font='900 46px Arial Black,sans-serif';ctx.letterSpacing='0';ctx.fillStyle='#fff';ctx.fillText('ATLÉTICO NORTE F.C.',130,28);
+  ctx.font='600 25px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,215,0,.88)';ctx.fillText('LIGA INTERNA  ·  S2 2026',130,88);
+  ctx.restore();
+
+  // ── DARK BASE FOR CONTENT BELOW CIRCLE ──
+  const botFade=lGrad(ctx,0,CY+CR-220,0,H,[0,'rgba(0,0,0,0)'],[.18,'rgba(0,0,0,.55)'],[.5,'rgba(0,0,0,.88)'],[1,'rgba(0,0,0,.97)']);
+  ctx.fillStyle=botFade;ctx.fillRect(0,CY+CR-220,W,H-(CY+CR-220));
 
   // ── MVP BADGE ──
-  const bW=520,bH=76,bX=(W-bW)/2,bY=1060;
-  rrFill(ctx,bX,bY,bW,bH,38,'rgba(245,159,11,.18)');
-  rrStroke(ctx,bX,bY,bW,bH,38,'rgba(245,159,11,.65)',2.5);
-  ctx.font='900 38px Arial Black,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fbbf24';
+  const bY=CY+CR+28,bW=530,bH=74;
+  rrFill(ctx,(W-bW)/2,bY,bW,bH,37,'rgba(245,159,11,.16)');
+  rrStroke(ctx,(W-bW)/2,bY,bW,bH,37,'rgba(245,159,11,.75)',2.5);
+  ctx.save();ctx.shadowColor='rgba(245,159,11,.4)';ctx.shadowBlur=20;
+  ctx.font='900 38px Arial Black,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fbbf24';ctx.letterSpacing='1px';
   ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);
+  ctx.restore();
 
   // ── PLAYER NAME ──
+  ctx.letterSpacing='0';
   const nomDisplay=(mvpNombreS||'JUGADOR').toUpperCase();
   ctx.textAlign='center';ctx.textBaseline='top';
-  let fs=96;ctx.font='900 '+fs+'px Arial Black,Arial,sans-serif';
-  while(ctx.measureText(nomDisplay).width>W-60&&fs>42){fs-=4;ctx.font='900 '+fs+'px Arial Black,Arial,sans-serif';}
-  ctx.fillStyle='#ffffff';ctx.fillText(nomDisplay,W/2,1168);
-  let curY=1168+fs+14;
+  let fs=92;ctx.font='900 '+fs+'px Arial Black,sans-serif';
+  while(ctx.measureText(nomDisplay).width>W-56&&fs>40){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=16;ctx.fillStyle='#fff';ctx.fillText(nomDisplay,W/2,bY+bH+24);ctx.restore();
+  let curY=bY+bH+24+fs+12;
 
-  // ── TEAM ──
+  // ── TEAM NAME ──
   if(mvpEquipoS){
-    ctx.font='700 40px Arial,sans-serif';ctx.fillStyle='rgba(245,159,11,.85)';
-    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,curY);curY+=58;
+    ctx.font='700 36px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(245,159,11,.88)';
+    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,curY);curY+=54;ctx.letterSpacing='0';
   }
 
-  // ── MATCH INFO (from selector) ──
-  const mSel=document.getElementById('mvpMatchSelS');
-  const mMid=mSel?parseInt(mSel.value)||0:0;
-  let infoTxt='';
-  if(mMid){
-    const mm=ALL.find(x=>x.id===mMid),rr=results[mMid];
-    if(mm&&rr)infoTxt=rr.wo?`${tn(mm.l)} vs ${tn(mm.v)} · Walkover`:`${tn(mm.l)} ${rr.l} – ${rr.v} ${tn(mm.v)} · S${mm.week}`;
+  // ── MATCH INFO ──
+  if(mvpSelectedMid){
+    const mm=ALL.find(x=>x.id===mvpSelectedMid),rr=results[mvpSelectedMid];
+    if(mm&&rr){
+      const sc=rr.wo?'Walkover':`${rr.l} – ${rr.v}`;
+      const txt=`${tn(mm.l)}  ${sc}  ${tn(mm.v)}`;
+      ctx.font='600 27px sans-serif';
+      const iW=Math.min(ctx.measureText(txt).width+64,W-80);
+      rrFill(ctx,(W-iW)/2,curY+8,iW,54,14,'rgba(255,255,255,.07)');
+      rrStroke(ctx,(W-iW)/2,curY+8,iW,54,14,'rgba(255,255,255,.08)',1);
+      ctx.fillStyle='rgba(200,220,255,.72)';ctx.textBaseline='middle';
+      ctx.fillText(txt,W/2,curY+8+27);curY+=72;
+      // Semana line
+      ctx.font='500 22px sans-serif';ctx.fillStyle='rgba(150,175,210,.5)';ctx.textBaseline='top';
+      ctx.fillText('Semana '+mm.week+' · Liga Interna S2 2026',W/2,curY+4);curY+=34;
+    }
   }
-  if(infoTxt){
-    ctx.font='600 28px Arial,sans-serif';
-    const iW=Math.min(ctx.measureText(infoTxt).width+72,W-80);
-    rrFill(ctx,(W-iW)/2,curY+8,iW,56,16,'rgba(255,255,255,.07)');
-    ctx.fillStyle='rgba(200,220,255,.72)';ctx.textBaseline='middle';
-    ctx.fillText(infoTxt,W/2,curY+8+28);curY+=78;
-  }
 
-  // ── DIVIDER ──
-  const dy=Math.max(curY+28,1390);
-  ctx.strokeStyle='rgba(200,16,46,.45)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(80,dy);ctx.lineTo(W-80,dy);ctx.stroke();
+  // ── GOLD DIVIDER ──
+  const dy=Math.max(curY+32,H-340);
+  goldRule(ctx,dy);
 
-  // ── FOOTER TEXT ──
-  ctx.textAlign='center';ctx.textBaseline='top';ctx.font='900 58px Arial Black,Arial,sans-serif';ctx.fillStyle='#ffffff';
-  ctx.fillText('¡FELICITACIONES! 🎉',W/2,dy+28);
-  ctx.font='600 32px Arial,sans-serif';ctx.fillStyle='rgba(200,16,46,.9)';
-  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,dy+106);
-  ctx.font='500 25px Arial,sans-serif';ctx.fillStyle='rgba(120,150,190,.55)';
-  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,dy+152);
+  // ── FOOTER ──
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
+  ctx.font='900 50px Arial Black,sans-serif';ctx.fillStyle='#ffffff';
+  ctx.fillText('¡FELICITACIONES! 🎉',W/2,dy+22);
+  ctx.font='600 26px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(200,16,46,.92)';
+  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,dy+88);
 
-  // Bottom stripe
-  ctx.fillStyle='#c8102e';ctx.fillRect(0,H-8,W,8);
+  footer(ctx);
 }
 
 // ═══ JORNADA ════════════════════════════════════════
