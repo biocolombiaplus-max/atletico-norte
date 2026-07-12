@@ -629,22 +629,30 @@ tbody td:nth-child(2){text-align:left}
 /* W penalty badge in table */
 .wpen{display:inline-block;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:5px;padding:1px 5px;font-size:9px;font-weight:900;margin-left:3px}
 /* ── TOAST NOTIFICATIONS ── */
-#toastWrap{position:fixed;top:0;left:0;right:0;z-index:9999;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:56px 12px 0}
-.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(6,13,26,.97),rgba(10,18,36,.97));border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 16px;box-shadow:0 16px 48px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(16px);max-width:420px;width:calc(100vw - 24px);animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both}
-.toast.out{animation:toastOut .3s ease-in both}
-.toast-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.toast-icon.goal{background:linear-gradient(135deg,rgba(16,185,129,.3),rgba(0,200,100,.15));border:1px solid rgba(16,185,129,.4)}
-.toast-icon.info{background:linear-gradient(135deg,rgba(14,165,233,.3),rgba(0,150,255,.15));border:1px solid rgba(14,165,233,.4)}
-.toast-icon.warn{background:linear-gradient(135deg,rgba(245,159,11,.3),rgba(255,180,0,.15));border:1px solid rgba(245,159,11,.4)}
-.toast-icon.red{background:linear-gradient(135deg,rgba(200,16,46,.3),rgba(180,0,30,.15));border:1px solid rgba(200,16,46,.4)}
+/* ── TOASTS PREMIUM ── */
+#toastWrap{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;z-index:9999;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 0}
+.toast{pointer-events:auto;position:relative;display:flex;align-items:center;gap:14px;width:calc(100vw - 28px);max-width:400px;padding:13px 15px 13px 13px;border-radius:20px;overflow:hidden;cursor:pointer;
+  background:rgba(12,18,32,.92);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 20px 60px rgba(0,0,0,.65),0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  animation:tIn .38s cubic-bezier(.22,1,.36,1) both}
+.toast.out{animation:tOut .28s cubic-bezier(.4,0,1,1) both}
+/* Accent left bar */
+.toast::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--tac,#0ea5e9)}
+/* Shimmer top edge */
+.toast::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--tac,#0ea5e9) 50%,transparent 100%);opacity:.35}
+.toast-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .toast-body{flex:1;min-width:0}
-.toast-title{font-size:13px;font-weight:900;color:#fff;margin-bottom:2px;line-height:1.2}
-.toast-sub{font-size:11px;color:rgba(255,255,255,.58);line-height:1.4}
-.toast-prog{position:absolute;bottom:0;left:16px;right:16px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
-.toast-prog-bar{height:100%;border-radius:2px;animation:toastProg linear both}
-@keyframes toastIn{from{opacity:0;transform:translateY(-22px) scale(.94)}to{opacity:1;transform:none}}
-@keyframes toastOut{to{opacity:0;transform:translateY(-12px) scale(.96)}}
-@keyframes toastProg{from{width:100%}to{width:0}}
+.toast-label{font-size:9px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--tac,#0ea5e9);margin-bottom:2px;opacity:.9}
+.toast-title{font-size:14px;font-weight:900;color:#fff;line-height:1.2;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast-sub{font-size:11px;color:rgba(255,255,255,.52);line-height:1.4;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast-close{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;color:rgba(255,255,255,.35);line-height:1}
+.toast-prog{position:absolute;bottom:0;left:0;right:0;height:2px;background:rgba(255,255,255,.05)}
+.toast-prog-bar{height:100%;border-radius:2px;animation:tProg linear both;background:var(--tac,#0ea5e9);opacity:.7}
+@keyframes tIn{from{opacity:0;transform:translateY(-100%) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tOut{to{opacity:0;transform:translateY(-16px) scale(.95)}}
+@keyframes tProg{from{width:100%}to{width:0%}}
 .mhi{font-size:10px;color:var(--gl);background:rgba(245,159,11,.07);border:1px solid rgba(245,159,11,.2);border-radius:9px;padding:10px 12px;margin-bottom:14px}
 .mer{font-size:10px;color:var(--rd);background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:10px 12px;margin-bottom:14px;display:none}
 
@@ -1945,8 +1953,18 @@ function adShowOverview(){
   h+='</div>';
   h+='<button onclick="openM(\'mPrint\')" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(14,165,233,.12));border:1px solid rgba(200,16,46,.3);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;-webkit-appearance:none"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#8b0000);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#128438;</div><div style="text-align:left"><div style="font-size:14px;font-weight:900;color:var(--t);letter-spacing:-.2px">Imprimir / PDF</div><div style="font-size:10px;color:var(--m);margin-top:2px">Fixture general &#183; Por equipo &#183; Tablas de equidad</div></div><div style="margin-left:auto;font-size:18px;color:var(--m)">&#8250;</div></button>';
   h+='<div id="pEx" style="margin-top:14px"></div>';
+  // Zona reinicio — solo Administrador
+  h+='<div style="margin-top:6px;padding:14px;background:rgba(200,16,46,.05);border:1px solid rgba(200,16,46,.18);border-radius:14px">';
+  h+='<div style="font-size:9px;font-weight:900;color:rgba(200,16,46,.6);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">⚙️ Control del Campeonato</div>';
+  h+='<div id="campStatusAdm" style="font-size:11px;color:var(--m);margin-bottom:10px;line-height:1.5">Cargando estado…</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:8px">';
+  h+='<button onclick="confirmResetApp()" style="-webkit-appearance:none;width:100%;padding:13px;border-radius:12px;background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.3);color:#f87171;font-size:13px;font-weight:900;cursor:pointer">🗑 Reiniciar datos de prueba</button>';
+  h+='<button id="btnCampApp" onclick="toggleCampeonatoApp()" style="-webkit-appearance:none;width:100%;padding:13px;border-radius:12px;background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.3);color:var(--ac);font-size:13px;font-weight:900;cursor:pointer">Cargando…</button>';
+  h+='</div></div>';
   h+='</div>';
   adCnt(h);
+  // Cargar estado campeonato
+  loadCampeonatoStatus();
 }
 
 function adShowPl(){
@@ -3723,6 +3741,128 @@ async function expC(){
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8;"}));a.download="socios_s2_2026.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 
+// ══════════════════════════════════════════════════════
+// ── CONTROL CAMPEONATO (solo Administrador) ──
+// ══════════════════════════════════════════════════════
+var _campIni=false,_clavePres=null;
+db.ref('/config/campeonatoIniciado').on('value',function(s){_campIni=!!s.val();});
+db.ref('/config/clavePresidente').on('value',function(s){_clavePres=s.val()||null;});
+
+function loadCampeonatoStatus(){
+  db.ref('/config/campeonatoIniciado').once('value',function(s){
+    var ini=!!s.val();
+    var st=document.getElementById('campStatusAdm');
+    var btn=document.getElementById('btnCampApp');
+    if(!st||!btn)return;
+    if(ini){
+      st.innerHTML='🟢 <strong style="color:#10b981">Campeonato EN CURSO</strong> — el reinicio requiere clave del Presidente.';
+      btn.textContent='🔑 Cambiar clave del Presidente';
+      btn.style.borderColor='rgba(16,185,129,.3)';btn.style.color='#10b981';btn.style.background='rgba(16,185,129,.08)';
+    }else{
+      st.innerHTML='⚪ Modo pruebas activo — campeonato <strong>no iniciado</strong>.';
+      btn.textContent='🚀 Iniciar campeonato';
+      btn.style.borderColor='rgba(14,165,233,.3)';btn.style.color='var(--ac)';btn.style.background='rgba(14,165,233,.08)';
+    }
+  });
+}
+
+function toggleCampeonatoApp(){
+  if(_campIni){
+    openPresClaveApp();
+  }else{
+    if(!confirm('¿Iniciar el campeonato? Asegúrate de haber definido la clave del Presidente primero.'))return;
+    if(!_clavePres){openPresClaveApp();showToast('warn','Define primero la clave del Presidente','Sin clave no se puede iniciar',4000,'#f59e0b');return;}
+    db.ref('/config/campeonatoIniciado').set(true).then(function(){
+      showToast('kick','¡Campeonato iniciado!','A partir de ahora los datos están protegidos',5000,'#10b981');
+      loadCampeonatoStatus();
+    });
+  }
+}
+
+function openPresClaveApp(){
+  var ov=document.getElementById('presClaveOvApp');
+  if(!ov){
+    ov=document.createElement('div');ov.id='presClaveOvApp';
+    ov.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;padding:0 0 env(safe-area-inset-bottom,16px)';
+    ov.innerHTML='<div style="background:#0b1422;border:1px solid rgba(255,255,255,.1);border-radius:24px 24px 0 0;padding:28px 20px 20px;width:100%;max-width:420px">'+
+      '<div style="text-align:center;font-size:28px;margin-bottom:6px">🔑</div>'+
+      '<div style="font-size:17px;font-weight:900;text-align:center;color:#fff;margin-bottom:4px">Clave del Presidente</div>'+
+      '<div style="font-size:12px;color:rgba(255,255,255,.45);text-align:center;margin-bottom:18px">Protege el reinicio de datos durante el campeonato</div>'+
+      '<input type="password" id="pcIn1App" placeholder="Nueva clave" style="width:100%;background:#101c30;border:2px solid #1a2d45;border-radius:14px;padding:16px;color:#fff;font-size:18px;font-weight:700;text-align:center;margin-bottom:10px;outline:none">'+
+      '<input type="password" id="pcIn2App" placeholder="Confirmar clave" style="width:100%;background:#101c30;border:2px solid #1a2d45;border-radius:14px;padding:16px;color:#fff;font-size:18px;font-weight:700;text-align:center;margin-bottom:10px;outline:none">'+
+      '<div id="pcErrApp" style="font-size:12px;color:#f87171;text-align:center;min-height:18px;margin-bottom:12px"></div>'+
+      '<div style="display:flex;gap:10px">'+
+        '<button onclick="document.getElementById(\'presClaveOvApp\').remove()" style="-webkit-appearance:none;flex:1;padding:15px;border-radius:12px;background:#1a2d45;border:none;color:#7a96b4;font-size:14px;font-weight:800;cursor:pointer">Cancelar</button>'+
+        '<button onclick="guardarClavePresApp()" style="-webkit-appearance:none;flex:2;padding:15px;border-radius:12px;background:#c8102e;border:none;color:#fff;font-size:14px;font-weight:900;cursor:pointer">Guardar clave</button>'+
+      '</div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  }
+  ov.style.display='flex';
+  setTimeout(function(){var i=document.getElementById('pcIn1App');if(i)i.focus();},100);
+}
+
+function guardarClavePresApp(){
+  var v1=(document.getElementById('pcIn1App').value||'').trim();
+  var v2=(document.getElementById('pcIn2App').value||'').trim();
+  var err=document.getElementById('pcErrApp');
+  if(v1.length<4){err.textContent='Mínimo 4 caracteres.';return;}
+  if(v1!==v2){err.textContent='Las claves no coinciden.';return;}
+  db.ref('/config/clavePresidente').set(v1).then(function(){
+    document.getElementById('presClaveOvApp').remove();
+    if(!_campIni){
+      db.ref('/config/campeonatoIniciado').set(true);
+      showToast('kick','¡Campeonato iniciado!','Clave del Presidente configurada',5000,'#10b981');
+    }else{
+      showToast('info','Clave actualizada','La nueva clave del Presidente está activa',4000,'#10b981');
+    }
+    loadCampeonatoStatus();
+  });
+}
+
+function confirmResetApp(){
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;padding:0 0 env(safe-area-inset-bottom,16px)';
+  var presHtml=_campIni?
+    '<div style="background:rgba(245,159,11,.08);border:1px solid rgba(245,159,11,.25);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:#f59e0b;text-align:center">🔒 Campeonato en curso — ingresa la clave del Presidente para continuar</div>'+
+    '<input type="password" id="resetPinApp" placeholder="Clave del Presidente" style="width:100%;background:#101c30;border:2px solid #1a2d45;border-radius:14px;padding:16px;color:#fff;font-size:18px;font-weight:700;text-align:center;margin-bottom:10px;outline:none">':
+    '<div style="font-size:12px;color:rgba(255,255,255,.45);text-align:center;margin-bottom:16px">Se borrarán todos los resultados y cambios de horario. Esta acción no se puede deshacer.</div>';
+  ov.innerHTML='<div style="background:#0b1422;border:1px solid rgba(255,255,255,.1);border-radius:24px 24px 0 0;padding:28px 20px 20px;width:100%;max-width:420px">'+
+    '<div style="text-align:center;font-size:28px;margin-bottom:6px">⚠️</div>'+
+    '<div style="font-size:17px;font-weight:900;text-align:center;color:#fff;margin-bottom:12px">'+(_campIni?'Reinicio bloqueado':'Reiniciar datos de prueba')+'</div>'+
+    presHtml+
+    '<div id="resetErrApp" style="font-size:12px;color:#f87171;text-align:center;min-height:18px;margin-bottom:10px"></div>'+
+    '<div style="display:flex;gap:10px">'+
+      '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="-webkit-appearance:none;flex:1;padding:15px;border-radius:12px;background:#1a2d45;border:none;color:#7a96b4;font-size:14px;font-weight:800;cursor:pointer">Cancelar</button>'+
+      '<button onclick="execResetApp(this)" style="-webkit-appearance:none;flex:2;padding:15px;border-radius:12px;background:#c8102e;border:none;color:#fff;font-size:14px;font-weight:900;cursor:pointer">🗑 Sí, reiniciar</button>'+
+    '</div></div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  if(_campIni){var i=document.getElementById('resetPinApp');if(i)setTimeout(function(){i.focus();},100);}
+}
+
+async function execResetApp(btn){
+  if(_campIni){
+    var pin=(document.getElementById('resetPinApp').value||'').trim();
+    var err=document.getElementById('resetErrApp');
+    if(!pin){err.textContent='Ingresa la clave del Presidente.';return;}
+    if(pin!==_clavePres){err.textContent='Clave incorrecta. Solo el Presidente puede autorizar esto.';return;}
+  }
+  btn.disabled=true;btn.textContent='Reiniciando…';
+  try{
+    await db.ref('/resultados').remove();
+    await db.ref('/horaOverrides').remove();
+    await db.ref('/config/campeonatoIniciado').remove();
+    await db.ref('/config/clavePresidente').remove();
+    btn.closest('[style*=fixed]').remove();
+    showToast('info','Datos reiniciados','Todos los resultados y cambios fueron eliminados',5000,'#10b981');
+    loadCampeonatoStatus();
+  }catch(e){
+    document.getElementById('resetErrApp').textContent='Error: '+e.message;
+    btn.disabled=false;btn.textContent='🗑 Sí, reiniciar';
+  }
+}
+
 // ── INIT ──
 initFltEq();rFx();rTb();rEqd();rDlg(DLG_DEF);updHdr();
 setTimeout(function(){rSortGrd();},100);
@@ -3731,15 +3871,26 @@ setTimeout(function(){rSortGrd();},100);
 // ── TOAST NOTIFICATION SYSTEM ──
 // ═══════════════════════════════════════════════
 var _toastTimers={};
+var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
 function showToast(type,title,sub,dur,accentColor){
   dur=dur||5000;
   var id='t'+Date.now();
-  var iconMap={goal:'⚽',info:'ℹ️',warn:'⚠️',red:'🔔'};
+  var iconMap={goal:'⚽',info:'ℹ️',warn:'⚠️',red:'🚨',kick:'🏁',yellow:'🟨',expulsion:'🟥'};
   var icon=iconMap[type]||'🔔';
   var ac=accentColor||'#0ea5e9';
+  var label=_toastLabels[type]||'';
   var el=document.createElement('div');
-  el.className='toast';el.id=id;el.style.borderColor=ac+'44';el.style.position='relative';el.style.overflow='hidden';
-  el.innerHTML='<div class="toast-icon '+type+'">'+icon+'</div><div class="toast-body"><div class="toast-title">'+title+'</div><div class="toast-sub">'+sub+'</div></div><div class="toast-prog"><div class="toast-prog-bar" style="background:'+ac+';animation-duration:'+dur+'ms"></div></div>';
+  el.className='toast';el.id=id;
+  el.style.setProperty('--tac',ac);
+  el.innerHTML=
+    '<div class="toast-icon">'+icon+'</div>'+
+    '<div class="toast-body">'+
+      (label?'<div class="toast-label">'+label+'</div>':'')+
+      '<div class="toast-title">'+title+'</div>'+
+      (sub?'<div class="toast-sub">'+sub+'</div>':'')+
+    '</div>'+
+    '<div class="toast-close">✕</div>'+
+    '<div class="toast-prog"><div class="toast-prog-bar" style="animation-duration:'+dur+'ms"></div></div>';
   el.onclick=function(){rmToast(id);};
   document.getElementById('toastWrap').appendChild(el);
   _toastTimers[id]=setTimeout(function(){rmToast(id);},dur);
@@ -3750,7 +3901,7 @@ function rmToast(id){
   var el=document.getElementById(id);
   if(!el)return;
   el.classList.add('out');
-  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},320);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},300);
 }
 
 // ═══════════════════════════════════════════════
@@ -3827,7 +3978,7 @@ async function pushTarjetaRoja(jugador,equipo){
 // Inicio de partido — llamar cuando el admin activa el partido
 async function pushInicioPartido(m){
   if(!fbR||!db)return;
-  showToast('info','🏁 ¡Comienza el partido!',tn(m.l)+' vs '+tn(m.v)+' · '+m.cancha,5000,'#0ea5e9');
+  showToast('kick','¡Comienza el partido!',tn(m.l)+' vs '+tn(m.v)+' · '+m.cancha,6000,'#f59e0b');
   await db.ref('/pushQueue').push({type:'kickoff',
     title:'🏁 ¡Arranca el partido!',
     body:tn(m.l)+' vs '+tn(m.v)+' · '+m.hora+' · '+m.cancha,
