@@ -1275,12 +1275,12 @@ async function tPartido(ctx,m){
   rule(ctx,1034,.42);
 
   // ── BADGES ──
-  const midY=1200,tlx=W*.25,trx=W*.75,tSz=380;
+  const midY=1200,tlx=W*.23,trx=W*.77,tSz=360;
   await drawBadge(ctx,m.l,tlx,midY,tSz);
   await drawBadge(ctx,m.v,trx,midY,tSz);
 
   // VS circle
-  const vsR=88;
+  const vsR=72;
   ctx.save();ctx.shadowColor='rgba(200,16,46,.9)';ctx.shadowBlur=60;
   const vg=ctx.createRadialGradient(W/2,midY,0,W/2,midY,vsR);
   vg.addColorStop(0,'rgba(200,16,46,.5)');vg.addColorStop(.6,'rgba(200,16,46,.22)');vg.addColorStop(1,'transparent');
