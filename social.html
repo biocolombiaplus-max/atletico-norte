@@ -502,6 +502,7 @@ async function gen(){
   const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
   spinEl.style.display='flex';cv.style.display='none';
   await new Promise(r=>setTimeout(r,40));
+  let ok=false;
   try{
     ctx.clearRect(0,0,W,H);
     if(curTpl==='mvp')await tMVP(ctx);
@@ -509,16 +510,19 @@ async function gen(){
     else if(curTpl==='partido')await tPartido(ctx,ms[0]);
     else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
     else await tTabla(ctx);
-    cv.style.display='block';
-    document.getElementById('btnDl').style.display='block';
-    document.getElementById('btnCp').style.display='block';
-    cv.scrollIntoView({behavior:'smooth',block:'center'});
-    updateBadgePreviews();
+    ok=true;
   }catch(e){
     console.error('Error generando imagen:',e);
     alert('Error al generar: '+e.message);
   }finally{
     spinEl.style.display='none';
+    cv.style.display='block';
+    if(ok){
+      document.getElementById('btnDl').style.display='block';
+      document.getElementById('btnCp').style.display='block';
+      cv.scrollIntoView({behavior:'smooth',block:'center'});
+      updateBadgePreviews();
+    }
   }
 }
 
@@ -1327,9 +1331,20 @@ async function tPartido(ctx,m){
 
 // ═══ RESULTADO ══════════════════════════════════════
 async function tResultado(ctx,m){
-  if(!m)return;
+  if(!m){
+    ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,215,0,.7)';ctx.font='700 42px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Selecciona un partido con resultado',W/2,H/2);return;
+  }
   const r=results[m.id];
-  if(!r||r.l===undefined){alert('Sin resultado aún');document.getElementById('spinW').style.display='none';return;}
+  if(!r||r.l===undefined){
+    ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='700 38px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Resultado no disponible aún',W/2,H/2-30);
+    ctx.fillStyle='rgba(255,215,0,.4)';ctx.font='500 28px sans-serif';
+    ctx.fillText('Ingresa el resultado en Firebase primero',W/2,H/2+30);
+    return;
+  }
   const mx=48;
 
   // ── FONDO ──
