@@ -1040,16 +1040,16 @@ async function tMVP(ctx){
 async function tJornada(ctx,ms){
   await drawBg(ctx);topStripe(ctx);clubHeader(ctx,52);
   const weeks=[...new Set(ms.map(m=>m.week))];
-  const wkLbl=weeks.length===1?`JORNADA ${weeks[0]}`:`SEMANAS ${Math.min(...weeks)}–${Math.max(...weeks)}`;
+  const wkLbl=weeks.length===1?`SEMANA ${weeks[0]}`:`SEMANAS ${Math.min(...weeks)}–${Math.max(...weeks)}`;
   // Week pill
-  const pW=520,pH=72,pX=W/2-pW/2,pY=400;
+  const pW=480,pH=58,pX=W/2-pW/2,pY=388;
   const pg=lGrad(ctx,pX,pY,pX+pW,pY+pH,[0,'rgba(200,16,46,.18)'],[.5,'rgba(200,16,46,.3)'],[1,'rgba(200,16,46,.18)']);
   ctx.fillStyle=pg;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.fill();
   ctx.save();ctx.globalAlpha=.1;ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(pX+8,pY+4,pW-16,pH*.45,pH*.45);ctx.fill();ctx.restore();
   const pb=lGrad(ctx,pX,pY,pX+pW,pY,[0,'rgba(255,215,0,.25)'],[.5,'rgba(255,215,0,.65)'],[1,'rgba(255,215,0,.25)']);
   ctx.strokeStyle=pb;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.stroke();
   const tg=lGrad(ctx,W/2-200,0,W/2+200,0,[0,'#ffd700'],[.5,'#fff'],[1,'#ffd700']);
-  ctx.fillStyle=tg;ctx.font='900 36px sans-serif';ctx.textAlign='center';ctx.letterSpacing='5px';ctx.fillText(wkLbl,W/2,pY+pH*.65);
+  ctx.fillStyle=tg;ctx.font='900 30px sans-serif';ctx.textAlign='center';ctx.letterSpacing='5px';ctx.fillText(wkLbl,W/2,pY+pH*.68);
 
   // Group all matches by day — sorted by date then by time within each day
   const byD={};ms.forEach(m=>{if(!byD[m.fecha])byD[m.fecha]=[];byD[m.fecha].push(m);});
@@ -1075,7 +1075,7 @@ async function tJornada(ctx,ms){
     }
     if(gi<grps.length-1)curY+=grpGap;
   }
-  footer(ctx);
+  botStripe(ctx);
 }
 
 function jorDayHeader(ctx,fecha,y,h){
