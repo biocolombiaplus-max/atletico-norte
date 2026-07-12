@@ -1272,55 +1272,111 @@ async function tResultado(ctx,m){
   const r=results[m.id];
   if(!r||r.l===undefined){alert('Sin resultado aún');document.getElementById('spinW').style.display='none';return;}
   await drawBg(ctx);topStripe(ctx);
-  rGlow(ctx,W/2,H*.42,720,'rgba(255,215,0,.12)');
+  // Glows de ambiente
+  rGlow(ctx,W*.2,H*.55,580,'rgba(200,16,46,.22)');
+  rGlow(ctx,W*.8,H*.55,580,'rgba(0,80,200,.15)');
+  rGlow(ctx,W/2,H*.4,500,'rgba(255,200,0,.08)');
+
+  // ── CABECERA CLUB ──
   clubHeader(ctx,50);
-  // "RESULTADO FINAL" badge
-  const rbY=448,rbW=640,rbH=74,rbX=W/2-rbW/2;
-  const rbg=lGrad(ctx,rbX,rbY-rbH*.8,rbX+rbW,rbY+10,[0,'rgba(255,215,0,.1)'],[.5,'rgba(255,215,0,.24)'],[1,'rgba(255,215,0,.1)']);
-  ctx.fillStyle=rbg;ctx.beginPath();ctx.roundRect(rbX,rbY-rbH*.8,rbW,rbH,rbH/2);ctx.fill();
-  ctx.strokeStyle='rgba(255,215,0,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(rbX,rbY-rbH*.8,rbW,rbH,rbH/2);ctx.stroke();
-  const rg2=lGrad(ctx,W/2-200,0,W/2+200,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-  ctx.fillStyle=rg2;ctx.font='900 38px sans-serif';ctx.textAlign='center';ctx.letterSpacing='4px';ctx.fillText('⚽  RESULTADO FINAL',W/2,rbY);
 
-  // Date/meta row
+  // ── BADGE "RESULTADO FINAL" ──
+  const rbH=78,rbW=700,rbX=W/2-rbW/2,rbY=406;
+  ctx.fillStyle=lGrad(ctx,rbX,rbY,rbX+rbW,rbY+rbH,[0,'rgba(200,16,46,.18)'],[.5,'rgba(200,16,46,.36)'],[1,'rgba(200,16,46,.18)']);
+  ctx.beginPath();ctx.roundRect(rbX,rbY,rbW,rbH,rbH/2);ctx.fill();
+  ctx.save();ctx.globalAlpha=.13;
+  ctx.fillStyle=lGrad(ctx,rbX,rbY,rbX+rbW,rbY+rbH*.48,[0,'transparent'],[.5,'#fff'],[1,'transparent']);
+  ctx.beginPath();ctx.roundRect(rbX+2,rbY+2,rbW-4,rbH*.44,rbH/2);ctx.fill();ctx.restore();
+  ctx.strokeStyle='rgba(200,16,46,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(rbX,rbY,rbW,rbH,rbH/2);ctx.stroke();
+  ctx.font='900 36px sans-serif';ctx.fillStyle='rgba(255,255,255,.92)';ctx.textAlign='center';ctx.letterSpacing='4px';
+  ctx.fillText('⚽  RESULTADO FINAL',W/2,rbY+rbH*.67);
+
+  // ── FECHA (grande, prominente) ──
   const d2=new Date(m.fecha+'T12:00:00');
-  const metaStr=`${DS[d2.getDay()].toUpperCase()} ${d2.getDate()} ${MS2[d2.getMonth()].toUpperCase()}   ·   ${m.hora}   ·   ${m.cancha}`;
-  ctx.font='700 30px sans-serif';ctx.fillStyle='rgba(255,255,255,.55)';ctx.textAlign='center';ctx.letterSpacing='1px';
-  ctx.fillText(metaStr,W/2,504);
-  rule(ctx,530,.4);
+  const fechaLarga=`${DL[d2.getDay()].toUpperCase()} ${d2.getDate()} DE ${ML[d2.getMonth()].toUpperCase()}`;
+  goldRule(ctx,500);
+  ctx.save();ctx.shadowColor='rgba(255,210,0,.3)';ctx.shadowBlur=20;
+  ctx.font='900 52px Arial Black,sans-serif';ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.letterSpacing='0';
+  ctx.fillText(fechaLarga,W/2,568);ctx.restore();
 
-  const midY=H*.5;
-  await drawBadge(ctx,m.l,W*.19,midY,300);
-  await drawBadge(ctx,m.v,W*.81,midY,300);
+  // ── META (hora · cancha · vuelta) ──
+  ctx.font='700 34px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,215,0,.75)';ctx.textAlign='center';
+  ctx.fillText(`🕐 ${m.hora}   ·   📍 ${m.cancha}   ·   V${m.vu}`,W/2,622);
+  goldRule(ctx,650);
+
+  // ── ZONA CENTRAL: badges + score ──
+  const midY=870;
+  await drawBadge(ctx,m.l,W*.17,midY,330);
+  await drawBadge(ctx,m.v,W*.83,midY,330);
 
   // Score box
-  const sbW=420,sbH=200,sbX=W/2-sbW/2,sbY=midY-sbH*.52;
-  ctx.save();ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=70;
-  const sbg=lGrad(ctx,sbX,sbY,sbX+sbW,sbY+sbH,[0,'rgba(120,8,20,.9)'],[.5,'rgba(185,14,30,.95)'],[1,'rgba(120,8,20,.9)']);
-  ctx.fillStyle=sbg;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,28);ctx.fill();ctx.restore();
-  const sbb=lGrad(ctx,sbX,sbY,sbX+sbW,sbY+sbH,[0,'rgba(255,215,0,.4)'],[.5,'rgba(255,215,0,.85)'],[1,'rgba(255,215,0,.4)']);
-  ctx.strokeStyle=sbb;ctx.lineWidth=2.5;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,28);ctx.stroke();
-  ctx.save();ctx.globalAlpha=.12;ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(sbX+14,sbY+10,sbW-28,sbH*.48,22);ctx.fill();ctx.restore();
-  ctx.save();ctx.shadowColor='rgba(255,255,255,.35)';ctx.shadowBlur=25;
-  ctx.font='900 136px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-4px';
-  ctx.fillText(`${r.l} - ${r.v}`,W/2,sbY+sbH*.52);ctx.restore();ctx.textBaseline='alphabetic';
+  const sbW=460,sbH=226,sbX=W/2-sbW/2,sbY=midY-sbH*.55;
+  ctx.save();ctx.shadowColor='rgba(180,10,26,.72)';ctx.shadowBlur=80;
+  ctx.fillStyle=lGrad(ctx,sbX,sbY,sbX+sbW,sbY+sbH,[0,'rgba(110,6,18,.94)'],[.5,'rgba(175,12,28,.97)'],[1,'rgba(110,6,18,.94)']);
+  ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,30);ctx.fill();ctx.restore();
+  ctx.strokeStyle=lGrad(ctx,sbX,sbY,sbX+sbW,sbY+sbH,[0,'rgba(255,215,0,.45)'],[.5,'rgba(255,215,0,.9)'],[1,'rgba(255,215,0,.45)']);
+  ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,30);ctx.stroke();
+  ctx.save();ctx.globalAlpha=.14;ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(sbX+14,sbY+12,sbW-28,sbH*.46,24);ctx.fill();ctx.restore();
+  // Marcador
+  const scoreStr=r.wo?'W/O':`${r.l} - ${r.v}`;
+  ctx.save();ctx.shadowColor='rgba(255,255,255,.4)';ctx.shadowBlur=30;
+  ctx.font='900 148px Arial Black,sans-serif';ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-4px';
+  ctx.fillText(scoreStr,W/2,sbY+sbH*.52);ctx.restore();ctx.textBaseline='alphabetic';
 
+  // ── RESULTADO (ganador / empate) ──
   const winId=r.l>r.v?m.l:(r.v>r.l?m.v:null);
-  const winY=midY+sbH*.5+64;
+  const resY=midY+sbH*.52+58;
   if(winId){
-    const wg=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-    ctx.fillStyle=wg;ctx.font='800 32px sans-serif';ctx.letterSpacing='2px';ctx.textAlign='center';
-    ctx.fillText(`🏆  ${tn(winId).toUpperCase()}  GANA`,W/2,winY);
-  }else{ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='700 28px sans-serif';ctx.letterSpacing='2px';ctx.textAlign='center';ctx.fillText('EMPATE',W/2,winY);}
-
-  const ny2=midY+210;
-  function rlbl(id,x){
-    ctx.font='900 36px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(tn(id).toUpperCase(),x,ny2);
-    const ag=lGrad(ctx,x-60,0,x+60,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-    ctx.font='700 26px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle=ag;ctx.fillText(ts(id),x,ny2+40);
+    ctx.save();ctx.shadowColor='rgba(255,210,0,.4)';ctx.shadowBlur=24;
+    ctx.fillStyle=lGrad(ctx,W/2-300,0,W/2+300,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+    ctx.font='900 48px Arial Black,sans-serif';ctx.textAlign='center';ctx.letterSpacing='1px';
+    let nm=tn(winId).toUpperCase();let nfs=48;ctx.font='900 '+nfs+'px Arial Black,sans-serif';
+    while(ctx.measureText('🏆  '+nm+'  GANA').width>W-80&&nfs>28){nfs-=4;ctx.font='900 '+nfs+'px Arial Black,sans-serif';}
+    ctx.fillText(`🏆  ${nm}  GANA`,W/2,resY);ctx.restore();
+  }else{
+    ctx.save();ctx.shadowColor='rgba(200,200,255,.2)';ctx.shadowBlur=16;
+    ctx.font='900 52px Arial Black,sans-serif';ctx.fillStyle='rgba(200,218,255,.72)';ctx.textAlign='center';ctx.letterSpacing='4px';
+    ctx.fillText('⚖️  EMPATE',W/2,resY);ctx.restore();
   }
-  rlbl(m.l,W*.19);rlbl(m.v,W*.81);
-  footer(ctx);
+
+  // ── NOMBRES DE EQUIPOS (grandes) ──
+  const ny2=midY+sbH*.52+130;
+  function rlbl(id,x){
+    let nm=tn(id).toUpperCase(),nfs=46;ctx.font='900 '+nfs+'px Arial Black,sans-serif';
+    while(ctx.measureText(nm).width>330&&nfs>26){nfs-=4;ctx.font='900 '+nfs+'px Arial Black,sans-serif';}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=14;ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText(nm,x,ny2);ctx.restore();
+    ctx.font='800 30px sans-serif';ctx.letterSpacing='4px';
+    ctx.fillStyle=lGrad(ctx,x-70,0,x+70,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+    ctx.fillText(ts(id),x,ny2+42);ctx.letterSpacing='0';
+  }
+  rlbl(m.l,W*.17);rlbl(m.v,W*.83);
+
+  // ── ANOTADORES (si los hay) ──
+  const scorers=r.scorers||[];
+  if(scorers.length){
+    const scY=ny2+100;
+    goldRule(ctx,scY);
+    ctx.font='800 26px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle='rgba(255,215,0,.65)';ctx.textAlign='center';
+    ctx.fillText('ANOTADORES',W/2,scY+34);
+    scorers.forEach((s,i)=>{
+      const lY=scY+70+i*48;if(lY>1640)return;
+      const tid=s.teamId||(s.team==='Local'?m.l:m.v);
+      const isLocal=tid===m.l;
+      const sym=s.autogol?'⚽ (AG)':'⚽';
+      ctx.font='700 28px sans-serif';ctx.letterSpacing='.5px';ctx.fillStyle='rgba(255,255,255,.82)';ctx.textAlign='center';
+      ctx.fillText(`${sym}  ${s.name||s.corto||''}  ·  ${isLocal?tn(m.l):tn(m.v)}`,W/2,lY);
+    });
+  }
+
+  // ── PIE ──
+  goldRule(ctx,H-260);
+  ctx.font='700 26px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle='rgba(255,255,255,.28)';ctx.textAlign='center';
+  ctx.fillText('LIGA INTERNA · TEMPORADA S2 2026',W/2,H-218);
+  ctx.font='500 20px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.18)';
+  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,H-182);
+  ctx.letterSpacing='0';
+  botStripe(ctx);
 }
 
 // ═══ TABLA ══════════════════════════════════════════
