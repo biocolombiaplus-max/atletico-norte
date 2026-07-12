@@ -1280,6 +1280,14 @@ window.addEventListener("load",function(){
   }
 });
 
+// Banner publicitario público — se muestra a todos, 10s tras cargar
+if(!sessionStorage.getItem('adSocioHidden')){
+  setTimeout(function(){
+    var b=document.getElementById('adSocioBanner');
+    if(b)b.style.display='block';
+  },10000);
+}
+
 // ── HELPERS ──
 function tn(id){return T[id]?T[id].n:"Equipo "+id}
 function ts(id){return T[id]?T[id].s:"T"+id}
@@ -1520,13 +1528,6 @@ function onIn(){
   rPn();
   setTimeout(function(){initLiveGoalListener();initPush();},1500);
   if(!pf.passChanged)setTimeout(function(){openM("mCp");},1000);
-  // Mostrar banner publicitario a socios logueados (8s delay, una vez por sesión)
-  if(!sessionStorage.getItem('adSocioHidden')){
-    setTimeout(function(){
-      var b=document.getElementById('adSocioBanner');
-      if(b&&cu)b.style.display='block';
-    },8000);
-  }
 }
 function closeAdSocioBanner(){
   var b=document.getElementById('adSocioBanner');
