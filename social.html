@@ -1062,7 +1062,7 @@ async function tJornada(ctx,ms){
   const startY=pY+pH+24,endY=H-178;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
-  const cH=Math.max(192,Math.floor((available-overhead)/Math.max(nCards,1)));
+  const cH=Math.max(240,Math.floor((available-overhead)/Math.max(nCards,1)));
 
   let curY=startY;
   for(let gi=0;gi<grps.length;gi++){
@@ -1130,8 +1130,8 @@ async function jorCard(ctx,m,y,h){
 
   // ── LAYOUT: horizontal (logo | nombre | VS/score | nombre | logo) ──
   // Meta strip con tamaños FIJOS para que siempre sea legible
-  const CHIP_H=34,CHIP_FS=21,FECHA_FS=20,META_PAD=12;
-  const metaH=CHIP_H+FECHA_FS+META_PAD*3; // ~80px fijo
+  const CHIP_H=50,CHIP_FS=30,FECHA_FS=28,META_PAD=14;
+  const metaH=FECHA_FS+CHIP_H*2+META_PAD*4; // fecha + 2 filas chips
   const topH=h-metaH;
   const cy=y+topH*.5;
   const logoSz=topH*.84,logoR=logoSz*.5;
@@ -1174,43 +1174,45 @@ async function jorCard(ctx,m,y,h){
   }
   drawTN(m.l,ncl,nameW);drawTN(m.v,ncr,nameW);
 
-  // ── META STRIP con chips de color FIJOS ──
+  // ── META STRIP — 2 filas para que no se solapen ──
   const metaTop=y+topH;
   ctx.strokeStyle='rgba(255,215,0,.22)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(mx+40,metaTop);ctx.lineTo(mx+mw-40,metaTop);ctx.stroke();
 
-  // Fecha encima de los chips
-  const fechaY=metaTop+META_PAD+FECHA_FS;
-  ctx.font=`700 ${FECHA_FS}px sans-serif`;ctx.letterSpacing='1.5px';
-  ctx.fillStyle='rgba(255,215,0,.82)';ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillText(fD(m.fecha,false),W/2,fechaY);
-
-  // Chips en fila debajo de fecha
-  const chipY2=fechaY+META_PAD;
-  function chip(label,bg,border,cx){
+  // Función chip genérica — dibuja donde se le diga
+  function chip(label,bg,border,chipX,chipY){
     ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
     const tw=ctx.measureText(label).width;
-    const cw=tw+26,cx0=cx-cw/2;
-    ctx.save();ctx.shadowColor=border;ctx.shadowBlur=12;
-    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(cx0,chipY2,cw,CHIP_H,CHIP_H/2);ctx.fill();ctx.restore();
-    ctx.strokeStyle=border;ctx.lineWidth=1.3;ctx.beginPath();ctx.roundRect(cx0,chipY2,cw,CHIP_H,CHIP_H/2);ctx.stroke();
+    const cw=tw+30,cx0=chipX-cw/2;
+    ctx.save();ctx.shadowColor=border;ctx.shadowBlur=14;
+    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(cx0,chipY,cw,CHIP_H,CHIP_H/2);ctx.fill();ctx.restore();
+    ctx.strokeStyle=border;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(cx0,chipY,cw,CHIP_H,CHIP_H/2);ctx.stroke();
     ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(label,cx,chipY2+CHIP_H/2);ctx.textBaseline='alphabetic';
-    return cw;
+    ctx.fillText(label,chipX,chipY+CHIP_H/2);ctx.textBaseline='alphabetic';
   }
 
-  ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
+  // Fecha centrada — primera línea
+  const fechaY=metaTop+META_PAD+FECHA_FS;
+  ctx.font=`700 ${FECHA_FS}px sans-serif`;ctx.letterSpacing='1.5px';
+  ctx.fillStyle='rgba(255,215,0,.88)';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  ctx.fillText(fD(m.fecha,false),W/2,fechaY);
+
+  // Fila 1 de chips: [🕐 hora]  [V1] — centrados con gap
+  const row1Y=fechaY+META_PAD;
   const horaLbl=`🕐 ${m.hora}`;
-  const canchaLbl=`📍 ${m.cancha}`;
   const vueltaLbl=`V${m.vu}`;
-  const w1=ctx.measureText(horaLbl).width+26;
-  const w2=ctx.measureText(canchaLbl).width+26;
-  const w3=ctx.measureText(vueltaLbl).width+26;
-  const gap=14,totalW=w1+w2+w3+gap*2;
-  let cx0=W/2-totalW/2+w1/2;
-  chip(horaLbl,'rgba(20,60,180,.60)','rgba(80,140,255,.70)',cx0);cx0+=w1+gap;
-  chip(canchaLbl,'rgba(10,90,50,.60)','rgba(40,190,110,.65)',cx0);cx0+=w2+gap;
-  chip(vueltaLbl,'rgba(130,55,0,.60)','rgba(255,140,40,.65)',cx0);
+  ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
+  const wH=ctx.measureText(horaLbl).width+30;
+  const wV=ctx.measureText(vueltaLbl).width+30;
+  const gap1=20;
+  const row1W=wH+wV+gap1;
+  chip(horaLbl,'rgba(20,60,180,.65)','rgba(80,140,255,.80)',W/2-row1W/2+wH/2,row1Y);
+  chip(vueltaLbl,'rgba(130,55,0,.65)','rgba(255,140,40,.75)',W/2+row1W/2-wV/2,row1Y);
+
+  // Fila 2 de chips: [📍 cancha] — ancho completo centrado
+  const row2Y=row1Y+CHIP_H+META_PAD;
+  const canchaLbl=`📍 ${m.cancha}`;
+  chip(canchaLbl,'rgba(10,90,50,.65)','rgba(40,190,110,.75)',W/2,row2Y);
 }
 function sc_half(h){return Math.round(h*.13);}
 
