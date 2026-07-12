@@ -15,23 +15,30 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-// Register service worker — network-first HTML ensures users always get fresh version
+var APP_VER='8.3';
+// Reload once per session when a new SW takes control (guard against loops)
+function _swReload(){
+  if(sessionStorage.getItem('_swr')==='1')return;
+  sessionStorage.setItem('_swr','1');
+  window.location.reload();
+}
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').then(function(reg){
-    // Check for SW update every page load
     reg.update();
-    // If a new SW is waiting, activate it immediately (user gets fresh version on next navigate)
-    if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
+    // New SW waiting → activate immediately
+    if(reg.waiting){
+      reg.waiting.postMessage({type:'SKIP_WAITING'});
+    }
     reg.addEventListener('updatefound',function(){
       var nw=reg.installing;
       nw.addEventListener('statechange',function(){
-        if(nw.state==='installed'&&navigator.serviceWorker.controller){
-          // Signal new SW to take over — skipWaiting+claim handles activation,
-          // no hard reload needed (avoids infinite reload loop)
+        if(nw.state==='installed'){
           nw.postMessage({type:'SKIP_WAITING'});
         }
       });
     });
+    // When a new SW takes controller → reload once to apply
+    navigator.serviceWorker.addEventListener('controllerchange',_swReload);
   }).catch(function(){});
 }
 </script>
@@ -1521,6 +1528,12 @@ async function doCp(){
   }catch(e){er.textContent="Error: "+e.message;er.style.display="block";}
 }
 async function doLt(){if(fbR)await au.signOut();onOut();}
+async function clearCacheReload(){
+  sessionStorage.clear();
+  if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(k){return caches.delete(k);}));}
+  if('serviceWorker' in navigator){var regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(function(r){return r.unregister();}));}
+  window.location.reload(true);
+}
 function onIn(){
   document.getElementById("btnIn").style.display="none";
   document.getElementById("btnPn").style.display="flex";
@@ -1872,7 +1885,8 @@ function rPn(){
   } else {
     h+='<div id="admPnCnt"></div>';
   }
-  h+='<div style="padding:14px 16px 24px"><button class="cb" onclick="doLt()">&#128682; Cerrar Sesi&#243;n</button></div>';
+  h+='<div style="padding:14px 16px 4px"><button class="cb" onclick="doLt()">&#128682; Cerrar Sesi&#243;n</button></div>';
+  h+='<div style="text-align:center;padding:8px 16px 24px;font-size:10px;color:var(--dm)">v'+APP_VER+' &middot; <button onclick="clearCacheReload()" style="background:none;border:none;color:var(--dm);font-size:10px;cursor:pointer;text-decoration:underline">Actualizar app</button></div>';
   document.getElementById("pnc").innerHTML=h;
   if(isAdm) adShowOverview();
 }
