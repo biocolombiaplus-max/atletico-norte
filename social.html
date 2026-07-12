@@ -1130,11 +1130,11 @@ async function jorCard(ctx,m,y,h){
 
   // ── LAYOUT: horizontal (logo | nombre | VS/score | nombre | logo) ──
   // Meta strip: 2 líneas de texto multicolor — compacto pero legible
-  const INFO_FS=32,DATE_FS=30,META_PAD=10;
-  const metaH=DATE_FS+INFO_FS+META_PAD*3+4; // ~106px
+  const INFO_FS=30,DATE_FS=27,META_PAD=7;
+  const metaH=DATE_FS+INFO_FS+META_PAD*3+2; // ~80px
   const topH=h-metaH;
   const cy=y+topH*.5;
-  const logoSz=topH*.84,logoR=logoSz*.5;
+  const logoSz=topH*.94,logoR=logoSz*.5;
   const lx=mx+logoR+10,rx=mx+mw-logoR-10;
 
   await drawBadge(ctx,m.l,lx,cy,logoSz);
