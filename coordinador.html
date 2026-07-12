@@ -463,39 +463,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
   </div>
 </div>
 
-<!-- ── RESET OVERLAY ── -->
-<div class="overlay" id="resetOverlay">
-  <div class="modal-sheet">
-    <div class="modal-icon">⚠️</div>
-    <div class="modal-title" id="resetTitle">Reiniciar datos de prueba</div>
-    <div class="modal-sub" id="resetSub">Se borrarán todos los resultados y cambios de horario ingresados. Esta acción no se puede deshacer.</div>
-    <div id="resetPresBox" style="display:none;margin:8px 0">
-      <div style="font-size:11px;color:var(--amber);font-weight:800;margin-bottom:8px;text-align:center">🔒 Campeonato en curso — requiere autorización del Presidente</div>
-      <input type="password" id="resetPresPin" class="pin-input" placeholder="Clave del Presidente" autocomplete="off">
-      <div class="err-box" id="resetErr"></div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeResetOverlay()">Cancelar</button>
-      <button class="btn" id="btnDoReset" onclick="doReset()" style="background:#c8102e;color:#fff">🗑 Sí, reiniciar todo</button>
-    </div>
-  </div>
-</div>
 
-<!-- ── CLAVE PRESIDENTE OVERLAY ── -->
-<div class="overlay" id="presClaveOverlay">
-  <div class="modal-sheet">
-    <div class="modal-icon">🏛</div>
-    <div class="modal-title">Clave del Presidente</div>
-    <div class="modal-sub">Define o cambia la clave que protege el reinicio de datos durante el campeonato.</div>
-    <input type="password" id="presClaveInput" class="pin-input" placeholder="Nueva clave" autocomplete="off">
-    <input type="password" id="presClaveConf" class="pin-input" placeholder="Confirmar clave" autocomplete="off" style="margin-top:8px">
-    <div class="err-box" id="presClaveErr"></div>
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="document.getElementById('presClaveOverlay').classList.remove('show')">Cancelar</button>
-      <button class="btn btn-red" onclick="guardarClavePres()">💾 Guardar clave</button>
-    </div>
-  </div>
-</div>
 
 <!-- ── PIN OVERLAY ── -->
 <div class="overlay" id="pinOverlay">
@@ -619,7 +587,7 @@ async function doLogin(){
     curUser=pf;curCed=c;curRol=rol;
     document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
     startResListener();
-    initAdminZone();
+
     goTo('sMatches');
   }catch(e){
     errEl.textContent='Error: '+e.message;errEl.style.display='block';
@@ -1552,116 +1520,7 @@ function doConfirm(){
   _onConfirm=null;
 }
 
-// ══════════════════════════════════════════════════════
-// ── ZONA ADMIN: RESET + CAMPEONATO ──
-// ══════════════════════════════════════════════════════
-var _campeonatoIniciado=false,_clavePres=null;
-
-function initAdminZone(){
-  if(!isAdmin())return;
-  var az=document.getElementById('adminZone');
-  az.style.display='flex';
-  // Escuchar estado del campeonato
-  db.ref('/config/campeonatoIniciado').on('value',function(s){
-    _campeonatoIniciado=!!s.val();
-    updateCampeonatoUI();
-  });
-  db.ref('/config/clavePresidente').on('value',function(s){_clavePres=s.val()||null;});
-}
-
-function updateCampeonatoUI(){
-  var st=document.getElementById('campeonatoStatus');
-  var btn=document.getElementById('btnToggleCampeonato');
-  btn.style.display='block';
-  if(_campeonatoIniciado){
-    st.innerHTML='🟢 <strong style="color:#10b981">Campeonato EN CURSO</strong><br>El reinicio requiere clave del Presidente.';
-    btn.textContent='🔒 Configurar clave del Presidente';
-    btn.style.borderColor='rgba(16,185,129,.4)';btn.style.color='#10b981';
-  }else{
-    st.innerHTML='⚪ Campeonato <strong>no iniciado</strong> — modo pruebas activo.';
-    btn.textContent='🚀 Marcar inicio del campeonato';
-    btn.style.borderColor='rgba(14,165,233,.4)';btn.style.color='var(--blue)';
-  }
-}
-
-function toggleCampeonato(){
-  if(_campeonatoIniciado){
-    // Solo permite cambiar la clave del presidente
-    document.getElementById('presClaveInput').value='';
-    document.getElementById('presClaveConf').value='';
-    document.getElementById('presClaveErr').style.display='none';
-    document.getElementById('presClaveOverlay').classList.add('show');
-  }else{
-    showConfirm('🚀','¿Iniciar el campeonato?',
-      'Una vez iniciado, cualquier reinicio de datos requerirá la clave del Presidente. Asegúrate de haber definido esa clave primero.',
-      function(){
-        if(!_clavePres){
-          document.getElementById('presClaveInput').value='';
-          document.getElementById('presClaveConf').value='';
-          document.getElementById('presClaveErr').style.display='none';
-          document.getElementById('presClaveOverlay').classList.add('show');
-          showToast('⚠️ Define primero la clave del Presidente','var(--amber)');
-          return;
-        }
-        db.ref('/config/campeonatoIniciado').set(true);
-        showToast('🚀 ¡Campeonato iniciado!','var(--green)');
-      }
-    );
-  }
-}
-
-function guardarClavePres(){
-  var v1=document.getElementById('presClaveInput').value.trim();
-  var v2=document.getElementById('presClaveConf').value.trim();
-  var err=document.getElementById('presClaveErr');
-  err.style.display='none';
-  if(v1.length<4){err.textContent='La clave debe tener al menos 4 caracteres.';err.style.display='block';return;}
-  if(v1!==v2){err.textContent='Las claves no coinciden.';err.style.display='block';return;}
-  db.ref('/config/clavePresidente').set(v1).then(function(){
-    document.getElementById('presClaveOverlay').classList.remove('show');
-    showToast('🔑 Clave del Presidente guardada','var(--green)');
-    if(!_campeonatoIniciado){
-      db.ref('/config/campeonatoIniciado').set(true);
-      showToast('🚀 Campeonato iniciado','var(--green)');
-    }
-  });
-}
-
-function confirmReset(){
-  var presBox=document.getElementById('resetPresBox');
-  var err=document.getElementById('resetErr');
-  presBox.style.display=_campeonatoIniciado?'block':'none';
-  document.getElementById('resetPresPin').value='';
-  err.style.display='none';
-  document.getElementById('resetTitle').textContent=_campeonatoIniciado
-    ?'⚠️ Reinicio bloqueado — Campeonato en curso'
-    :'Reiniciar datos de prueba';
-  document.getElementById('resetOverlay').classList.add('show');
-}
-
-function closeResetOverlay(){document.getElementById('resetOverlay').classList.remove('show');}
-
-async function doReset(){
-  if(_campeonatoIniciado){
-    var pin=document.getElementById('resetPresPin').value.trim();
-    var err=document.getElementById('resetErr');
-    if(!pin){err.textContent='Ingresa la clave del Presidente.';err.style.display='block';return;}
-    if(pin!==_clavePres){err.textContent='Clave incorrecta. Solo el Presidente puede autorizar esto.';err.style.display='block';return;}
-  }
-  document.getElementById('resetOverlay').classList.remove('show');
-  var btn=document.getElementById('btnReset');
-  btn.disabled=true;btn.textContent='Reiniciando…';
-  try{
-    await db.ref('/resultados').remove();
-    await db.ref('/horaOverrides').remove();
-    await db.ref('/config/campeonatoIniciado').remove();
-    await db.ref('/config/clavePresidente').remove();
-    showToast('✅ Datos reiniciados correctamente','var(--green)');
-  }catch(e){
-    showToast('Error: '+e.message,'var(--red)');
-  }finally{
-    btn.disabled=false;btn.textContent='🗑 Reiniciar datos de prueba';
-  }
+// (zona admin movida al panel principal index.html)
 }
 
 // ── INIT ──
@@ -1687,7 +1546,7 @@ au.onAuthStateChanged(async function(user){
       curUser=pf;curCed=c;curRol=rol;
       document.getElementById('userGreet').textContent='Hola, '+(pf.nombre||c).split(' ')[0]+' 👋';
       startResListener();
-      initAdminZone();
+  
       document.getElementById('sLogin').classList.remove('active');
       document.getElementById('sMatches').classList.add('active');
       _hist=['sLogin','sMatches'];
