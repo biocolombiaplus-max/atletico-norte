@@ -1274,32 +1274,38 @@ async function tPartido(ctx,m){
   rule(ctx,1034,.42);
 
   // ── BADGES ──
-  const midY=1188;
-  await drawBadge(ctx,m.l,W*.2,midY,300);
-  await drawBadge(ctx,m.v,W*.8,midY,300);
+  const midY=1200,tlx=W*.25,trx=W*.75,tSz=380;
+  await drawBadge(ctx,m.l,tlx,midY,tSz);
+  await drawBadge(ctx,m.v,trx,midY,tSz);
 
   // VS circle
-  const vsR=94;
+  const vsR=88;
   ctx.save();ctx.shadowColor='rgba(200,16,46,.9)';ctx.shadowBlur=60;
   const vg=ctx.createRadialGradient(W/2,midY,0,W/2,midY,vsR);
   vg.addColorStop(0,'rgba(200,16,46,.5)');vg.addColorStop(.6,'rgba(200,16,46,.22)');vg.addColorStop(1,'transparent');
   ctx.fillStyle=vg;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
-  const vrg=lGrad(ctx,W/2-vsR,midY-vsR,W/2+vsR,midY+vsR,[0,'rgba(255,215,0,.55)'],[.5,'rgba(200,16,46,.7)'],[1,'rgba(255,215,0,.55)']);
+  ctx.save();ctx.fillStyle='rgba(8,10,22,.80)';ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
+  const vrg=lGrad(ctx,W/2-vsR,midY-vsR,W/2+vsR,midY+vsR,[0,'rgba(255,215,0,.55)'],[.5,'rgba(255,215,0,.9)'],[1,'rgba(255,215,0,.55)']);
   ctx.strokeStyle=vrg;ctx.lineWidth=3;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.stroke();
-  ctx.font='900 60px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='3px';
-  ctx.save();ctx.shadowColor='rgba(255,255,255,.3)';ctx.shadowBlur=20;ctx.fillText('VS',W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.5)';ctx.shadowBlur=20;
+  ctx.font='900 62px Arial Black,sans-serif';ctx.fillStyle='#ffe033';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='4px';
+  ctx.fillText('VS',W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
 
-  // ── TEAM NAMES — large and readable ──
-  const ny=midY+258;
+  // ── TEAM NAMES — auto-shrink para que nunca se corten ──
+  const ny=midY+tSz*.52+20;
+  const maxNameW=420;
   function teamLbl(x,id){
-    ctx.font='900 42px sans-serif';ctx.letterSpacing='1px';ctx.textAlign='center';
-    const ng=lGrad(ctx,x-230,0,x+230,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
-    ctx.fillStyle=ng;ctx.fillText(tn(id).toUpperCase(),x,ny);
-    ctx.font='800 32px sans-serif';ctx.letterSpacing='3px';
+    let nm=tn(id).toUpperCase(),fs=46;
+    ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0px';
+    while(ctx.measureText(nm).width>maxNameW&&fs>26){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=14;
+    const ng=lGrad(ctx,x-maxNameW/2,0,x+maxNameW/2,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
+    ctx.fillStyle=ng;ctx.textAlign='center';ctx.fillText(nm,x,ny);ctx.restore();
+    ctx.font='700 30px sans-serif';ctx.letterSpacing='3px';
     const ag=lGrad(ctx,x-60,0,x+60,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-    ctx.fillStyle=ag;ctx.fillText(ts(id),x,ny+50);
+    ctx.fillStyle=ag;ctx.textAlign='center';ctx.fillText(ts(id),x,ny+46);ctx.letterSpacing='0';
   }
-  teamLbl(W*.2,m.l);teamLbl(W*.8,m.v);
+  teamLbl(tlx,m.l);teamLbl(trx,m.v);
 
   rule(ctx,H-320,.38);
   ctx.font='700 28px sans-serif';ctx.fillStyle='rgba(255,255,255,.28)';ctx.textAlign='center';ctx.letterSpacing='3px';
