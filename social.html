@@ -123,6 +123,25 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <button class="pill" onclick="setTpl('partido',this)">⚽ Partido</button>
     <button class="pill" onclick="setTpl('resultado',this)">🏆 Resultado</button>
     <button class="pill" onclick="setTpl('tabla',this)">📊 Tabla</button>
+    <button class="pill" onclick="setTpl('mvp',this)">⭐ MVP</button>
+  </div>
+
+  <!-- MVP PANEL — shown only when MVP template selected -->
+  <div id="mvpPanel" style="display:none;background:rgba(245,159,11,.06);border:1.5px solid rgba(245,159,11,.22);border-radius:14px;padding:16px;margin-bottom:14px">
+    <div class="sec" style="margin-top:0;margin-bottom:10px">Jugador MVP</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <input id="mvpCed" type="number" placeholder="Cédula del jugador" style="flex:1;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:13px;font-weight:600;-webkit-appearance:none">
+      <button onclick="mvpBuscarSocial()" style="background:var(--rd);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap">Buscar</button>
+    </div>
+    <div id="mvpNom" style="font-size:12px;color:var(--gn);font-weight:700;min-height:18px;margin-bottom:10px"></div>
+    <input id="mvpNomManual" type="text" placeholder="O escribe el nombre directamente" style="width:100%;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:10px;-webkit-appearance:none">
+    <input id="mvpInfo" type="text" placeholder="Info del partido (ej: Dragones 3-1 Panteras · S4)" style="width:100%;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:10px;-webkit-appearance:none">
+    <div class="ctrl-l" style="margin-bottom:6px">Foto del jugador (opcional)</div>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.35);border-radius:10px;padding:12px 14px">
+      <span style="font-size:22px">📷</span>
+      <div><div style="font-size:12px;font-weight:700;color:var(--t)">Subir foto</div><div id="mvpPhNm" style="font-size:10px;color:var(--m);margin-top:2px">Ninguna seleccionada</div></div>
+      <input type="file" accept="image/*" id="mvpPhFile" onchange="mvpLoadPhoto(this)" style="display:none">
+    </label>
   </div>
 
   <div class="row2">
@@ -183,7 +202,7 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
   <button class="btn-dl" id="btnDl" onclick="dl()">⬇️ Descargar PNG</button>
   <button class="btn-cp" id="btnCp" onclick="cpCaption()">📋 Copiar Caption</button>
 
-  <div class="ms">
+  <div class="ms" id="matchSec">
     <div class="sec">Seleccionar partidos</div>
     <div id="mList"><div class="no-ms">Cargando…</div></div>
   </div>
@@ -410,7 +429,14 @@ function togM(id,el){
     else{selMs.add(id);el.classList.add('on');el.querySelector('.mi-chk').textContent='✓';}
   }
 }
-function setTpl(t,b){curTpl=t;document.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));b.classList.add('on');loadMs();}
+function setTpl(t,b){
+  curTpl=t;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  const isMvp=t==='mvp';
+  document.getElementById('mvpPanel').style.display=isMvp?'block':'none';
+  document.getElementById('matchSec').style.display=isMvp?'none':'block';
+  if(!isMvp)loadMs();
+}
 function setBg(t,b){bgType=t;document.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
 function loadBgImg(inp){
   const f=inp.files[0];if(!f)return;
@@ -433,7 +459,7 @@ function fD(f,long){const d=new Date(f+'T12:00:00');return long?`${DL[d.getDay()
 async function gen(){
   // Always generate in chronological order: date ASC, then time ASC within each day
   const ms=ALL.filter(m=>selMs.has(m.id)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
-  if(!ms.length&&curTpl!=='tabla'){alert('Selecciona al menos un partido');return;}
+  if(!ms.length&&curTpl!=='tabla'&&curTpl!=='mvp'){alert('Selecciona al menos un partido');return;}
   // Preload all badge images fresh
   const ids=curTpl==='tabla'?[1,2,3,4,5,6,7,8,9,10]:[...new Set(ms.flatMap(m=>[m.l,m.v]))];
   await Promise.all(ids.filter(id=>custBadges[id]).map(id=>loadImg(custBadges[id],'b'+id)));
@@ -443,7 +469,8 @@ async function gen(){
   await new Promise(r=>setTimeout(r,40));
   const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
   ctx.clearRect(0,0,W,H);
-  if(curTpl==='jornada')await tJornada(ctx,ms);
+  if(curTpl==='mvp'){await tMVP(ctx);}
+  else if(curTpl==='jornada')await tJornada(ctx,ms);
   else if(curTpl==='partido')await tPartido(ctx,ms[0]);
   else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
   else await tTabla(ctx);
@@ -768,6 +795,103 @@ function drawMetaRow(ctx,y,parts,pill=true){
     ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(mx,y-mH*.75,mW,mH,mH/2);ctx.stroke();
   }
   ctx.fillStyle='rgba(255,255,255,.82)';ctx.fillText(full,W/2,y);
+}
+
+// ═══ MVP ═════════════════════════════════════════════
+let mvpPhotoImg=null;
+function mvpBuscarSocial(){
+  const ced=(document.getElementById('mvpCed').value||'').trim();
+  const el=document.getElementById('mvpNom');
+  if(!ced){el.textContent='';return;}
+  el.textContent='Buscando…';el.style.color='var(--gl)';
+  db.ref('/socios/'+ced+'/nombre').once('value',s=>{
+    if(s.val()){el.textContent='✅ '+s.val();el.style.color='var(--gn)';document.getElementById('mvpNomManual').value=s.val();}
+    else{el.textContent='No encontrado';el.style.color='var(--rd)';}
+  },()=>{el.textContent='Error';el.style.color='var(--rd)';});
+}
+function mvpLoadPhoto(inp){
+  const f=inp.files[0];if(!f)return;
+  document.getElementById('mvpPhNm').textContent=f.name;
+  const rd=new FileReader();
+  rd.onload=ev=>loadImg(ev.target.result,'mvpph').then(img=>{mvpPhotoImg=img||null;});
+  rd.readAsDataURL(f);
+}
+function rrFill(ctx,x,y,w,h,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+function rrStroke(ctx,x,y,w,h,r,c,lw){ctx.strokeStyle=c;ctx.lineWidth=lw||2;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.stroke();}
+
+async function tMVP(ctx){
+  await drawBg(ctx);
+
+  // Extra dark overlay so player photo pops
+  ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W,H);
+
+  topStripe(ctx);
+  clubHeader(ctx,52);
+
+  // ── PHOTO AREA (Y 220 → 1140) ──
+  const PY=220,PH=920;
+  if(mvpPhotoImg){
+    const pi=mvpPhotoImg;
+    const tr=W/PH,sr=pi.width/pi.height;
+    let sx=0,sy=0,sw=pi.width,sh=pi.height;
+    if(sr>tr){sw=pi.height*tr;sx=(pi.width-sw)/2;}else{sh=pi.width/tr;sy=(pi.height-sh)/2;}
+    ctx.save();
+    // Clip to rect
+    ctx.beginPath();ctx.rect(0,PY,W,PH);ctx.clip();
+    ctx.drawImage(pi,sx,sy,sw,sh,0,PY,W,PH);
+    ctx.restore();
+  } else {
+    // Placeholder
+    const pg=ctx.createLinearGradient(0,PY,0,PY+PH);
+    pg.addColorStop(0,'rgba(200,16,46,.08)');pg.addColorStop(1,'rgba(245,159,11,.05)');
+    ctx.fillStyle=pg;ctx.fillRect(0,PY,W,PH);
+    ctx.font='300 180px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(255,255,255,.05)';ctx.fillText('⭐',W/2,PY+PH/2);
+  }
+
+  // Gradient fade from photo into lower section
+  const fg=ctx.createLinearGradient(0,PY+PH-500,0,PY+PH);
+  fg.addColorStop(0,'rgba(0,0,0,0)');fg.addColorStop(1,'rgba(0,0,0,.92)');
+  ctx.fillStyle=fg;ctx.fillRect(0,PY+PH-500,W,500);
+
+  // ── MVP BADGE ──
+  const bW=520,bH=76,bX=(W-bW)/2,bY=1060;
+  rrFill(ctx,bX,bY,bW,bH,38,'rgba(245,159,11,.18)');
+  rrStroke(ctx,bX,bY,bW,bH,38,'rgba(245,159,11,.65)',2.5);
+  ctx.font='900 38px Arial Black,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fbbf24';
+  ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);
+
+  // ── PLAYER NAME ──
+  const nomRaw=(document.getElementById('mvpNomManual').value||'').trim()||'JUGADOR';
+  const nomUp=nomRaw.toUpperCase();
+  ctx.textAlign='center';ctx.textBaseline='top';
+  let fs=96;ctx.font='900 '+fs+'px Arial Black,Arial,sans-serif';
+  while(ctx.measureText(nomUp).width>W-60&&fs>42){fs-=4;ctx.font='900 '+fs+'px Arial Black,Arial,sans-serif';}
+  ctx.fillStyle='#ffffff';ctx.fillText(nomUp,W/2,1168);
+
+  // ── MATCH INFO ──
+  const infoTxt=(document.getElementById('mvpInfo').value||'').trim();
+  if(infoTxt){
+    const iW=Math.min(ctx.measureText(infoTxt).width+80,W-80);
+    rrFill(ctx,(W-iW)/2,1292,iW,60,16,'rgba(255,255,255,.07)');
+    ctx.font='600 30px Arial,sans-serif';ctx.fillStyle='rgba(200,220,255,.75)';ctx.textBaseline='middle';
+    ctx.fillText(infoTxt,W/2,1322);
+  }
+
+  // ── DIVIDER ──
+  const dy=infoTxt?1390:1290;
+  ctx.strokeStyle='rgba(200,16,46,.45)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(80,dy);ctx.lineTo(W-80,dy);ctx.stroke();
+
+  // ── FOOTER TEXT ──
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.font='900 60px Arial Black,Arial,sans-serif';ctx.fillStyle='#ffffff';
+  ctx.fillText('¡FELICITACIONES! 🎉',W/2,dy+30);
+  ctx.font='600 32px Arial,sans-serif';ctx.fillStyle='rgba(200,16,46,.9)';
+  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,dy+110);
+  ctx.font='500 25px Arial,sans-serif';ctx.fillStyle='rgba(120,150,190,.55)';
+  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,dy+158);
+
+  // Bottom stripe
+  ctx.fillStyle='#c8102e';ctx.fillRect(0,H-8,W,8);
 }
 
 // ═══ JORNADA ════════════════════════════════════════
