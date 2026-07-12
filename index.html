@@ -753,8 +753,8 @@ tbody td:nth-child(2){text-align:left}
     <div class="admbx">
       <div class="admhd"><span style="font-size:16px">&#9881;&#65039;</span><h3>Administraci&#243;n</h3><span class="admtg" id="admRlTg">Admin</span></div>
       <div class="admacts">
-        <button class="admact" onclick="shPl()"><span class="aico">&#128176;</span><span class="atxt">Planilla Cobro</span></button>
-        <button class="admact" onclick="shSo()"><span class="aico">&#128101;</span><span class="atxt">Gestionar Socios</span></button>
+        <button class="admact" onclick="showTab('panel');setTimeout(function(){adNav('planilla');},250)"><span class="aico">&#128176;</span><span class="atxt">Planilla Cobro</span></button>
+        <button class="admact" onclick="showTab('panel');setTimeout(shSo,250)"><span class="aico">&#128101;</span><span class="atxt">Gestionar Socios</span></button>
         <button class="admact" onclick="showTab(\'panel\');setTimeout(function(){adNav(\'escudos\');},200)"><span class="aico">&#127960;&#65039;</span><span class="atxt">Escudos Equipos</span></button>
         <button class="admact" onclick="expC()"><span class="aico">&#128228;</span><span class="atxt">Exportar CSV</span></button>
       </div>
@@ -3278,9 +3278,14 @@ async function chRl(c,r){if(fbR&&db)await db.ref('/socios/'+c+'/rol').set(r);}
 async function shSo(){
   if(!fbR||!db){adCnt('<div class="es"><p>Firebase no disponible</p></div>');return;}
   adCnt('<div class="es"><div class="esi" style="font-size:36px">&#9203;</div><p>Cargando socios...</p></div>');
-  var s=await db.ref('/socios').get();
-  _soAll=s.val()||{};_soFilter='';
-  renderSoList();
+  try{
+    var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},10000);});
+    var s=await Promise.race([db.ref('/socios').get(),timeout]);
+    _soAll=s.val()||{};_soFilter='';
+    renderSoList();
+  }catch(e){
+    adCnt('<div class="es"><div class="esi" style="font-size:32px">&#9888;&#65039;</div><p style="margin-bottom:12px">No se pudieron cargar los socios</p><button class="sb2" style="max-width:180px;margin:0 auto" onclick="shSo()">Reintentar</button><br><br><button class="sb2" style="max-width:180px;margin:0 auto;background:rgba(255,255,255,.05)" onclick="adShowOverview()">&#8592; Volver</button></div>');
+  }
 }
 
 function renderSoList(){
