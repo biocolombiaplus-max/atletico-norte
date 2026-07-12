@@ -1058,7 +1058,7 @@ async function tJornada(ctx,ms){
   const startY=pY+pH+24,endY=H-178;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
-  const cH=Math.max(168,Math.floor((available-overhead)/Math.max(nCards,1)));
+  const cH=Math.max(192,Math.floor((available-overhead)/Math.max(nCards,1)));
 
   let curY=startY;
   for(let gi=0;gi<grps.length;gi++){
@@ -1125,7 +1125,10 @@ async function jorCard(ctx,m,y,h){
   ctx.beginPath();ctx.roundRect(mx,y,mw,h,18);ctx.stroke();
 
   // ── LAYOUT: horizontal (logo | nombre | VS/score | nombre | logo) ──
-  const metaH=h*.34,topH=h-metaH;
+  // Meta strip con tamaños FIJOS para que siempre sea legible
+  const CHIP_H=34,CHIP_FS=21,FECHA_FS=20,META_PAD=12;
+  const metaH=CHIP_H+FECHA_FS+META_PAD*3; // ~80px fijo
+  const topH=h-metaH;
   const cy=y+topH*.5;
   const logoSz=topH*.84,logoR=logoSz*.5;
   const lx=mx+logoR+10,rx=mx+mw-logoR-10;
@@ -1167,47 +1170,43 @@ async function jorCard(ctx,m,y,h){
   }
   drawTN(m.l,ncl,nameW);drawTN(m.v,ncr,nameW);
 
-  // ── META STRIP con chips de color ──
+  // ── META STRIP con chips de color FIJOS ──
   const metaTop=y+topH;
-  // Separator
-  ctx.strokeStyle='rgba(255,215,0,.20)';ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(255,215,0,.22)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(mx+40,metaTop);ctx.lineTo(mx+mw-40,metaTop);ctx.stroke();
 
-  const chipH=Math.max(Math.round(metaH*.42),22);
-  const chipY=metaTop+(metaH-chipH*2.15)*.5;
-  const cfs=Math.max(Math.round(chipH*.56),13);
+  // Fecha encima de los chips
+  const fechaY=metaTop+META_PAD+FECHA_FS;
+  ctx.font=`700 ${FECHA_FS}px sans-serif`;ctx.letterSpacing='1.5px';
+  ctx.fillStyle='rgba(255,215,0,.82)';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  ctx.fillText(fD(m.fecha,false),W/2,fechaY);
 
-  // Chip helper
-  function chip(label,bg,stroke,tx,cx){
-    ctx.save();
-    ctx.shadowColor=stroke;ctx.shadowBlur=10;
-    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(cx-tx/2-14,chipY,tx+28,chipH,chipH/2);ctx.fill();ctx.restore();
-    ctx.strokeStyle=stroke;ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect(cx-tx/2-14,chipY,tx+28,chipH,chipH/2);ctx.stroke();
-    ctx.font=`700 ${cfs}px sans-serif`;ctx.letterSpacing='.5px';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(label,cx,chipY+chipH*.5);ctx.textBaseline='alphabetic';
+  // Chips en fila debajo de fecha
+  const chipY2=fechaY+META_PAD;
+  function chip(label,bg,border,cx){
+    ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
+    const tw=ctx.measureText(label).width;
+    const cw=tw+26,cx0=cx-cw/2;
+    ctx.save();ctx.shadowColor=border;ctx.shadowBlur=12;
+    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(cx0,chipY2,cw,CHIP_H,CHIP_H/2);ctx.fill();ctx.restore();
+    ctx.strokeStyle=border;ctx.lineWidth=1.3;ctx.beginPath();ctx.roundRect(cx0,chipY2,cw,CHIP_H,CHIP_H/2);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(label,cx,chipY2+CHIP_H/2);ctx.textBaseline='alphabetic';
+    return cw;
   }
 
-  // Medir textos para centrar los chips
-  ctx.font=`700 ${cfs}px sans-serif`;
+  ctx.font=`700 ${CHIP_FS}px sans-serif`;ctx.letterSpacing='.5px';
   const horaLbl=`🕐 ${m.hora}`;
   const canchaLbl=`📍 ${m.cancha}`;
   const vueltaLbl=`V${m.vu}`;
-  const tw1=ctx.measureText(horaLbl).width;
-  const tw2=ctx.measureText(canchaLbl).width;
-  const tw3=ctx.measureText(vueltaLbl).width;
-  const totalW=tw1+tw2+tw3+28*3+16*2; // chips + gaps
-  let cx0=W/2-totalW/2+tw1/2+14;
-  chip(horaLbl,'rgba(30,80,180,.55)','rgba(100,160,255,.55)',tw1,cx0);
-  cx0+=tw1+28+16;
-  chip(canchaLbl,'rgba(10,100,60,.55)','rgba(60,200,130,.50)',tw2,cx0);
-  cx0+=tw2+28+16;
-  chip(vueltaLbl,'rgba(120,50,10,.55)','rgba(255,150,60,.50)',tw3,cx0);
-
-  // Fecha pequeña debajo de los chips
-  const fechaY=chipY+chipH+Math.round(metaH*.18);
-  ctx.font=`600 ${Math.max(Math.round(cfs*.82),12)}px sans-serif`;ctx.letterSpacing='1px';
-  ctx.fillStyle='rgba(255,215,0,.70)';ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillText(fD(m.fecha,false),W/2,fechaY);
+  const w1=ctx.measureText(horaLbl).width+26;
+  const w2=ctx.measureText(canchaLbl).width+26;
+  const w3=ctx.measureText(vueltaLbl).width+26;
+  const gap=14,totalW=w1+w2+w3+gap*2;
+  let cx0=W/2-totalW/2+w1/2;
+  chip(horaLbl,'rgba(20,60,180,.60)','rgba(80,140,255,.70)',cx0);cx0+=w1+gap;
+  chip(canchaLbl,'rgba(10,90,50,.60)','rgba(40,190,110,.65)',cx0);cx0+=w2+gap;
+  chip(vueltaLbl,'rgba(130,55,0,.60)','rgba(255,140,40,.65)',cx0);
 }
 function sc_half(h){return Math.round(h*.13);}
 
