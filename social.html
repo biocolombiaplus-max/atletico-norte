@@ -1325,6 +1325,7 @@ async function tResultado(ctx,m){
   if(!m)return;
   const r=results[m.id];
   if(!r||r.l===undefined){alert('Sin resultado aún');document.getElementById('spinW').style.display='none';return;}
+  const mx=48;
 
   // ── FONDO ──
   await drawBg(ctx);
