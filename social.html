@@ -493,29 +493,33 @@ const MS2=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Di
 function fD(f,long){const d=new Date(f+'T12:00:00');return long?`${DL[d.getDay()].toUpperCase()} ${d.getDate()} DE ${ML[d.getMonth()].toUpperCase()}`:`${DS[d.getDay()]} ${d.getDate()} ${MS2[d.getMonth()]}`; }
 
 async function gen(){
-  // Always generate in chronological order: date ASC, then time ASC within each day
   const ms=ALL.filter(m=>selMs.has(m.id)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
   if(!ms.length&&curTpl!=='tabla'&&curTpl!=='mvp'){alert('Selecciona al menos un partido');return;}
-  // Preload all badge images fresh
   const ids=curTpl==='tabla'?[1,2,3,4,5,6,7,8,9,10]:[...new Set(ms.flatMap(m=>[m.l,m.v]))];
   await Promise.all(ids.filter(id=>custBadges[id]).map(id=>loadImg(custBadges[id],'b'+id)));
   if(clubLogoSrc)await loadImg(clubLogoSrc,'club');
-  document.getElementById('spinW').style.display='flex';
-  document.getElementById('cv').style.display='none';
-  await new Promise(r=>setTimeout(r,40));
+  const spinEl=document.getElementById('spinW');
   const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-  if(curTpl==='mvp'){await tMVP(ctx);}
-  else if(curTpl==='jornada')await tJornada(ctx,ms);
-  else if(curTpl==='partido')await tPartido(ctx,ms[0]);
-  else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
-  else await tTabla(ctx);
-  document.getElementById('spinW').style.display='none';
-  cv.style.display='block';
-  document.getElementById('btnDl').style.display='block';
-  document.getElementById('btnCp').style.display='block';
-  cv.scrollIntoView({behavior:'smooth',block:'center'});
-  updateBadgePreviews();
+  spinEl.style.display='flex';cv.style.display='none';
+  await new Promise(r=>setTimeout(r,40));
+  try{
+    ctx.clearRect(0,0,W,H);
+    if(curTpl==='mvp')await tMVP(ctx);
+    else if(curTpl==='jornada')await tJornada(ctx,ms);
+    else if(curTpl==='partido')await tPartido(ctx,ms[0]);
+    else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
+    else await tTabla(ctx);
+    cv.style.display='block';
+    document.getElementById('btnDl').style.display='block';
+    document.getElementById('btnCp').style.display='block';
+    cv.scrollIntoView({behavior:'smooth',block:'center'});
+    updateBadgePreviews();
+  }catch(e){
+    console.error('Error generando imagen:',e);
+    alert('Error al generar: '+e.message);
+  }finally{
+    spinEl.style.display='none';
+  }
 }
 
 // ── BACKGROUNDS ──────────────────────────────────────
@@ -1150,7 +1154,7 @@ async function jorCard(ctx,m,y,h){
     const sfs=Math.round(topH*.46);
     ctx.font=`900 ${sfs}px Arial Black,sans-serif`;ctx.fillStyle='#fff';
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
-    ctx.fillText(`${r.l}-${r.v}`,W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
+    ctx.fillText(`${Number(r.l)}-${Number(r.v)}`,W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
   }else{
     ctx.save();ctx.shadowColor='rgba(200,16,46,.5)';ctx.shadowBlur=18;
     const vfs=Math.round(topH*.27);
@@ -1380,8 +1384,9 @@ async function tResultado(ctx,m){
 
   // ── MARCADOR DEBAJO DE CADA ESCUDO ──
   const scoreBoxY=1130;
-  const scoreStr_l=r.wo?'W':`${r.l}`;
-  const scoreStr_r=r.wo?'O':`${r.v}`;
+  const rl=Number(r.l),rv=Number(r.v);
+  const scoreStr_l=r.wo?'W':`${rl}`;
+  const scoreStr_r=r.wo?'O':`${rv}`;
 
   function drawScoreNum(val,x){
     // Fondo caja
@@ -1416,7 +1421,7 @@ async function tResultado(ctx,m){
   goldRule(ctx,1378);
 
   // ── GANADOR / EMPATE ──
-  const winId=r.l>r.v?m.l:(r.v>r.l?m.v:null);
+  const winId=rl>rv?m.l:(rv>rl?m.v:null);
   if(winId){
     // Banner dorado
     const bW=920,bH=96,bX=W/2-bW/2,bY2=1400;
