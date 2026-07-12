@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#060d1a">
-<title>Panel Coordinador · Atlético Norte</title>
+<title>Panel de Resultados · Atlético Norte</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -267,7 +267,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
   <div class="login-logo">
     <span class="em">🛡️</span>
     <h1>Atlético Norte F.C.</h1>
-    <p>Panel Coordinador Deportivo</p>
+    <p>Panel de Resultados · Liga Interna S2 2026</p>
   </div>
   <div class="field">
     <label>Tu número de cédula</label>
@@ -276,7 +276,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
   </div>
   <div class="err-box" id="loginErr"></div>
   <button class="btn btn-red" id="btnLogin" onclick="doLogin()">🔐 Ingresar</button>
-  <p style="font-size:10px;color:var(--dm);text-align:center">Solo para Coordinador Deportivo · Liga Interna S2 2026</p>
+  <p style="font-size:10px;color:var(--dm);text-align:center">Coordinador Deportivo · Administradores · Liga Interna S2 2026</p>
 </div>
 
 <!-- ── SCREEN 2: MATCH LIST ── -->
@@ -391,6 +391,16 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
       <div id="tbMini"></div>
     </div>
 
+    <!-- suspensión banner -->
+    <div id="suspBanner" style="display:none;margin:0 16px 12px;background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.35);border-radius:14px;padding:12px 14px">
+      <div style="font-size:12px;font-weight:900;color:#f59e0b;margin-bottom:4px">⚠️ Partido suspendido</div>
+      <div id="suspBannerText" style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.5"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="openSuspOverlay()" style="-webkit-appearance:none;flex:1;padding:9px;border-radius:10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#f59e0b;font-size:11px;font-weight:900;cursor:pointer">✏️ Editar</button>
+        <button onclick="levantarSuspension()" style="-webkit-appearance:none;flex:1;padding:9px;border-radius:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28);color:#10b981;font-size:11px;font-weight:900;cursor:pointer">✅ Levantar suspensión</button>
+      </div>
+    </div>
+
     <!-- audit info -->
     <div id="auditInfo" style="display:none;padding:0 16px 8px">
       <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:10px;color:var(--m);line-height:1.6">
@@ -402,6 +412,7 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 
   <div class="save-bar">
     <button class="btn btn-ghost" style="max-width:120px" onclick="goBack()">← Volver</button>
+    <button class="btn btn-ghost" id="btnSusp" onclick="openSuspOverlay()" style="border-color:rgba(245,158,11,.4);color:#f59e0b;max-width:52px;padding:0;font-size:20px" title="Suspender partido">⚠️</button>
     <button class="btn btn-red" id="btnSave" onclick="confirmSave()">💾 Guardar resultado</button>
   </div>
   <div id="imgBar" style="display:none;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--bg2);border-top:1.5px solid rgba(99,102,241,.22)">
@@ -464,6 +475,52 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 </div>
 
 
+
+<!-- ── SUSPENSIÓN OVERLAY ── -->
+<div class="overlay" id="suspOverlay" onclick="if(event.target===this)closeSuspOverlay()">
+  <div class="modal-sheet" style="max-height:88vh;overflow-y:auto">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Suspender partido</div>
+    <div class="modal-sub" id="suspMatchLabel" style="font-weight:800;color:rgba(255,255,255,.7)"></div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;text-align:left">
+      <div>
+        <div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Motivo de la suspensión *</div>
+        <input type="text" id="suspMotivo" maxlength="80" placeholder="Ej: Lluvia, cancha en mal estado…"
+          style="width:100%;background:var(--bg3);border:2px solid var(--bd2);border-radius:12px;padding:13px 14px;color:var(--t);font-size:14px;outline:none">
+      </div>
+      <div style="background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.2);border-radius:12px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📅 Nueva fecha (opcional — si ya se conoce)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-size:9px;color:var(--m);font-weight:700;margin-bottom:4px">Fecha</div>
+            <input type="date" id="suspNewFecha" style="width:100%;background:var(--bg3);border:1.5px solid var(--bd2);border-radius:10px;padding:10px;color:var(--t);font-size:13px;outline:none">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--m);font-weight:700;margin-bottom:4px">Hora</div>
+            <select id="suspNewHora" style="width:100%;background:var(--bg3);border:1.5px solid var(--bd2);border-radius:10px;padding:10px;color:var(--t);font-size:13px;outline:none">
+              <option value="">-- Hora --</option>
+              <option>06:00</option><option>16:00</option><option>18:00</option>
+              <option>19:00</option><option>20:00</option><option>21:00</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--m);font-weight:700;margin-bottom:4px">Cancha</div>
+          <select id="suspNewCancha" style="width:100%;background:var(--bg3);border:1.5px solid var(--bd2);border-radius:10px;padding:10px;color:var(--t);font-size:13px;outline:none">
+            <option value="">-- Misma cancha --</option>
+            <option>Comfanorte</option><option>Coveadse</option><option>Villa Silvania</option>
+          </select>
+        </div>
+      </div>
+      <div class="err-box" id="suspErr"></div>
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeSuspOverlay()">Cancelar</button>
+      <button class="btn btn-amber" onclick="guardarSuspension()" style="background:var(--amber);color:#000">⚠️ Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── PIN OVERLAY ── -->
 <div class="overlay" id="pinOverlay">
@@ -604,6 +661,8 @@ function doLogout(){
 }
 
 // ── RESULTS LISTENER ──
+var suspensiones={};
+var suspRef=null;
 function startResListener(){
   if(resRef)resRef.off();
   resRef=db.ref('/resultados');
@@ -622,6 +681,12 @@ function startResListener(){
     if(curMatch){
       document.getElementById('mpSub').textContent=fd(curMatch.fecha)+' · '+getHora(curMatch);
     }
+  });
+  if(suspRef)suspRef.off();
+  suspRef=db.ref('/suspensiones');
+  suspRef.on('value',function(s){
+    suspensiones=s.val()||{};
+    renderMatchList();
   });
 }
 
@@ -657,7 +722,9 @@ function renderMatchList(){
       var scoreHtml=hasDone
         ?'<div class="mc-score">'+(isWO?'W':''+r.l)+' <span>–</span> '+(isWO?'W':''+r.v)+'</div>'
         :'<div class="mc-score pending">'+hora+(horaChanged?'<br><span style="font-size:8px;color:var(--blue)">modificado</span>':'')+'</div>';
-      var status=isToday?'<span class="mc-status status-hoy">HOY</span>'
+      var isSusp=!!(suspensiones&&suspensiones[m.id]);
+      var status=isSusp?'<span class="mc-status" style="background:rgba(245,158,11,.18);color:#f59e0b">⚠️ SUSP</span>'
+        :isToday?'<span class="mc-status status-hoy">HOY</span>'
         :isLocked?'<span class="mc-status status-lock">🔒 Final</span>'
         :hasDone?'<span class="mc-status status-ok">✓ Listo</span>'
         :'<span class="mc-status status-pend">Pendiente</span>';
@@ -713,6 +780,9 @@ function openMatch(id){
   renderStandings();
   renderLockState();
   renderAudit();
+  curSusp=null;
+  document.getElementById('suspBanner').style.display='none';
+  loadSuspension(m.id);
   document.getElementById('mpScroll').scrollTop=0;
   goTo('sMatch');
 }
@@ -1521,6 +1591,77 @@ function doConfirm(){
 }
 
 // (zona admin movida al panel principal index.html)
+}
+
+// ── SUSPENSIONES ──
+var curSusp=null; // suspension data for current match
+
+function loadSuspension(matchId){
+  db.ref('/suspensiones/'+matchId).get().then(function(snap){
+    curSusp=snap.exists()?snap.val():null;
+    renderSuspBanner();
+  });
+}
+
+function renderSuspBanner(){
+  var banner=document.getElementById('suspBanner');
+  var txt=document.getElementById('suspBannerText');
+  if(!curSusp){banner.style.display='none';return;}
+  var lines=['Motivo: '+esc(curSusp.motivo||'Sin especificar')];
+  if(curSusp.nuevaFecha){
+    var h=curSusp.nuevaHora?(' · '+curSusp.nuevaHora):'';
+    var ca=curSusp.nuevaCancha?(' · '+curSusp.nuevaCancha):'';
+    lines.push('Reprogramado: '+fd(curSusp.nuevaFecha)+h+ca);
+  }else{
+    lines.push('Fecha por confirmar');
+  }
+  txt.innerHTML=lines.join('<br>');
+  banner.style.display='block';
+}
+
+function openSuspOverlay(){
+  if(!curMatch)return;
+  document.getElementById('suspMatchLabel').textContent=tn(curMatch.l)+' vs '+tn(curMatch.v)+' · '+fd(curMatch.fecha);
+  document.getElementById('suspMotivo').value=curSusp?curSusp.motivo||'':'';
+  document.getElementById('suspNewFecha').value=curSusp&&curSusp.nuevaFecha?curSusp.nuevaFecha:'';
+  document.getElementById('suspNewHora').value=curSusp&&curSusp.nuevaHora?curSusp.nuevaHora:'';
+  document.getElementById('suspNewCancha').value=curSusp&&curSusp.nuevaCancha?curSusp.nuevaCancha:'';
+  document.getElementById('suspOverlay').classList.add('show');
+}
+
+function closeSuspOverlay(){
+  document.getElementById('suspOverlay').classList.remove('show');
+}
+
+async function guardarSuspension(){
+  var motivo=document.getElementById('suspMotivo').value.trim();
+  if(!motivo){showToast('Ingresa el motivo de suspensión','var(--amber)');return;}
+  var nuevaFecha=document.getElementById('suspNewFecha').value||null;
+  var nuevaHora=document.getElementById('suspNewHora').value||null;
+  var nuevaCancha=document.getElementById('suspNewCancha').value||null;
+  var data={motivo:motivo,por:curCed,nombre:curUser.nombre||curCed,at:Date.now()};
+  if(nuevaFecha)data.nuevaFecha=nuevaFecha;
+  if(nuevaHora)data.nuevaHora=nuevaHora;
+  if(nuevaCancha)data.nuevaCancha=nuevaCancha;
+  try{
+    await db.ref('/suspensiones/'+curMatch.id).set(data);
+    curSusp=data;
+    renderSuspBanner();
+    closeSuspOverlay();
+    renderMatchList();
+    showToast('⚠️ Partido marcado como suspendido','var(--amber)');
+  }catch(e){showToast('Error: '+e.message,'var(--red)');}
+}
+
+async function levantarSuspension(){
+  if(!confirm('¿Levantar la suspensión de este partido?'))return;
+  try{
+    await db.ref('/suspensiones/'+curMatch.id).remove();
+    curSusp=null;
+    renderSuspBanner();
+    renderMatchList();
+    showToast('✅ Suspensión levantada','var(--green)');
+  }catch(e){showToast('Error: '+e.message,'var(--red)');}
 }
 
 // ── INIT ──

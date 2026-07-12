@@ -124,6 +124,8 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <button class="pill" onclick="setTpl('partido',this)">⚽ Partido</button>
     <button class="pill" onclick="setTpl('resultado',this)">🏆 Resultado</button>
     <button class="pill" onclick="setTpl('tabla',this)">📊 Tabla</button>
+    <button class="pill" onclick="setTpl('suspendido',this)">⚠️ Susp.</button>
+    <button class="pill" onclick="setTpl('reprogramado',this)">📅 Reprog.</button>
     <button class="pill" onclick="setTpl('mvp',this)">⭐ MVP</button>
   </div>
 
@@ -392,12 +394,12 @@ function loadMs(){
   const ms=ALL.filter(m=>(wk==='all'||m.week===parseInt(wk))&&(vu===0||m.vu===vu))
     .sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
   // Jornada: auto-select all. Partido/Resultado: start empty so user picks one
-  selMs=(curTpl==='jornada')?new Set(ms.map(m=>m.id)):new Set();
+  selMs=(curTpl==='jornada'||curTpl==='tabla')?new Set(ms.map(m=>m.id)):new Set();
   renderMs(ms);
 }
 function renderMs(ms){
   const el=document.getElementById('mList');
-  const single=curTpl==='partido'||curTpl==='resultado';
+  const single=curTpl==='partido'||curTpl==='resultado'||curTpl==='suspendido'||curTpl==='reprogramado';
   if(!ms.length){el.innerHTML='<div class="no-ms">Sin partidos</div>';return;}
   let h='';
   if(single)h+='<div style="font-size:10px;color:var(--gl);font-weight:800;letter-spacing:1px;padding:4px 0 10px;text-align:center">TAP PARA SELECCIONAR UN PARTIDO</div>';
@@ -420,7 +422,7 @@ function renderMs(ms){
   el.innerHTML=h;
 }
 function togM(id,el){
-  const single=curTpl==='partido'||curTpl==='resultado';
+  const single=curTpl==='partido'||curTpl==='resultado'||curTpl==='suspendido'||curTpl==='reprogramado';
   if(single){
     if(selMs.has(id)){selMs.delete(id);el.classList.remove('on');el.querySelector('.mi-chk').textContent='';}
     else{
@@ -509,6 +511,8 @@ async function gen(){
     else if(curTpl==='jornada')await tJornada(ctx,ms);
     else if(curTpl==='partido')await tPartido(ctx,ms[0]);
     else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
+    else if(curTpl==='suspendido')await tSuspendido(ctx,ms[0]);
+    else if(curTpl==='reprogramado')await tReprogramado(ctx,ms[0]);
     else await tTabla(ctx);
     ok=true;
   }catch(e){
@@ -1604,6 +1608,183 @@ async function shareOrDownload(){
   }
 }
 function dl(){shareOrDownload();}
+
+// ═══ SUSPENDIDO ═════════════════════════════════════
+async function tSuspendido(ctx,m){
+  if(!m){
+    ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+    ctx.font='700 36px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='center';ctx.letterSpacing='0';
+    ctx.fillText('Selecciona un partido',W/2,H/2);return;
+  }
+  await drawBg(ctx);topStripe(ctx);
+  // Amber glow overlay
+  rGlow(ctx,W/2,H*.48,800,'rgba(245,158,11,.18)');
+  clubHeader(ctx,50);
+
+  // Warning label pill
+  {const lW=560,lH=62,lX=W/2-lW/2,lY=368;
+  const lg=lGrad(ctx,lX,lY,lX+lW,lY+lH,[0,'rgba(245,158,11,.08)'],[.5,'rgba(245,158,11,.22)'],[1,'rgba(245,158,11,.08)']);
+  ctx.fillStyle=lg;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
+  ctx.strokeStyle='rgba(245,158,11,.45)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
+  ctx.font='800 30px sans-serif';ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.letterSpacing='4px';
+  ctx.fillText('⚠️  PARTIDO SUSPENDIDO',W/2,lY+lH*.68);}
+
+  // Big warning icon
+  ctx.save();ctx.font='900 180px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(245,158,11,.5)';ctx.shadowBlur=60;
+  ctx.fillText('⚠️',W/2,640);ctx.restore();ctx.textBaseline='alphabetic';
+
+  goldRule(ctx,760);
+
+  // Team names
+  const d=new Date(m.fecha+'T12:00:00');
+  ctx.font='900 52px Arial Black,sans-serif';ctx.letterSpacing='0px';ctx.textAlign='center';
+  const ng=lGrad(ctx,W/2-300,0,W/2+300,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
+  ctx.fillStyle=ng;
+  const nm=`${tn(m.l).toUpperCase()}  vs  ${tn(m.v).toUpperCase()}`;
+  let fs=52;ctx.font=`900 ${fs}px Arial Black,sans-serif`;
+  while(ctx.measureText(nm).width>920&&fs>28){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+  ctx.fillText(nm,W/2,840);
+
+  ctx.font='700 36px sans-serif';ctx.letterSpacing='2px';
+  ctx.fillStyle='rgba(255,215,0,.75)';ctx.textAlign='center';
+  ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · ${m.hora}`,W/2,898);
+  ctx.font='700 32px sans-serif';ctx.fillStyle='rgba(255,255,255,.5)';ctx.letterSpacing='1px';
+  ctx.fillText(m.cancha,W/2,946);
+
+  rule(ctx,982,.35);
+
+  // Suspension reason from Firebase
+  const suspSnap=await db.ref('/suspensiones/'+m.id).get();
+  const susp=suspSnap.exists()?suspSnap.val():null;
+  if(susp&&susp.motivo){
+    ctx.font='700 34px sans-serif';ctx.letterSpacing='1px';ctx.textAlign='center';
+    ctx.fillStyle='rgba(245,158,11,.9)';
+    ctx.fillText('Motivo: '+susp.motivo,W/2,1046);
+  }
+
+  // Logos (smaller)
+  const midY=1280,tSz=280;
+  await drawBadge(ctx,m.l,W*.27,midY,tSz);
+  await drawBadge(ctx,m.v,W*.73,midY,tSz);
+  // Grayscale hint overlay (suspended feel)
+  ctx.globalAlpha=0.32;ctx.fillStyle='#060d1a';ctx.beginPath();
+  ctx.arc(W*.27,midY,tSz*.52,0,Math.PI*2);ctx.fill();
+  ctx.arc(W*.73,midY,tSz*.52,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+
+  // Bottom CTA
+  rule(ctx,H-320,.38);
+  ctx.font='700 28px sans-serif';ctx.fillStyle='rgba(255,255,255,.28)';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.fillText('LIGA INTERNA · TEMPORADA S2 2026',W/2,H-272);
+  const ctaW=560,ctaH=74,ctaX=W/2-ctaW/2,ctaY=H-236;
+  const ctag=lGrad(ctx,ctaX,ctaY,ctaX+ctaW,ctaY,[0,'rgba(245,158,11,.0)'],[.3,'rgba(245,158,11,.22)'],[.7,'rgba(245,158,11,.22)'],[1,'rgba(245,158,11,.0)']);
+  ctx.fillStyle=ctag;ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.fill();
+  ctx.strokeStyle='rgba(245,158,11,.4)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.stroke();
+  ctx.font='900 36px sans-serif';ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.letterSpacing='2px';
+  ctx.fillText('🕐 Nueva fecha por confirmar',W/2,ctaY+ctaH*.64);
+  botStripe(ctx);
+}
+
+// ═══ REPROGRAMADO ════════════════════════════════════
+async function tReprogramado(ctx,m){
+  if(!m){
+    ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+    ctx.font='700 36px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='center';ctx.letterSpacing='0';
+    ctx.fillText('Selecciona un partido',W/2,H/2);return;
+  }
+  const suspSnap=await db.ref('/suspensiones/'+m.id).get();
+  const susp=suspSnap.exists()?suspSnap.val():null;
+  // Use rescheduled date if available, else original
+  const rFecha=susp&&susp.nuevaFecha?susp.nuevaFecha:m.fecha;
+  const rHora=susp&&susp.nuevaHora?susp.nuevaHora:m.hora;
+  const rCancha=susp&&susp.nuevaCancha?susp.nuevaCancha:m.cancha;
+
+  await drawBg(ctx);topStripe(ctx);
+  rGlow(ctx,W*.17,H*.5,620,'rgba(14,165,233,.2)');
+  rGlow(ctx,W*.83,H*.5,580,'rgba(200,16,46,.18)');
+  clubHeader(ctx,50);
+
+  // Header pill
+  {const lW=620,lH=62,lX=W/2-lW/2,lY=368;
+  const lg=lGrad(ctx,lX,lY,lX+lW,lY+lH,[0,'rgba(14,165,233,.08)'],[.5,'rgba(14,165,233,.24)'],[1,'rgba(14,165,233,.08)']);
+  ctx.fillStyle=lg;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
+  ctx.strokeStyle='rgba(14,165,233,.42)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
+  ctx.font='800 28px sans-serif';ctx.fillStyle='#38bdf8';ctx.textAlign='center';ctx.letterSpacing='4px';
+  ctx.fillText('📅  PARTIDO REPROGRAMADO',W/2,lY+lH*.68);}
+
+  // New date display
+  const d=new Date(rFecha+'T12:00:00');
+  const dayName=DL[d.getDay()].toUpperCase();
+  const dateNum=d.getDate();
+  const monName=ML[d.getMonth()].toUpperCase();
+
+  {const cW=340,cH=60,cX=W/2-cW/2,cY=458;
+  const cg=lGrad(ctx,cX,cY,cX+cW,cY+cH,[0,'rgba(14,165,233,.3)'],[1,'rgba(14,165,233,.14)']);
+  ctx.fillStyle=cg;ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.fill();
+  ctx.strokeStyle='rgba(14,165,233,.48)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.stroke();
+  ctx.font='800 32px sans-serif';ctx.fillStyle='#7dd3fc';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.fillText(dayName,W/2,cY+cH*.68);}
+
+  ctx.font='900 140px sans-serif';ctx.letterSpacing='-3px';
+  const dng=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#c0d8f0'],[.5,'#ffffff'],[1,'#c0d8f0']);
+  ctx.fillStyle=dng;ctx.textAlign='center';
+  ctx.save();ctx.shadowColor='rgba(14,165,233,.3)';ctx.shadowBlur=40;
+  ctx.fillText(dateNum,W/2,640);ctx.restore();
+
+  ctx.font='700 56px sans-serif';ctx.letterSpacing='8px';
+  ctx.fillStyle='rgba(255,255,255,.62)';ctx.textAlign='center';
+  ctx.fillText(monName,W/2,754);
+
+  goldRule(ctx,786);
+
+  ctx.textAlign='center';ctx.font='800 54px sans-serif';ctx.letterSpacing='2px';
+  ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillText(`🕐  ${rHora}`,W/2,862);
+  ctx.font='800 50px sans-serif';ctx.letterSpacing='1px';
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillText(`📍  ${rCancha}`,W/2,934);
+
+  rule(ctx,970,.38);
+
+  // Team logos + names
+  const midY=1200,tSz=340;
+  await drawBadge(ctx,m.l,W*.23,midY,tSz);
+  await drawBadge(ctx,m.v,W*.77,midY,tSz);
+
+  const vsR=68;
+  ctx.save();ctx.shadowColor='rgba(14,165,233,.7)';ctx.shadowBlur=50;
+  const vg=ctx.createRadialGradient(W/2,midY,0,W/2,midY,vsR);
+  vg.addColorStop(0,'rgba(14,165,233,.45)');vg.addColorStop(.6,'rgba(14,165,233,.18)');vg.addColorStop(1,'transparent');
+  ctx.fillStyle=vg;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
+  ctx.save();ctx.fillStyle='rgba(8,10,22,.82)';ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
+  const vrg=lGrad(ctx,W/2-vsR,midY-vsR,W/2+vsR,midY+vsR,[0,'rgba(56,189,248,.5)'],[.5,'rgba(56,189,248,.9)'],[1,'rgba(56,189,248,.5)']);
+  ctx.strokeStyle=vrg;ctx.lineWidth=3;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.stroke();
+  ctx.save();ctx.shadowColor='rgba(56,189,248,.5)';ctx.shadowBlur=20;
+  ctx.font='900 58px Arial Black,sans-serif';ctx.fillStyle='#7dd3fc';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='2px';
+  ctx.fillText('VS',W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
+
+  const ny=midY+tSz*.52+18;const maxNameW=400;
+  function teamLblR(x,id){
+    let nm=tn(id).toUpperCase(),fs=44;
+    ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0px';
+    while(ctx.measureText(nm).width>maxNameW&&fs>24){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=14;
+    const ng2=lGrad(ctx,x-maxNameW/2,0,x+maxNameW/2,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
+    ctx.fillStyle=ng2;ctx.textAlign='center';ctx.fillText(nm,x,ny);ctx.restore();
+  }
+  teamLblR(W*.23,m.l);teamLblR(W*.77,m.v);
+
+  rule(ctx,H-320,.38);
+  ctx.font='700 28px sans-serif';ctx.fillStyle='rgba(255,255,255,.28)';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.fillText('LIGA INTERNA · TEMPORADA S2 2026',W/2,H-272);
+  const ctaW=560,ctaH=74,ctaX=W/2-ctaW/2,ctaY=H-236;
+  const ctag=lGrad(ctx,ctaX,ctaY,ctaX+ctaW,ctaY,[0,'rgba(14,165,233,.0)'],[.3,'rgba(14,165,233,.22)'],[.7,'rgba(14,165,233,.22)'],[1,'rgba(14,165,233,.0)']);
+  ctx.fillStyle=ctag;ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.fill();
+  ctx.strokeStyle='rgba(14,165,233,.42)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.stroke();
+  ctx.font='900 36px sans-serif';ctx.fillStyle='#38bdf8';ctx.textAlign='center';ctx.letterSpacing='2px';
+  ctx.fillText('✅ ¡SE JUEGA DE NUEVO!',W/2,ctaY+ctaH*.64);
+  botStripe(ctx);
+}
+
 function cpCaption(){
   const ms=ALL.filter(m=>selMs.has(m.id));const hash=document.getElementById('hash').value;let txt='';
   if(curTpl==='resultado'){const m=ms[0],r=results[m?.id];if(m&&r)txt=`⚽ RESULTADO FINAL\n${tn(m.l)} ${r.l} - ${r.v} ${tn(m.v)}\n📅 ${fD(m.fecha,false)} · ${m.hora}\n\n`;}
