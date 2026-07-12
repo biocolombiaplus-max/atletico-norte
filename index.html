@@ -15,7 +15,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.3';
+var APP_VER='8.4';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -3280,6 +3280,7 @@ async function shPl(){
 async function tgPg(c){if(!fbR||!db)return;var s=await db.ref("/socios/"+c+"/pagado").get();await db.ref("/socios/"+c+"/pagado").set(!s.val());shPl();}
 
 // ── GESTIONAR SOCIOS ──
+// Reads individual /socios/{cedula} — avoids full-list read (blocked by Firebase rules)
 var _soAll={},_soFilter='',_assignTipo='fijo';
 
 function chRlEl(el){
@@ -3289,131 +3290,121 @@ function chRlEl(el){
 }
 async function chRl(c,r){if(fbR&&db)await db.ref('/socios/'+c+'/rol').set(r);}
 
-var _soRef=null;
-async function shSo(){
+// Socios panel — individual reads only (full-list read blocked by Firebase rules)
+var _soAll={},_soFilter='',_assignTipo='fijo',_soCache={};
+
+function shSo(){
   if(!fbR||!db){adCnt('<div class="es"><p>Firebase no disponible</p></div>');return;}
-  adCnt('<div class="es"><div class="esi" style="font-size:36px">&#9203;</div><p>Cargando socios...</p></div>');
-  if(_soRef){try{_soRef.off();}catch(x){}_soRef=null;}
-  _soRef=db.ref('/socios');
-  _soRef.once('value',function(s){
-    _soAll=s.val()||{};_soFilter='';
-    renderSoList();
-  },function(err){
-    var msg=err&&err.code?err.code:(err&&err.message?err.message:'desconocido');
-    adCnt('<div class="es"><div class="esi" style="font-size:32px">&#9888;&#65039;</div>'
-      +'<p style="margin-bottom:6px">Error al cargar socios</p>'
-      +'<p style="font-size:11px;color:var(--m);margin-bottom:14px">'+msg+'</p>'
-      +'<button class="sb2" style="max-width:180px;margin:0 auto" onclick="shSo()">Reintentar</button><br><br>'
-      +'<button class="sb2" style="max-width:180px;margin:0 auto;background:rgba(255,255,255,.05)" onclick="adShowOverview()">&#8592; Volver</button></div>');
-  });
-}
-
-function renderSoList(){
-  var so=_soAll,now=Date.now();
-  var ks=Object.keys(so).sort(function(a,b){return(so[a].nombre||a).toLowerCase().localeCompare((so[b].nombre||b).toLowerCase());});
-  var coordCed=null,coordSc=null;
-  ks.forEach(function(c){if(SUPER_ADMINS.indexOf(c)>=0)return;var sc=so[c];if((sc.rol||'').toLowerCase()==='coordinador deportivo'){coordCed=c;coordSc=sc;}});
   var h='<div style="padding:12px 16px 20px">';
-
-  // Coordinator card
-  h+='<div style="margin-bottom:12px;background:rgba(200,16,46,.07);border:1.5px solid rgba(200,16,46,.18);border-radius:16px;overflow:hidden">';
+  h+='<div id="soCoordCard" style="margin-bottom:12px;background:rgba(200,16,46,.07);border:1.5px solid rgba(200,16,46,.18);border-radius:16px;overflow:hidden">';
   h+='<div style="padding:11px 14px;border-bottom:1px solid rgba(200,16,46,.12);display:flex;align-items:center;justify-content:space-between">';
   h+='<div style="font-size:9px;font-weight:900;color:var(--red);text-transform:uppercase;letter-spacing:1.2px">&#9917; Coordinador Deportivo</div>';
   h+='<button onclick="shAsignarCoord()" style="padding:6px 12px;border-radius:8px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:900;cursor:pointer">+ Asignar</button>';
-  h+='</div>';
-  if(coordCed&&coordSc){
-    var isTmp=!!coordSc.coordHasta,expired=isTmp&&coordSc.coordHasta<now;
-    var dL=isTmp&&!expired?Math.ceil((coordSc.coordHasta-now)/86400000):0;
-    h+='<div style="padding:12px 14px;display:flex;align-items:center;gap:12px">';
-    h+='<div style="width:38px;height:38px;border-radius:10px;background:rgba(200,16,46,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9917;</div>';
-    h+='<div style="flex:1"><div style="font-size:13px;font-weight:900">'+(coordSc.nombre||coordCed)+'</div>';
-    h+='<div style="font-size:10px;color:var(--m);margin-top:2px">CC '+coordCed+' &middot; ';
-    if(expired)h+='<span style="color:#f87171">&#9888;&#65039; Acceso expirado</span>';
-    else if(isTmp)h+='<span style="color:var(--amber)">&#8987; Temporal &middot; '+dL+' día'+(dL!==1?'s':'')+' restante'+(dL!==1?'s':'')+'</span>';
-    else h+='<span style="color:var(--green)">&#128204; Fijo</span>';
-    h+='</div></div>';
-    h+='<button onclick="quitarCoord(\''+coordCed+'\')" style="padding:6px 10px;border-radius:8px;background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.25);color:var(--red);font-size:10px;font-weight:900;cursor:pointer">Quitar</button>';
-    h+='</div>';
-  }else{
-    h+='<div style="padding:12px 14px;font-size:11px;color:var(--dm)">Sin coordinador asignado.</div>';
-  }
-  h+='</div>';
-
-  // Super-admins card
+  h+='</div><div id="soCoordBody"><div style="padding:12px 14px;font-size:11px;color:var(--dm)">&#9203; Cargando...</div></div></div>';
   h+='<div style="margin-bottom:12px;background:rgba(14,165,233,.05);border:1px solid rgba(14,165,233,.18);border-radius:14px;padding:10px 14px">';
   h+='<div style="font-size:9px;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">&#128737;&#65039; Administradores permanentes</div>';
-  SUPER_ADMINS.forEach(function(c){var sc=so[c]||{};
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(14,165,233,.08)">';
-    h+='<span style="font-size:16px">&#128737;&#65039;</span><div><div style="font-size:12px;font-weight:800">'+(sc.nombre||'CC '+c)+'</div>';
-    h+='<div style="font-size:10px;color:var(--m)">CC '+c+' &middot; Acceso total permanente</div></div></div>';
-  });
+  h+='<div id="soAdmList">'+SUPER_ADMINS.map(function(c){return'<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(14,165,233,.08)"><span style="font-size:16px">&#128737;&#65039;</span><div><div style="font-size:12px;font-weight:800" id="soAdm_'+c+'">CC '+c+'</div><div style="font-size:10px;color:var(--m)">CC '+c+' &middot; Acceso total permanente</div></div></div>';}).join('')+'</div>';
   h+='</div>';
-
-  // Search
-  h+='<div style="position:relative;margin-bottom:10px">';
-  h+='<span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">&#128269;</span>';
-  h+='<input type="search" id="soSearch" placeholder="Buscar por nombre o cédula..." oninput="filtSo(this.value)" autocomplete="off" style="width:100%;background:var(--b3);border:1.5px solid var(--bd);border-radius:12px;padding:11px 12px 11px 38px;color:var(--t);font-size:13px;outline:none;-webkit-appearance:none">';
+  h+='<div style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">&#128269; Buscar socio por c&#233;dula</div>';
+  h+='<div style="display:flex;gap:8px;margin-bottom:12px">';
+  h+='<input type="number" id="soSearchCed" placeholder="N&#250;mero de c&#233;dula..." inputmode="numeric" style="flex:1;background:var(--b3);border:1.5px solid var(--bd);border-radius:12px;padding:12px 14px;color:var(--t);font-size:14px;outline:none;-webkit-appearance:none" onkeydown="if(event.key===\'Enter\')buscarSocio()">';
+  h+='<button onclick="buscarSocio()" style="padding:12px 18px;border-radius:12px;background:var(--ac);border:none;color:#fff;font-size:14px;font-weight:900;cursor:pointer;flex-shrink:0">Buscar</button>';
   h+='</div>';
-  h+='<div id="soCntLabel" style="font-size:9px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'+ks.length+' socio'+(ks.length!==1?'s':'')+'</div>';
-  h+='<div id="soList">'+renderSoItems(ks,so,'')+'</div></div>';
+  h+='<div id="soResult"></div></div>';
   adCnt(h);
+  loadCoordCard();
+  SUPER_ADMINS.forEach(function(c){
+    db.ref('/socios/'+c+'/nombre').once('value',function(s){
+      var el=document.getElementById('soAdm_'+c);
+      if(el&&s.val())el.textContent=s.val();
+    },function(){});
+  });
 }
 
-function renderSoItems(ks,so,q){
-  var now=Date.now(),f=(q||'').trim().toLowerCase();
-  var filtered=f?ks.filter(function(c){return(so[c].nombre||'').toLowerCase().indexOf(f)>=0||c.indexOf(q.trim())>=0;}):ks;
-  if(!filtered.length)return'<div style="text-align:center;color:var(--dm);padding:20px 0;font-size:12px">Sin resultados para &ldquo;'+esc(q)+'&rdquo;</div>';
-  return filtered.map(function(c){
-    var sc=so[c],isSA=SUPER_ADMINS.indexOf(c)>=0;
+function loadCoordCard(){
+  db.ref('/config/coordDeportivo').once('value',function(s){
+    var d=s.val(),el=document.getElementById('soCoordBody');
+    if(!el)return;
+    if(!d||!d.cedula){el.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--dm)">Sin coordinador asignado.</div>';return;}
+    var now=Date.now(),isTmp=!!d.hasta,expired=isTmp&&d.hasta<now;
+    var dL=isTmp&&!expired?Math.ceil((d.hasta-now)/86400000):0;
+    var stato=expired?'<span style="color:#f87171">&#9888;&#65039; Acceso expirado</span>'
+      :isTmp?'<span style="color:var(--amber)">&#8987; Temporal &middot; '+dL+' d&#237;a'+(dL!==1?'s':'')+' restante'+(dL!==1?'s':'')+'</span>'
+      :'<span style="color:var(--green)">&#128204; Fijo</span>';
+    el.innerHTML='<div style="padding:12px 14px;display:flex;align-items:center;gap:12px">'
+      +'<div style="width:38px;height:38px;border-radius:10px;background:rgba(200,16,46,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9917;</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:900">'+esc(d.nombre||d.cedula)+'</div>'
+      +'<div style="font-size:10px;color:var(--m);margin-top:2px">CC '+d.cedula+' &middot; '+stato+'</div></div>'
+      +'<button onclick="quitarCoord(\''+d.cedula+'\')" style="padding:6px 10px;border-radius:8px;background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.25);color:var(--red);font-size:10px;font-weight:900;cursor:pointer">Quitar</button>'
+      +'</div>';
+  },function(){
+    var el=document.getElementById('soCoordBody');
+    if(el)el.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--dm)">Sin coordinador asignado.</div>';
+  });
+}
+
+function buscarSocio(){
+  var inp=document.getElementById('soSearchCed');
+  var cedula=(inp?inp.value:'').toString().trim().replace(/\D/g,'');
+  var res=document.getElementById('soResult');
+  if(!cedula){if(res)res.innerHTML='<div style="font-size:12px;color:var(--m);text-align:center;padding:10px">Ingresa una c&#233;dula v&#225;lida.</div>';return;}
+  if(res)res.innerHTML='<div style="font-size:12px;color:var(--m);text-align:center;padding:10px">&#9203; Buscando...</div>';
+  db.ref('/socios/'+cedula).once('value',function(s){
+    if(!res)return;
+    if(!s.exists()){res.innerHTML='<div style="font-size:12px;color:var(--m);text-align:center;padding:16px">No se encontr&#243; ning&#250;n socio con CC '+cedula+'.</div>';return;}
+    var sc=s.val(),isSA=SUPER_ADMINS.indexOf(cedula)>=0;
+    _soCache[cedula]=sc;
     var rol=isSA?'Administrador':(sc.rol||'Socio');
-    var isCoord=!isSA&&rol==='Coordinador Deportivo';
-    var isTmp=isCoord&&!!sc.coordHasta,expired=isTmp&&sc.coordHasta<now;
+    var isCoord=!isSA&&(sc.rol||'').toLowerCase()==='coordinador deportivo';
+    var now=Date.now(),isTmp=isCoord&&!!sc.coordHasta,expired=isTmp&&sc.coordHasta<now;
     var dL=isTmp&&!expired?Math.ceil((sc.coordHasta-now)/86400000):0;
-    var badge=isSA?'<span style="margin-left:6px;padding:2px 7px;border-radius:6px;background:rgba(14,165,233,.15);color:var(--blue);font-size:9px;font-weight:900">&#128737;&#65039; Admin</span>'
-      :isCoord?'<span style="margin-left:6px;padding:2px 7px;border-radius:6px;background:rgba(200,16,46,.12);color:var(--red);font-size:9px;font-weight:900">'+(expired?'&#9888; Expirado':isTmp?'&#8987; Coord.':'&#9917; Coord.')+'</span>':'';
-    var extra=isTmp&&!expired?'<div style="font-size:9px;color:var(--amber);margin-top:2px">&#8987; Expira en '+dL+' día'+(dL!==1?'s':'')+'</div>':expired?'<div style="font-size:9px;color:#f87171;margin-top:2px">Acceso expirado</div>':'';
-    var ctrl=isSA?'<span style="font-size:9px;color:var(--dm);padding:4px">Permanente</span>'
-      :'<select data-c="'+c+'" onchange="chRlEl(this)" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:7px;font-size:10px">'+
-      ['Socio','Administrador','Coordinador Deportivo','Coordinador Financiero'].map(function(ro){return'<option'+(rol===ro?' selected':'')+'>'+ro+'</option>';}).join('')+'</select>';
-    return'<div class="pli" style="'+(isCoord&&!expired?'border-color:rgba(200,16,46,.25);background:rgba(200,16,46,.03);':'')+(expired?'opacity:.6;':'')+'">'+
-      '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><div class="pln">'+esc(sc.nombre||'Sin nombre')+'</div>'+badge+'</div>'+
-      '<div class="plc">CC '+c+(sc.equipo&&sc.equipo!=='0'?' &middot; Eq.'+sc.equipo:'')+'</div>'+extra+'</div>'+ctrl+'</div>';
-  }).join('');
-}
-
-function filtSo(q){
-  _soFilter=q;
-  var so=_soAll;
-  var ks=Object.keys(so).sort(function(a,b){return(so[a].nombre||a).toLowerCase().localeCompare((so[b].nombre||b).toLowerCase());});
-  var f=(q||'').trim().toLowerCase();
-  var filtered=f?ks.filter(function(c){return(so[c].nombre||'').toLowerCase().indexOf(f)>=0||c.indexOf(q.trim())>=0;}):ks;
-  var lbl=document.getElementById('soCntLabel');if(lbl)lbl.textContent=filtered.length+' socio'+(filtered.length!==1?'s':'')+(f?' · "'+q+'"':'');
-  var lst=document.getElementById('soList');if(lst)lst.innerHTML=renderSoItems(ks,so,q);
+    var badge=isSA?'<span style="padding:2px 8px;border-radius:6px;background:rgba(14,165,233,.15);color:var(--blue);font-size:9px;font-weight:900">&#128737;&#65039; Admin</span>'
+      :isCoord?'<span style="padding:2px 8px;border-radius:6px;background:rgba(200,16,46,.12);color:var(--red);font-size:9px;font-weight:900">'+(expired?'&#9888; Expirado':isTmp?'&#8987; Coord.':'&#9917; Coord.')+'</span>':'';
+    var extra=isTmp&&!expired?'<div style="font-size:10px;color:var(--amber);margin-top:4px">&#8987; Expira en '+dL+' d&#237;a'+(dL!==1?'s':'')+'</div>':expired?'<div style="font-size:10px;color:#f87171;margin-top:4px">Acceso expirado</div>':'';
+    var ctrl=isSA?'<div style="font-size:10px;color:var(--dm);margin-top:8px">Acceso permanente &mdash; no modificable</div>'
+      :'<div style="margin-top:10px"><label style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Cambiar rol</label>'
+      +'<select data-c="'+cedula+'" onchange="chRlEl(this)" style="background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:10px 12px;border-radius:10px;font-size:13px;width:100%">'
+      +['Socio','Administrador','Coordinador Deportivo','Coordinador Financiero'].map(function(ro){return'<option'+(rol===ro?' selected':'')+'>'+ro+'</option>';}).join('')+'</select></div>';
+    res.innerHTML='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:14px;padding:14px 16px">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">'
+      +'<div style="font-size:15px;font-weight:900">'+esc(sc.nombre||'Sin nombre')+'</div>'+badge+'</div>'
+      +'<div style="font-size:11px;color:var(--m)">CC '+cedula+(sc.equipo&&sc.equipo!=='0'?' &middot; Equipo '+sc.equipo:'')+(sc.pos?' &middot; '+sc.pos:'')+'</div>'
+      +extra+ctrl+'</div>';
+  },function(err){
+    if(res)res.innerHTML='<div style="font-size:12px;color:#f87171;text-align:center;padding:16px">Error: '+(err?err.code||err.message:'?')+'</div>';
+  });
 }
 
 function shAsignarCoord(){
-  var so=_soAll;
-  var ks=Object.keys(so).sort(function(a,b){return(so[a].nombre||a).toLowerCase().localeCompare((so[b].nombre||b).toLowerCase());}).filter(function(c){return SUPER_ADMINS.indexOf(c)<0;});
-  var opts=ks.map(function(c){return'<option value="'+c+'">'+(so[c].nombre||'CC '+c)+' (CC '+c+')</option>';}).join('');
   var today=new Date().toISOString().split('T')[0];
   _assignTipo='fijo';
   var h='<div style="padding:14px 16px">';
-  h+='<button onclick="renderSoList()" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--m);font-size:13px;cursor:pointer;padding:0 0 14px;font-weight:700">‹ Volver</button>';
+  h+='<button onclick="shSo()" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--m);font-size:13px;cursor:pointer;padding:0 0 14px;font-weight:700">&#8249; Volver</button>';
   h+='<div style="font-size:15px;font-weight:900;margin-bottom:4px;letter-spacing:-.3px">&#9917; Asignar Coordinador Deportivo</div>';
-  h+='<div style="font-size:11px;color:var(--m);margin-bottom:18px">Elige un socio y define si el acceso es fijo o temporal.</div>';
-  h+='<div class="field" style="margin-bottom:14px"><label>Socio</label>';
-  h+='<select id="coordSel" style="background:var(--b3);border:2px solid var(--bd);border-radius:12px;padding:13px 12px;color:var(--t);font-size:13px;width:100%;outline:none"><option value="">-- Selecciona un socio --</option>'+opts+'</select></div>';
+  h+='<div style="font-size:11px;color:var(--m);margin-bottom:18px">Ingresa la c&#233;dula del socio y define el tipo de acceso.</div>';
+  h+='<div class="field" style="margin-bottom:14px"><label>C&#233;dula del socio</label>';
+  h+='<input type="number" id="coordCedInput" placeholder="N&#250;mero de c&#233;dula..." inputmode="numeric" style="background:var(--b3);border:2px solid var(--bd);border-radius:12px;padding:13px 12px;color:var(--t);font-size:14px;width:100%;outline:none;-webkit-appearance:none"></div>';
+  h+='<div id="coordPreview" style="margin-bottom:14px"></div>';
   h+='<div class="field" style="margin-bottom:14px"><label>Tipo de acceso</label>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   h+='<button id="ctFijo" onclick="setCoordTipo(\'fijo\')" style="padding:14px 10px;border-radius:12px;border:2px solid var(--red);background:rgba(200,16,46,.12);color:var(--red);font-size:13px;font-weight:900;cursor:pointer">&#128204; Fijo</button>';
   h+='<button id="ctTemp" onclick="setCoordTipo(\'temporal\')" style="padding:14px 10px;border-radius:12px;border:2px solid var(--bd);background:transparent;color:var(--m);font-size:13px;font-weight:900;cursor:pointer">&#8987; Temporal</button>';
   h+='</div></div>';
-  h+='<div id="hastaWrap" style="display:none" class="field"><label>Fecha hasta (incluyendo ese día)</label>';
+  h+='<div id="hastaWrap" style="display:none" class="field"><label>Fecha hasta (incluyendo ese d&#237;a)</label>';
   h+='<input type="date" id="coordHastaDate" min="'+today+'" style="background:var(--b3);border:2px solid var(--bd);border-radius:12px;padding:13px 12px;color:var(--t);font-size:14px;width:100%;outline:none"></div>';
   h+='<div id="coordErr" style="background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.3);border-radius:10px;padding:10px 12px;font-size:11px;color:#f87171;display:none;margin:10px 0;line-height:1.5"></div>';
-  h+='<button onclick="saveCoord()" style="width:100%;padding:16px;border-radius:14px;background:var(--red);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px">&#9917; Guardar asignación</button>';
+  h+='<button onclick="saveCoord()" style="width:100%;padding:16px;border-radius:14px;background:var(--red);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px">&#9917; Guardar asignaci&#243;n</button>';
   h+='</div>';
   adCnt(h);
+  document.getElementById('coordCedInput').addEventListener('input',function(){
+    var c=this.value.trim(),pv=document.getElementById('coordPreview');
+    if(!c||c.length<4){if(pv)pv.innerHTML='';return;}
+    db.ref('/socios/'+c+'/nombre').once('value',function(s){
+      if(!pv)return;
+      pv.innerHTML=s.val()?'<div style="background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.2);border-radius:10px;padding:10px 12px;font-size:12px"><strong>'+esc(s.val())+'</strong></div>'
+        :'<div style="font-size:11px;color:var(--m)">No encontrado</div>';
+    },function(){});
+  });
 }
 
 function setCoordTipo(t){
@@ -3425,44 +3416,47 @@ function setCoordTipo(t){
 }
 
 async function saveCoord(){
-  var sel=document.getElementById('coordSel'),err=document.getElementById('coordErr');
+  var cinp=document.getElementById('coordCedInput'),err=document.getElementById('coordErr');
   if(err)err.style.display='none';
-  if(!sel||!sel.value){if(err){err.innerHTML='Selecciona un socio.';err.style.display='block';}return;}
-  var c=sel.value,hasta=null;
+  var c=(cinp?cinp.value:'').toString().trim().replace(/\D/g,'');
+  if(!c){if(err){err.innerHTML='Ingresa la c&#233;dula del socio.';err.style.display='block';}return;}
+  if(SUPER_ADMINS.indexOf(c)>=0){if(err){err.innerHTML='Los administradores permanentes no necesitan este rol.';err.style.display='block';}return;}
+  var hasta=null;
   if(_assignTipo==='temporal'){
     var dateEl=document.getElementById('coordHastaDate');
-    if(!dateEl||!dateEl.value){if(err){err.innerHTML='Selecciona la fecha de expiración.';err.style.display='block';}return;}
+    if(!dateEl||!dateEl.value){if(err){err.innerHTML='Selecciona la fecha de expiraci&#243;n.';err.style.display='block';}return;}
     var d=new Date(dateEl.value+'T23:59:59');
     if(d<=new Date()){if(err){err.innerHTML='La fecha debe ser en el futuro.';err.style.display='block';}return;}
     hasta=d.getTime();
   }
   if(!fbR||!db)return;
+  var snap=await db.ref('/socios/'+c).get().catch(function(){return null;});
+  if(!snap||!snap.exists()){if(err){err.innerHTML='No se encontr&#243; ning&#250;n socio con esa c&#233;dula.';err.style.display='block';}return;}
+  var sc=snap.val();
+  var prevSnap=await db.ref('/config/coordDeportivo').get().catch(function(){return null;});
   var updates={};
-  // Clear previous coordinator
-  Object.keys(_soAll).forEach(function(k){
-    if(k!==c&&SUPER_ADMINS.indexOf(k)<0&&(_soAll[k].rol||'').toLowerCase()==='coordinador deportivo'){
-      updates['/socios/'+k+'/rol']='Socio';updates['/socios/'+k+'/coordHasta']=null;
-      _soAll[k].rol='Socio';delete _soAll[k].coordHasta;
-    }
-  });
+  if(prevSnap&&prevSnap.exists()&&prevSnap.val().cedula&&prevSnap.val().cedula!==c){
+    updates['/socios/'+prevSnap.val().cedula+'/rol']='Socio';
+    updates['/socios/'+prevSnap.val().cedula+'/coordHasta']=null;
+  }
   updates['/socios/'+c+'/rol']='Coordinador Deportivo';
   updates['/socios/'+c+'/coordHasta']=hasta||null;
+  updates['/config/coordDeportivo']={cedula:c,nombre:sc.nombre||c,hasta:hasta||null,tipo:_assignTipo,asignadoPor:cu,ts:Date.now()};
   await db.ref().update(updates);
-  _soAll[c]=_soAll[c]||{};_soAll[c].rol='Coordinador Deportivo';
-  if(hasta)_soAll[c].coordHasta=hasta;else delete _soAll[c].coordHasta;
-  renderSoList();
-  var sc=_soAll[c];
-  var msg=(sc.nombre||c)+' asignado como Coord. Deportivo '+(hasta?'temporal hasta '+new Date(hasta).toLocaleDateString('es-CO'):'de forma permanente');
-  if(typeof showToast==='function')showToast('info','✅ Coordinador asignado',msg,4000,'#10b981');
+  if(typeof showToast==='function')showToast('info','✅ Coordinador asignado',(sc.nombre||c)+' asignado'+(hasta?' temporal hasta '+new Date(hasta).toLocaleDateString('es-CO'):''),4000,'#10b981');
+  shSo();
 }
 
 async function quitarCoord(c){
   if(!fbR||!db)return;
-  if(!confirm('¿Quitar a '+((_soAll[c]||{}).nombre||c)+' como Coordinador Deportivo?'))return;
-  var upd={};upd['/socios/'+c+'/rol']='Socio';upd['/socios/'+c+'/coordHasta']=null;
+  var nombre=c;
+  try{var ns=await db.ref('/socios/'+c+'/nombre').get();if(ns.val())nombre=ns.val();}catch(x){}
+  if(!confirm('¿Quitar a '+nombre+' como Coordinador Deportivo?'))return;
+  var upd={};
+  upd['/socios/'+c+'/rol']='Socio';upd['/socios/'+c+'/coordHasta']=null;
+  upd['/config/coordDeportivo']=null;
   await db.ref().update(upd);
-  if(_soAll[c]){_soAll[c].rol='Socio';delete _soAll[c].coordHasta;}
-  renderSoList();
+  shSo();
 }
 
 // ── EXPORT CSV ──
