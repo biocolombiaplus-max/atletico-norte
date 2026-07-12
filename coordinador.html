@@ -568,9 +568,16 @@ var curMatch=null,curRType='normal',curWO=null;
 var evGoals=[],evYellows=[],evReds=[],curEvtTab='goal';
 var curFilter='hoy',resRef=null,_saving=false;
 var horaOverrides={},swapRef=null; // {matchId: "HH:MM"}
+var teamBadges={};
 var _swapTarget=null,_swapDels={};
 
 function isAdmin(){return curRol==='administrador'||SUPER_ADMINS.indexOf(curCed)>=0;}
+function bdgImg(id,sz){
+  var url=teamBadges[id];
+  if(url)return '<img src="'+url+'" style="width:'+sz+'px;height:'+sz+'px;object-fit:contain;display:block">';
+  var ab=(T[id]?T[id].s:'?').slice(0,3);
+  return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:rgba(200,16,46,.18);border:1.5px solid rgba(200,16,46,.3);display:flex;align-items:center;justify-content:center;font-size:'+(sz*.32)+'px;font-weight:900;color:var(--red);flex-shrink:0">'+ab+'</div>';
+}
 function getHora(m){return horaOverrides[m.id]||m.hora;}
 
 // ── UTILS ──
@@ -688,6 +695,10 @@ function startResListener(){
     suspensiones=s.val()||{};
     renderMatchList();
   });
+  db.ref('/teamBadges').once('value',function(s){
+    if(s.exists())teamBadges=s.val()||{};
+    renderMatchList();
+  });
 }
 
 // ── MATCH LIST ──
@@ -729,12 +740,26 @@ function renderMatchList(){
         :hasDone?'<span class="mc-status status-ok">✓ Listo</span>'
         :'<span class="mc-status status-pend">Pendiente</span>';
       var lName=esc(tn(m.l)),vName=esc(tn(m.v));
-      var scoreDisp=hasDone?(isWO?'W/O':r.l+'-'+r.v):'vs';
-      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')+'" onclick="openMatch('+m.id+')">'
-        +'<div class="mc-top">'
-          +'<div class="mc-meta">'+lName+' '+scoreDisp+' '+vName+'<br>'+hora+' &middot; '+m.cancha+' &middot; V'+m.week+'</div>'
+      var mid_content=hasDone
+        ?'<div style="font-size:22px;font-weight:900;color:var(--amber);letter-spacing:-1px;text-align:center;min-width:52px">'+(isWO?'W/O':r.l+'<span style="font-size:14px;color:var(--dm)"> - </span>'+r.v)+'</div>'
+        :'<div style="font-size:11px;font-weight:900;color:var(--dm);text-align:center;min-width:52px;letter-spacing:1px">VS</div>';
+      html+='<div class="match-card'+(isToday?' today':'')+(hasDone?' done':'')+'" onclick="openMatch('+m.id+')" style="padding:10px 14px">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+          +'<div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.5px;text-transform:uppercase">'+hora+' &middot; '+m.cancha+' &middot; V'+m.week+'</div>'
           +status
         +'</div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<div style="flex:1;display:flex;align-items:center;gap:8px">'
+            +bdgImg(m.l,36)
+            +'<div style="font-size:13px;font-weight:900;color:var(--t);line-height:1.2;letter-spacing:-.2px">'+lName+'</div>'
+          +'</div>'
+          +mid_content
+          +'<div style="flex:1;display:flex;align-items:center;gap:8px;justify-content:flex-end">'
+            +'<div style="font-size:13px;font-weight:900;color:var(--t);line-height:1.2;letter-spacing:-.2px;text-align:right">'+vName+'</div>'
+            +bdgImg(m.v,36)
+          +'</div>'
+        +'</div>'
+        +(isSusp?'<div style="margin-top:6px;font-size:10px;color:#f59e0b;font-weight:800">⚠️ '+esc(suspensiones[m.id].motivo||'Suspendido')+'</div>':'')
         +'</div>';
     });
   });
