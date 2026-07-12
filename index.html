@@ -3275,17 +3275,23 @@ function chRlEl(el){
 }
 async function chRl(c,r){if(fbR&&db)await db.ref('/socios/'+c+'/rol').set(r);}
 
+var _soRef=null;
 async function shSo(){
   if(!fbR||!db){adCnt('<div class="es"><p>Firebase no disponible</p></div>');return;}
   adCnt('<div class="es"><div class="esi" style="font-size:36px">&#9203;</div><p>Cargando socios...</p></div>');
-  try{
-    var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},10000);});
-    var s=await Promise.race([db.ref('/socios').get(),timeout]);
+  if(_soRef){try{_soRef.off();}catch(x){}_soRef=null;}
+  _soRef=db.ref('/socios');
+  _soRef.once('value',function(s){
     _soAll=s.val()||{};_soFilter='';
     renderSoList();
-  }catch(e){
-    adCnt('<div class="es"><div class="esi" style="font-size:32px">&#9888;&#65039;</div><p style="margin-bottom:12px">No se pudieron cargar los socios</p><button class="sb2" style="max-width:180px;margin:0 auto" onclick="shSo()">Reintentar</button><br><br><button class="sb2" style="max-width:180px;margin:0 auto;background:rgba(255,255,255,.05)" onclick="adShowOverview()">&#8592; Volver</button></div>');
-  }
+  },function(err){
+    var msg=err&&err.code?err.code:(err&&err.message?err.message:'desconocido');
+    adCnt('<div class="es"><div class="esi" style="font-size:32px">&#9888;&#65039;</div>'
+      +'<p style="margin-bottom:6px">Error al cargar socios</p>'
+      +'<p style="font-size:11px;color:var(--m);margin-bottom:14px">'+msg+'</p>'
+      +'<button class="sb2" style="max-width:180px;margin:0 auto" onclick="shSo()">Reintentar</button><br><br>'
+      +'<button class="sb2" style="max-width:180px;margin:0 auto;background:rgba(255,255,255,.05)" onclick="adShowOverview()">&#8592; Volver</button></div>');
+  });
 }
 
 function renderSoList(){

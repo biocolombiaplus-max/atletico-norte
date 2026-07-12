@@ -1,6 +1,6 @@
 // Atlético Norte FC — Service Worker
 // Increment SW_VER on every deploy to force cache invalidation
-const SW_VER = 'v8.1-2026-07-12';
+const SW_VER = 'v8.2-2026-07-12';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 
 // Firebase SDK scripts — heavy, rarely change, cache aggressively
