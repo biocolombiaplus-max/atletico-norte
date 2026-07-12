@@ -868,150 +868,227 @@ function rrFill(ctx,x,y,w,h,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x
 function rrStroke(ctx,x,y,w,h,r,c,lw){ctx.strokeStyle=c;ctx.lineWidth=lw||2;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.stroke();}
 
 async function tMVP(ctx){
-  // ── BACKGROUND ──
+  // ═══════════════════════════════════════════════════════════════
+  // MVP DEL PARTIDO — UEFA Man of the Match style
+  // Safe zone: top Y=270, bottom Y=1560
+  // Layout (top→bottom):
+  //   270-460  Club header (logo centrado + nombre + regla dorada)
+  //   468-540  MVP badge dorado
+  //   558-1318 Foto circular (CX=540, CY=938, CR=380)
+  //   1346-    Nombre · Equipo · Marcador · Fecha
+  // ═══════════════════════════════════════════════════════════════
+  const CX=W/2, CY=938, CR=380;
+
+  // 1 ── BACKGROUND
   await drawBg(ctx);
-  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,0,W,H);
 
-  // ── CIRCULAR PHOTO — Champions League style ──
-  // Circle centered at W/2, Y=590. Diameter 880px (radius 440).
-  const CX=W/2,CY=590,CR=440;
+  // Rich dark veil
+  ctx.fillStyle='rgba(0,0,0,.38)';ctx.fillRect(0,0,W,H);
 
+  // Warm radial atmosphere behind player
+  const atm=ctx.createRadialGradient(CX,CY,0,CX,CY,CR+420);
+  atm.addColorStop(0,'rgba(180,100,10,.22)');
+  atm.addColorStop(.4,'rgba(200,16,46,.12)');
+  atm.addColorStop(.8,'rgba(60,10,5,.06)');
+  atm.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=atm;ctx.fillRect(0,0,W,H);
+
+  // 2 ── DECORATIVE TOP STRIPE
+  topStripe(ctx);
+
+  // 3 ── HEADER (starts Y=270, inside Instagram safe zone)
+  // Gold eyebrow line
+  goldRule(ctx,268);
+
+  // "LIGA INTERNA · S2 2026" eyebrow
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='3px';
+  ctx.font='600 21px sans-serif';ctx.fillStyle='rgba(255,215,0,.70)';
+  ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,280);
+
+  // Club logo centered (large)
+  const logoI=getImg('club');const LH=108,LW=90;
+  const lx=CX-LW/2,ly=312;
+  if(logoI){
+    ctx.save();
+    ctx.shadowColor='rgba(255,180,0,.6)';ctx.shadowBlur=36;
+    ctx.drawImage(logoI,lx,ly,LW,LH);
+    ctx.restore();
+  }else{
+    // Fallback badge
+    const fb=lGrad(ctx,lx,ly,lx+LW,ly+LH,[0,'#8a0018'],[1,'#c8102e']);
+    ctx.fillStyle=fb;ctx.beginPath();ctx.roundRect(lx,ly,LW,LH,14);ctx.fill();
+    ctx.font='900 32px sans-serif';ctx.fillStyle='#fff';ctx.textBaseline='middle';
+    ctx.fillText('AN',CX,ly+LH/2);ctx.textBaseline='top';
+  }
+
+  // Club name
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=12;
+  ctx.font='900 42px Arial Black,sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='#fff';
+  ctx.fillText('ATLÉTICO NORTE F.C.',CX,432);
+  ctx.restore();
+
+  // Gold accent rule below header
+  goldRule(ctx,490);
+
+  // 4 ── MVP BADGE (gold pill — premium, centered)
+  const bY=506,bW=580,bH=70;
+  // Badge background: gold gradient
+  const bG=lGrad(ctx,(W-bW)/2,bY,(W+bW)/2,bY+bH,[0,'rgba(120,80,0,.30)'],[.5,'rgba(255,215,0,.18)'],[1,'rgba(120,80,0,.30)']);
+  ctx.fillStyle=bG;ctx.beginPath();ctx.roundRect((W-bW)/2,bY,bW,bH,bH/2);ctx.fill();
+  // Sheen highlight inside pill
+  ctx.save();ctx.globalAlpha=.12;
+  const sh=lGrad(ctx,(W-bW)/2,bY,(W+bW)/2,bY+bH,[0,'transparent'],[.5,'#fff'],[1,'transparent']);
+  ctx.fillStyle=sh;ctx.beginPath();ctx.roundRect((W-bW)/2,bY,bW,bH*.45,bH/2);ctx.fill();
+  ctx.restore();
+  // Gold border with glow
+  ctx.save();
+  ctx.shadowColor='rgba(255,200,0,.65)';ctx.shadowBlur=22;
+  ctx.strokeStyle='rgba(255,215,0,.88)';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.roundRect((W-bW)/2,bY,bW,bH,bH/2);ctx.stroke();
+  ctx.restore();
+  // Text
+  ctx.save();ctx.shadowColor='rgba(255,200,0,.55)';ctx.shadowBlur=14;
+  ctx.font='900 34px Arial Black,sans-serif';ctx.letterSpacing='2px';
+  ctx.textBaseline='middle';ctx.fillStyle='#ffd700';
+  ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',CX,bY+bH/2);
+  ctx.restore();
+
+  // 5 ── CIRCULAR PHOTO
   if(mvpPhotoImg){
     const pi=mvpPhotoImg;
-    // Crop photo to square (center crop)
     let sx=0,sy=0,sw=pi.width,sh=pi.height;
     if(pi.width>pi.height){sw=pi.height;sx=(pi.width-pi.height)/2;}
     else if(pi.height>pi.width){sh=pi.width;sy=(pi.height-pi.width)/2;}
 
-    // 1. Outer soft glow halo behind circle
-    const halo=ctx.createRadialGradient(CX,CY,CR*.75,CX,CY,CR+180);
-    halo.addColorStop(0,'rgba(200,16,46,.35)');
-    halo.addColorStop(.4,'rgba(200,16,46,.12)');
-    halo.addColorStop(.8,'rgba(245,159,11,.06)');
+    // Outer ambient halo
+    const halo=ctx.createRadialGradient(CX,CY,CR*.8,CX,CY,CR+240);
+    halo.addColorStop(0,'rgba(200,16,46,.30)');
+    halo.addColorStop(.35,'rgba(245,159,11,.14)');
+    halo.addColorStop(.75,'rgba(100,50,0,.04)');
     halo.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=halo;ctx.fillRect(0,0,W,H);
 
-    // 2. Draw photo clipped to circle
+    // Photo clipped to circle
     ctx.save();
     ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.clip();
     ctx.drawImage(pi,sx,sy,sw,sh,CX-CR,CY-CR,CR*2,CR*2);
 
-    // 3. Vignette inside circle (darkens edges, spotlights face)
-    const innerVig=ctx.createRadialGradient(CX,CY-CR*.08,CR*.3,CX,CY,CR);
-    innerVig.addColorStop(0,'rgba(0,0,0,0)');
-    innerVig.addColorStop(.5,'rgba(0,0,0,.04)');
-    innerVig.addColorStop(.78,'rgba(0,0,0,.28)');
-    innerVig.addColorStop(1,'rgba(0,0,0,.68)');
-    ctx.fillStyle=innerVig;ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fill();
+    // Inner vignette — spotlights face
+    const vig=ctx.createRadialGradient(CX,CY-CR*.1,CR*.25,CX,CY,CR);
+    vig.addColorStop(0,'rgba(0,0,0,0)');
+    vig.addColorStop(.52,'rgba(0,0,0,.03)');
+    vig.addColorStop(.80,'rgba(0,0,0,.30)');
+    vig.addColorStop(1,'rgba(0,0,0,.72)');
+    ctx.fillStyle=vig;ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fill();
 
-    // 4. Warm light leak from top-right inside circle (stadium floodlight)
-    const flare=ctx.createRadialGradient(CX+CR*.55,CY-CR*.62,0,CX+CR*.3,CY-CR*.3,CR*.9);
-    flare.addColorStop(0,'rgba(255,220,120,.20)');
-    flare.addColorStop(.4,'rgba(220,160,40,.07)');
+    // Warm top-right stadium flare
+    const flare=ctx.createRadialGradient(CX+CR*.52,CY-CR*.58,0,CX+CR*.28,CY-CR*.3,CR*.88);
+    flare.addColorStop(0,'rgba(255,230,120,.18)');
+    flare.addColorStop(.4,'rgba(220,150,30,.06)');
     flare.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=flare;ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fill();
-
     ctx.restore();
 
-    // 5. Double ring frame — outer gold, inner subtle white
-    ctx.save();
-    ctx.shadowColor='rgba(245,159,11,.55)';ctx.shadowBlur=32;
-    ctx.strokeStyle='rgba(245,159,11,.82)';ctx.lineWidth=3.5;
-    ctx.beginPath();ctx.arc(CX,CY,CR+1,0,Math.PI*2);ctx.stroke();
-    ctx.restore();
-    ctx.save();
-    ctx.strokeStyle='rgba(255,255,255,.16)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.arc(CX,CY,CR-7,0,Math.PI*2);ctx.stroke();
-    ctx.restore();
+    // Triple ring frame — outer gold glow, mid gold, inner white
+    ctx.save();ctx.shadowColor='rgba(255,200,0,.70)';ctx.shadowBlur=36;
+    ctx.strokeStyle='rgba(255,215,0,.90)';ctx.lineWidth=4.5;
+    ctx.beginPath();ctx.arc(CX,CY,CR+2,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.strokeStyle='rgba(255,200,50,.30)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(CX,CY,CR-8,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(CX,CY,CR-14,0,Math.PI*2);ctx.stroke();ctx.restore();
 
-  } else {
-    // No photo — elegant placeholder circle
-    const noPhG=ctx.createRadialGradient(CX,CY-CR*.2,0,CX,CY,CR);
-    noPhG.addColorStop(0,'rgba(200,16,46,.15)');
-    noPhG.addColorStop(.6,'rgba(100,8,23,.10)');
-    noPhG.addColorStop(1,'rgba(0,0,0,.5)');
-    ctx.save();ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fillStyle=noPhG;ctx.fill();ctx.restore();
-    ctx.save();ctx.strokeStyle='rgba(245,159,11,.45)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(CX,CY,CR+1,0,Math.PI*2);ctx.stroke();ctx.restore();
-    ctx.save();ctx.globalAlpha=.07;ctx.font='300 220px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffd700';ctx.fillText('⭐',CX,CY+20);ctx.restore();
+  }else{
+    // Elegant placeholder
+    const npG=ctx.createRadialGradient(CX,CY-CR*.2,0,CX,CY,CR);
+    npG.addColorStop(0,'rgba(200,16,46,.18)');
+    npG.addColorStop(.6,'rgba(80,6,18,.12)');
+    npG.addColorStop(1,'rgba(0,0,0,.55)');
+    ctx.save();ctx.beginPath();ctx.arc(CX,CY,CR,0,Math.PI*2);ctx.fillStyle=npG;ctx.fill();ctx.restore();
+    ctx.save();ctx.shadowColor='rgba(255,200,0,.5)';ctx.shadowBlur=22;
+    ctx.strokeStyle='rgba(255,215,0,.60)';ctx.lineWidth=4.5;
+    ctx.beginPath();ctx.arc(CX,CY,CR+2,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.globalAlpha=.06;ctx.font='300 190px serif';ctx.textAlign='center';
+    ctx.textBaseline='middle';ctx.fillStyle='#ffd700';ctx.fillText('⭐',CX,CY+18);ctx.restore();
   }
 
-  // ── COMPACT HEADER OVERLAY (floats over background) ──
-  // Dark fade at top for readability
-  const hFade=lGrad(ctx,0,0,0,200,[0,'rgba(0,0,0,.72)'],[.65,'rgba(0,0,0,.18)'],[1,'rgba(0,0,0,0)']);
-  ctx.fillStyle=hFade;ctx.fillRect(0,0,W,200);
-  topStripe(ctx);
-  // Logo left-aligned compact
-  const logoI=getImg('club');const LW=72,LH=86;
-  if(logoI){ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=18;ctx.drawImage(logoI,44,20,LW,LH);ctx.restore();}
-  else{rrFill(ctx,44,20,LW,LH,12,'rgba(200,16,46,.85)');ctx.font='900 24px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('AN',44+LW/2,20+LH/2);}
-  ctx.textAlign='left';ctx.textBaseline='top';
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;
-  ctx.font='900 46px Arial Black,sans-serif';ctx.letterSpacing='0';ctx.fillStyle='#fff';ctx.fillText('ATLÉTICO NORTE F.C.',130,28);
-  ctx.font='600 25px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,215,0,.88)';ctx.fillText('LIGA INTERNA  ·  S2 2026',130,88);
-  ctx.restore();
+  // Dark gradient from circle bottom to canvas bottom
+  const botFade=lGrad(ctx,0,CY+CR-140,0,H,[0,'rgba(0,0,0,0)'],[.14,'rgba(0,0,0,.62)'],[.4,'rgba(0,0,0,.92)'],[1,'rgba(0,0,0,.99)']);
+  ctx.fillStyle=botFade;ctx.fillRect(0,CY+CR-140,W,H-(CY+CR-140));
 
-  // ── DARK BASE FOR CONTENT BELOW CIRCLE ──
-  const botFade=lGrad(ctx,0,CY+CR-220,0,H,[0,'rgba(0,0,0,0)'],[.18,'rgba(0,0,0,.55)'],[.5,'rgba(0,0,0,.88)'],[1,'rgba(0,0,0,.97)']);
-  ctx.fillStyle=botFade;ctx.fillRect(0,CY+CR-220,W,H-(CY+CR-220));
-
-  // ── MVP BADGE ──
-  const bY=CY+CR+22,bW=530,bH=68;
-  rrFill(ctx,(W-bW)/2,bY,bW,bH,37,'rgba(245,159,11,.16)');
-  rrStroke(ctx,(W-bW)/2,bY,bW,bH,37,'rgba(245,159,11,.75)',2.5);
-  ctx.save();ctx.shadowColor='rgba(245,159,11,.4)';ctx.shadowBlur=20;
-  ctx.font='900 36px Arial Black,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fbbf24';ctx.letterSpacing='1px';
-  ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);
-  ctx.restore();
-
-  // ── PLAYER NAME ──
-  ctx.letterSpacing='0';
+  // 6 ── PLAYER NAME
+  let curY=CY+CR+38;
   const nomDisplay=(mvpNombreS||'JUGADOR').toUpperCase();
-  ctx.textAlign='center';ctx.textBaseline='top';
-  let fs=86;ctx.font='900 '+fs+'px Arial Black,sans-serif';
-  while(ctx.measureText(nomDisplay).width>W-56&&fs>38){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=16;ctx.fillStyle='#fff';ctx.fillText(nomDisplay,W/2,bY+bH+18);ctx.restore();
-  let curY=bY+bH+18+fs+10;
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
+  let fs=90;ctx.font='900 '+fs+'px Arial Black,sans-serif';
+  while(ctx.measureText(nomDisplay).width>W-44&&fs>34){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=22;
+  ctx.fillStyle='#ffffff';ctx.fillText(nomDisplay,CX,curY);
+  ctx.restore();
+  curY+=fs+14;
 
-  // ── TEAM NAME ──
+  // 7 ── TEAM NAME — gold with subtle glow
   if(mvpEquipoS){
-    ctx.font='700 32px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(245,159,11,.88)';
-    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,curY);curY+=48;ctx.letterSpacing='0';
+    ctx.save();ctx.shadowColor='rgba(255,180,0,.35)';ctx.shadowBlur=12;
+    ctx.font='700 34px sans-serif';ctx.letterSpacing='3px';ctx.fillStyle='#ffd700';
+    ctx.fillText(mvpEquipoS.toUpperCase(),CX,curY);
+    ctx.restore();curY+=54;ctx.letterSpacing='0';
   }
 
-  // ── MATCH INFO ──
+  // 8 ── MATCH RESULT — score large + teams, inside one premium box
   if(mvpSelectedMid){
     const mm=ALL.find(x=>x.id===mvpSelectedMid),rr=results[mvpSelectedMid];
     if(mm&&rr){
-      const sc=rr.wo?'Walkover':`${rr.l} – ${rr.v}`;
-      const txt=`${tn(mm.l)}  ${sc}  ${tn(mm.v)}`;
-      ctx.font='600 25px sans-serif';
-      const iW=Math.min(ctx.measureText(txt).width+60,W-80);
-      rrFill(ctx,(W-iW)/2,curY+6,iW,50,13,'rgba(255,255,255,.07)');
-      rrStroke(ctx,(W-iW)/2,curY+6,iW,50,13,'rgba(255,255,255,.08)',1);
-      ctx.fillStyle='rgba(200,220,255,.72)';ctx.textBaseline='middle';
-      ctx.fillText(txt,W/2,curY+6+25);curY+=64;
-      // Semana line
-      ctx.font='500 20px sans-serif';ctx.fillStyle='rgba(150,175,210,.5)';ctx.textBaseline='top';
-      ctx.fillText('Semana '+mm.week+' · Liga Interna S2 2026',W/2,curY+2);curY+=30;
+      const sc=rr.wo?'W/O':`${rr.l} – ${rr.v}`;
+
+      // Container box
+      const boxW=880,boxH=168,boxX=(W-boxW)/2,boxY=curY+10;
+      const bxG=lGrad(ctx,boxX,boxY,boxX+boxW,boxY+boxH,[0,'rgba(255,215,0,.06)'],[.5,'rgba(255,255,255,.06)'],[1,'rgba(255,215,0,.06)']);
+      ctx.fillStyle=bxG;ctx.beginPath();ctx.roundRect(boxX,boxY,boxW,boxH,20);ctx.fill();
+      ctx.save();ctx.strokeStyle='rgba(255,215,0,.28)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.roundRect(boxX,boxY,boxW,boxH,20);ctx.stroke();ctx.restore();
+
+      // Score — large centered
+      ctx.save();ctx.shadowColor='rgba(255,200,0,.55)';ctx.shadowBlur=16;
+      ctx.font='900 82px Arial Black,sans-serif';ctx.fillStyle='#ffd700';
+      ctx.textBaseline='middle';ctx.fillText(sc,CX,boxY+boxH*.44);ctx.restore();
+
+      // Team names — flanking the score
+      const lName=tn(mm.l),vName=tn(mm.v);
+      let tnFs=24;ctx.font='700 '+tnFs+'px sans-serif';
+      while(Math.max(ctx.measureText(lName).width,ctx.measureText(vName).width)>300&&tnFs>16){tnFs--;ctx.font='700 '+tnFs+'px sans-serif';}
+      ctx.letterSpacing='0.5px';ctx.fillStyle='rgba(200,215,235,.75)';
+      ctx.textAlign='right';ctx.fillText(lName.toUpperCase(),CX-20,boxY+boxH*.82);
+      ctx.textAlign='left';ctx.fillText(vName.toUpperCase(),CX+20,boxY+boxH*.82);
+      ctx.textAlign='center';
+
+      // VS dot between team names
+      ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,215,0,.45)';ctx.letterSpacing='0';
+      ctx.fillText('VS',CX,boxY+boxH*.82);
+      curY=boxY+boxH+16;
+
+      // Date + cancha + semana pill
+      const dStr=fD(mm.fecha,false)+' · '+mm.hora+'  ·  Semana '+mm.week;
+      ctx.font='500 23px sans-serif';ctx.letterSpacing='.5px';
+      ctx.fillStyle='rgba(160,185,215,.55)';ctx.textBaseline='top';
+      ctx.fillText(dStr,CX,curY);
+      curY+=36;ctx.letterSpacing='0';
     }
   }
 
-  // ── GOLD DIVIDER — keep well inside Instagram safe zone (top 250 / bottom 350) ──
-  const safeBot=H-380; // Y=1540 — last safe content line
-  const dy=Math.min(Math.max(curY+28,1380),safeBot-200);
-  goldRule(ctx,dy);
+  // 9 ── GOLD RULE + ¡FELICITACIONES! (all within safe zone Y<1560)
+  const rY=Math.min(Math.max(curY+20,1420),1480);
+  goldRule(ctx,rY);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;
+  ctx.font='900 48px Arial Black,sans-serif';ctx.fillStyle='#fff';ctx.textBaseline='top';ctx.letterSpacing='0';
+  ctx.fillText('¡FELICITACIONES! 🎉',CX,rY+18);ctx.restore();
+  ctx.font='600 23px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(200,16,46,.90)';
+  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',CX,rY+78);
+  ctx.font='500 20px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.25)';
+  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',CX,rY+116);
 
-  // ── FOOTER CONTENT — all within safe zone ──
-  ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
-  ctx.font='900 46px Arial Black,sans-serif';ctx.fillStyle='#ffffff';
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=10;
-  ctx.fillText('¡FELICITACIONES! 🎉',W/2,dy+20);ctx.restore();
-  ctx.font='600 24px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(200,16,46,.88)';
-  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,dy+82);
-  ctx.font='500 20px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.28)';
-  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,dy+120);
-
-  // Decorative stripes at very bottom (outside safe zone intentionally — just color bars)
+  // Bottom stripe (decorative — outside safe zone, no critical info)
   botStripe(ctx);
 }
 
