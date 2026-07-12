@@ -806,7 +806,11 @@ async function drawBadge(ctx,tid,cx,cy,sz){
   if(img){
     rGlow(ctx,cx,cy,sz*.72,'rgba(200,16,46,.14)');
     ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=sz*.35;ctx.shadowOffsetY=sz*.1;
-    ctx.drawImage(img,cx-sz/2,cy-sz/2,sz,sz);ctx.restore();
+    // Mantener proporción original (object-fit: contain)
+    const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+    const scale=Math.min(sz/iw,sz/ih);
+    const dw=iw*scale,dh=ih*scale;
+    ctx.drawImage(img,cx-dw/2,cy-dh/2,dw,dh);ctx.restore();
   }else{
     // Premium badge fallback with team color ring
     const cg=ctx.createRadialGradient(cx,cy-sz*.06,0,cx,cy,sz*.52);
