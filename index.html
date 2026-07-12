@@ -1916,6 +1916,7 @@ function adShowOverview(){
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="expC()"><span class="aico">&#128228;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Exportar</div><div class="atxt">CSV socios</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(99,102,241,.2);background:rgba(99,102,241,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px;grid-column:1" onclick="shSociosEq()"><span class="aico">&#127942;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios &amp; Equipos</div><div class="atxt">Asignar equipo a cada socio</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(200,16,46,.25);background:rgba(200,16,46,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shNotifSender()"><span class="aico">&#128276;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Notificaciones</div><div class="atxt">Avisos a socios</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(245,159,11,.3);background:rgba(245,159,11,.07);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shMVPGen()"><span class="aico">&#11088;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">MVP del Partido</div><div class="atxt">Generar imagen 9:16</div></div></button>';
   h+='</div>';
   h+='<button onclick="openM(\'mPrint\')" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(14,165,233,.12));border:1px solid rgba(200,16,46,.3);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;-webkit-appearance:none"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#8b0000);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#128438;</div><div style="text-align:left"><div style="font-size:14px;font-weight:900;color:var(--t);letter-spacing:-.2px">Imprimir / PDF</div><div style="font-size:10px;color:var(--m);margin-top:2px">Fixture general &#183; Por equipo &#183; Tablas de equidad</div></div><div style="margin-left:auto;font-size:18px;color:var(--m)">&#8250;</div></button>';
   h+='<div id="pEx" style="margin-top:14px"></div>';
@@ -2916,6 +2917,189 @@ async function genMatchCard(mid){
   ctx.fillStyle="#c8102e";ctx.fillRect(0,H-6,W,6);
 
   _showInModal(cv,"partido-"+ts(m.l)+"-vs-"+ts(m.v)+".png","📤 "+tn(m.l)+" vs "+tn(m.v));
+}
+
+// ── MVP DEL PARTIDO GENERATOR ──
+var _mvpPhotoFile=null,_mvpPhotoUrl=null;
+
+function shMVPGen(){
+  var h='<div style="padding:16px 16px 24px">';
+  h+='<div style="font-size:11px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">⭐ MVP del Partido — Generador</div>';
+
+  // Player search
+  h+='<div style="background:var(--b2);border-radius:12px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">1. Buscar jugador por cédula</div>';
+  h+='<div style="display:flex;gap:8px">';
+  h+='<input id="mvpCedInput" type="number" placeholder="Número de cédula" style="flex:1;background:var(--b3);border:1px solid var(--b3);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--t);-webkit-appearance:none" oninput="mvpCedChanged()">';
+  h+='<button onclick="mvpBuscar()" style="background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer;-webkit-appearance:none">Buscar</button>';
+  h+='</div>';
+  h+='<div id="mvpNomResult" style="margin-top:8px;font-size:13px;color:var(--m)"></div>';
+  h+='</div>';
+
+  // Photo upload
+  h+='<div style="background:var(--b2);border-radius:12px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">2. Foto del jugador</div>';
+  h+='<label for="mvpPhotoIn" style="display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.4);border-radius:10px;padding:14px;transition:.15s">';
+  h+='<span style="font-size:28px">📷</span>';
+  h+='<div><div style="font-size:13px;font-weight:700;color:var(--t)">Seleccionar foto</div><div id="mvpPhotoName" style="font-size:11px;color:var(--m);margin-top:2px">Ninguna seleccionada</div></div>';
+  h+='</label>';
+  h+='<input type="file" id="mvpPhotoIn" accept="image/*" style="display:none" onchange="mvpPhotoSel(this)">';
+  h+='<div id="mvpPhotoPreview" style="margin-top:10px;display:none;text-align:center"><img id="mvpPhotoImg" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:cover"></div>';
+  h+='</div>';
+
+  // Match info
+  h+='<div style="background:var(--b2);border-radius:12px;padding:14px;margin-bottom:16px">';
+  h+='<div style="font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">3. Info del partido (opcional)</div>';
+  h+='<input id="mvpMatchTxt" type="text" placeholder="Ej: Dragones 3-1 Panteras · Semana 4" style="width:100%;box-sizing:border-box;background:var(--b3);border:1px solid var(--b3);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--t);-webkit-appearance:none">';
+  h+='</div>';
+
+  h+='<button onclick="genMVPCard()" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none;border-radius:12px;padding:15px;font-size:14px;font-weight:900;cursor:pointer;-webkit-appearance:none">⭐ Generar imagen MVP</button>';
+  h+='</div>';
+  adCnt(h);
+  _mvpPhotoFile=null;_mvpPhotoUrl=null;
+}
+
+function mvpCedChanged(){
+  document.getElementById('mvpNomResult').textContent='';
+}
+
+function mvpBuscar(){
+  var ced=(document.getElementById('mvpCedInput').value||'').trim();
+  var el=document.getElementById('mvpNomResult');
+  if(!ced){el.textContent='Ingrese una cédula.';return;}
+  el.innerHTML='<span style="color:var(--m)">Buscando...</span>';
+  db.ref('/socios/'+ced+'/nombre').once('value',function(s){
+    if(s.val()){
+      el.innerHTML='<span style="color:var(--green)">✅ '+s.val()+'</span>';
+      el.dataset.nombre=s.val();
+    } else {
+      el.innerHTML='<span style="color:var(--red)">❌ No encontrado</span>';
+      el.dataset.nombre='';
+    }
+  },function(){
+    el.innerHTML='<span style="color:var(--red)">Error al buscar</span>';
+    el.dataset.nombre='';
+  });
+}
+
+function mvpPhotoSel(inp){
+  if(!inp.files||!inp.files[0])return;
+  _mvpPhotoFile=inp.files[0];
+  document.getElementById('mvpPhotoName').textContent=_mvpPhotoFile.name;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    _mvpPhotoUrl=e.target.result;
+    var prev=document.getElementById('mvpPhotoPreview');
+    document.getElementById('mvpPhotoImg').src=_mvpPhotoUrl;
+    prev.style.display='block';
+  };
+  reader.readAsDataURL(_mvpPhotoFile);
+}
+
+async function genMVPCard(){
+  var nomEl=document.getElementById('mvpNomResult');
+  var nombre=(nomEl&&nomEl.dataset.nombre)||'';
+  if(!nombre){
+    var cedVal=(document.getElementById('mvpCedInput').value||'').trim();
+    if(cedVal)nombre=cedVal;
+  }
+  var matchTxt=(document.getElementById('mvpMatchTxt').value||'').trim();
+
+  var W=1080,H=1920;
+  var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var ctx=cv.getContext('2d');
+
+  // Background — dark navy
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#070c1a');bg.addColorStop(.5,'#0a1020');bg.addColorStop(1,'#060b18');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // Diagonal texture
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.012)';ctx.lineWidth=1;
+  for(var i=-H;i<W+H;i+=64){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+H,H);ctx.stroke();}
+  ctx.restore();
+
+  // Top accent bar
+  ctx.fillStyle='#c8102e';ctx.fillRect(0,0,W,8);
+
+  // Header strip
+  var hg=ctx.createLinearGradient(0,8,W,200);
+  hg.addColorStop(0,'#7a0019');hg.addColorStop(.5,'#c8102e');hg.addColorStop(1,'#7a0019');
+  ctx.fillStyle=hg;ctx.fillRect(0,8,W,192);
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,196,W,4);
+
+  // Club logo
+  if(_lsClub){try{var li=await _ldImg(_lsClub);ctx.drawImage(li,48,28,148,148);}catch(e){}}
+  var TX=_lsClub?220:60;
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.font='900 52px Arial Black,Arial,sans-serif';ctx.fillStyle='#ffffff';ctx.fillText('ATLÉTICO NORTE F.C.',TX,44);
+  ctx.font='600 30px Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText('LIGA INTERNA  ·  S2 2026',TX,112);
+
+  // Photo area (Y: 220 – 1100 = 880px tall)
+  var PY=220,PH=880;
+  if(_mvpPhotoUrl){
+    try{
+      var pi=await _ldImg(_mvpPhotoUrl);
+      // Draw photo with cover-fit centered
+      var sx=0,sy=0,sw=pi.width,sh=pi.height;
+      var targetRatio=W/PH;
+      var srcRatio=pi.width/pi.height;
+      if(srcRatio>targetRatio){sw=pi.height*targetRatio;sx=(pi.width-sw)/2;}
+      else{sh=pi.width/targetRatio;sy=(pi.height-sh)/2;}
+      ctx.drawImage(pi,sx,sy,sw,sh,0,PY,W,PH);
+    }catch(e){}
+  } else {
+    // Placeholder gradient
+    var pg=ctx.createLinearGradient(0,PY,0,PY+PH);
+    pg.addColorStop(0,'rgba(200,16,46,.12)');pg.addColorStop(1,'rgba(245,159,11,.08)');
+    ctx.fillStyle=pg;ctx.fillRect(0,PY,W,PH);
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='800 120px Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.08)';
+    ctx.fillText('⭐',W/2,PY+PH/2);
+  }
+
+  // Photo gradient fade bottom
+  var fg=ctx.createLinearGradient(0,PY+PH-360,0,PY+PH);
+  fg.addColorStop(0,'rgba(7,12,26,0)');fg.addColorStop(1,'rgba(7,12,26,1)');
+  ctx.fillStyle=fg;ctx.fillRect(0,PY+PH-360,W,360);
+
+  // MVP badge (centered, Y: 1060)
+  var bY=1060,bW=420,bH=72;
+  _rrFill(ctx,W/2-bW/2,bY,bW,bH,36,'rgba(245,159,11,.22)');
+  _rrStroke(ctx,W/2-bW/2,bY,bW,bH,36,'rgba(245,159,11,.65)',2.5);
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 38px Arial Black,Arial,sans-serif';ctx.fillStyle='#fbbf24';
+  ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2);
+
+  // Player name (Y: 1165)
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.font='900 88px Arial Black,Arial,sans-serif';ctx.fillStyle='#ffffff';
+  var nomDisplay=nombre?nombre.toUpperCase():'JUGADOR';
+  // Shrink if long
+  var fs=88;
+  while(ctx.measureText(nomDisplay).width>W-80&&fs>40){fs-=4;ctx.font='900 '+fs+'px Arial Black,Arial,sans-serif';}
+  ctx.fillText(nomDisplay,W/2,1165);
+
+  // Match info pill (Y: 1290)
+  if(matchTxt){
+    var mW=Math.min(ctx.measureText(matchTxt).width+80,W-80);
+    _rrFill(ctx,W/2-mW/2,1290,mW,58,16,'rgba(255,255,255,.08)');
+    ctx.font='600 30px Arial,sans-serif';ctx.fillStyle='rgba(200,230,255,.75)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(matchTxt,W/2,1319);
+  }
+
+  // Separator
+  ctx.strokeStyle='rgba(200,16,46,.45)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(80,1400);ctx.lineTo(W-80,1400);ctx.stroke();
+
+  // Stats label area (Y: 1440) — static for now
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.font='900 56px Arial Black,Arial,sans-serif';ctx.fillStyle='#ffffff';
+  ctx.fillText('¡FELICITACIONES! 🎉',W/2,1440);
+  ctx.font='600 34px Arial,sans-serif';ctx.fillStyle='rgba(200,16,46,.95)';
+  ctx.fillText('LIGA INTERNA  ·  TEMPORADA S2 2026',W/2,1520);
+  ctx.font='500 26px Arial,sans-serif';ctx.fillStyle='rgba(120,150,185,.60)';
+  ctx.fillText('fixture.cesarcreps.com  ·  @atleticonortefc',W/2,1578);
+
+  // Bottom accent bar
+  ctx.fillStyle='#c8102e';ctx.fillRect(0,H-8,W,8);
+
+  _showInModal(cv,'mvp-atletico-norte.png','⭐ MVP — '+nomDisplay);
 }
 
 // ── WEEK IMAGE GENERATOR ──

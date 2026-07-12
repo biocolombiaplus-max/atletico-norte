@@ -671,7 +671,7 @@ function openMatch(id){
   var m=MF.find(function(x){return x.id===id;});if(!m)return;
   curMatch=m;curRType='normal';curWO=null;
   var r=res[id];
-  evGoals=r&&r.scorers?r.scorers.map(function(s){return{name:s.name||'?',corto:s.corto||s.name||'?',teamId:s.teamId||0};}):[];
+  evGoals=r&&r.scorers?r.scorers.map(function(s){var o={name:s.name||'?',corto:s.corto||s.name||'?',teamId:s.teamId||0};if(s.autogol){o.autogol=true;o.scorerTeamId=s.scorerTeamId||0;}return o;}):[];
   evYellows=r&&r.yellows?r.yellows.slice():[];
   evReds=r&&r.reds?r.reds.slice():[];
   curEvtTab='goal';
@@ -803,13 +803,16 @@ function adjScore(side,delta){
 }
 function getScore(){return{l:parseInt(document.getElementById('numL').textContent)||0,v:parseInt(document.getElementById('numV').textContent)||0};}
 
-// ── QUICK ASSIGN SHEET (Gol) ──
-var _qaOverlay=null,_qaSide=null;
-function openQuickAssign(side){
+// ── QUICK ASSIGN SHEET (Gol + Autogol) ──
+var _qaOverlay=null,_qaSide=null,_qaIsAG=false;
+
+function openQuickAssign(side,isAG){
   var m=curMatch;if(!m)return;
-  _qaSide=side;
+  _qaSide=side;_qaIsAG=!!isAG;
   var tid=side==='l'?m.l:m.v;
-  var players=rosters[side]||[];
+  // Autogol: show opposing team's players (they score against themselves)
+  var playerSide=_qaIsAG?(side==='l'?'v':'l'):side;
+  var players=rosters[playerSide]||[];
   var locked=!!(res[m.id]&&res[m.id].locked)&&!isAdmin();
   if(locked)return;
 
@@ -827,14 +830,22 @@ function openQuickAssign(side){
     }).join('');
   }
 
+  var agToggle='<button id="qaAgBtn" onclick="qaToggleAG()" style="'
+    +(_qaIsAG?'background:rgba(245,158,11,.15);border-color:var(--amber);color:var(--amber);':'background:var(--bg3);border-color:var(--bd2);color:var(--m);')
+    +'border:1.5px solid;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap">🔄 Autogol</button>';
+
   var html='<div class="overlay show" id="qaOverlay" onclick="qaClose(event)">'
     +'<div class="modal-sheet" style="padding-bottom:calc(20px + env(safe-area-inset-bottom))">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
     +'<div><div style="font-size:20px;font-weight:900">⚽ ¿Quién marcó?</div>'
-    +'<div style="font-size:11px;color:var(--m);margin-top:2px">'+esc(tn(tid))+'</div></div>'
+    +'<div style="font-size:11px;color:var(--m);margin-top:2px">'
+    +(_qaIsAG?'<span style="color:var(--amber);font-weight:800">🔄 AUTOGOL</span> · jugador de '+esc(tn(side==='l'?m.v:m.l)):esc(tn(tid)))
+    +'</div></div>'
     +'<span onclick="qaClose(null,true)" style="font-size:22px;cursor:pointer;color:var(--m);padding:4px 8px">✕</span>'
     +'</div>'
-    +(players.length?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Selecciona el jugador</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px">'+agToggle+'</div>'
+    +(players.length?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'
+      +(_qaIsAG?'Jugador que anotó en contra ('+esc(tn(side==='l'?m.v:m.l))+')':'Selecciona el jugador')+'</div>'
       +'<div class="player-grid" style="gap:8px">'+chipsHtml+'</div></div>'
       +'<div style="height:1px;background:var(--bd);margin:8px 0"></div>':'')
     +'<div style="margin-bottom:10px">'
@@ -853,6 +864,10 @@ function openQuickAssign(side){
   _qaOverlay=wrap;
   setTimeout(function(){var inp=document.getElementById('qaNameInput');if(inp)inp.focus();},300);
 }
+function qaToggleAG(){
+  if(_qaOverlay){_qaOverlay.remove();_qaOverlay=null;}
+  openQuickAssign(_qaSide,!_qaIsAG);
+}
 function qaClose(e,force){
   if(!force&&e&&e.target&&e.target.id!=='qaOverlay')return;
   if(_qaOverlay){_qaOverlay.remove();_qaOverlay=null;}
@@ -863,26 +878,32 @@ function qaInputChange(){
   if(btn){btn.disabled=!v;btn.style.opacity=v?'1':'.4';}
 }
 function qaPickPlayer(name,corto,teamId){
+  var isAG=_qaIsAG;
   if(_qaOverlay){_qaOverlay.remove();_qaOverlay=null;}
-  evGoals.push({name:name,corto:corto,teamId:teamId});
-  // Also add to dynamic roster if not present
-  var side=teamId===curMatch.l?'l':'v';
-  if(!rosters[side].find(function(p){return p.name===name;}))rosters[side].push({name:name,corto:corto,teamId:teamId});
+  // teamId here = the player's actual team; benefiting team = _qaSide team
+  var m=curMatch;
+  var benefitTeamId=_qaSide==='l'?m.l:m.v;
+  var entry=isAG
+    ?{name:name,corto:corto,teamId:benefitTeamId,autogol:true,scorerTeamId:teamId}
+    :{name:name,corto:corto,teamId:teamId};
+  evGoals.push(entry);
+  // Add to roster if not present
+  var side=teamId===m.l?'l':'v';
+  if(!rosters[side].find(function(p){return p.name===name;}))rosters[side].push({name:name,corto:corto,teamId:teamId,num:0});
   syncScore();renderPickerPanel();renderEvtLog();
   document.getElementById('mpSaved').style.display='none';
-  showToast('⚽ '+corto+' — '+tn(teamId),'var(--green)');
+  showToast((isAG?'🔄 AG · ':'⚽ ')+corto+' — '+(isAG?tn(benefitTeamId):tn(teamId)),isAG?'var(--amber)':'var(--green)');
 }
 function qaConfirmTyped(){
   var name=(document.getElementById('qaNameInput').value||'').trim();
   if(!name)return;
   var m=curMatch;if(!m)return;
-  var tid=_qaSide==='l'?m.l:m.v;
-  // Add to dynamic roster
-  var side=_qaSide;
-  if(!rosters[side])rosters[side]=[];
-  if(!rosters[side].find(function(p){return p.name.toLowerCase()===name.toLowerCase();})){
-    rosters[side].push({name:name,corto:name,teamId:tid});
-    rosters[side].sort(function(a,b){return a.corto.localeCompare(b.corto);});
+  // For autogol: the typing is for the player who scored against themselves (opposing team)
+  var playerSide=_qaIsAG?(_qaSide==='l'?'v':'l'):_qaSide;
+  var tid=playerSide==='l'?m.l:m.v;
+  if(!rosters[playerSide])rosters[playerSide]=[];
+  if(!rosters[playerSide].find(function(p){return p.name.toLowerCase()===name.toLowerCase();})){
+    rosters[playerSide].push({name:name,corto:name,teamId:tid,num:0});
   }
   qaPickPlayer(name,name,tid);
 }
@@ -1106,10 +1127,14 @@ function renderEvtLog(){
   count.textContent=evGoals.length+(evYellows.length?'+'+evYellows.length+'🟨':'')+(evReds.length?'+'+evReds.length+'🟥':'');
   if(!allEvts.length){document.getElementById('evtLog').innerHTML='<div class="evt-empty">Sin eventos registrados</div>';return;}
   allEvts.forEach(function(ev,i){
+    var isAG=ev.type==='goal'&&ev.e.autogol;
+    var teamLabel=isAG
+      ?'<span style="color:var(--amber)">🔄 AG</span> · '+esc(tn(ev.e.teamId))+' <span style="color:var(--m);font-size:9px">(jugador de '+esc(tn(ev.e.scorerTeamId||0))+')</span>'
+      :esc(tn(ev.e.teamId));
     h+='<div class="evt-item">'
-      +'<span class="evt-icon">'+ev.icon+'</span>'
+      +'<span class="evt-icon">'+(isAG?'🔄':ev.icon)+'</span>'
       +'<div style="flex:1"><div class="evt-name">'+esc(ev.e.corto||ev.e.name)+'</div>'
-      +'<div class="evt-team">'+esc(tn(ev.e.teamId))+'</div></div>'
+      +'<div class="evt-team">'+teamLabel+'</div></div>'
       +'<button class="evt-del" '+(locked?'disabled':'')+' onclick="delEvt(\''+ev.type+'\','+i+')">✕</button>'
       +'</div>';
   });
@@ -1405,7 +1430,7 @@ async function doSave(){
     }else{
       var sc=getScore();
       data={l:sc.l,v:sc.v,
-        scorers:evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId};}),
+        scorers:evGoals.map(function(g){var o={name:g.name,corto:g.corto,teamId:g.teamId};if(g.autogol){o.autogol=true;o.scorerTeamId=g.scorerTeamId;}return o;}),
         yellows:evYellows.slice(),reds:evReds.slice(),
         locked:true,savedBy:auditBy,ts:Date.now()};
     }
