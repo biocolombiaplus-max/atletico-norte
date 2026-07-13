@@ -1630,13 +1630,13 @@ async function tGoleadores(ctx){
     await drawBadge(ctx,p.teamId,C.bdg,my,64);
     // Player name + team
     ctx.textAlign='left';
-    ctx.font='800 28px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
+    ctx.font='800 34px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
     // Truncate long names
     let nm=p.name||p.corto||'Jugador';
-    if(ctx.measureText(nm).width>460){ctx.font='800 24px sans-serif';}
+    if(ctx.measureText(nm).width>460){ctx.font='800 30px sans-serif';}
     ctx.fillText(nm,C.nm,my+2);
-    ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.45)';
-    ctx.fillText(tn(p.teamId),C.nm,my+28);
+    ctx.font='600 24px sans-serif';ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fillText(tn(p.teamId),C.nm,my+30);
     // Goals — big gold number
     const golC=i===0?'#ffd700':i<3?'rgba(255,215,0,.75)':'rgba(255,255,255,.8)';
     ctx.font='900 '+(i<3?42:34)+'px sans-serif';ctx.fillStyle=golC;ctx.textAlign='center';
@@ -1705,8 +1705,8 @@ async function tMenosVencida(ctx){
     // Badge
     await drawBadge(ctx,t.id,C.bdg,my,64);
     // Team name
-    ctx.textAlign='left';ctx.font='800 28px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
-    ctx.fillText(tn(t.id),C.nm,my+10);
+    ctx.textAlign='left';ctx.font='800 34px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
+    ctx.fillText(tn(t.id),C.nm,my+12);
     // Stats
     ctx.textAlign='center';ctx.font='700 26px sans-serif';
     ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillText(t.pj,C.pj,my+10);
