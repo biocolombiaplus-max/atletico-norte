@@ -130,6 +130,8 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <button class="pill" onclick="setTpl('suspendido',this)">⚠️ Susp.</button>
     <button class="pill" onclick="setTpl('reprogramado',this)">📅 Reprog.</button>
     <button class="pill" onclick="setTpl('mvp',this)">⭐ MVP</button>
+    <button class="pill" onclick="setTpl('goleadores',this)">🥇 Goleadores</button>
+    <button class="pill" onclick="setTpl('menosvencida',this)">🧤 Menos Vencida</button>
   </div>
 
   <!-- MVP PANEL — shown only when MVP template selected -->
@@ -499,8 +501,9 @@ function fD(f,long){const d=new Date(f+'T12:00:00');return long?`${DL[d.getDay()
 
 async function gen(){
   const ms=ALL.filter(m=>selMs.has(m.id)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
-  if(!ms.length&&curTpl!=='tabla'&&curTpl!=='mvp'){alert('Selecciona al menos un partido');return;}
-  const ids=curTpl==='tabla'?[1,2,3,4,5,6,7,8,9,10]:[...new Set(ms.flatMap(m=>[m.l,m.v]))];
+  const noMatchTpl=curTpl==='tabla'||curTpl==='mvp'||curTpl==='goleadores'||curTpl==='menosvencida';
+  if(!ms.length&&!noMatchTpl){alert('Selecciona al menos un partido');return;}
+  const ids=noMatchTpl?[1,2,3,4,5,6,7,8,9,10]:[...new Set(ms.flatMap(m=>[m.l,m.v]))];
   await Promise.all(ids.filter(id=>custBadges[id]).map(id=>loadImg(custBadges[id],'b'+id)));
   if(clubLogoSrc)await loadImg(clubLogoSrc,'club');
   const spinEl=document.getElementById('spinW');
@@ -516,6 +519,8 @@ async function gen(){
     else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
     else if(curTpl==='suspendido')await tSuspendido(ctx,ms[0]);
     else if(curTpl==='reprogramado')await tReprogramado(ctx,ms[0]);
+    else if(curTpl==='goleadores')await tGoleadores(ctx);
+    else if(curTpl==='menosvencida')await tMenosVencida(ctx);
     else await tTabla(ctx);
     ok=true;
   }catch(e){
@@ -1564,6 +1569,156 @@ async function tTabla(ctx){
   footer(ctx);
 }
 
+
+// ── TABLA DE GOLEADORES ──────────────────────────────
+async function tGoleadores(ctx){
+  await drawBg(ctx);topStripe(ctx);clubHeader(ctx,50);
+
+  // Gold title
+  const tg=lGrad(ctx,W/2-260,0,W/2+260,0,[0,'#b8860b'],[.5,'#ffd700'],[1,'#b8860b']);
+  ctx.fillStyle=tg;ctx.font='900 46px sans-serif';ctx.textAlign='center';ctx.letterSpacing='4px';
+  ctx.fillText('TABLA DE GOLEADORES',W/2,448);
+  ctx.fillStyle='rgba(255,215,0,.55)';ctx.font='700 24px sans-serif';ctx.letterSpacing='3px';
+  ctx.fillText('LIGA INTERNA · S2 2026',W/2,492);
+  rule(ctx,518,.4);
+
+  // Aggregate goals by player
+  const goals={}; // key: "name|teamId" -> {name,corto,teamId,goles}
+  ALL.forEach(m=>{
+    const r=results[m.id];if(!r||!r.scorers)return;
+    r.scorers.forEach(s=>{
+      if(s.autogol)return; // autogols no cuentan para goleadores
+      const k=(s.name||'?')+'|'+(s.teamId||0);
+      if(!goals[k])goals[k]={name:s.name||'?',corto:s.corto||s.name||'?',teamId:s.teamId||0,goles:0};
+      goals[k].goles++;
+    });
+  });
+  const top10=Object.values(goals).sort((a,b)=>b.goles-a.goles).slice(0,10);
+
+  if(!top10.length){
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='600 32px sans-serif';ctx.letterSpacing='0';
+    ctx.fillText('Aún no hay goles registrados',W/2,860);
+    footer(ctx);return;
+  }
+
+  const rH=118,tY=540,tX=40,tW=W-80;
+  // Header row
+  ctx.fillStyle='rgba(255,215,0,.12)';ctx.beginPath();ctx.roundRect(tX,tY,tW,54,12);ctx.fill();
+  ctx.strokeStyle='rgba(255,215,0,.22)';ctx.lineWidth=1;ctx.stroke();
+  ctx.font='800 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.38)';ctx.letterSpacing='0';
+  const C={pos:tX+46,bdg:tX+108,nm:tX+176,gls:tX+tW-50};
+  [['#',C.pos],['',C.bdg],['Jugador / Equipo',C.nm],['⚽',C.gls]].forEach(([t,x])=>{
+    ctx.textAlign=t==='Jugador / Equipo'?'left':'center';ctx.fillText(t,x,tY+35);
+  });
+
+  for(let i=0;i<top10.length;i++){
+    const p=top10[i],ry=tY+54+i*rH;
+    // Row bg
+    ctx.fillStyle=i%2?'rgba(255,255,255,.025)':'rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.roundRect(tX,ry,tW,rH,8);ctx.fill();
+    // Podium accent bar
+    if(i<3){
+      const barC=['rgba(255,215,0,.85)','rgba(192,200,220,.7)','rgba(180,110,50,.75)'][i];
+      ctx.fillStyle=barC;ctx.beginPath();ctx.roundRect(tX,ry+rH*.1,4,rH*.8,2);ctx.fill();
+    }
+    const my=ry+rH/2;
+    // Rank
+    const rankC=i===0?'#ffd700':i===1?'#c8d0e0':i===2?'#cd7f32':'rgba(255,255,255,.45)';
+    ctx.font='900 '+(i<3?36:28)+'px sans-serif';ctx.fillStyle=rankC;ctx.textAlign='center';
+    ctx.letterSpacing='0';ctx.fillText(i+1,C.pos,my+12);
+    // Team badge
+    await drawBadge(ctx,p.teamId,C.bdg,my,64);
+    // Player name + team
+    ctx.textAlign='left';
+    ctx.font='800 28px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
+    // Truncate long names
+    let nm=p.name||p.corto||'Jugador';
+    if(ctx.measureText(nm).width>460){ctx.font='800 24px sans-serif';}
+    ctx.fillText(nm,C.nm,my+2);
+    ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fillText(tn(p.teamId),C.nm,my+28);
+    // Goals — big gold number
+    const golC=i===0?'#ffd700':i<3?'rgba(255,215,0,.75)':'rgba(255,255,255,.8)';
+    ctx.font='900 '+(i<3?42:34)+'px sans-serif';ctx.fillStyle=golC;ctx.textAlign='center';
+    ctx.fillText(p.goles,C.gls,my+14);
+  }
+  footer(ctx);
+}
+
+// ── TABLA MENOS VENCIDA ──────────────────────────────
+async function tMenosVencida(ctx){
+  await drawBg(ctx);topStripe(ctx);clubHeader(ctx,50);
+
+  // Cyan/teal title
+  const tg=lGrad(ctx,W/2-260,0,W/2+260,0,[0,'#0e7a8a'],[.5,'#22d3ee'],[1,'#0e7a8a']);
+  ctx.fillStyle=tg;ctx.font='900 46px sans-serif';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.fillText('MENOS VENCIDA',W/2,448);
+  ctx.fillStyle='rgba(34,211,238,.5)';ctx.font='700 24px sans-serif';ctx.letterSpacing='3px';
+  ctx.fillText('MEJORES DEFENSAS · S2 2026',W/2,492);
+  rule(ctx,518,.35);
+
+  // Aggregate goals conceded per team
+  const teams={};
+  for(let i=1;i<=10;i++)teams[i]={id:i,pj:0,gc:0,promedio:0};
+  ALL.forEach(m=>{
+    const r=results[m.id];if(!r||r.l===undefined)return;
+    if(!teams[m.l]||!teams[m.v])return;
+    teams[m.l].pj++;teams[m.v].pj++;
+    teams[m.l].gc+=r.v; // local concedes visitor goals
+    teams[m.v].gc+=r.l; // visitor concedes local goals
+  });
+  const sorted=Object.values(teams)
+    .filter(t=>t.pj>0)
+    .map(t=>({...t,promedio:t.gc/t.pj}))
+    .sort((a,b)=>a.gc-b.gc||(a.promedio-b.promedio)||b.pj-a.pj)
+    .slice(0,10);
+
+  if(!sorted.length){
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='600 32px sans-serif';ctx.letterSpacing='0';
+    ctx.fillText('Aún no hay partidos jugados',W/2,860);
+    footer(ctx);return;
+  }
+
+  const rH=118,tY=540,tX=40,tW=W-80;
+  // Header row
+  ctx.fillStyle='rgba(34,211,238,.1)';ctx.beginPath();ctx.roundRect(tX,tY,tW,54,12);ctx.fill();
+  ctx.strokeStyle='rgba(34,211,238,.2)';ctx.lineWidth=1;ctx.stroke();
+  ctx.font='800 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.38)';ctx.letterSpacing='0';
+  const C={pos:tX+46,bdg:tX+108,nm:tX+176,pj:tX+620,gc:tX+726,avg:tX+tW-50};
+  [['#',C.pos],['',C.bdg],['Equipo',C.nm],['PJ',C.pj],['GC',C.gc],['Prom',C.avg]].forEach(([t,x])=>{
+    ctx.textAlign=t==='Equipo'?'left':'center';ctx.fillText(t,x,tY+35);
+  });
+
+  for(let i=0;i<sorted.length;i++){
+    const t=sorted[i],ry=tY+54+i*rH;
+    ctx.fillStyle=i%2?'rgba(255,255,255,.025)':'rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.roundRect(tX,ry,tW,rH,8);ctx.fill();
+    if(i<3){
+      const barC=['rgba(255,215,0,.85)','rgba(192,200,220,.7)','rgba(180,110,50,.75)'][i];
+      ctx.fillStyle=barC;ctx.beginPath();ctx.roundRect(tX,ry+rH*.1,4,rH*.8,2);ctx.fill();
+    }
+    const my=ry+rH/2;
+    // Rank
+    const rankC=i===0?'#ffd700':i===1?'#c8d0e0':i===2?'#cd7f32':'rgba(255,255,255,.45)';
+    ctx.font='900 '+(i<3?36:28)+'px sans-serif';ctx.fillStyle=rankC;ctx.textAlign='center';
+    ctx.letterSpacing='0';ctx.fillText(i+1,C.pos,my+12);
+    // Badge
+    await drawBadge(ctx,t.id,C.bdg,my,64);
+    // Team name
+    ctx.textAlign='left';ctx.font='800 28px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
+    ctx.fillText(tn(t.id),C.nm,my+10);
+    // Stats
+    ctx.textAlign='center';ctx.font='700 26px sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillText(t.pj,C.pj,my+10);
+    // GC — green if 0, amber if low, red if high
+    const gcC=t.gc===0?'#00e676':t.gc<=5?'#22d3ee':t.gc<=10?'rgba(255,255,255,.8)':'#ff5252';
+    ctx.fillStyle=gcC;ctx.font='900 '+(i<3?38:30)+'px sans-serif';ctx.fillText(t.gc,C.gc,my+12);
+    // Promedio
+    const avgC=t.promedio<1?'#00e676':t.promedio<2?'#22d3ee':'rgba(255,255,255,.6)';
+    ctx.fillStyle=avgC;ctx.font='700 24px sans-serif';ctx.fillText(t.promedio.toFixed(1),C.avg,my+10);
+  }
+  footer(ctx);
+}
 
 // ── URL PARAM AUTO-SELECT (from coordinador) ──────────
 function applyUrlParams(){
