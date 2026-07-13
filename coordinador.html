@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#060d1a">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Panel de Resultados · Atlético Norte</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -256,6 +259,26 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .spin{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(function(reg){
+    reg.update();
+    if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+    reg.addEventListener('updatefound',function(){
+      var nw=reg.installing;
+      nw.addEventListener('statechange',function(){
+        if(nw.state==='installed'&&navigator.serviceWorker.controller) nw.postMessage({type:'SKIP_WAITING'});
+      });
+    });
+    navigator.serviceWorker.addEventListener('controllerchange',function(){
+      if(sessionStorage.getItem('_swr2')==='1')return;
+      sessionStorage.setItem('_swr2','1');
+      window.location.reload();
+    });
+    setInterval(function(){reg.update();},60000);
+  }).catch(function(){});
+}
+</script>
 </head>
 <body>
 
