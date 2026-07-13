@@ -983,12 +983,17 @@ tbody td:nth-child(2){text-align:left}
 <div class="mo" id="mCp">
   <div class="md"><div class="mh"><span class="mt">&#128273; Cambiar Contrase&#241;a</span><button class="mcl" onclick="cM('mCp')">&#10005;</button></div>
   <div class="mb">
-    <div class="mhi">&#128161; Si nunca la has cambiado, tu clave inicial es tu número de cédula seguido de <strong>_AN26</strong> (ej: <em>88253091_AN26</em>). Recomendamos cambiarla.</div>
+    <div class="mhi">&#128161; <strong>Clave inicial:</strong> tu n&#250;mero de c&#233;dula completo + <strong>_AN26</strong><br><span style="color:rgba(255,255,255,.5);font-size:11px">Ejemplo: si tu c&#233;dula es 88253091, la clave inicial es <strong>88253091_AN26</strong></span></div>
+    <div id="pOk" style="display:none;background:rgba(16,185,129,.15);border:1.5px solid rgba(16,185,129,.4);border-radius:12px;padding:14px 16px;margin-bottom:12px;text-align:center">
+      <div style="font-size:22px;margin-bottom:4px">&#9989;</div>
+      <div style="font-size:15px;font-weight:800;color:#10b981">&#161;Contrase&#241;a actualizada!</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px">Ya puedes usar tu nueva clave la pr&#243;xima vez que ingreses.</div>
+    </div>
     <div class="mer" id="pErr"></div>
-    <div class="fg"><label class="fl">Clave Actual</label><input type="password" class="fi" id="pOl"></div>
-    <div class="fg"><label class="fl">Nueva Clave</label><input type="password" class="fi" id="pNw" placeholder="M&#237;n. 6 caracteres"></div>
-    <div class="fg"><label class="fl">Confirmar</label><input type="password" class="fi" id="pCf"></div>
-    <button class="sb2" onclick="doCp()">Cambiar Contrase&#241;a</button>
+    <div class="fg"><label class="fl">Clave Actual</label><input type="password" class="fi" id="pOl" autocomplete="current-password"></div>
+    <div class="fg"><label class="fl">Nueva Clave</label><input type="password" class="fi" id="pNw" placeholder="M&#237;n. 6 caracteres" autocomplete="new-password"></div>
+    <div class="fg"><label class="fl">Confirmar Nueva Clave</label><input type="password" class="fi" id="pCf" placeholder="Repite la nueva clave" autocomplete="new-password"></div>
+    <button class="sb2" id="btnDoCp" onclick="doCp()">&#128273; Cambiar Contrase&#241;a</button>
     <button class="cb" onclick="cM('mCp')">Despu&#233;s</button>
   </div></div>
 </div>
@@ -1556,10 +1561,18 @@ async function loginWithCedula(c){
   }
 }
 async function doCp(){
-  var o=document.getElementById("pOl").value,n=document.getElementById("pNw").value,c2=document.getElementById("pCf").value;
-  var er=document.getElementById("pErr");er.style.display="none";
-  if(n!==c2){er.textContent="Las claves no coinciden.";er.style.display="block";return;}
-  if(n.length<6){er.textContent="M\u00ednimo 6 caracteres.";er.style.display="block";return;}
+  var o=document.getElementById("pOl").value.trim();
+  var n=document.getElementById("pNw").value;
+  var c2=document.getElementById("pCf").value;
+  var er=document.getElementById("pErr");
+  var ok=document.getElementById("pOk");
+  er.style.display="none";ok.style.display="none";
+  if(!o){er.textContent="Ingresa tu clave actual.";er.style.display="block";return;}
+  if(n.length<6){er.textContent="La nueva clave debe tener m\u00ednimo 6 caracteres.";er.style.display="block";return;}
+  if(n!==c2){er.textContent="Las claves nuevas no coinciden. Verifica que sean iguales.";er.style.display="block";return;}
+  if(o===n){er.textContent="La nueva clave debe ser diferente a la actual.";er.style.display="block";return;}
+  var btn=document.getElementById("btnDoCp");
+  btn.disabled=true;btn.textContent="Cambiando...";
   try{
     if(fbR&&au.currentUser){
       var crd=firebase.auth.EmailAuthProvider.credential(au.currentUser.email,o);
@@ -1567,8 +1580,20 @@ async function doCp(){
       await au.currentUser.updatePassword(n);
       if(db)await db.ref("/socios/"+cu+"/passChanged").set(true);
     }
-    pf.passChanged=true;cM("mCp");alert("\u2705 Contrase\u00f1a actualizada.");
-  }catch(e){er.textContent="Error: "+e.message;er.style.display="block";}
+    pf.passChanged=true;
+    document.getElementById("pOl").value="";
+    document.getElementById("pNw").value="";
+    document.getElementById("pCf").value="";
+    ok.style.display="block";
+    showToast("success","\u2705 Listo","Contrase\u00f1a actualizada correctamente",4000,"#10b981");
+  }catch(e){
+    var msg=e.code==="auth/wrong-password"||e.code==="auth/invalid-credential"||e.code==="auth/invalid-login-credentials"
+      ?"Clave actual incorrecta. Recuerda: si nunca la cambiaste, es tu c\u00e9dula + _AN26 (ej: 88253091_AN26)"
+      :e.code==="auth/too-many-requests"
+      ?"Demasiados intentos fallidos. Espera unos minutos e intenta de nuevo."
+      :"Error: "+e.message;
+    er.textContent=msg;er.style.display="block";
+  }finally{btn.disabled=false;btn.innerHTML="&#128273; Cambiar Contrase\u00f1a";}
 }
 async function doLt(){if(fbR)await au.signOut();onOut();}
 async function clearCacheReload(){
