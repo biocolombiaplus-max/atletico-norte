@@ -132,6 +132,7 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <button class="pill" onclick="setTpl('mvp',this)">⭐ MVP</button>
     <button class="pill" onclick="setTpl('goleadores',this)">🥇 Goleadores</button>
     <button class="pill" onclick="setTpl('menosvencida',this)">🧤 Menos Vencida</button>
+    <button class="pill" onclick="setTpl('partidoshoy',this)">🔥 Partidos Hoy</button>
   </div>
 
   <!-- MVP PANEL — shown only when MVP template selected -->
@@ -501,7 +502,7 @@ function fD(f,long){const d=new Date(f+'T12:00:00');return long?`${DL[d.getDay()
 
 async function gen(){
   const ms=ALL.filter(m=>selMs.has(m.id)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
-  const noMatchTpl=curTpl==='tabla'||curTpl==='mvp'||curTpl==='goleadores'||curTpl==='menosvencida';
+  const noMatchTpl=curTpl==='tabla'||curTpl==='mvp'||curTpl==='goleadores'||curTpl==='menosvencida'||curTpl==='partidoshoy';
   if(!ms.length&&!noMatchTpl){alert('Selecciona al menos un partido');return;}
   const ids=noMatchTpl?[1,2,3,4,5,6,7,8,9,10]:[...new Set(ms.flatMap(m=>[m.l,m.v]))];
   await Promise.all(ids.filter(id=>custBadges[id]).map(id=>loadImg(custBadges[id],'b'+id)));
@@ -521,6 +522,7 @@ async function gen(){
     else if(curTpl==='reprogramado')await tReprogramado(ctx,ms[0]);
     else if(curTpl==='goleadores')await tGoleadores(ctx);
     else if(curTpl==='menosvencida')await tMenosVencida(ctx);
+    else if(curTpl==='partidoshoy')await tPartidosHoy(ctx);
     else await tTabla(ctx);
     ok=true;
   }catch(e){
@@ -1718,6 +1720,299 @@ async function tMenosVencida(ctx){
     ctx.fillStyle=avgC;ctx.font='700 24px sans-serif';ctx.fillText(t.promedio.toFixed(1),C.avg,my+10);
   }
   footer(ctx);
+}
+
+// ── PARTIDOS HOY ─────────────────────────────────────
+const FRASES_FUTBOL=[
+  {q:"El fútbol es el deporte más hermoso del mundo.",a:"Johan Cruyff"},
+  {q:"Siempre creo que soy el mejor, pero nunca digo que nadie puede alcanzarme.",a:"Ronaldo Nazário"},
+  {q:"No me compares con Messi. No insultes a Messi.",a:"Cristiano Ronaldo"},
+  {q:"El éxito no es final, el fracaso no es fatal: lo que cuenta es el coraje de continuar.",a:"Winston Churchill"},
+  {q:"La pelota no se mancha.",a:"Diego Armando Maradona"},
+  {q:"Juego por el amor al fútbol, no por el dinero.",a:"Ronaldinho"},
+  {q:"Lo que el trabajo lento construye, la impaciencia lo destruye.",a:"Johan Cruyff"},
+  {q:"No existe mayor derrota que rendirse.",a:"Zinedine Zidane"},
+  {q:"El talento gana juegos, pero el trabajo en equipo gana campeonatos.",a:"Michael Jordan"},
+  {q:"El éxito pertenece a todos.",a:"Pelé"},
+  {q:"Si tienes miedo de perder, ya has perdido.",a:"Johan Cruyff"},
+  {q:"El secreto del éxito es trabajar duro, aprender, aprender y aprender.",a:"Pelé"},
+  {q:"Sin equipo, el individuo no sirve de nada.",a:"Zinedine Zidane"},
+  {q:"Prefiero ganar 1-0 que perder 5-4.",a:"José Mourinho"},
+  {q:"En el fútbol todo es posible.",a:"Lionel Messi"},
+  {q:"La diferencia entre lo posible y lo imposible es la determinación.",a:"Tomás Carlyle"},
+  {q:"El fútbol no es solo un deporte, es una pasión que une al mundo.",a:"Pelé"},
+  {q:"El mejor momento para ganar es cuando el partido es más difícil.",a:"Franz Beckenbauer"},
+  {q:"Nunca te rindas, nunca te detengas, siempre cree en ti mismo.",a:"Ronaldo Nazário"},
+  {q:"El fútbol es el arte más bonito del mundo.",a:"Ronaldinho"},
+  {q:"Cada partido es una oportunidad de hacer historia.",a:"Thierry Henry"},
+  {q:"No hay equipo I en Team, pero sí hay uno en Win.",a:"Michael Jordan"},
+  {q:"El equipo que más corre, gana.",a:"Jürgen Klopp"},
+  {q:"La gloria es efímera, pero el olvido es eterno.",a:"Napoleón Bonaparte"},
+  {q:"El fútbol me ha dado todo lo que tengo.",a:"Lionel Messi"},
+  {q:"Trabaja en silencio y deja que tu éxito haga el ruido.",a:"Frank Rijkaard"},
+  {q:"La victoria tiene mil padres, pero la derrota es huérfana.",a:"John F. Kennedy"},
+  {q:"Solo hay una bola, la voy a ganar yo.",a:"Ronaldo Nazário"},
+  {q:"Si llegas a los límites y sigues, encontrarás tu verdadero potencial.",a:"Jürgen Klopp"},
+  {q:"El fútbol es una metáfora de la vida: hay que luchar hasta el final.",a:"Johan Cruyff"}
+];
+
+async function tPartidosHoy(ctx){
+  // Today's matches Colombia timezone
+  const todayStr=new Date(Date.now()-5*3600000).toISOString().split('T')[0];
+  const todayMs=ALL.filter(m=>m.fecha===todayStr).sort((a,b)=>a.hora.localeCompare(b.hora));
+
+  // Preload badges for today's teams
+  const teamIds=[...new Set(todayMs.flatMap(m=>[m.l,m.v]))];
+  await Promise.all(teamIds.filter(id=>custBadges[id]).map(id=>loadImg(custBadges[id],'b'+id)));
+
+  // ── BACKGROUND: deep dark + pitch elements ──
+  fill(ctx,lGrad(ctx,0,0,0,H,[0,'#020408'],[.45,'#04090f'],[.75,'#030b06'],[1,'#010804']));
+
+  // Dramatic red/gold top glow (spotlight)
+  rGlow(ctx,W/2,-60,1100,'rgba(200,16,46,.48)');
+  rGlow(ctx,W*.15,H*.12,700,'rgba(180,10,30,.18)');
+  rGlow(ctx,W*.85,H*.12,700,'rgba(100,0,40,.14)');
+
+  // Bottom pitch green glow
+  rGlow(ctx,W/2,H,900,'rgba(20,140,60,.32)');
+  rGlow(ctx,W/2,H*.88,500,'rgba(10,200,80,.1)');
+
+  // ── PITCH LINES at bottom (decorative) ──
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=2.5;
+
+  // Goal box
+  ctx.beginPath();ctx.rect(W*.22,H*.84,W*.56,H*.14);ctx.stroke();
+  // Penalty area
+  ctx.beginPath();ctx.rect(W*.08,H*.75,W*.84,H*.24);ctx.stroke();
+  // Center arc (partial, top of pitch at bottom of image)
+  ctx.beginPath();ctx.arc(W/2,H*.99,W*.32,Math.PI,2*Math.PI);ctx.stroke();
+  // Center line
+  ctx.beginPath();ctx.moveTo(W*.06,H*.74);ctx.lineTo(W*.94,H*.74);ctx.stroke();
+  // Vertical left/right lines
+  ctx.beginPath();ctx.moveTo(W*.06,H*.74);ctx.lineTo(W*.06,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(W*.94,H*.74);ctx.lineTo(W*.94,H);ctx.stroke();
+  // Penalty spot
+  ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(W/2,H*.91,8,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // Pitch scanline fade so text stays readable
+  const fadeG=lGrad(ctx,0,H*.62,0,H,[0,'rgba(2,4,8,0)'],[.3,'rgba(2,4,8,.55)'],[1,'rgba(2,4,8,.92)']);
+  ctx.fillStyle=fadeG;ctx.fillRect(0,H*.62,W,H);
+
+  // Light rays from top
+  ctx.save();ctx.globalAlpha=.045;
+  for(let i=0;i<6;i++){
+    const x=W*.06+i*W*.175,w=20+i*10;
+    const rg=lGrad(ctx,x,0,x+H*.35,H,[0,'rgba(255,255,255,1)'],[1,'rgba(255,255,255,0)']);
+    ctx.fillStyle=rg;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+w,0);ctx.lineTo(x+w+H*.38,H*.7);ctx.lineTo(x+H*.38,H*.7);ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+
+  vignette(ctx,.65);
+  topStripe(ctx);
+
+  // ── CLUB LOGO ──
+  const logoImg=imgCache['club'];
+  const logoSz=110;
+  if(logoImg){
+    ctx.save();
+    ctx.shadowColor='rgba(200,16,46,.7)';ctx.shadowBlur=40;
+    ctx.drawImage(logoImg,W/2-logoSz/2,62,logoSz,logoSz);
+    ctx.restore();
+  }
+
+  // ── HEADER: "PARTIDOS" / "HOY" ──
+  const titleY=210;
+  // "PARTIDOS" — white, wide tracking
+  ctx.textAlign='center';ctx.letterSpacing='12px';
+  ctx.font='900 96px sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.92)';
+  ctx.fillText('PARTIDOS',W/2+6,titleY);
+
+  // "HOY" — giant red/gold gradient
+  const hoyG=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#c8102e'],[.45,'#ff2044'],[.55,'#ff2044'],[1,'#c8102e']);
+  ctx.letterSpacing='18px';ctx.font='900 148px sans-serif';
+  ctx.fillStyle=hoyG;
+  ctx.fillText('HOY',W/2+9,titleY+138);
+
+  // Underline rule
+  const ulG=lGrad(ctx,W*.12,0,W*.88,0,[0,'transparent'],[.15,'rgba(255,215,0,.9)'],[.85,'rgba(255,215,0,.9)'],[1,'transparent']);
+  ctx.fillStyle=ulG;ctx.fillRect(W*.12,titleY+155,W*.76,3);
+
+  // ── DATE PILL ──
+  const d=new Date(todayStr+'T12:00:00');
+  const dateLbl=(DL[d.getDay()]+' '+d.getDate()+' de '+ML[d.getMonth()]).toUpperCase();
+  ctx.letterSpacing='2px';ctx.font='700 30px sans-serif';
+  const dW=ctx.measureText(dateLbl).width+80,dH=54,dX=W/2-dW/2,dY=titleY+172;
+  ctx.fillStyle='rgba(255,215,0,.12)';ctx.beginPath();ctx.roundRect(dX,dY,dW,dH,dH/2);ctx.fill();
+  ctx.strokeStyle='rgba(255,215,0,.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(dX,dY,dW,dH,dH/2);ctx.stroke();
+  ctx.fillStyle='#ffd700';ctx.fillText(dateLbl,W/2,dY+35);
+
+  // ── MATCH CARDS ──
+  if(!todayMs.length){
+    ctx.letterSpacing='0';ctx.font='600 38px sans-serif';ctx.fillStyle='rgba(255,255,255,.3)';
+    ctx.fillText('Sin partidos hoy',W/2,H/2);
+  } else {
+    const startY=dY+dH+28;
+    const endY=H-280;
+    const gap=16;
+    const cH=Math.max(165,Math.floor((endY-startY-(todayMs.length-1)*gap)/todayMs.length));
+    const mx=44,mw=W-88;
+
+    for(let i=0;i<todayMs.length;i++){
+      const m=todayMs[i],cy=startY+i*(cH+gap);
+
+      // Card shadow
+      ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=30;ctx.shadowOffsetY=6;
+      // Card bg
+      const cbg=lGrad(ctx,mx,cy,mx+mw,cy+cH,[0,'rgba(8,14,28,.97)'],[1,'rgba(14,20,38,.96)']);
+      ctx.fillStyle=cbg;ctx.beginPath();ctx.roundRect(mx,cy,mw,cH,20);ctx.fill();
+      ctx.restore();
+
+      // Left accent bar (red gradient)
+      const abG=lGrad(ctx,mx,cy,mx,cy+cH,[0,'#c8102e'],[.5,'#ff2044'],[1,'#c8102e']);
+      ctx.fillStyle=abG;ctx.beginPath();ctx.roundRect(mx,cy+cH*.1,5,cH*.8,3);ctx.fill();
+
+      // Card border (subtle gold on top)
+      ctx.strokeStyle='rgba(255,215,0,.2)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.roundRect(mx,cy,mw,cH,20);ctx.stroke();
+      // Gold top highlight line
+      const topLG=lGrad(ctx,mx+50,cy,mx+mw-50,cy,[0,'transparent'],[.2,'rgba(255,215,0,.6)'],[.8,'rgba(255,215,0,.6)'],[1,'transparent']);
+      ctx.fillStyle=topLG;ctx.fillRect(mx+50,cy,mw-100,2);
+
+      const midY=cy+cH/2;
+
+      // ── TIME (left) — big clock feel ──
+      const timeX=mx+92;
+      ctx.textAlign='center';
+      // Clock icon circle
+      ctx.strokeStyle='rgba(255,215,0,.22)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(timeX,midY-10,38,0,Math.PI*2);ctx.stroke();
+      // Tick marks
+      for(let t=0;t<12;t++){
+        const a=t*Math.PI/6-Math.PI/2,r1=30,r2=t%3===0?24:27;
+        ctx.strokeStyle=t%3===0?'rgba(255,215,0,.5)':'rgba(255,255,255,.2)';ctx.lineWidth=t%3===0?2.5:1.5;
+        ctx.beginPath();ctx.moveTo(timeX+r2*Math.cos(a),midY-10+r2*Math.sin(a));ctx.lineTo(timeX+r1*Math.cos(a),midY-10+r1*Math.sin(a));ctx.stroke();
+      }
+      // Hour text inside clock
+      const hParts=m.hora.split(':');
+      ctx.letterSpacing='0';ctx.font='900 22px sans-serif';ctx.fillStyle='#ffd700';
+      ctx.fillText(hParts[0],timeX,midY-14);
+      ctx.font='700 16px sans-serif';ctx.fillStyle='rgba(255,215,0,.7)';
+      ctx.fillText(':'+hParts[1],timeX+2,midY+4);
+      // "HOY" tag below clock
+      ctx.font='800 18px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(200,16,46,.9)';
+      ctx.fillText('HOY',timeX,midY+42);
+
+      // Divider after time
+      ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(mx+155,cy+20);ctx.lineTo(mx+155,cy+cH-20);ctx.stroke();
+
+      // ── TEAMS section ──
+      const teamArea=mx+170;const teamW=mw-170-20;
+      const halfW=teamW/2-40;
+
+      // LOCAL
+      const lbdg=imgCache['b'+m.l];
+      const bdgSz=cH*.38;
+      const lx=teamArea+halfW/2;
+      if(lbdg){ctx.drawImage(lbdg,lx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz);}
+      else{
+        ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.roundRect(lx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz,8);ctx.fill();
+      }
+      ctx.textAlign='center';ctx.letterSpacing='0';
+      ctx.font='700 '+(cH<200?24:26)+'px sans-serif';ctx.fillStyle='#fff';
+      const lName=tn(m.l);
+      // Wrap long names
+      _wrapCenter(ctx,lName,lx,midY+bdgSz*.42,halfW,cH<200?24:26);
+      ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.letterSpacing='2px';
+      ctx.fillText('LOCAL',lx,midY+bdgSz*.42+28);
+
+      // VS badge center
+      const vsX=teamArea+halfW+40;
+      ctx.fillStyle='rgba(200,16,46,.18)';ctx.beginPath();ctx.roundRect(vsX-28,midY-22,56,44,8);ctx.fill();
+      ctx.strokeStyle='rgba(200,16,46,.4)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(vsX-28,midY-22,56,44,8);ctx.stroke();
+      ctx.font='900 28px sans-serif';ctx.fillStyle='#ff2044';ctx.letterSpacing='0';
+      ctx.fillText('VS',vsX,midY+10);
+
+      // VISITANTE
+      const vx=teamArea+halfW+80+halfW/2;
+      const vbdg=imgCache['b'+m.v];
+      if(vbdg){ctx.drawImage(vbdg,vx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz);}
+      else{
+        ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.roundRect(vx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz,8);ctx.fill();
+      }
+      ctx.textAlign='center';ctx.letterSpacing='0';
+      ctx.font='700 '+(cH<200?24:26)+'px sans-serif';ctx.fillStyle='rgba(255,255,255,.88)';
+      _wrapCenter(ctx,tn(m.v),vx,midY+bdgSz*.42,halfW,cH<200?24:26);
+      ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.letterSpacing='2px';
+      ctx.fillText('VISITANTE',vx,midY+bdgSz*.42+28);
+
+      // ── VENUE pill at bottom of card ──
+      ctx.letterSpacing='0';ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(34,211,238,.65)';
+      ctx.textAlign='center';
+      ctx.fillText('📍 '+m.cancha,mx+mw/2,cy+cH-22);
+    }
+  }
+
+  // ── MOTIVATIONAL QUOTE ──
+  // Seed from today's date so it changes daily but stays consistent within the day
+  const seed=(d.getFullYear()*10000+d.getMonth()*100+d.getDate());
+  const frase=FRASES_FUTBOL[seed%FRASES_FUTBOL.length];
+  const qY=H-210;
+
+  // Quote rule top
+  const qrG=lGrad(ctx,W*.15,0,W*.85,0,[0,'transparent'],[.25,'rgba(255,215,0,.4)'],[.75,'rgba(255,215,0,.4)'],[1,'transparent']);
+  ctx.fillStyle=qrG;ctx.fillRect(W*.15,qY,W*.7,1.5);
+
+  ctx.textAlign='center';ctx.letterSpacing='0';
+  // Quote marks
+  ctx.font='900 54px sans-serif';ctx.fillStyle='rgba(200,16,46,.35)';
+  ctx.fillText('"',W*.16,qY+46);
+  ctx.fillText('"',W*.84,qY+70);
+
+  // Quote text — wrapping
+  const qLines=_splitText(ctx,frase.q,W*.7,'italic 600 28px sans-serif');
+  ctx.font='italic 600 28px sans-serif';ctx.fillStyle='rgba(255,255,255,.62)';
+  const qLineH=38;
+  const qTotalH=qLines.length*qLineH;
+  const qStartY=qY+30+(80-qTotalH)/2;
+  qLines.forEach((l,i)=>ctx.fillText(l,W/2,qStartY+i*qLineH));
+
+  // Author
+  ctx.font='700 24px sans-serif';ctx.fillStyle='rgba(255,215,0,.7)';ctx.letterSpacing='1px';
+  ctx.fillText('— '+frase.a,W/2,qY+120);
+
+  // Bottom rule
+  ctx.fillStyle=qrG;ctx.fillRect(W*.15,qY+138,W*.7,1.5);
+
+  botStripe(ctx);
+}
+
+// Text wrap helpers
+function _splitText(ctx,text,maxW,font){
+  ctx.font=font;
+  const words=text.split(' ');let line='',lines=[];
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}
+    else line=test;
+  }
+  if(line)lines.push(line);
+  return lines;
+}
+function _wrapCenter(ctx,text,x,y,maxW,sz){
+  const words=text.split(' ');let lines=[];let line='';
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}
+    else line=test;
+  }
+  if(line)lines.push(line);
+  const lh=sz+6;
+  const startY=y-(lines.length-1)*lh/2;
+  lines.forEach((l,i)=>ctx.fillText(l,x,startY+i*lh));
 }
 
 // ── URL PARAM AUTO-SELECT (from coordinador) ──────────
