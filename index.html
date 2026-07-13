@@ -3649,7 +3649,7 @@ function buscarSocio(){
 }
 
 function shAsignarCoord(){
-  var today=new Date().toISOString().split('T')[0];
+  var today=new Date(Date.now()-5*3600000).toISOString().split('T')[0];
   _assignTipo='fijo';
   var h='<div style="padding:14px 16px">';
   h+='<button onclick="shSo()" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--m);font-size:13px;cursor:pointer;padding:0 0 14px;font-weight:700">&#8249; Volver</button>';
@@ -4150,7 +4150,7 @@ function initLiveGoalListener(){
 }
 
 function checkMatchDayReminder(){
-  var today=new Date().toISOString().slice(0,10);
+  var today=new Date(Date.now()-5*3600000).toISOString().slice(0,10);
   var todayMs=MF.filter(function(m){return m.fecha===today;});
   if(!todayMs.length)return;
   var h=new Date().getHours();

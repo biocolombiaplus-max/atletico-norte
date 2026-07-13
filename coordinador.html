@@ -581,7 +581,7 @@ function bdgImg(id,sz){
 function getHora(m){return horaOverrides[m.id]||m.hora;}
 
 // ── UTILS ──
-function today(){return new Date().toISOString().split('T')[0];}
+function today(){var d=new Date(Date.now()-5*3600000);return d.toISOString().split('T')[0];}
 function fd(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 function fts(ts){if(!ts)return'';var d=new Date(ts);return d.toLocaleDateString('es-CO')+' '+d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]||c;});}
