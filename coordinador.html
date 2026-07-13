@@ -709,7 +709,7 @@ function setFilter(f,btn){
 function renderMatchList(){
   var tod=today();
   var matches=MF.slice();
-  matches.sort(function(a,b){return a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora);});
+  matches.sort(function(a,b){return a.fecha.localeCompare(b.fecha)||getHora(a).localeCompare(getHora(b));});
   if(curFilter==='hoy')matches=matches.filter(function(m){return m.fecha===tod;});
   else if(curFilter==='pend')matches=matches.filter(function(m){return !res[m.id];});
   else if(curFilter==='done')matches=matches.filter(function(m){return !!res[m.id];});
