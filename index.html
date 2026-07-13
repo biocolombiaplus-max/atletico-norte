@@ -3902,7 +3902,8 @@ async function execResetApp(btn){
   btn.disabled=true;btn.textContent='Reiniciando…';
   try{
     await db.ref('/resultados').remove();
-    await db.ref('/horaOverrides').remove();
+    await db.ref('/horariosSwap').remove();
+    await db.ref('/auditHorarios').remove();
     await db.ref('/config/campeonatoIniciado').remove();
     await db.ref('/config/clavePresidente').remove();
     btn.closest('[style*=fixed]').remove();
