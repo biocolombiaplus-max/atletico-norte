@@ -1700,7 +1700,11 @@ au.onAuthStateChanged(async function(user){
     var snap=await db.ref('/socios/'+c).get();
     var pf=snap.exists()?snap.val():{};
     var rol=(pf.rol||'').toLowerCase();
-    if(SUPER_ADMINS.indexOf(c)>=0) rol='administrador';
+    if(SUPER_ADMINS.indexOf(c)>=0){
+      rol='administrador';
+      // Ensure Firebase rule can verify the role
+      if((pf.rol||'').toLowerCase()!=='administrador') db.ref('/socios/'+c+'/rol').set('administrador');
+    }
     else if(rol==='coordinador deportivo'&&pf.coordHasta&&pf.coordHasta<Date.now()){
       // expired — revoke silently, stay on login screen
       db.ref('/socios/'+c+'/rol').set('Socio');db.ref('/socios/'+c+'/coordHasta').remove();
