@@ -9,13 +9,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Atlético Norte">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <title>Liga Interna S2 2026 · Atlético Norte F.C.</title>
 <meta name="version" content="v8.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.6';
+var APP_VER='8.23';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -57,6 +59,10 @@ if('serviceWorker' in navigator){
     // Check for SW updates every 60s while app is open (catches background updates on iOS)
     setInterval(function(){reg.update();},60000);
   }).catch(function(){});
+  // Also show banner when SW sends SW_UPDATED message (fires on activate → clients.claim)
+  navigator.serviceWorker.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='SW_UPDATED')_showUpdateBanner();
+  });
 }
 </script>
 <style>
@@ -446,17 +452,24 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .bw{width:36px;height:43px;flex-shrink:0}
 .tnm{font-size:13px;font-weight:800;line-height:1.2}
 .tsb{font-size:10px;color:var(--m);margin-top:2px;font-weight:600}
-.sb{text-align:center;min-width:76px}
-.sn{font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1}
+.sb{flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.sn{font-size:28px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:0;justify-content:center}
+.sn-num{width:44px;font-variant-numeric:tabular-nums;font-size:28px;font-weight:900;display:inline-block}
+.sn-num.left{text-align:right}
+.sn-num.right{text-align:left}
+.sn-sep{width:26px;text-align:center;font-size:26px;font-weight:900;color:#fff;line-height:1;opacity:.85}
 .ss{color:var(--dm);font-weight:400}
-.mm{margin-top:7px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap;align-items:center}
-.mm .mhora{background:var(--b3);border:1px solid var(--bd);padding:4px 10px;border-radius:7px;font-size:12px;font-weight:900;color:var(--t)}
-.mm .mcancha{padding:4px 9px;border-radius:7px;font-size:10.5px;font-weight:800;white-space:nowrap}
+/* fila info: hora · cancha · vuelta — sin wrap */
+.mm{margin-top:7px;display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:nowrap}
+.mm .mhora{background:var(--b3);border:1px solid var(--bd);padding:3px 8px;border-radius:7px;font-size:11px;font-weight:900;color:var(--t);white-space:nowrap}
+.mm .mcancha{padding:3px 7px;border-radius:7px;font-size:10px;font-weight:800;white-space:nowrap}
 .mm .cov{background:rgba(14,165,233,.15);color:#38bdf8;border:1px solid rgba(14,165,233,.25)}
 .mm .cnf{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
 .mm .vls{background:rgba(245,159,11,.15);color:#fbbf24;border:1px solid rgba(245,159,11,.25)}
-.mm .mvu{padding:4px 9px;border-radius:7px;font-size:10px;font-weight:700;background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2)}
-.mm .ec{cursor:pointer;color:var(--ac);background:var(--b3);border:1px solid var(--bd);padding:4px 9px;border-radius:7px;font-size:12px}
+.mm .mvu{padding:3px 7px;border-radius:7px;font-size:10px;font-weight:700;background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2);white-space:nowrap}
+/* fila acciones: lápiz + botones de imagen — fila propia, solo cEd() */
+.mm-acts{margin-top:4px;display:flex;gap:4px;justify-content:center;align-items:center}
+.mm-acts .ec{cursor:pointer;color:var(--ac);background:var(--b3);border:1px solid var(--bd);padding:3px 8px;border-radius:7px;font-size:12px}
 .pl .sn{color:var(--gl)}
 .mc-sh{cursor:pointer;color:var(--m);background:var(--b3);border:1px solid var(--bd);padding:4px 8px;border-radius:7px;font-size:13px;transition:.12s;-webkit-appearance:none}
 .mc-sh:active{background:rgba(14,165,233,.15);color:var(--ac);transform:scale(.9)}
@@ -994,7 +1007,7 @@ tbody td:nth-child(2){text-align:left}
     <div class="fg"><label class="fl">Nueva Clave</label><input type="password" class="fi" id="pNw" placeholder="M&#237;n. 6 caracteres" autocomplete="new-password"></div>
     <div class="fg"><label class="fl">Confirmar Nueva Clave</label><input type="password" class="fi" id="pCf" placeholder="Repite la nueva clave" autocomplete="new-password"></div>
     <button class="sb2" id="btnDoCp" onclick="doCp()">&#128273; Cambiar Contrase&#241;a</button>
-    <button class="cb" onclick="cM('mCp')">Despu&#233;s</button>
+    <button class="cb" onclick="cM('mCp');if(fbR&&db&&cu){db.ref('/socios/'+cu+'/passChanged').set(true);pf.passChanged=true;}">Despu&#233;s</button>
   </div></div>
 </div>
 
@@ -1195,6 +1208,240 @@ tbody td:nth-child(2){text-align:left}
 <script>
 // ── DATA ──
 const T={1:{n:"C\u00facuta Deportivo",s:"CUC"},2:{n:"At. Bucaramanga",s:"BUC"},3:{n:"Atl. Nacional",s:"NAL"},4:{n:"Ind. Santa Fe",s:"SNF"},5:{n:"Millonarios",s:"MIL"},6:{n:"Dep. Cali",s:"CAL"},7:{n:"Dep. Tolima",s:"TOL"},8:{n:"Am\u00e9rica de Cali",s:"AME"},9:{n:"Junior F.C.",s:"JUN"},10:{n:"Inter Bogot\u00e1",s:"INT"}};
+const PLANTILLAS_DATA={
+  1:[ // C\u00facuta Deportivo
+    {s:1,c:'',n:'LOPEZ GIL IVAN ALFONSO'},
+    {s:13,c:'10',n:'MONTA\u00d1EZ RODRIGUEZ JESUS ANTONIO'},
+    {s:14,c:'14',n:'ORTIZ MILLAN HENRY GIOVANNY'},
+    {s:15,c:'13',n:'COBO VILLARREAL MANUEL AMET'},
+    {s:27,c:'18',n:'DIAZ MANTILLA RICHARD HERNAN'},
+    {s:45,c:'31',n:'SUESCUN BOTIA BRYAM ALEXANDER'},
+    {s:54,c:'26',n:'LEON MOLINA NELSON ALBEIRO'},
+    {s:57,c:'5',n:'RUIZ SALAZAR ALVARO'},
+    {s:80,c:'16',n:'PEREZ ARROYO JAVIER ERNESTO'},
+    {s:90,c:'20',n:'SANCHEZ ARGOTE JULIO RENE'},
+    {s:119,c:'7',n:'AGUDELO JUAN CARLOS'},
+    {s:129,c:'17',n:'ALARCON GOMEZ AYMER GUEILLER'},
+    {s:130,c:'15',n:'PLATA SOTO EDISON LIBARDO'},
+    {s:157,c:'11',n:'MEJIA FLOREZ CARLOS MARIO'},
+    {s:172,c:'',n:'PE\u00d1ARANDA ROJAS JHON JAIRO'},
+    {s:176,c:'19',n:'LIZARAZO RODRIGUEZ HECTOR'},
+    {s:180,c:'23',n:'ALVAREZ PATI\u00d1O VICTOR MAURICIO'},
+    {s:190,c:'30',n:'CORREDOR RAMIREZ JHON HARLEM'},
+    {s:200,c:'6',n:'CACERES LUIS ALBERTO'},
+    {s:208,c:'21',n:'VELANDIA MARTINEZ JORGE ARMANDO'}
+  ],
+  2:[ // At. Bucaramanga
+    {s:2,c:'22',n:'TOSCANO CRUZ JUAN IGNACIO'},
+    {s:16,c:'5',n:'RANGEL GERARDO'},
+    {s:26,c:'28',n:'ALVAREZ RAMIREZ RONALD JESUS'},
+    {s:51,c:'26',n:'PE\u00d1ARANDA ROLON LUIS SANIEL'},
+    {s:56,c:'29',n:'RUIZ LARA HERNANDO JAVIER'},
+    {s:63,c:'63',n:'RODRIGUEZ LAGUADO JOSE RAFAEL'},
+    {s:75,c:'8',n:'JEJEN ORTIZ EDINSON ARBEY'},
+    {s:84,c:'20',n:'BAUTISTA JAIMES GABRIEL ALEXANDER'},
+    {s:88,c:'11',n:'MONTA\u00d1EZ RODRIGUEZ JOSE ALEJANDRO'},
+    {s:107,c:'78',n:'GRANADOS PEREZ YAIR'},
+    {s:120,c:'15',n:'ARDILA ESPINEL JOSE ARMANDO'},
+    {s:123,c:'10',n:'BOTELLO PE\u00d1A GABRIEL ARNULFO'},
+    {s:133,c:'30',n:'AFANADOR RIOS SAUL'},
+    {s:134,c:'21',n:'QUINTERO DIAZ JESUS HERNANDO'},
+    {s:143,c:'14',n:'CAPACHO SALAZAR MAYKOL YOHANNY'},
+    {s:149,c:'17',n:'GAMARRA RUEDA OSCAR IVAN'},
+    {s:169,c:'43',n:'GALAVIS LEON CESAR AUGUSTO'},
+    {s:196,c:'',n:'QUIN\u00d1ONEZ WILSON ARBEY'},
+    {s:205,c:'26',n:'GOMEZ PE\u00d1ARANDA YOBEIRO'},
+    {s:207,c:'4',n:'YA\u00d1ES URBINA DIXON ALEXIS'}
+  ],
+  3:[ // Atl. Nacional
+    {s:8,c:'79',n:'AGUDELO AVENDA\u00d1O JAVIER ALEXIS'},
+    {s:17,c:'14',n:'CARVAJAL PARRA JAVIER DARIO'},
+    {s:20,c:'47',n:'TAPIAS TAPIAS LUIS MIGUEL'},
+    {s:24,c:'9',n:'MORAN PACHECO JESUS CARLOS'},
+    {s:35,c:'28',n:'HERNANDEZ BAUTISTA WILMER'},
+    {s:38,c:'10',n:'GRANADOS MALDONADO DANIEL ALFONSO'},
+    {s:49,c:'24',n:'OSORIO SOLANO JESUS ESTEBAN'},
+    {s:66,c:'2',n:'ROLON ROSAS LUIS EDUARDO'},
+    {s:72,c:'11',n:'CONTRERAS YA\u00d1EZ JUAN CARLOS'},
+    {s:82,c:'77',n:'SUESCUN ROJAS GERMAN LEONARDO'},
+    {s:89,c:'8',n:'ARDILA ESPINEL WILMAR ALEXANDER'},
+    {s:95,c:'17',n:'GARCIA CASANOVA MARCO ANTONIO'},
+    {s:97,c:'31',n:'GARCIA ORTIZ MARIO ALBERTO'},
+    {s:104,c:'25',n:'PEREZ FLOREZ REINALDO'},
+    {s:128,c:'15',n:'SILVA AMAYA EMERSON ARMID'},
+    {s:166,c:'19',n:'DEL RIO DELGADO LEVY SNEYDER'},
+    {s:186,c:'88',n:'JEJEN ORTIZ OMAR YESID'},
+    {s:195,c:'7',n:'RIVERA DELGADO DIEGO FERNANDO'},
+    {s:198,c:'55',n:'BARRERA MONSALVE MIGUEL ANGEL'},
+    {s:206,c:'6',n:'PEREZ CHACON JOSE GUSTAVO'}
+  ],
+  4:[ // Ind. Santa Fe
+    {s:12,c:'13',n:'MEJIA ALVARADO JULIAN ANDRES'},
+    {s:28,c:'20',n:'SOLANO NAVARRO WILBER EFFREN'},
+    {s:41,c:'3',n:'GOMEZ MALDONADO EDWIN ENRIQUE'},
+    {s:61,c:'80',n:'GOMEZ CELIS JESUS ARMANDO'},
+    {s:62,c:'27',n:'RODRIGUEZ VILLAMIZAR ELKIN FABIAN'},
+    {s:69,c:'9',n:'CABALLERO NOGUERA JOSE'},
+    {s:77,c:'',n:'MOSQUERA QUINTERO JORGE MARIO'},
+    {s:78,c:'8',n:'LEON MOLINA EDGAR ORLANDO'},
+    {s:93,c:'7',n:'PE\u00d1ARANDA COLMENARES CARLOS ALBERTO'},
+    {s:99,c:'4',n:'OVALLOS QUINTERO CIRO ALFONSO'},
+    {s:103,c:'5',n:'GARZA FUENTES MARCEL FERNANDO'},
+    {s:112,c:'10',n:'HERNANDEZ GALVIS ALBEIRO'},
+    {s:122,c:'33',n:'YANES REY JESUS RICARDO'},
+    {s:135,c:'24',n:'ESTUPI\u00d1AN ESTUPI\u00d1AN JAKSSON STARSKI'},
+    {s:142,c:'15',n:'RENDON DAVID JAMID JOSE'},
+    {s:144,c:'23',n:'TAMARA RIVERA CESAR HUMBERTO'},
+    {s:164,c:'19',n:'RODRIGUEZ CONDE VICTOR EDUARDO'},
+    {s:165,c:'22',n:'CUADROS PICON JAVIER HUMBERTO'},
+    {s:174,c:'31',n:'BLANCO PARADA WILLIAM HERNANDO'},
+    {s:199,c:'',n:'ENTRENA FERNANDEZ SERGIO ANDRES'},
+    {s:201,c:'66',n:'PIZARRO VALBUENA CARLOS MANUEL'}
+  ],
+  5:[ // Millonarios
+    {s:11,c:'3',n:'MOJICA BLANCO JAVIER ALEJANDRO'},
+    {s:21,c:'8',n:'NI\u00d1O NI\u00d1O ALDEMAR JOSE'},
+    {s:30,c:'17',n:'HENAO PLAZAS JAVIER ANTONIO'},
+    {s:32,c:'27',n:'DUQUE BUITRAGO YEINER RICARDO'},
+    {s:39,c:'18',n:'RINCON RINCON GERMAN CELESTINO'},
+    {s:47,c:'6',n:'CARDENAS ORTIZ JONATTAN FABIAN'},
+    {s:58,c:'14',n:'RANGEL PEREZ ELKIN HERNANDO'},
+    {s:76,c:'7',n:'ESCALANTE BECERRA SAMUEL ALEXANDER'},
+    {s:94,c:'723',n:'MARTINEZ ABREO FRANKLIN OMAR'},
+    {s:96,c:'11',n:'IBARRA JAIMES GERSON GIOVANNY'},
+    {s:114,c:'69',n:'CARRASCAL MARQUEZ WILLIAM GERSON'},
+    {s:118,c:'10',n:'GARCIA GOMEZ JUAN CARLOS'},
+    {s:121,c:'23',n:'ARDILA ESPINEL EDINSON ARNOLDO'},
+    {s:127,c:'99',n:'TRUJILLO DELGADO CARLOS'},
+    {s:139,c:'21',n:'RODRIGUEZ RODRIGUEZ EMERSON ALEXIS'},
+    {s:140,c:'20',n:'CARDENAS GONZALEZ LUIS ENRIQUE'},
+    {s:148,c:'19',n:'BAYONA SANGUINO JHONNY ALEJANDRO'},
+    {s:152,c:'2',n:'DURAN JARAMILLO ANDRES'},
+    {s:154,c:'26',n:'SANCHEZ RODRIGUEZ OSCAR JAVIER'},
+    {s:189,c:'86',n:'MONTA\u00d1EZ RODRIGUEZ DIEGO ARMANDO'}
+  ],
+  6:[ // Dep. Cali
+    {s:7,c:'7',n:'BALLEN CACERES JAVIER'},
+    {s:37,c:'37',n:'JAIMES CERVELEON JAVIER'},
+    {s:42,c:'8',n:'BARRERA CORREDOR ELMER JAVIER'},
+    {s:55,c:'55',n:'PE\u00d1ARANDA RAMIREZ JESUS OMAR'},
+    {s:64,c:'10',n:'URBINA SUAREZ NESTOR ANDRES'},
+    {s:74,c:'22',n:'MONTAGU FUENTES JESUS ANTONIO'},
+    {s:85,c:'6',n:'DUARTE LINDARTE ORLANDO FABIANNY'},
+    {s:92,c:'16',n:'LOPEZ BARRERA GERMAN LUCIANO'},
+    {s:126,c:'17',n:'HOME GIL FRANCISCO JOSE'},
+    {s:138,c:'69',n:'PEREZ SERRANO EDILBERTO'},
+    {s:147,c:'12',n:'ORTIZ FLOREZ OSCAR EMIGDIO'},
+    {s:153,c:'23',n:'AVILA ROJAS ARNULFO'},
+    {s:155,c:'18',n:'ESCALANTE MOGOLLON HORACIO'},
+    {s:156,c:'3',n:'ARIAS TORRADO JAVIER ALONSO'},
+    {s:171,c:'26',n:'CRISTANCHO MARTINEZ ANGEL MIGUEL'},
+    {s:173,c:'2',n:'CARDONA CELY RAMON EDUARDO'},
+    {s:175,c:'90',n:'CHAUSTRE ROA JONATHAN'},
+    {s:177,c:'39',n:'VARGAS FRANCO NESTOR'},
+    {s:191,c:'777',n:'AFANADOR DUARTE JOSE MAURICIO'},
+    {s:202,c:'25',n:'BRICE\u00d1O BUENO OSCAR ALBERTO'}
+  ],
+  7:[ // Dep. Tolima
+    {s:25,c:'12',n:'BALLEN VESGA LUIS HELI'},
+    {s:48,c:'19',n:'PAEZ VEGA LIZANDRO'},
+    {s:59,c:'23',n:'GARCIA PARADA CARLOS EDUARDO'},
+    {s:70,c:'5',n:'BOADA ORTEGA GERMAN ALEXIS'},
+    {s:78,c:'15',n:'GOMEZ DURAN ALEXIS EDUARDO'},
+    {s:79,c:'1',n:'VELEZ PEREZ DARWIN YAMPOL'},
+    {s:98,c:'75',n:'OROZCO QUINTERO ANDRES HERNANDO'},
+    {s:108,c:'48',n:'GARCIA IZAQUITA SERGIO ANTONIO'},
+    {s:110,c:'20',n:'DIAZ CARVAJAL EDINSON ORLANDO'},
+    {s:117,c:'83',n:'CELIS MIRANDA HENRY XAVIER'},
+    {s:141,c:'9',n:'SIERRA HERNANDEZ KLISMAN EDGAR'},
+    {s:145,c:'26',n:'MATUTE MEJIA LUIS ANGEL'},
+    {s:146,c:'8',n:'SERRANO ARIAS GERBY ANTONIO'},
+    {s:150,c:'14',n:'MANJARRES MORALES DAVID JOSE'},
+    {s:161,c:'24',n:'MANZANO BECERRA FREDDY ARMANDO'},
+    {s:162,c:'10',n:'MORENO MALPICA RICHARD OSWALDO'},
+    {s:163,c:'2',n:'PATI\u00d1O LARA EDGAR AUGUSTO'},
+    {s:168,c:'13',n:'JAUREGUI ZUNINO CESAR AUGUSTO'},
+    {s:183,c:'7',n:'DURAN HERNANDEZ MARLON'},
+    {s:184,c:'11',n:'GELVES DURAN FROYLAN'}
+  ],
+  8:[ // Am\u00e9rica de Cali
+    {s:3,c:'23',n:'ARRIETA OSORIO JAISON'},
+    {s:5,c:'10',n:'ARIAS RAMIREZ JAVIER NICOLAS'},
+    {s:22,c:'20',n:'GELVIS DIAZ JAVIER ENRIQUE'},
+    {s:23,c:'9',n:'GARCIA ESPITIA OMAR RICARDO'},
+    {s:44,c:'99',n:'FUENTES GOMEZ JOSE LUIS'},
+    {s:46,c:'6',n:'GARCIA CACERES LUIS CARLOS'},
+    {s:53,c:'18',n:'DELGADO MORA EDISON JAIR'},
+    {s:71,c:'13',n:'CHAUSTRE CARDENAS FREDDY HERNAN'},
+    {s:81,c:'81',n:'RINCON MACHADO RAMON ANTONIO'},
+    {s:106,c:'17',n:'MORALES VILLAMIZAR JOHN JAIRO'},
+    {s:109,c:'1',n:'ARIAS RAMIREZ JOSE MANUEL'},
+    {s:116,c:'28',n:'DURAN ORTIZ EDWARD'},
+    {s:136,c:'25',n:'JAIMES CONTRERAS JUAN CARLOS'},
+    {s:151,c:'7',n:'PACHECO JIMENEZ RAFAEL ENRIQUE'},
+    {s:160,c:'5',n:'SUPERLANO ACERO DOUGLAS ALEXIS'},
+    {s:178,c:'70',n:'ARDILA ESPINEL LUIS FRANCISCO'},
+    {s:185,c:'19',n:'MU\u00d1OZ LOPEZ GIOVANNY ANTONIO'},
+    {s:203,c:'21',n:'MORA TIBAMOZA EDWIN FABIAN'}
+  ],
+  9:[ // Junior F.C.
+    {s:9,c:'15',n:'ATHEORTUA ALARCON WILLIAM EDUARDO'},
+    {s:31,c:'31',n:'AREVALO ESPITIA JOHN ALEXANDER'},
+    {s:34,c:'34',n:'MORENO CHARRY JOSE ANTONIO'},
+    {s:36,c:'',n:'ARAQUE VELASQUEZ LUIS FRANCISCO'},
+    {s:40,c:'0',n:'RIVERA VERGEL IVAN ZESERGIO'},
+    {s:60,c:'3',n:'MALDONADO BASTOS FELIX ALBERTO'},
+    {s:67,c:'7',n:'CALDERON ARENAS JHON MARIO'},
+    {s:100,c:'30',n:'GOMEZ LAZARO ALEXANDER'},
+    {s:101,c:'26',n:'GAMBOA JAIMES GABRIEL ANTONIO'},
+    {s:102,c:'6',n:'ORTIZ CASTRO WILLINTON'},
+    {s:131,c:'24',n:'FLOREZ NU\u00d1EZ SERGIO EDUARDO'},
+    {s:132,c:'2',n:'PEREZ BECERRA JOSE FERNANDO'},
+    {s:158,c:'17',n:'MORENO RAMIREZ JAIRO URIEL'},
+    {s:170,c:'12',n:'DIAZ AREVALO HERNANDO'},
+    {s:181,c:'16',n:'CASTRILLON ARIAS WALTHER RODRIGO'},
+    {s:182,c:'9+1',n:'ARAMBULA GARCIA JOSE ELIAS'},
+    {s:188,c:'80',n:'GARCIA GIRALDO JUAN MANUEL'},
+    {s:194,c:'10',n:'CAMPOS OMAR'},
+    {s:197,c:'20',n:'ARAQUE EDWIN ENRIQUE'}
+  ],
+  10:[ // Inter Bogot\u00e1
+    {s:6,c:'6',n:'HERNANDEZ ORTEGA HERMES'},
+    {s:10,c:'12',n:'FUENTES CONTRERAS ANDRES MAURICIO'},
+    {s:19,c:'5',n:'ESTEBAN RINCON LENIN MANUEL'},
+    {s:29,c:'29',n:'PARRA MALDONADO ALONSO'},
+    {s:33,c:'7',n:'GIL CASTA\u00d1EDA GEORGE DAVID'},
+    {s:50,c:'18',n:'AYACHE RODRIGUEZ MOHAMAD RAFAT'},
+    {s:52,c:'4',n:'HERNANDEZ RODRIGUEZ MARTIN ADOLFO'},
+    {s:65,c:'2',n:'CORREDOR YA\u00d1ES GERMAN ARDENNIS'},
+    {s:83,c:'28',n:'DELGADO MIGUEL ARMANDO'},
+    {s:87,c:'3',n:'ESCALANTE ARCINIEGAS ELKIN MAURICIO'},
+    {s:115,c:'19',n:'CASADIEGO BUELVAS LUIS CARLOS'},
+    {s:159,c:'16',n:'BARRERA ROSAS JAIRO ANDRES'},
+    {s:167,c:'20',n:'MORALES MARLES JIMMY ROBINSON'},
+    {s:179,c:'8',n:'NU\u00d1EZ MENDIVELSO JOHN JAIRO'},
+    {s:187,c:'23',n:'GAMBOA JAIMES GIOVANNI ALEXANDER'},
+    {s:192,c:'10',n:'OSPINA PE\u00d1ARANDA HEBERT ALBERTO'},
+    {s:193,c:'26',n:'GRANADOS HERNANDEZ JUAN MANUEL'}
+  ]
+};
+function normNombre(n){return(n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim().replace(/\s+/g,' ');}
+function toTitleCase(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
+function toCorto(fullName){
+  var p=fullName.trim().split(/\s+/);
+  if(p.length===1)return toTitleCase(p[0]);
+  if(p.length===2)return toTitleCase(p[1])+' '+toTitleCase(p[0]);
+  return toTitleCase(p[2])+' '+toTitleCase(p[0]);
+}
+function matchSocioByName(targetNorm,sociosMap){
+  for(var ced in sociosMap){var s=sociosMap[ced];if(!s.nombre)continue;if(normNombre(s.nombre)===targetNorm)return{ced:ced,s:s,score:3};}
+  var words=targetNorm.split(' ');
+  var ap1=words[0];
+  for(var ced2 in sociosMap){var s2=sociosMap[ced2];if(!s2.nombre)continue;var sw=normNombre(s2.nombre).split(' ');if(sw[0]===ap1&&words.length>=2&&sw.indexOf(words[words.length-1])>=0)return{ced:ced2,s:s2,score:2};}
+  for(var ced3 in sociosMap){var s3=sociosMap[ced3];if(!s3.nombre)continue;var sw3=normNombre(s3.nombre).split(' ');if(sw3[0]===ap1)return{ced:ced3,s:s3,score:1};}
+  return null;
+}
+var _plSocios=null,_plCurTeam=1,_plMatches={};
 const B={
   1:`<svg viewBox="0 0 60 71" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><defs><clipPath id="c1"><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z"/></clipPath></defs><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z" fill="#c8102e" stroke="#111" stroke-width="2.2"/><g clip-path="url(#c1)"><line x1="-10" y1="5" x2="65" y2="80" stroke="#c8102e" stroke-width="20"/><text x="34" y="26" text-anchor="middle" fill="#c8102e" font-size="16" font-weight="900" font-family="Arial">C</text><text x="34" y="37" text-anchor="middle" fill="#fff" font-size="6.5" font-weight="700" font-family="Arial">DEPORTIVO</text><text x="34" y="49" text-anchor="middle" fill="#c8102e" font-size="7.5" font-weight="900" font-family="Arial">CÚCUTA</text><text x="34" y="60" text-anchor="middle" fill="#aaa" font-size="7" font-weight="700" font-family="Arial">CUC</text></g></svg>`,
   2:`<svg viewBox="0 0 60 71" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><defs><clipPath id="c2"><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z"/></clipPath></defs><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z" fill="#f5c400" stroke="#111" stroke-width="2.2"/><g clip-path="url(#c2)"><circle cx="30" cy="30" r="14" fill="#111" opacity=".1"/><circle cx="23" cy="26" r="2" fill="#111" opacity=".8"/><circle cx="37" cy="26" r="2" fill="#111" opacity=".8"/><path d="M21 34 Q30 41 39 34" stroke="#111" stroke-width="2" fill="none"/><text x="30" y="18" text-anchor="middle" fill="#111" font-size="6.5" font-weight="900" font-family="Arial">ATL.</text><text x="30" y="52" text-anchor="middle" fill="#111" font-size="9.5" font-weight="900" font-family="Arial">BUCA</text><text x="30" y="62" text-anchor="middle" fill="#555" font-size="7" font-weight="700" font-family="Arial">BUC</text></g></svg>`,
@@ -1253,23 +1500,25 @@ var _lsClub=safeGet("an_clublogo");
   }
 })();
 
+var _listenersActive=false;
 function setupFirebaseListeners(){
-  // Listeners are set up independently — one failing doesn't block the others
-  db.ref("/resultados").on("value",function(s){res=s.val()||{};rGl();rFx();rTb();rGo();rVl();updHdr();},function(){});
-  db.ref("/horariosSwap").on("value",function(s){
+  if(_listenersActive)return;
+  _listenersActive=true;
+  db.ref("/resultados").on("value",function(s){try{res=s.val()||{};rGl();rFx();rTb();rGo();rVl();updHdr();}catch(e){}},function(){});
+  db.ref("/horariosSwap").on("value",function(s){try{
     var d=s.val()||{};
     horaOverrides={};
     Object.keys(d).forEach(function(k){if(d[k]&&d[k].hora)horaOverrides[parseInt(k)]=d[k].hora;});
     rFx();
-  },function(){});
-  db.ref("/sorteo").on("value",function(s){sortAssign=s.val()||{};rSortGrd();},function(){});
-  db.ref("/delegados").on("value",function(s){rDlg(s.val()?Object.values(s.val()):DLG_DEF);},function(){rDlg(DLG_DEF);});
-  db.ref("/teamBadges").on("value",function(s){
+  }catch(e){}},function(){});
+  db.ref("/sorteo").on("value",function(s){try{sortAssign=s.val()||{};rSortGrd();}catch(e){}},function(){});
+  db.ref("/delegados").on("value",function(s){try{rDlg(s.val()?Object.values(s.val()):DLG_DEF);}catch(e){}},function(){try{rDlg(DLG_DEF);}catch(e){}});
+  db.ref("/teamBadges").on("value",function(s){try{
     var v=s.val();
     if(v!==null){custBadges=v;safeSet("an_badges",JSON.stringify(v));}
     initFltEq();rFx();rTb();rGl();
-  },function(){});
-  db.ref("/clubLogo").on("value",function(s){
+  }catch(e){}},function(){});
+  db.ref("/clubLogo").on("value",function(s){try{
     var img=s.val();
     var sh=document.getElementById("anShield");
     if(img){
@@ -1283,12 +1532,8 @@ function setupFirebaseListeners(){
     }else if(!_lsClub){
       sh.className='hshield';sh.innerHTML=AN_SVG;
     }
-    // null + _lsClub exists: keep cached logo (Firebase null may be transient)
-  },function(){
-    var sh=document.getElementById("anShield");
-    if(!_lsClub){sh.className='hshield';sh.innerHTML=AN_SVG;}
-  });
-  db.ref("/equipos").on("value",function(s){teamInfo=s.val()||{};},function(){});
+  }catch(e){}},function(){try{var sh=document.getElementById("anShield");if(!_lsClub){sh.className='hshield';sh.innerHTML=AN_SVG;}}catch(e){}});
+  db.ref("/equipos").on("value",function(s){try{teamInfo=s.val()||{};}catch(e){}},function(){});
 }
 
 // Fallback: remove shield shimmer after 5s if Firebase hasn't resolved it
@@ -1302,7 +1547,14 @@ window.addEventListener("load",function(){
     var app=firebase.initializeApp(FB);
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
     au.onAuthStateChanged(async function(u){
-      if(u){
+      if(u && u.isAnonymous){
+        // Anonymous visitor — load public data, stay in public mode
+        setupFirebaseListeners();
+        onOut();
+        return;
+      }
+      if(u && !u.isAnonymous){
+        // Real authenticated user
         setupFirebaseListeners();
         var c=u.email.replace("@atleticonorte.co","");
         var s=await db.ref("/socios/"+c).get();
@@ -1331,7 +1583,12 @@ window.addEventListener("load",function(){
             else{openRegNewModal(c);}
           }
         },800);
-      }else onOut();
+        return;
+      }
+      // u === null — no auth at all, request anonymous session
+      onOut();
+      setupFirebaseListeners(); // attempt public reads (works if rules allow; silent fail otherwise)
+      try{ au.signInAnonymously(); }catch(e){}
     });
   }catch(e){
     console.warn("Firebase init failed:",e.message);
@@ -1427,8 +1684,19 @@ async function doLo(){
   }catch(e){
     spin.style.display="none";
     if(e.code==="auth/user-not-found"||e.code==="auth/invalid-credential"||e.code==="auth/invalid-login-credentials"){
-      cM("mLo");
-      openContactModal('not_found', c, null);
+      // Socio may exist in DB but have no Auth account yet — try creating it
+      spin.style.display="block";
+      try{
+        await au.createUserWithEmailAndPassword(email,pass);
+        // onAuthStateChanged fires and checks /socios/{c} — routes correctly
+        spin.style.display="none";
+        cM("mLo");
+      }catch(e2){
+        spin.style.display="none";
+        // Auth creation also failed — truly not registered
+        cM("mLo");
+        openContactModal('not_found', c, null);
+      }
     }else if(e.code==="auth/wrong-password"){
       errEl.textContent="Error de acceso. Contacta al administrador.";errEl.style.display="block";
     }else{
@@ -1595,7 +1863,7 @@ async function doCp(){
     er.textContent=msg;er.style.display="block";
   }finally{btn.disabled=false;btn.innerHTML="&#128273; Cambiar Contrase\u00f1a";}
 }
-async function doLt(){if(fbR)await au.signOut();onOut();}
+async function doLt(){if(fbR)await au.signOut();window.location.reload();}
 async function clearCacheReload(){
   sessionStorage.clear();
   if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(k){return caches.delete(k);}));}
@@ -1613,7 +1881,8 @@ function onIn(){
   rFx();rTb();
   rPn();
   setTimeout(function(){initLiveGoalListener();initPush();},1500);
-  if(!pf.passChanged)setTimeout(function(){openM("mCp");},1000);
+  var isStaff=cr==='Administrador'||cr==='Coordinador Deportivo'||cr==='Coordinador Financiero';
+  if(!pf.passChanged&&!isStaff)setTimeout(function(){openM("mCp");},1000);
 }
 function closeAdSocioBanner(){
   var b=document.getElementById('adSocioBanner');
@@ -1666,7 +1935,7 @@ function rFx(){
     h+='<div class="wdate">'+fd(dt)+' <span class="wdsem">Sem '+wk+'</span></div>';
     h+='</div>';
     h+='<div class="whc"><div class="whcn">'+dm.length+'</div><div style="font-size:9px;margin-top:1px">partidos</div></div>';
-    h+='<button class="wh-img-btn no-print" onclick="event.stopPropagation();genWkImg('+wk+')" title="Generar imagen">&#128247;</button>';
+    if(cEd())h+='<button class="wh-img-btn no-print" onclick="event.stopPropagation();genWkImg('+wk+')" title="Generar imagen">&#128247;</button>';
     h+='</div>';
     h+='<div class="wbdy'+openCls+'">';
     dm.forEach(function(m){
@@ -1675,15 +1944,19 @@ function rFx(){
       h+='<div class="mc'+(ip?' pl':'')+'">';
       h+='<div class="ts">'+bdg(m.l,'bw')+'<div><div class="tnm">'+tn(m.l)+'</div><div class="tsb">'+ts(m.l)+'</div></div></div>';
       h+='<div class="sb">';
-      if(ip)h+='<div class="sn">'+r.l+'<span class="ss"> - </span>'+r.v+'</div>';
-      else h+='<div class="sn" style="color:var(--dm);font-size:18px">vs</div>';
+      if(ip)h+='<div class="sn"><span class="sn-num left">'+(r.wo?'W':r.l)+'</span><span class="sn-sep">–</span><span class="sn-num right">'+(r.wo?'W':r.v)+'</span></div>';
+      else h+='<div class="sn" style="font-size:13px;font-weight:700;color:var(--dm);grid-column:1/-1;text-align:center;letter-spacing:.5px">VS</div>';
       var mhora=getHora(m);
-      h+='<div class="mm"><span class="mhora"'+(mhora!==m.hora?' style="color:#38bdf8"':'')+'>'+mhora+'</span><span class="mcancha '+cc+'">'+m.cancha+'</span><span class="mvu">V'+m.vu+'</span>';
-      if(cEd())h+='<span class="ec" data-mid="'+m.id+'" onclick="oRsEl(this)">&#9999;&#65039;</span>';
-      if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=resultado" onclick="event.stopPropagation()" title="Imagen resultado">&#128202;</a>';
-      if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=mvp" onclick="event.stopPropagation()" title="Imagen MVP">&#11088;</a>';
-      h+='<span class="mc-sh no-print" onclick="event.stopPropagation();genMatchCard('+m.id+')" title="Generar póster">&#128228;</span>';
-      h+='</div></div>';
+      h+='<div class="mm"><span class="mhora"'+(mhora!==m.hora?' style="color:#38bdf8"':'')+'>'+mhora+'</span><span class="mcancha '+cc+'">'+m.cancha+'</span><span class="mvu">V'+m.vu+'</span></div>';
+      if(cEd()){
+        h+='<div class="mm-acts">';
+        h+='<span class="ec" data-mid="'+m.id+'" onclick="oRsEl(this)">&#9999;&#65039;</span>';
+        if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=resultado" onclick="event.stopPropagation()" title="Imagen resultado">&#128202;</a>';
+        if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=mvp" onclick="event.stopPropagation()" title="Imagen MVP">&#11088;</a>';
+        h+='<span class="mc-sh no-print" onclick="event.stopPropagation();genMatchCard('+m.id+')" title="Generar póster">&#128228;</span>';
+        h+='</div>';
+      }
+      h+='</div>';
       h+='<div class="ts aw"><div><div class="tnm">'+tn(m.v)+'</div><div class="tsb">'+ts(m.v)+'</div></div>'+bdg(m.v,'bw')+'</div></div>';
     });
     h+='</div></div>';
@@ -1750,14 +2023,20 @@ function rBr(t8){
 function rGl(){
   gm={};Object.values(res).forEach(function(r){
     if(!r||!r.scorers)return;
-    r.scorers.forEach(function(s){var k=s.name+"_"+s.team;if(!gm[k])gm[k]={name:s.name,team:s.team,goals:0};gm[k].goals+=s.goals||1;});
+    r.scorers.forEach(function(s){
+      if(s.autogol)return;
+      var nm=(s.name||'').trim().replace(/\s+/g,' ');if(!nm)return;
+      var k=nm.toLowerCase()+'|'+(s.teamId||0);
+      if(!gm[k])gm[k]={name:nm,teamId:s.teamId||0,goals:0};
+      gm[k].goals+=s.goals||1;
+    });
   });
 }
 function rGo(){
   var list=Object.values(gm).sort(function(a,b){return b.goals-a.goals;});
   document.getElementById("gl").innerHTML=list.length?list.slice(0,20).map(function(g,i){
     var gc=i===0?"g1":i===1?"g2":i===2?"g3":"";
-    return'<div class="ri"><div class="rp '+gc+'">'+(i+1)+'</div><div class="ri-i"><div class="rn">'+g.name+'</div><div class="rt">'+g.team+'</div></div><div class="rv">'+g.goals+'</div></div>';
+    return'<div class="ri"><div class="rp '+gc+'">'+(i+1)+'</div><div class="ri-i"><div class="rn">'+g.name+'</div><div class="rt">'+tn(g.teamId)+'</div></div><div class="rv">'+g.goals+'</div></div>';
   }).join(""):'<div class="es"><div class="esi">&#9917;</div><p>Sin goles a&#250;n</p></div>';
 }
 function rVl(){
@@ -1961,7 +2240,7 @@ function rPn(){
   if(cEd())h+='<div class="ab" onclick="showTab(\'fixture\')"><div class="ai">&#9917;</div><div class="al">Resultados</div></div>';
   if(cr==="Administrador"||cr==="Coordinador Financiero")h+='<div class="ab" onclick="adNav(\'planilla\')"><div class="ai">&#128176;</div><div class="al">Planilla</div></div>';
   h+='</div>';
-  if(cEd())h+='<a href="coordinador.html" style="display:flex;align-items:center;gap:14px;margin:12px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(245,158,11,.1));border:1.5px solid rgba(200,16,46,.22);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#9917;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Panel de Resultados</div><div style="font-size:11px;color:var(--m);margin-top:3px">Goles &middot; Amarillas &middot; Rojas &middot; Walkover</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
+  if(cEd())h+='<a href="#" onclick="event.preventDefault();showTab(\'fixture\')" style="display:flex;align-items:center;gap:14px;margin:12px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(245,158,11,.1));border:1.5px solid rgba(200,16,46,.22);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#9917;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Panel de Resultados</div><div style="font-size:11px;color:var(--m);margin-top:3px">Goles &middot; Amarillas &middot; Rojas &middot; Walkover</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
   if(cEd())h+='<a href="social.html" style="display:flex;align-items:center;gap:14px;margin:10px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.08));border:1.5px solid rgba(99,102,241,.25);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#127912;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Generador de Im&aacute;genes</div><div style="font-size:11px;color:var(--m);margin-top:3px">P&oacute;sters &middot; Jornada &middot; Resultados &middot; Tabla &middot; 9:16</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
   if(isAdm){
     h+='<div class="admpntabs" id="admpntabs"><button class="admpntab active" onclick="adNav(\'overview\')">&#9881; Panel</button><button class="admpntab" onclick="adNav(\'equipos\')">&#128101; Equipos</button><button class="admpntab" onclick="adNav(\'fixture\')">&#128197; Fixture</button><button class="admpntab" onclick="adNav(\'equidad\')">&#128202; Equidad</button><button class="admpntab" onclick="adNav(\'stats\')">&#9889; Estad\u00edsticas</button></div>';
@@ -1986,6 +2265,7 @@ function adNav(tab){
   else if(tab==='stats') adShowSt();
   else if(tab==='planilla') adShowPl();
   else if(tab==='socios-eq') shSociosEq();
+  else if(tab==='plantillas') shPlantillas();
   else if(tab==='notif') shNotifSender();
 }
 
@@ -1998,7 +2278,8 @@ function adShowOverview(){
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(14,165,233,.2);background:rgba(14,165,233,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shSo()"><span class="aico">&#128101;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios</div><div class="atxt">Gestionar roles</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'equipos\')"><span class="aico">&#127960;&#65039;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Equipos</div><div class="atxt">Editar y escudos</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="expC()"><span class="aico">&#128228;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Exportar</div><div class="atxt">CSV socios</div></div></button>';
-  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(99,102,241,.2);background:rgba(99,102,241,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px;grid-column:1" onclick="shSociosEq()"><span class="aico">&#127942;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios &amp; Equipos</div><div class="atxt">Asignar equipo a cada socio</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(99,102,241,.2);background:rgba(99,102,241,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shSociosEq()"><span class="aico">&#127942;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Socios &amp; Equipos</div><div class="atxt">Asignar equipo a cada socio</div></div></button>';
+  h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="adNav(\'plantillas\')"><span class="aico">📋</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Plantillas</div><div class="atxt">Cruce y camisetas</div></div></button>';
   h+='<button class="admact" style="border-radius:12px;border:1px solid rgba(200,16,46,.25);background:rgba(200,16,46,.06);flex-direction:column;align-items:flex-start;padding:14px 14px;gap:6px" onclick="shNotifSender()"><span class="aico">&#128276;</span><div><div style="font-size:11px;font-weight:900;color:var(--t)">Notificaciones</div><div class="atxt">Avisos a socios</div></div></button>';
   h+='<a href="social.html" style="grid-column:1/-1;border-radius:14px;border:1.5px solid rgba(99,102,241,.35);background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));flex-direction:row;align-items:center;padding:16px 18px;gap:14px;text-decoration:none;display:flex;transition:.15s" class="admact"><span style="font-size:32px;flex-shrink:0">&#127912;</span><div style="flex:1"><div style="font-size:14px;font-weight:900;color:var(--t);letter-spacing:-.2px">Generador de Im&aacute;genes</div><div style="font-size:11px;color:var(--m);margin-top:2px">P&oacute;sters &middot; Jornada &middot; Resultados &middot; MVP &middot; Redes 9:16</div></div><span style="font-size:20px;color:var(--m);opacity:.6">&#8250;</span></a>';
   h+='</div>';
@@ -2026,30 +2307,41 @@ function adShowPl(){
 // ── EQUIPOS (admin) ──
 var EQ_LOADED={};
 function adShowEq(){
-  var h='<div style="padding:10px 16px 6px;display:flex;align-items:center;justify-content:space-between">';
-  h+='<div style="font-size:10px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px">Equipos</div>';
-  h+='<button onclick="adNav(\'escudos\')" style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--ac);padding:6px 12px;border-radius:8px;font-size:10px;font-weight:800;cursor:pointer;-webkit-appearance:none">&#128247; Gestionar Escudos</button>';
+  var h='<div style="padding:12px 16px 6px;display:flex;align-items:center;justify-content:space-between">';
+  h+='<div><div style="font-size:15px;font-weight:900;color:var(--t)">⚽ Equipos</div><div style="font-size:10px;color:var(--m);margin-top:1px">Liga Interna S2 2026</div></div>';
+  h+='<button onclick="adNav(\'escudos\')" style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--ac);padding:7px 12px;border-radius:9px;font-size:10px;font-weight:800;cursor:pointer;-webkit-appearance:none">&#128247; Escudos</button>';
   h+='</div>';
   h+='<div class="eqgrd">';
   for(var i=1;i<=10;i++){
     var col=TC[i]||'#c8102e';
     var hasBdg=!!custBadges[i];
-    h+='<div class="eqcard" id="eqcard'+i+'" onclick="adTogEq('+i+',this)">';
-    h+='<div class="eqhd">';
-    // Badge with camera overlay for direct upload
-    h+='<label style="cursor:pointer;flex-shrink:0;position:relative;display:block;width:34px;height:41px" onclick="event.stopPropagation()">';
-    h+='<div class="eqbdg">'+bdg(i,'')+'</div>';
+    var plData=PLANTILLAS_DATA[i]||[];
+    h+='<div class="eqcard" id="eqcard'+i+'" style="border-color:'+col+'33;position:relative;overflow:visible" onclick="adTogEq('+i+',this)">';
+    // Accent bar top
+    h+='<div style="height:3px;background:linear-gradient(90deg,'+col+','+col+'88);border-radius:3px 3px 0 0"></div>';
+    h+='<div class="eqhd" style="padding:10px 10px 6px">';
+    // Badge with camera overlay
+    h+='<label style="cursor:pointer;flex-shrink:0;position:relative;display:block;width:38px;height:46px" onclick="event.stopPropagation()">';
+    h+='<div class="eqbdg" style="width:38px;height:46px">'+bdg(i,'')+'</div>';
     h+='<div style="position:absolute;inset:0;background:rgba(0,0,0,.55);border-radius:4px;display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">&#128247;</div>';
     if(hasBdg)h+='<div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;background:#10b981;border-radius:50%;border:2px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:7px">&#10003;</div>';
     h+='<input type="file" accept="image/*" style="display:none" data-tid="'+i+'" onchange="upBdg(event)">';
     h+='</label>';
-    h+='<div style="flex:1"><div class="eqnm">'+tn(i)+'</div><div class="eqab">Equipo '+i+'</div></div>';
-    h+='<span class="eqchv">&#8964;</span>';
+    h+='<div style="flex:1;min-width:0"><div class="eqnm" style="color:var(--t)">'+tn(i)+'</div>';
+    h+='<div style="display:flex;align-items:center;gap:4px;margin-top:3px">';
+    h+='<span style="font-size:8px;font-weight:900;color:'+col+';letter-spacing:.5px">'+ts(i)+'</span>';
+    if(plData.length)h+='<span style="font-size:7px;color:var(--m)">· '+plData.length+' jug.</span>';
+    h+='</div></div>';
+    h+='<span class="eqchv" style="color:'+col+'">&#8964;</span>';
     h+='</div>';
-    h+='<div class="eqmeta">';
+    h+='<div class="eqmeta" style="border-top:1px solid '+col+'22">';
     h+='<div class="eqmetaitem"><div class="eqmetav" id="eqpj'+i+'">—</div><div class="eqmetal">PJ</div></div>';
     h+='<div class="eqmetaitem"><div class="eqmetav" id="eqpts'+i+'">—</div><div class="eqmetal">Pts</div></div>';
-    h+='<div class="eqmetaitem"><div class="eqmetav" id="eqjug'+i+'">—</div><div class="eqmetal">Jugadores</div></div>';
+    h+='<div class="eqmetaitem"><div class="eqmetav" id="eqjug'+i+'">—</div><div class="eqmetal">Socios</div></div>';
+    h+='</div>';
+    // Plantilla quick-link
+    h+='<div style="padding:6px 10px 8px;border-top:1px solid '+col+'1a" onclick="event.stopPropagation()">';
+    h+='<button onclick="_plCurTeam='+i+';adNav(\'plantillas\')" style="-webkit-appearance:none;width:100%;padding:6px;border-radius:7px;border:1px solid '+col+'44;background:'+col+'12;color:'+col+';font-size:9px;font-weight:900;cursor:pointer">📋 Ver Plantilla</button>';
     h+='</div>';
     h+='<div class="eqpl" id="eqpl'+i+'"></div>';
     h+='</div>';
@@ -4053,8 +4345,8 @@ function loadPickerRosters(lId,vId){
     if(!fbR||!db){renderPickerPanel();return;}
     db.ref('/equipos/'+teamId+'/jugadores').once('value').then(function(s){
       var pl=[];
-      s.forEach(function(c){var v=c.val();pl.push({name:v.nombre||v.name||c.key,corto:v.corto||(v.nombre||v.name||c.key),teamId:teamId});});
-      pl.sort(function(a,b){return a.corto.localeCompare(b.corto);});
+      s.forEach(function(c){var v=c.val();pl.push({name:v.nombre||v.name||c.key,corto:v.corto||(v.nombre||v.name||c.key),teamId:teamId,camiseta:v.camiseta||''});});
+      pl.sort(function(a,b){var na=parseInt(a.camiseta)||999,nb=parseInt(b.camiseta)||999;return na-nb||a.corto.localeCompare(b.corto);});
       _pickerRosters[side]=pl;
       if(++done===2)renderPickerPanel();
     }).catch(function(){if(++done===2)renderPickerPanel();});
@@ -4072,19 +4364,43 @@ function setEvtTab(tab,btn){
 function renderPickerPanel(){
   var m=MF.find(function(x){return x.id===cri;});if(!m)return;
   var panel=document.getElementById('pickerPanel');if(!panel)return;
-  var selClass='sel-'+_curEvtTab;
   var arr=_curEvtTab==='goal'?_evGoals:_curEvtTab==='yellow'?_evYellows:_evReds;
   var selectedNames=arr.map(function(e){return e.name+e.teamId;});
+  var accentColor=_curEvtTab==='goal'?'#10b981':_curEvtTab==='yellow'?'#f59e0b':'#ef4444';
+  var accentBg=_curEvtTab==='goal'?'rgba(16,185,129,.2)':_curEvtTab==='yellow'?'rgba(245,158,11,.2)':'rgba(239,68,68,.2)';
+  var accentBorder=_curEvtTab==='goal'?'#10b981':_curEvtTab==='yellow'?'#f59e0b':'#ef4444';
   function teamSection(side,label){
     var players=_pickerRosters[side];
     var teamId=side==='l'?m.l:m.v;
-    var chips=players.length?players.map(function(p){
-      var isOn=selectedNames.indexOf(p.name+p.teamId)>=0;
-      return '<button class="pchip'+(isOn?' '+selClass:'')+'" onclick="toggleEvtChip(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+')">'+escHtml(p.corto)+'</button>';
-    }).join(''):'<span style="font-size:10px;color:var(--m)">Sin jugadores registrados</span>';
-    return '<div class="picker-team"><div class="picker-team-hdr"><span style="color:var(--ac)">'+label+'</span> '+escHtml(tn(teamId))+'</div><div class="picker-chips">'+chips+'</div></div>';
+    var teamColor=TC[teamId]||'#0ea5e9';
+    var badgeHtml=bdg(teamId,'bs');
+    var hdr='<div style="display:flex;align-items:center;gap:8px;padding:6px 0 8px">';
+    hdr+='<div style="width:26px;height:30px;flex-shrink:0">'+badgeHtml+'</div>';
+    hdr+='<div style="flex:1"><div style="font-size:9px;font-weight:900;color:'+teamColor+';letter-spacing:1px">'+label+'</div>';
+    hdr+='<div style="font-size:12px;font-weight:900;color:var(--t)">'+escHtml(tn(teamId))+'</div></div>';
+    hdr+='</div>';
+    var cards;
+    if(!players.length){
+      cards='<div style="font-size:10px;color:var(--m);padding:8px 0">Sin jugadores registrados</div>';
+    }else{
+      cards='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
+      players.forEach(function(p){
+        var isOn=selectedNames.indexOf(p.name+p.teamId)>=0;
+        var numBg=isOn?accentColor:teamColor;
+        var cardBorder=isOn?'2px solid '+accentBorder:'1.5px solid rgba(255,255,255,.08)';
+        var cardBg=isOn?accentBg:'var(--b3)';
+        var numDisplay=p.camiseta||'?';
+        cards+='<button onclick="toggleEvtChip(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+')" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;border-radius:10px;border:'+cardBorder+';background:'+cardBg+';cursor:pointer;transition:.15s;-webkit-appearance:none;position:relative">';
+        if(isOn)cards+='<div style="position:absolute;top:4px;right:4px;font-size:9px">'+(_curEvtTab==='goal'?'⚽':_curEvtTab==='yellow'?'🟨':'🟥')+'</div>';
+        cards+='<div style="width:32px;height:32px;border-radius:50%;background:'+numBg+';display:flex;align-items:center;justify-content:center;font-size:'+(numDisplay.length>3?'8':'11')+'px;font-weight:900;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.4)">'+escHtml(numDisplay)+'</div>';
+        cards+='<div style="font-size:9px;font-weight:800;color:'+(isOn?accentColor:'var(--t)')+';text-align:center;line-height:1.2;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px">'+escHtml(p.corto)+'</div>';
+        cards+='</button>';
+      });
+      cards+='</div>';
+    }
+    return '<div>'+hdr+cards+'</div>';
   }
-  panel.innerHTML=teamSection('l','LOCAL')+'<div style="height:2px;background:var(--bd);margin:6px 0;border-radius:2px"></div>'+teamSection('v','VISITA');
+  panel.innerHTML=teamSection('l','LOCAL')+'<div style="height:1px;background:linear-gradient(90deg,transparent,var(--bd),transparent);margin:10px 0"></div>'+teamSection('v','VISITA');
   renderEvtLog();
 }
 
@@ -4093,16 +4409,23 @@ function escHtml(s){return String(s).replace(/[&<>"']/g,function(c){return({'&':
 function toggleEvtChip(name,corto,teamId){
   var arr=_curEvtTab==='goal'?_evGoals:_curEvtTab==='yellow'?_evYellows:_evReds;
   var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
-  if(idx>=0){arr.splice(idx,1);}else{arr.push({name:name,corto:corto,teamId:teamId});}
+  if(idx>=0){arr.splice(idx,1);}else{
+    // Look up camiseta from roster
+    var side=teamId===MF.find(function(x){return x.id===cri;})?'l':'v';
+    var rAll=[].concat(_pickerRosters.l||[],_pickerRosters.v||[]);
+    var rp=rAll.find(function(p){return p.name===name&&p.teamId===teamId;});
+    arr.push({name:name,corto:corto,teamId:teamId,camiseta:rp?rp.camiseta:''});
+  }
   renderPickerPanel();
 }
 
 function renderEvtLog(){
   var log=document.getElementById('evtLog');if(!log)return;
   var all=[];
-  _evGoals.forEach(function(e){all.push('<span class="evt-pill goal-pill">⚽ '+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'goal\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
-  _evYellows.forEach(function(e){all.push('<span class="evt-pill yellow-pill">🟨 '+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'yellow\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
-  _evReds.forEach(function(e){all.push('<span class="evt-pill red-pill">🟥 '+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'red\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
+  function camBadge(e){var cam=e.camiseta;return cam?'<span style="font-size:8px;font-weight:900;opacity:.75;margin-right:2px">#'+cam+'</span>':'';}
+  _evGoals.forEach(function(e){all.push('<span class="evt-pill goal-pill">⚽ '+camBadge(e)+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'goal\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
+  _evYellows.forEach(function(e){all.push('<span class="evt-pill yellow-pill">🟨 '+camBadge(e)+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'yellow\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
+  _evReds.forEach(function(e){all.push('<span class="evt-pill red-pill">🟥 '+camBadge(e)+escHtml(e.corto)+' <span class="rmv" onclick="removeEvt(\'red\',\''+escHtml(e.name)+'\','+e.teamId+')">×</span></span>');});
   log.innerHTML=all.join('');
 }
 
@@ -4256,6 +4579,112 @@ async function setSocioEq(ced,tid){
   await db.ref('/socios/'+ced+'/equipo').set(tid);
   cM('mDlg');showToast('info','Equipo asignado',tn(tid)+' → '+ced,3000,'#10b981');
   shSociosEq();
+}
+
+// ═══════════════════════════════════════════════
+// ── ADMIN PLANTILLAS ──
+// ═══════════════════════════════════════════════
+function shPlantillas(){
+  adCnt('<div style="padding:14px 16px"><div style="font-size:12px;color:var(--m);text-align:center;padding:20px">⏳ Cargando socios de Firebase…</div></div>');
+  if(!fbR||!db){adCnt('<div style="padding:20px;text-align:center;color:var(--m)">Firebase no disponible</div>');return;}
+  db.ref('/socios').once('value').then(function(snap){
+    _plSocios={};
+    snap.forEach(function(c){var v=c.val();if(v&&v.nombre)_plSocios[c.key]=v;});
+    _plMatches={};
+    for(var tid=1;tid<=10;tid++){
+      var pl=PLANTILLAS_DATA[tid]||[];
+      _plMatches[tid]=pl.map(function(p){
+        var m=matchSocioByName(normNombre(p.n),_plSocios);
+        return{player:p,match:m||null};
+      });
+    }
+    renderPlantillasUI();
+  }).catch(function(e){adCnt('<div style="padding:20px;text-align:center;color:#f87171">Error: '+e.message+'</div>');});
+}
+
+function renderPlantillasUI(){
+  var h='<div style="padding:0 0 80px">';
+  h+='<div style="padding:14px 16px 8px;display:flex;align-items:center;justify-content:space-between">';
+  h+='<div><div style="font-size:15px;font-weight:900;color:var(--t)">📋 Plantillas</div><div style="font-size:10px;color:var(--m);margin-top:2px">Cruce con Firebase · Actualizar equipos y camisetas</div></div>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none">';
+  for(var i=1;i<=10;i++){
+    var tpl=PLANTILLAS_DATA[i]||[];
+    var pending=tpl.length===0;
+    var matched=_plMatches[i]?_plMatches[i].filter(function(r){return r.match&&r.match.score>=2;}).length:0;
+    var col=_plCurTeam===i?'background:'+TC[i]+';color:#fff;border-color:'+TC[i]+';':'';
+    var badge=pending?'':'<span style="font-size:9px;font-weight:900;margin-left:4px;opacity:.8">'+matched+'/'+tpl.length+'</span>';
+    h+='<button onclick="_plCurTeam='+i+';renderPlantillasUI()" style="flex-shrink:0;padding:7px 12px;border-radius:20px;border:1.5px solid rgba(255,255,255,.15);background:var(--b3);color:var(--m);font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;'+col+'">';
+    h+=ts(i)+(pending?' ⏳':badge)+'</button>';
+  }
+  h+='</div>';
+  var tid=_plCurTeam,tpl2=PLANTILLAS_DATA[tid]||[];
+  if(!tpl2.length){
+    h+='<div style="margin:0 16px;padding:24px;background:rgba(245,159,11,.06);border:1.5px dashed rgba(245,159,11,.25);border-radius:14px;text-align:center">';
+    h+='<div style="font-size:24px;margin-bottom:8px">⏳</div>';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--gl)">Plantilla pendiente</div>';
+    h+='<div style="font-size:11px;color:var(--m);margin-top:4px">Proporcione el listado de '+tn(tid)+' para continuar</div>';
+    h+='</div>';
+  }else{
+    var rows=_plMatches[tid]||[];
+    var nMatch=rows.filter(function(r){return r.match&&r.match.score>=2;}).length;
+    var nWeak=rows.filter(function(r){return r.match&&r.match.score===1;}).length;
+    var nNone=rows.filter(function(r){return !r.match;}).length;
+    h+='<div style="margin:0 16px 10px;display:flex;gap:8px">';
+    h+='<div style="flex:1;padding:10px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:#34d399">'+nMatch+'</div><div style="font-size:9px;color:var(--m)">Encontrados</div></div>';
+    h+='<div style="flex:1;padding:10px;background:rgba(245,159,11,.08);border:1px solid rgba(245,159,11,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--gl)">'+nWeak+'</div><div style="font-size:9px;color:var(--m)">Posibles</div></div>';
+    h+='<div style="flex:1;padding:10px;background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:#f87171">'+nNone+'</div><div style="font-size:9px;color:var(--m)">No hallados</div></div>';
+    h+='</div>';
+    h+='<div style="margin:0 16px 12px;display:flex;gap:8px">';
+    h+='<button onclick="syncPlantillaTeam('+tid+')" style="flex:1;-webkit-appearance:none;padding:12px;border-radius:10px;background:linear-gradient(135deg,#065f46,#047857);border:1px solid #34d399;color:#fff;font-size:12px;font-weight:900;cursor:pointer">✅ Sincronizar '+tn(tid)+' en Firebase</button>';
+    h+='</div>';
+    h+='<div style="margin:0 16px;display:flex;flex-direction:column;gap:6px">';
+    rows.forEach(function(r){
+      var p=r.player,m=r.match;
+      var statusIcon=m&&m.score>=2?'✅':m&&m.score===1?'⚠️':'❌';
+      var statusColor=m&&m.score>=2?'#34d399':m&&m.score===1?'#fbbf24':'#f87171';
+      var cedInfo=m?'<div style="font-size:9px;color:'+statusColor+';margin-top:2px">CC '+m.ced+(m.score===1?' (revisar)':'')+'</div>':'<div style="font-size:9px;color:#f87171;margin-top:2px">No en Firebase</div>';
+      var camisetaStr=p.c?'<span style="font-size:9px;font-weight:900;color:rgba(255,215,0,.8);background:rgba(255,215,0,.1);padding:1px 5px;border-radius:4px">#'+p.c+'</span> ':'';
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--b2);border:1px solid rgba(255,255,255,.06);border-radius:10px">';
+      h+='<div style="width:28px;text-align:center;font-size:9px;font-weight:900;color:var(--m)">#'+p.s+'</div>';
+      h+='<div style="flex:1;min-width:0">';
+      h+='<div style="font-size:12px;font-weight:800;color:var(--t)">'+camisetaStr+escHtml(toCorto(p.n))+'</div>';
+      h+='<div style="font-size:10px;color:var(--m)">'+escHtml(p.n)+'</div>';
+      h+=cedInfo;
+      h+='</div>';
+      h+='<div style="font-size:16px">'+statusIcon+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  adCnt(h);
+}
+
+async function syncPlantillaTeam(tid){
+  if(!fbR||!db){alert('Firebase no disponible');return;}
+  var rows=_plMatches[tid]||[];
+  if(!rows.length){alert('No hay jugadores para sincronizar');return;}
+  var updates={};
+  rows.forEach(function(r){
+    var p=r.player,m=r.match;
+    var corto=toCorto(p.n);
+    var key='s'+String(p.s).padStart(3,'0');
+    updates['/equipos/'+tid+'/jugadores/'+key+'/nombre']=p.n;
+    updates['/equipos/'+tid+'/jugadores/'+key+'/corto']=corto;
+    updates['/equipos/'+tid+'/jugadores/'+key+'/camiseta']=p.c||'';
+    updates['/equipos/'+tid+'/jugadores/'+key+'/socioNum']=p.s;
+    if(m&&m.score>=2){
+      updates['/socios/'+m.ced+'/equipo']=tid;
+      updates['/socios/'+m.ced+'/camiseta']=p.c||'';
+      updates['/socios/'+m.ced+'/socioNum']=p.s;
+    }
+  });
+  try{
+    await db.ref('/').update(updates);
+    showToast('info','✅ '+tn(tid)+' sincronizado','Jugadores y camisetas actualizados',3500,'#10b981');
+    renderPlantillasUI();
+  }catch(e){alert('Error: '+e.message);}
 }
 
 // ═══════════════════════════════════════════════
