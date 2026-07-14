@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.26';
+var APP_VER='8.27';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -2025,7 +2025,7 @@ function rVl(){
 
 // ── RESULTS EDIT ──
 function oRsEl(el){oRs(parseInt(el.getAttribute("data-mid")));}
-var curRType='normal',curWOWinner=null,_rsPicker=null,_rsSaved=false,_rsMvpQuery='';
+var curRType='normal',curWOWinner=null,_rsPicker=null,_rsSaved=false,_rsMvpQuery='',_rsRostersReady=false;
 // legacy stubs kept for doSR compatibility
 function setRType(t){curRType=t;}
 function setWOWinner(side){curWOWinner=side;}
@@ -2034,7 +2034,7 @@ function updWOBtns(){}
 function oRs(id){
   cri=id;var m=MF.find(function(x){return x.id===id;});if(!m)return;
   curRType='normal';curWOWinner=null;_rsPicker=null;_rsSaved=false;_rsMvpQuery='';
-  _evGoals=[];_evYellows=[];_evReds=[];_pickerRosters={l:[],v:[]};
+  _evGoals=[];_evYellows=[];_evReds=[];_pickerRosters={l:[],v:[]};_rsRostersReady=false;
   var r=res[id];
   if(r&&r.wo){curRType='wo';curWOWinner=r.woWinner;}
   else if(r){
@@ -2042,18 +2042,23 @@ function oRs(id){
     _evYellows=r.yellows?r.yellows.slice():[];_evReds=r.reds?r.reds.slice():[];
   }
   rsRender(m);openM("mRs");
-  // Load rosters async → re-render when ready
-  var done=0;
+  // Cargar nóminas — re-renderiza siempre al terminar
+  var _loadId=id,done=0;
+  function onRosterDone(){
+    if(++done<2)return;
+    _rsRostersReady=true;
+    if(cri===_loadId)rsRender(MF.find(function(x){return x.id===cri;}));
+  }
   ['l','v'].forEach(function(side){
     var tid=side==='l'?m.l:m.v;
-    if(!fbR||!db){done++;return;}
+    if(!fbR||!db){_pickerRosters[side]=[];onRosterDone();return;}
     db.ref('/equipos/'+tid+'/jugadores').once('value').then(function(s){
       var pl=[];
       s.forEach(function(c){var v=c.val();pl.push({name:v.nombre||v.name||c.key,corto:v.corto||(v.nombre||v.name||c.key),teamId:tid,camiseta:v.camiseta||''});});
       pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
       _pickerRosters[side]=pl;
-      if(++done===2&&_rsPicker)rsRender(MF.find(function(x){return x.id===cri;}));
-    }).catch(function(){done++;});
+      onRosterDone();
+    }).catch(function(){_pickerRosters[side]=[];onRosterDone();});
   });
 }
 
@@ -2149,7 +2154,7 @@ function rsPickerHtml(m){
   h+='<button onclick="rsOpenPicker(\''+_rsPicker+'\')" style="background:none;border:none;color:var(--m);font-size:18px;cursor:pointer;-webkit-appearance:none;padding:0">✕</button>';
   h+='</div>';
   if(!players.length){
-    h+='<div style="font-size:11px;color:var(--m);text-align:center;padding:8px">Cargando jugadores…</div>';
+    h+='<div style="font-size:11px;color:var(--m);text-align:center;padding:12px">'+(_rsRostersReady?'Sin jugadores registrados para este equipo':'⏳ Cargando jugadores…')+'</div>';
   } else {
     h+='<div class="rs-pl-grid">';
     players.forEach(function(p){
