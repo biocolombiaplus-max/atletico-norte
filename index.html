@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.23';
+var APP_VER='8.24';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -445,22 +445,22 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .wh-img-btn:active{background:rgba(255,255,255,.16);transform:scale(.90)}
 .wbdy{display:none}
 .wbdy.open{display:block}
-.wbdy .mc{border-top:1px solid var(--bd);padding:14px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;transition:.1s}
+.wbdy .mc{border-top:1px solid var(--bd);padding:14px 8px;display:grid;grid-template-columns:1fr 112px 1fr;align-items:center;gap:4px;transition:.1s}
 .wbdy .mc:active{background:var(--b3)}
-.ts{display:flex;align-items:center;gap:9px}
+.ts{display:flex;align-items:center;gap:6px;min-width:0}
 .ts.aw{flex-direction:row-reverse;text-align:right}
 .bw{width:36px;height:43px;flex-shrink:0}
-.tnm{font-size:13px;font-weight:800;line-height:1.2}
+.tnm{font-size:12px;font-weight:800;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .tsb{font-size:10px;color:var(--m);margin-top:2px;font-weight:600}
 .sb{flex-shrink:0;display:flex;flex-direction:column;align-items:center}
-.sn{font-size:28px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:0;justify-content:center}
-.sn-num{width:44px;font-variant-numeric:tabular-nums;font-size:28px;font-weight:900;display:inline-block}
+.sn{font-size:30px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;width:100%}
+.sn-num{width:36px;font-variant-numeric:tabular-nums;font-size:30px;font-weight:900;display:inline-block;text-align:center}
 .sn-num.left{text-align:right}
 .sn-num.right{text-align:left}
-.sn-sep{width:26px;text-align:center;font-size:26px;font-weight:900;color:#fff;line-height:1;opacity:.85}
+.sn-sep{width:24px;text-align:center;font-size:22px;font-weight:900;color:rgba(255,255,255,.7);line-height:1;letter-spacing:0}
 .ss{color:var(--dm);font-weight:400}
 /* fila info: hora · cancha · vuelta — sin wrap */
-.mm{margin-top:7px;display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:nowrap}
+.mm{margin-top:6px;display:flex;gap:3px;justify-content:center;align-items:center;flex-wrap:wrap}
 .mm .mhora{background:var(--b3);border:1px solid var(--bd);padding:3px 8px;border-radius:7px;font-size:11px;font-weight:900;color:var(--t);white-space:nowrap}
 .mm .mcancha{padding:3px 7px;border-radius:7px;font-size:10px;font-weight:800;white-space:nowrap}
 .mm .cov{background:rgba(14,165,233,.15);color:#38bdf8;border:1px solid rgba(14,165,233,.25)}
