@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.24';
+var APP_VER='8.25';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -2249,7 +2249,7 @@ function rPn(){
     h+='<div id="admPnCnt"></div>';
   }
   h+='<div style="padding:14px 16px 4px"><button class="cb" onclick="doLt()">&#128682; Cerrar Sesi&#243;n</button></div>';
-  h+='<div style="text-align:center;padding:8px 16px 24px;font-size:10px;color:var(--dm)">v'+APP_VER+' &middot; <button onclick="clearCacheReload()" style="background:none;border:none;color:var(--dm);font-size:10px;cursor:pointer;text-decoration:underline">Actualizar app</button></div>';
+  h+='<div style="padding:8px 16px 16px"><button onclick="clearCacheReload()" style="width:100%;background:var(--b3);border:1px solid var(--bd);color:var(--t);font-size:13px;font-weight:700;border-radius:10px;padding:10px;cursor:pointer">🔄 Actualizar app <span style=\"font-size:10px;opacity:.5\">v'+APP_VER+'</span></button></div>';
   document.getElementById("pnc").innerHTML=h;
   if(isAdm) adShowOverview();
 }
