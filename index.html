@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.27';
+var APP_VER='8.28';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -2041,25 +2041,20 @@ function oRs(id){
     _evGoals=r.scorers?r.scorers.map(function(s){return{name:s.name,corto:s.corto||s.name,teamId:s.teamId||0,camiseta:s.camiseta||''};}):[];
     _evYellows=r.yellows?r.yellows.slice():[];_evReds=r.reds?r.reds.slice():[];
   }
-  rsRender(m);openM("mRs");
-  // Cargar nóminas — re-renderiza siempre al terminar
-  var _loadId=id,done=0;
-  function onRosterDone(){
-    if(++done<2)return;
-    _rsRostersReady=true;
-    if(cri===_loadId)rsRender(MF.find(function(x){return x.id===cri;}));
-  }
+  // Cargar nóminas desde teamInfo (ya en memoria) — sin llamada Firebase adicional
   ['l','v'].forEach(function(side){
     var tid=side==='l'?m.l:m.v;
-    if(!fbR||!db){_pickerRosters[side]=[];onRosterDone();return;}
-    db.ref('/equipos/'+tid+'/jugadores').once('value').then(function(s){
-      var pl=[];
-      s.forEach(function(c){var v=c.val();pl.push({name:v.nombre||v.name||c.key,corto:v.corto||(v.nombre||v.name||c.key),teamId:tid,camiseta:v.camiseta||''});});
-      pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
-      _pickerRosters[side]=pl;
-      onRosterDone();
-    }).catch(function(){_pickerRosters[side]=[];onRosterDone();});
+    var jugs=(teamInfo[tid]&&teamInfo[tid].jugadores)?teamInfo[tid].jugadores:{};
+    var pl=[];
+    Object.keys(jugs).forEach(function(key){
+      var v=jugs[key];
+      pl.push({name:v.nombre||v.name||key,corto:v.corto||(v.nombre||v.name||key),teamId:tid,camiseta:v.camiseta||''});
+    });
+    pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
+    _pickerRosters[side]=pl;
   });
+  _rsRostersReady=true;
+  rsRender(m);openM("mRs");
 }
 
 function rsRender(m){
