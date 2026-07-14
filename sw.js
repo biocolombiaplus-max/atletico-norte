@@ -1,6 +1,6 @@
 // Atlético Norte FC — Service Worker
 // Increment SW_VER on every deploy to force cache invalidation
-const SW_VER = 'v8.8-2026-07-13';
+const SW_VER = 'v8.23-2026-07-14';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 
 // Firebase SDK scripts — heavy, rarely change, cache aggressively
@@ -13,7 +13,7 @@ const PRECACHE = [
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(STATIC_CACHE)
-      .then(c => c.addAll(PRECACHE).catch(() => {})) // don't fail install if CDN unreachable
+      .then(c => c.addAll(PRECACHE).catch(() => {}))
       .then(() => self.skipWaiting())
   );
 });
@@ -23,6 +23,8 @@ self.addEventListener('activate', e => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== STATIC_CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({type:'window', includeUncontrolled:true}))
+      .then(cls => cls.forEach(c => c.postMessage({type:'SW_UPDATED', ver:SW_VER})))
   );
 });
 
@@ -62,16 +64,15 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
   // ── HTML pages: ALWAYS network-first, no-store cache ──
-  // This guarantees every visit gets the freshest version from GitHub Pages
   if (e.request.mode === 'navigate') {
     e.respondWith(
       fetch(e.request, { cache: 'no-store' })
-        .catch(() => caches.match(e.request)) // offline fallback only
+        .catch(() => caches.match(e.request))
     );
     return;
   }
 
-  // ── Firebase SDK + gstatic: cache-first (these never change by URL) ──
+  // ── Firebase SDK + gstatic: cache-first ──
   if (url.hostname === 'www.gstatic.com') {
     e.respondWith(
       caches.match(e.request).then(cached => {
@@ -86,5 +87,4 @@ self.addEventListener('fetch', e => {
   }
 
   // ── Everything else: network (Firebase RTDB, images, etc.) ──
-  // No caching — data must always be live
 });
