@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.28';
+var APP_VER='8.29';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -2010,10 +2010,33 @@ function rGl(){
 }
 function rGo(){
   var list=Object.values(gm).sort(function(a,b){return b.goals-a.goals;});
-  document.getElementById("gl").innerHTML=list.length?list.slice(0,20).map(function(g,i){
-    var gc=i===0?"g1":i===1?"g2":i===2?"g3":"";
-    return'<div class="ri"><div class="rp '+gc+'">'+(i+1)+'</div><div class="ri-i"><div class="rn">'+g.name+'</div><div class="rt">'+tn(g.teamId)+'</div></div><div class="rv">'+g.goals+'</div></div>';
-  }).join(""):'<div class="es"><div class="esi">&#9917;</div><p>Sin goles a&#250;n</p></div>';
+  if(!list.length){document.getElementById("gl").innerHTML='<div class="es"><div class="esi">&#9917;</div><p>Sin goles a&#250;n</p></div>';return;}
+  var medals=['🥇','🥈','🥉'];
+  var maxG=list[0].goals;
+  var h='<div style="display:flex;flex-direction:column;gap:0">';
+  list.slice(0,20).forEach(function(g,i){
+    var col=TC[g.teamId]||'#6b7280';
+    var isTop=i<3;
+    var pos=isTop?medals[i]:'<span style="font-size:11px;font-weight:900;color:var(--m)">'+(i+1)+'</span>';
+    var pct=Math.round((g.goals/maxG)*100);
+    var bg=i===0?'linear-gradient(90deg,rgba(255,215,0,.08),transparent)':i===1?'linear-gradient(90deg,rgba(192,192,192,.06),transparent)':i===2?'linear-gradient(90deg,rgba(205,127,50,.06),transparent)':'';
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);'+(bg?'background:'+bg+';':'')+(i===0?'border-left:3px solid #fbbf24;':'i===1?border-left:3px solid #9ca3af;':'i===2?border-left:3px solid #b45309;':'')+'">';
+    h+='<div style="width:26px;text-align:center;flex-shrink:0;font-size:'+(isTop?'18':'13')+'px">'+pos+'</div>';
+    h+=bdg(g.teamId,'xs');
+    h+='<div style="flex:1;min-width:0">';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(g.name)+'</div>';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-top:3px">';
+    h+='<span style="font-size:9px;font-weight:800;color:'+col+';letter-spacing:.3px">'+escHtml(tn(g.teamId).toUpperCase())+'</span>';
+    h+='<div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:2px;transition:.3s"></div></div>';
+    h+='</div></div>';
+    h+='<div style="flex-shrink:0;text-align:right">';
+    h+='<div style="font-size:20px;font-weight:900;color:'+col+';font-variant-numeric:tabular-nums;line-height:1">'+g.goals+'</div>';
+    h+='<div style="font-size:8px;color:var(--m);font-weight:700;letter-spacing:.5px">'+(g.goals===1?'GOL':'GOLES')+'</div>';
+    h+='</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  document.getElementById("gl").innerHTML=h;
 }
 function rVl(){
   var st=cSt().filter(function(t){return t.pj>0;}).sort(function(a,b){return a.gc!==b.gc?a.gc-b.gc:b.pj-a.pj;});
@@ -2041,20 +2064,48 @@ function oRs(id){
     _evGoals=r.scorers?r.scorers.map(function(s){return{name:s.name,corto:s.corto||s.name,teamId:s.teamId||0,camiseta:s.camiseta||''};}):[];
     _evYellows=r.yellows?r.yellows.slice():[];_evReds=r.reds?r.reds.slice():[];
   }
-  // Cargar nóminas desde teamInfo (ya en memoria) — sin llamada Firebase adicional
+  // Cargar nóminas: 1) teamInfo.jugadores 2) EQ_LOADED 3) Firebase /socios fallback
+  function _buildRosterFromJugs(jugs,tid){
+    var pl=[];
+    Object.keys(jugs).forEach(function(key){var v=jugs[key];pl.push({name:v.nombre||v.name||key,corto:v.corto||(v.nombre||v.name||key),teamId:tid,camiseta:v.camiseta||''});});
+    pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
+    return pl;
+  }
+  function _buildRosterFromSocios(list,tid){
+    var pl=list.map(function(sc){return{name:sc.nombre||sc.cedula||'',corto:toCorto(sc.nombre||sc.cedula||''),teamId:tid,camiseta:sc.camiseta||sc.num||''};});
+    pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
+    return pl;
+  }
+  var needFirebase=false;
   ['l','v'].forEach(function(side){
     var tid=side==='l'?m.l:m.v;
-    var jugs=(teamInfo[tid]&&teamInfo[tid].jugadores)?teamInfo[tid].jugadores:{};
-    var pl=[];
-    Object.keys(jugs).forEach(function(key){
-      var v=jugs[key];
-      pl.push({name:v.nombre||v.name||key,corto:v.corto||(v.nombre||v.name||key),teamId:tid,camiseta:v.camiseta||''});
-    });
-    pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
-    _pickerRosters[side]=pl;
+    var jugs=(teamInfo[tid]&&teamInfo[tid].jugadores)?teamInfo[tid].jugadores:null;
+    if(jugs&&Object.keys(jugs).length){
+      _pickerRosters[side]=_buildRosterFromJugs(jugs,tid);
+    } else if(EQ_LOADED[tid]&&EQ_LOADED[tid].length){
+      _pickerRosters[side]=_buildRosterFromSocios(EQ_LOADED[tid],tid);
+    } else {
+      _pickerRosters[side]=[];needFirebase=true;
+    }
   });
   _rsRostersReady=true;
   rsRender(m);openM("mRs");
+  if(needFirebase&&fbR&&db){
+    var _loadId=id;
+    db.ref('/socios').get().then(function(snap){
+      var so=snap.val()||{};
+      var byT={};
+      Object.values(so).forEach(function(sc){var eq=parseInt(sc.equipo)||0;if(!byT[eq])byT[eq]=[];byT[eq].push(sc);});
+      if(!EQ_LOADED||!Object.keys(EQ_LOADED).length)EQ_LOADED=byT;
+      var mx=MF.find(function(x){return x.id===_loadId;});if(!mx||cri!==_loadId)return;
+      ['l','v'].forEach(function(side){
+        if(_pickerRosters[side].length)return;
+        var tid=side==='l'?mx.l:mx.v;
+        _pickerRosters[side]=_buildRosterFromSocios(byT[tid]||[],tid);
+      });
+      rsRender(MF.find(function(x){return x.id===cri;}));
+    }).catch(function(){});
+  }
 }
 
 function rsRender(m){
