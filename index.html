@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.30';
+var APP_VER='8.31';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -554,7 +554,7 @@ tbody td:nth-child(2){text-align:left}
 .tbdg-av:hover::after{content:"↑";position:absolute;inset:0;background:rgba(200,16,46,.6);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:900}
 
 /* ── MODALS ── */
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;z-index:200;padding:0}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;z-index:900;padding:0}
 .mo.op{display:flex}
 .md{background:var(--b2);border:1px solid var(--bd);border-top-left-radius:22px;border-top-right-radius:22px;width:100%;max-width:520px;overflow:hidden;max-height:94dvh;display:flex;flex-direction:column}
 .mh{background:var(--b3);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd);flex-shrink:0}
@@ -1599,7 +1599,7 @@ function openL(){
   openM("mLo");
   setTimeout(function(){var f=document.getElementById('iCed');if(f)f.focus();},200);
 }
-function openM(id){document.getElementById(id).classList.add("op");}
+function openM(id){document.getElementById(id).classList.add("op");var _ib=document.getElementById('invBanner');if(_ib)_ib.style.display='none';}
 function cM(id){
   document.getElementById(id).classList.remove("op");
   // If closing login modal without being logged in, restore banner
@@ -1859,6 +1859,15 @@ function onIn(){
   setTimeout(function(){initLiveGoalListener();initPush();},1500);
   var isStaff=cr==='Administrador'||cr==='Coordinador Deportivo'||cr==='Coordinador Financiero';
   if(!pf.passChanged&&!isStaff)setTimeout(function(){openM("mCp");},1000);
+  // Pre-cargar nóminas de socios para admin y coordinador (necesario para picker de goles)
+  if(cEd()&&fbR&&db){
+    db.ref('/socios').get().then(function(snap){
+      var so=snap.val()||{};
+      var byT={};
+      Object.values(so).forEach(function(sc){var eq=parseInt(sc.equipo)||0;if(eq>=1){if(!byT[eq])byT[eq]=[];byT[eq].push(sc);}});
+      EQ_LOADED=byT;
+    }).catch(function(){});
+  }
 }
 function closeAdSocioBanner(){
   var b=document.getElementById('adSocioBanner');
@@ -2073,7 +2082,7 @@ function oRs(id){
     return pl;
   }
   function _buildRosterFromSocios(list,tid){
-    var pl=list.map(function(sc){return{name:sc.nombre||sc.cedula||'',corto:toCorto(sc.nombre||sc.cedula||''),teamId:tid,camiseta:sc.camiseta||sc.num||''};});
+    var pl=list.map(function(sc){return{name:sc.nombre||sc.cedula||'',corto:toCorto(sc.nombre||sc.cedula||''),teamId:tid,camiseta:sc.num||sc.camiseta||''};});
     pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
     return pl;
   }
