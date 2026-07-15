@@ -17,7 +17,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.29';
+var APP_VER='8.30';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -2020,7 +2020,8 @@ function rGo(){
     var pos=isTop?medals[i]:'<span style="font-size:11px;font-weight:900;color:var(--m)">'+(i+1)+'</span>';
     var pct=Math.round((g.goals/maxG)*100);
     var bg=i===0?'linear-gradient(90deg,rgba(255,215,0,.08),transparent)':i===1?'linear-gradient(90deg,rgba(192,192,192,.06),transparent)':i===2?'linear-gradient(90deg,rgba(205,127,50,.06),transparent)':'';
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);'+(bg?'background:'+bg+';':'')+(i===0?'border-left:3px solid #fbbf24;':'i===1?border-left:3px solid #9ca3af;':'i===2?border-left:3px solid #b45309;':'')+'">';
+    var bl=i===0?'border-left:3px solid #fbbf24;':i===1?'border-left:3px solid #9ca3af;':i===2?'border-left:3px solid #b45309;':'border-left:3px solid transparent;';
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);'+bl+(bg?'background:'+bg+';':'')+'">';
     h+='<div style="width:26px;text-align:center;flex-shrink:0;font-size:'+(isTop?'18':'13')+'px">'+pos+'</div>';
     h+=bdg(g.teamId,'xs');
     h+='<div style="flex:1;min-width:0">';
