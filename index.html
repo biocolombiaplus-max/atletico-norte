@@ -1512,6 +1512,8 @@ function setupFirebaseListeners(){
         existing.forEach(function(e){e.parentNode.removeChild(e);});
         var a=document.createElement("link");a.rel=rel;a.sizes="180x180";a.href=img;document.head.appendChild(a);
       });
+      // Send real club logo to SW so Android PWA icon uses the actual badge
+      _sendLogoToSW(img);
     }else if(!_lsClub){
       sh.className='hshield';sh.innerHTML=AN_SVG;
     }
@@ -3440,6 +3442,29 @@ async function rmClubLogo(){
   var sh=document.getElementById("anShield");if(sh){sh.className='hshield';sh.innerHTML=AN_SVG;}
   if(fbR&&db)await db.ref("/clubLogo").remove();
   shBdg();
+}
+
+// Send club logo to SW icon cache so Android PWA home-screen icon shows real badge
+function _sendLogoToSW(dataUrl){
+  if(!('serviceWorker' in navigator))return;
+  var sw=navigator.serviceWorker.controller;
+  if(!sw)return;
+  var img=new Image();
+  img.onload=function(){
+    function makeIconBuf(sz,pad){
+      var cv=document.createElement('canvas');cv.width=sz;cv.height=sz;
+      var cx=cv.getContext('2d');
+      cx.fillStyle='#070a0f';cx.fillRect(0,0,sz,sz);
+      var inner=sz*(1-pad*2);
+      cx.drawImage(img,(sz-inner)/2,(sz-inner)/2,inner,inner);
+      return new Promise(function(res){cv.toBlob(function(b){b.arrayBuffer().then(res);},  'image/png');});
+    }
+    Promise.all([makeIconBuf(192,.12),makeIconBuf(512,.12)]).then(function(bufs){
+      var buf192=bufs[0],buf512=bufs[1];
+      try{sw.postMessage({type:'SET_CLUB_ICON',buf192:buf192,buf512:buf512},[buf192,buf512]);}catch(ex){}
+    });
+  };
+  img.src=dataUrl;
 }
 
 // ── SHARED CANVAS HELPERS ──

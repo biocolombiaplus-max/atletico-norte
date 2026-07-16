@@ -1,7 +1,9 @@
 // Atlético Norte FC — Service Worker
 // Increment SW_VER on every deploy to force cache invalidation
-const SW_VER = 'v8.42-2026-07-16';
+const SW_VER = 'v8.43-2026-07-16';
 const STATIC_CACHE = 'an-static-' + SW_VER;
+// Icon cache — NOT versioned so it survives SW updates
+const ICON_CACHE = 'an-club-icon';
 
 // Firebase SDK scripts — heavy, rarely change, cache aggressively
 const PRECACHE = [
@@ -21,7 +23,11 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== STATIC_CACHE).map(k => caches.delete(k))))
+      // Delete old versioned caches but KEEP the icon cache
+      .then(keys => Promise.all(
+        keys.filter(k => k !== STATIC_CACHE && k !== ICON_CACHE)
+            .map(k => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
       .then(() => self.clients.matchAll({type:'window', includeUncontrolled:true}))
       .then(cls => cls.forEach(c => c.postMessage({type:'SW_UPDATED', ver:SW_VER})))
@@ -29,7 +35,26 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('message', e => {
-  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (!e.data) return;
+  if (e.data.type === 'SKIP_WAITING') { self.skipWaiting(); return; }
+
+  // Store club logo as PWA icons so Android/iOS show the real badge
+  if (e.data.type === 'SET_CLUB_ICON') {
+    const { buf192, buf512 } = e.data;
+    caches.open(ICON_CACHE).then(cache => {
+      const headers = { 'Content-Type': 'image/png', 'Cache-Control': 'no-cache' };
+      if (buf192) {
+        const r192 = new Response(new Blob([buf192], {type:'image/png'}), {status:200, headers});
+        cache.put('/icon-192.png',          r192.clone());
+        cache.put('/icon-192-maskable.png', r192.clone());
+      }
+      if (buf512) {
+        const r512 = new Response(new Blob([buf512], {type:'image/png'}), {status:200, headers});
+        cache.put('/icon-512.png',          r512.clone());
+        cache.put('/icon-512-maskable.png', r512.clone());
+      }
+    });
+  }
 });
 
 // ── PUSH NOTIFICATIONS ──
@@ -62,6 +87,17 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+
+  // ── PWA Icons: serve from icon cache if available (contains real club logo) ──
+  const iconPaths = ['/icon-192.png','/icon-512.png','/icon-192-maskable.png','/icon-512-maskable.png'];
+  if (iconPaths.includes(url.pathname)) {
+    e.respondWith(
+      caches.open(ICON_CACHE).then(cache =>
+        cache.match(url.pathname).then(cached => cached || fetch(e.request))
+      )
+    );
+    return;
+  }
 
   // ── HTML pages: ALWAYS network-first, no-store cache ──
   if (e.request.mode === 'navigate') {
