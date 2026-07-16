@@ -1927,9 +1927,9 @@ async function tPartidosHoy(ctx){
       ctx.font='700 '+(cH<200?24:26)+'px sans-serif';ctx.fillStyle='#fff';
       const lName=tn(m.l);
       // Wrap long names
-      _wrapCenter(ctx,lName,lx,midY+bdgSz*.42,halfW,cH<200?24:26);
+      _wrapCenter(ctx,lName,lx,midY+bdgSz*.58,halfW,cH<200?24:26);
       ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.letterSpacing='2px';
-      ctx.fillText('LOCAL',lx,midY+bdgSz*.42+28);
+      ctx.fillText('LOCAL',lx,midY+bdgSz*.58+28);
 
       // VS badge center
       const vsX=teamArea+halfW+40;
@@ -1947,9 +1947,9 @@ async function tPartidosHoy(ctx){
       }
       ctx.textAlign='center';ctx.letterSpacing='0';
       ctx.font='700 '+(cH<200?24:26)+'px sans-serif';ctx.fillStyle='rgba(255,255,255,.88)';
-      _wrapCenter(ctx,tn(m.v),vx,midY+bdgSz*.42,halfW,cH<200?24:26);
+      _wrapCenter(ctx,tn(m.v),vx,midY+bdgSz*.58,halfW,cH<200?24:26);
       ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.letterSpacing='2px';
-      ctx.fillText('VISITANTE',vx,midY+bdgSz*.42+28);
+      ctx.fillText('VISITANTE',vx,midY+bdgSz*.58+28);
 
       // ── VENUE pill at bottom of card ──
       ctx.letterSpacing='1px';ctx.font='700 28px sans-serif';ctx.fillStyle='rgba(34,211,238,.85)';
