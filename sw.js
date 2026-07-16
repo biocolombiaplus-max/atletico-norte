@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v8.47-2026-07-16';
+const SW_VER = 'v8.48-2026-07-16';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER; // versioned — cleared on every deploy
 
@@ -43,13 +43,13 @@ self.addEventListener('message', e => {
       const headers = { 'Content-Type': 'image/png', 'Cache-Control': 'no-cache' };
       if (buf192) {
         const r192 = new Response(new Blob([buf192], {type:'image/png'}), {status:200, headers});
-        cache.put('/icon-192.png',          r192.clone());
-        cache.put('/icon-192-maskable.png', r192.clone());
+        cache.put('/an-logo-192.png', r192.clone());
+        cache.put('/an-logo-192m.png', r192.clone());
       }
       if (buf512) {
         const r512 = new Response(new Blob([buf512], {type:'image/png'}), {status:200, headers});
-        cache.put('/icon-512.png',          r512.clone());
-        cache.put('/icon-512-maskable.png', r512.clone());
+        cache.put('/an-logo-512.png', r512.clone());
+        cache.put('/an-logo-512m.png', r512.clone());
       }
     });
   }
@@ -86,8 +86,15 @@ self.addEventListener('notificationclick', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
+  // ── Manifest: always fresh so Chrome sees icon changes immediately ──
+  if (url.pathname === '/manifest.json') {
+    e.respondWith(fetch(new Request(e.request.url, {cache:'no-store'})));
+    return;
+  }
+
   // ── PWA Icons: network-first, bypass HTTP cache, then store for offline ──
-  const iconPaths = ['/icon-192.png','/icon-512.png','/icon-192-maskable.png','/icon-512-maskable.png'];
+  const iconPaths = ['/an-logo-192.png','/an-logo-512.png','/an-logo-192m.png','/an-logo-512m.png',
+                     '/icon-192.png','/icon-512.png','/icon-192-maskable.png','/icon-512-maskable.png'];
   if (iconPaths.includes(url.pathname)) {
     e.respondWith(
       fetch(new Request(e.request.url, {cache: 'no-store'}))
