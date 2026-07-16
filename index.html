@@ -3445,10 +3445,10 @@ async function rmClubLogo(){
 }
 
 // Send club logo to SW icon cache so Android PWA home-screen icon shows real badge
+var _lastLogoDataUrl=null;
 function _sendLogoToSW(dataUrl){
   if(!('serviceWorker' in navigator))return;
-  var sw=navigator.serviceWorker.controller;
-  if(!sw)return;
+  _lastLogoDataUrl=dataUrl;
   var img=new Image();
   img.onload=function(){
     function makeIconBuf(sz,pad){
@@ -3457,14 +3457,24 @@ function _sendLogoToSW(dataUrl){
       cx.fillStyle='#070a0f';cx.fillRect(0,0,sz,sz);
       var inner=sz*(1-pad*2);
       cx.drawImage(img,(sz-inner)/2,(sz-inner)/2,inner,inner);
-      return new Promise(function(res){cv.toBlob(function(b){b.arrayBuffer().then(res);},  'image/png');});
+      return new Promise(function(res){cv.toBlob(function(b){b.arrayBuffer().then(res);},'image/png');});
     }
     Promise.all([makeIconBuf(192,.12),makeIconBuf(512,.12)]).then(function(bufs){
       var buf192=bufs[0],buf512=bufs[1];
-      try{sw.postMessage({type:'SET_CLUB_ICON',buf192:buf192,buf512:buf512},[buf192,buf512]);}catch(ex){}
+      // Use ready so it works even on first visit when controller is still null
+      navigator.serviceWorker.ready.then(function(reg){
+        var target=navigator.serviceWorker.controller||reg.active;
+        if(target){try{target.postMessage({type:'SET_CLUB_ICON',buf192:buf192,buf512:buf512},[buf192,buf512]);}catch(ex){}}
+      });
     });
   };
   img.src=dataUrl;
+}
+// If SW takes control after page load (first visit), resend logo immediately
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(_lastLogoDataUrl)_sendLogoToSW(_lastLogoDataUrl);
+  });
 }
 
 // ── SHARED CANVAS HELPERS ──
