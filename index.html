@@ -2048,9 +2048,26 @@ function rGl(){
     if(!r||!r.scorers)return;
     r.scorers.forEach(function(s){
       if(s.autogol)return;
-      var nm=(s.name||'').trim().replace(/\s+/g,' ');if(!nm)return;
-      var k=nm.toLowerCase()+'|'+(s.teamId||0);
-      if(!gm[k])gm[k]={name:nm,teamId:s.teamId||0,goals:0};
+      var nm=(s.name||'').replace(/[\s ]+/g,' ').trim();if(!nm)return;
+      // strip internal key suffixes like "manual_name_teamId_timestamp"
+      nm=nm.replace(/^manual_/i,'').replace(/_\d+_\d+$/,'').replace(/[\s ]+/g,' ').trim();
+      var tid=s.teamId||0;
+      var kLow=nm.toLowerCase();
+      // dedup: if same team already has an entry sharing ≥2 word tokens, merge into it
+      var existKey=null;
+      var words=kLow.split(' ').filter(function(w){return w.length>2;});
+      if(words.length>=2){
+        Object.keys(gm).forEach(function(existing){
+          if(existKey)return;
+          var parts=existing.split('|');
+          if(parseInt(parts[1])!==tid)return;
+          var eWords=parts[0].split(' ').filter(function(w){return w.length>2;});
+          var shared=words.filter(function(w){return eWords.indexOf(w)>=0;});
+          if(shared.length>=2)existKey=existing;
+        });
+      }
+      var k=existKey||(kLow+'|'+tid);
+      if(!gm[k])gm[k]={name:nm,teamId:tid,goals:0};
       gm[k].goals+=s.goals||1;
     });
   });
@@ -2070,7 +2087,7 @@ function rGo(){
     var bl=i===0?'border-left:3px solid #fbbf24;':i===1?'border-left:3px solid #9ca3af;':i===2?'border-left:3px solid #b45309;':'border-left:3px solid transparent;';
     h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);'+bl+(bg?'background:'+bg+';':'')+'">';
     h+='<div style="width:26px;text-align:center;flex-shrink:0;font-size:'+(isTop?'18':'13')+'px">'+pos+'</div>';
-    h+=bdg(g.teamId,'xs');
+    h+=bdg(g.teamId,'bs');
     h+='<div style="flex:1;min-width:0">';
     h+='<div style="font-size:13px;font-weight:800;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(g.name)+'</div>';
     h+='<div style="display:flex;align-items:center;gap:6px;margin-top:3px">';
