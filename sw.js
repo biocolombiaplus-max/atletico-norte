@@ -1,9 +1,7 @@
 // Atlético Norte FC — Service Worker
-// Increment SW_VER on every deploy to force cache invalidation
-const SW_VER = 'v8.45-2026-07-16';
+const SW_VER = 'v8.46-2026-07-16';
 const STATIC_CACHE = 'an-static-' + SW_VER;
-// Icon cache — NOT versioned so it survives SW updates
-const ICON_CACHE = 'an-club-icon';
+const ICON_CACHE   = 'an-club-icon-' + SW_VER; // versioned — cleared on every deploy
 
 // Firebase SDK scripts — heavy, rarely change, cache aggressively
 const PRECACHE = [
@@ -23,7 +21,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      // Delete old versioned caches but KEEP the icon cache
+      // Delete ALL old caches — including old icon caches with stale data
       .then(keys => Promise.all(
         keys.filter(k => k !== STATIC_CACHE && k !== ICON_CACHE)
             .map(k => caches.delete(k))
@@ -38,7 +36,7 @@ self.addEventListener('message', e => {
   if (!e.data) return;
   if (e.data.type === 'SKIP_WAITING') { self.skipWaiting(); return; }
 
-  // Store club logo as PWA icons so Android/iOS show the real badge
+  // Store club logo as PWA icons (used as offline fallback)
   if (e.data.type === 'SET_CLUB_ICON') {
     const { buf192, buf512 } = e.data;
     caches.open(ICON_CACHE).then(cache => {
@@ -88,13 +86,20 @@ self.addEventListener('notificationclick', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // ── PWA Icons: serve from icon cache if available (contains real club logo) ──
+  // ── PWA Icons: network-first, bypass HTTP cache, then store for offline ──
   const iconPaths = ['/icon-192.png','/icon-512.png','/icon-192-maskable.png','/icon-512-maskable.png'];
   if (iconPaths.includes(url.pathname)) {
     e.respondWith(
-      caches.open(ICON_CACHE).then(cache =>
-        cache.match(url.pathname).then(cached => cached || fetch(e.request))
-      )
+      fetch(new Request(e.request.url, {cache: 'no-store'}))
+        .then(r => {
+          if (r && r.ok) {
+            caches.open(ICON_CACHE).then(c => c.put(url.pathname, r.clone()));
+          }
+          return r;
+        })
+        .catch(() =>
+          caches.open(ICON_CACHE).then(c => c.match(url.pathname))
+        )
     );
     return;
   }
