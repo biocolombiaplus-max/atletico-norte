@@ -1420,7 +1420,7 @@ function matchSocioByName(targetNorm,sociosMap){
   for(var ced3 in sociosMap){var s3=sociosMap[ced3];if(!s3.nombre)continue;var sw3=normNombre(s3.nombre).split(' ');if(sw3[0]===ap1)return{ced:ced3,s:s3,score:1};}
   return null;
 }
-var _plSocios=null,_plCurTeam=1,_plMatches={};
+var _plSocios=null,_plCurTeam=1,_plMatches={},_plSynced={};
 const B={
   1:`<svg viewBox="0 0 60 71" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><defs><clipPath id="c1"><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z"/></clipPath></defs><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z" fill="#c8102e" stroke="#111" stroke-width="2.2"/><g clip-path="url(#c1)"><line x1="-10" y1="5" x2="65" y2="80" stroke="#c8102e" stroke-width="20"/><text x="34" y="26" text-anchor="middle" fill="#c8102e" font-size="16" font-weight="900" font-family="Arial">C</text><text x="34" y="37" text-anchor="middle" fill="#fff" font-size="6.5" font-weight="700" font-family="Arial">DEPORTIVO</text><text x="34" y="49" text-anchor="middle" fill="#c8102e" font-size="7.5" font-weight="900" font-family="Arial">CÚCUTA</text><text x="34" y="60" text-anchor="middle" fill="#aaa" font-size="7" font-weight="700" font-family="Arial">CUC</text></g></svg>`,
   2:`<svg viewBox="0 0 60 71" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><defs><clipPath id="c2"><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z"/></clipPath></defs><path d="M30 4L56 14 56 38Q56 58 30 67Q4 58 4 38L4 14Z" fill="#f5c400" stroke="#111" stroke-width="2.2"/><g clip-path="url(#c2)"><circle cx="30" cy="30" r="14" fill="#111" opacity=".1"/><circle cx="23" cy="26" r="2" fill="#111" opacity=".8"/><circle cx="37" cy="26" r="2" fill="#111" opacity=".8"/><path d="M21 34 Q30 41 39 34" stroke="#111" stroke-width="2" fill="none"/><text x="30" y="18" text-anchor="middle" fill="#111" font-size="6.5" font-weight="900" font-family="Arial">ATL.</text><text x="30" y="52" text-anchor="middle" fill="#111" font-size="9.5" font-weight="900" font-family="Arial">BUCA</text><text x="30" y="62" text-anchor="middle" fill="#555" font-size="7" font-weight="700" font-family="Arial">BUC</text></g></svg>`,
@@ -4939,27 +4939,53 @@ function renderPlantillasUI(){
     var nMatch=rows.filter(function(r){return r.match&&r.match.score>=2;}).length;
     var nWeak=rows.filter(function(r){return r.match&&r.match.score===1;}).length;
     var nNone=rows.filter(function(r){return !r.match;}).length;
+    // Check if team already synced to jugadores (in memory or Firebase)
+    var jugInFB=teamInfo[tid]&&teamInfo[tid].jugadores&&Object.keys(teamInfo[tid].jugadores).length>0;
+    var nSynced=_plSynced[tid]||0;
     h+='<div style="margin:0 16px 10px;display:flex;gap:8px">';
-    h+='<div style="flex:1;padding:10px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:#34d399">'+nMatch+'</div><div style="font-size:9px;color:var(--m)">Encontrados</div></div>';
+    h+='<div style="flex:1;padding:10px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:#34d399">'+nMatch+'</div><div style="font-size:9px;color:var(--m)">Socios OK</div></div>';
     h+='<div style="flex:1;padding:10px;background:rgba(245,159,11,.08);border:1px solid rgba(245,159,11,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--gl)">'+nWeak+'</div><div style="font-size:9px;color:var(--m)">Posibles</div></div>';
-    h+='<div style="flex:1;padding:10px;background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:#f87171">'+nNone+'</div><div style="font-size:9px;color:var(--m)">No hallados</div></div>';
+    h+='<div style="flex:1;padding:10px;background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:10px;text-align:center"><div style="font-size:18px;font-weight:900;color:#f87171">'+nNone+'</div><div style="font-size:9px;color:var(--m)">Sin socio</div></div>';
     h+='</div>';
+    // Firebase jugadores status banner
+    if(jugInFB){
+      var nJugs=Object.keys(teamInfo[tid].jugadores).length;
+      h+='<div style="margin:0 16px 10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">';
+      h+='<span style="font-size:16px">✅</span>';
+      h+='<div style="flex:1"><div style="font-size:11px;font-weight:900;color:#34d399">'+nJugs+' jugadores en Firebase</div>';
+      h+='<div style="font-size:10px;color:var(--m)">El coordinador ya puede ver este equipo en el picker</div></div>';
+      h+='</div>';
+    } else {
+      h+='<div style="margin:0 16px 10px;background:rgba(245,159,11,.08);border:1px solid rgba(245,159,11,.25);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">';
+      h+='<span style="font-size:16px">⚠️</span>';
+      h+='<div style="flex:1"><div style="font-size:11px;font-weight:900;color:#fbbf24">Sin jugadores en Firebase</div>';
+      h+='<div style="font-size:10px;color:var(--m)">El coordinador no puede ver este equipo hasta sincronizar</div></div>';
+      h+='</div>';
+    }
     h+='<div style="margin:0 16px 12px;display:flex;gap:8px">';
-    h+='<button onclick="syncPlantillaTeam('+tid+')" style="flex:1;-webkit-appearance:none;padding:12px;border-radius:10px;background:linear-gradient(135deg,#065f46,#047857);border:1px solid #34d399;color:#fff;font-size:12px;font-weight:900;cursor:pointer">✅ Sincronizar '+tn(tid)+' en Firebase</button>';
+    h+='<button onclick="syncPlantillaTeam('+tid+')" id="syncBtn'+tid+'" style="flex:2;-webkit-appearance:none;padding:12px;border-radius:10px;background:linear-gradient(135deg,#065f46,#047857);border:1px solid #34d399;color:#fff;font-size:12px;font-weight:900;cursor:pointer">🔄 Sincronizar '+tn(tid)+'</button>';
+    h+='<button onclick="syncAllPlantillas()" style="flex:1;-webkit-appearance:none;padding:12px;border-radius:10px;background:var(--b3);border:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:800;cursor:pointer">Todos</button>';
     h+='</div>';
     h+='<div style="margin:0 16px;display:flex;flex-direction:column;gap:6px">';
     rows.forEach(function(r){
       var p=r.player,m=r.match;
+      var key='s'+String(p.s).padStart(3,'0');
+      var inJugs=teamInfo[tid]&&teamInfo[tid].jugadores&&teamInfo[tid].jugadores[key];
       var statusIcon=m&&m.score>=2?'✅':m&&m.score===1?'⚠️':'❌';
       var statusColor=m&&m.score>=2?'#34d399':m&&m.score===1?'#fbbf24':'#f87171';
-      var cedInfo=m?'<div style="font-size:9px;color:'+statusColor+';margin-top:2px">CC '+m.ced+(m.score===1?' (revisar)':'')+'</div>':'<div style="font-size:9px;color:#f87171;margin-top:2px">No en Firebase</div>';
+      var cedInfo=m
+        ?'<span style="font-size:9px;color:'+statusColor+';font-weight:700">CC '+m.ced+(m.score===1?' ⚠️ revisar':'')+'</span>'
+        :'<span style="font-size:9px;color:#f87171;font-weight:700">Sin socio</span>';
+      var jugBadge=inJugs
+        ?'<span style="font-size:8px;font-weight:900;color:#34d399;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);padding:1px 5px;border-radius:4px;margin-left:4px">🔥 En picker</span>'
+        :'<span style="font-size:8px;font-weight:700;color:#f87171;background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);padding:1px 5px;border-radius:4px;margin-left:4px">Sin sync</span>';
       var camisetaStr=p.c?'<span style="font-size:9px;font-weight:900;color:rgba(255,215,0,.8);background:rgba(255,215,0,.1);padding:1px 5px;border-radius:4px">#'+p.c+'</span> ':'';
-      h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--b2);border:1px solid rgba(255,255,255,.06);border-radius:10px">';
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--b2);border:1px solid '+(inJugs?'rgba(16,185,129,.15)':'rgba(255,255,255,.06)')+';border-radius:10px">';
       h+='<div style="width:28px;text-align:center;font-size:9px;font-weight:900;color:var(--m)">#'+p.s+'</div>';
       h+='<div style="flex:1;min-width:0">';
-      h+='<div style="font-size:12px;font-weight:800;color:var(--t)">'+camisetaStr+escHtml(toCorto(p.n))+'</div>';
-      h+='<div style="font-size:10px;color:var(--m)">'+escHtml(p.n)+'</div>';
-      h+=cedInfo;
+      h+='<div style="font-size:12px;font-weight:800;color:var(--t)">'+camisetaStr+escHtml(toCorto(p.n))+jugBadge+'</div>';
+      h+='<div style="font-size:10px;color:var(--m);margin-top:1px">'+escHtml(p.n)+'</div>';
+      h+='<div style="margin-top:2px">'+cedInfo+'</div>';
       h+='</div>';
       h+='<div style="font-size:16px">'+statusIcon+'</div>';
       h+='</div>';
@@ -4970,51 +4996,77 @@ function renderPlantillasUI(){
   adCnt(h);
 }
 
-async function syncPlantillaTeam(tid){
-  if(!fbR||!db){alert('Firebase no disponible');return;}
+async function syncPlantillaTeam(tid, silent){
+  if(!fbR||!db){if(!silent)showToast('warn','Firebase no disponible','Recarga la app',3000);return false;}
   var rows=_plMatches[tid]||[];
-  if(!rows.length){alert('No hay jugadores para sincronizar');return;}
-  var equiposUpdates={};
+  if(!rows.length){if(!silent)showToast('warn','Sin jugadores','No hay datos para '+tn(tid),3000);return false;}
+
+  // Show loading state on button
+  var btn=document.getElementById('syncBtn'+tid);
+  if(btn){btn.disabled=true;btn.textContent='⏳ Guardando…';}
+
+  // Build jugadores object (direct path update — más confiable que root update)
+  var jugadoresObj={};
   var sociosUpdates={};
   rows.forEach(function(r){
     var p=r.player,m=r.match;
-    var corto=toCorto(p.n);
     var key='s'+String(p.s).padStart(3,'0');
-    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/nombre']=p.n;
-    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/corto']=corto;
-    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/camiseta']=p.c||'';
-    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/socioNum']=p.s;
+    jugadoresObj[key]={nombre:p.n,corto:toCorto(p.n),camiseta:p.c||'',socioNum:p.s};
     if(m&&m.score>=2){
       sociosUpdates['/socios/'+m.ced+'/equipo']=tid;
       sociosUpdates['/socios/'+m.ced+'/camiseta']=p.c||'';
       sociosUpdates['/socios/'+m.ced+'/socioNum']=p.s;
     }
   });
+
+  var ok=false;
   try{
-    await db.ref('/').update(equiposUpdates);
-    // Update teamInfo in memory so coordinators see jugadores immediately
+    // Write directly to the jugadores subpath — avoids root-level permission issues
+    await db.ref('/equipos/'+tid+'/jugadores').update(jugadoresObj);
+    ok=true;
+
+    // Update teamInfo in memory so coordinators see players immediately (no reload needed)
     if(!teamInfo[tid])teamInfo[tid]={};
     if(!teamInfo[tid].jugadores)teamInfo[tid].jugadores={};
-    rows.forEach(function(r){
-      var p=r.player;
-      var key='s'+String(p.s).padStart(3,'0');
-      teamInfo[tid].jugadores[key]={nombre:p.n,corto:toCorto(p.n),camiseta:p.c||'',socioNum:p.s};
-    });
-    // Update EQ_LOADED so picker can use it right away
+    Object.assign(teamInfo[tid].jugadores,jugadoresObj);
+
+    // Update EQ_LOADED for immediate picker use
     var tid2=parseInt(tid);
     EQ_LOADED[tid2]=rows.map(function(r){
-      var p=r.player;return{cedula:'s'+String(p.s).padStart(3,'0'),nombre:p.n,num:p.c||'',equipo:tid2};
+      var p=r.player;
+      return{cedula:'s'+String(p.s).padStart(3,'0'),nombre:p.n,num:p.c||'',equipo:tid2};
     });
-    showToast('info','✅ '+tn(tid)+' sincronizado','Jugadores guardados en Firebase',3500,'#10b981');
-    renderPlantillasUI();
+
+    _plSynced[tid]=rows.length;
+    if(!silent)showToast('info','✅ '+tn(tid)+' sincronizado',rows.length+' jugadores guardados · El coordinador ya los puede ver',4000,'#10b981');
   }catch(e){
-    showToast('warn','Error al sincronizar',e.message||'Intenta de nuevo',4000);
-    return;
+    if(!silent)showToast('warn','⚠️ Error al sincronizar '+tn(tid),e.message||'Verifica permisos Firebase',5000);
   }
-  // Best-effort socios update (may fail for non-admin)
-  if(Object.keys(sociosUpdates).length){
+
+  // Best-effort socios update
+  if(ok&&Object.keys(sociosUpdates).length){
     db.ref('/').update(sociosUpdates).catch(function(){});
   }
+
+  if(!silent)renderPlantillasUI();
+  return ok;
+}
+
+async function syncAllPlantillas(){
+  if(!fbR||!db){showToast('warn','Firebase no disponible','Recarga la app',3000);return;}
+  if(!_plMatches||!Object.keys(_plMatches).length){
+    showToast('warn','Carga la sección Plantillas primero','Ve a Plantillas para que carguen los datos',3500);return;
+  }
+  var total=0,ok=0;
+  for(var t=1;t<=10;t++){
+    if(!(PLANTILLAS_DATA[t]||[]).length)continue;
+    if(!(_plMatches[t]||[]).length)continue;
+    total++;
+    var res=await syncPlantillaTeam(t,true);
+    if(res)ok++;
+  }
+  showToast('info','🔄 Sincronización completa',ok+'/'+total+' equipos guardados en Firebase'+(ok<total?' · '+(total-ok)+' fallaron':''),5000,'#10b981');
+  renderPlantillasUI();
 }
 
 // ═══════════════════════════════════════════════
