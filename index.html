@@ -5021,11 +5021,15 @@ async function syncPlantillaTeam(tid, silent){
 
   var ok=false;
   try{
-    // Write directly to the jugadores subpath — avoids root-level permission issues
-    await db.ref('/equipos/'+tid+'/jugadores').update(jugadoresObj);
+    // Timeout de 10s — si Firebase no responde, libera el botón en vez de quedarse colgado
+    var _timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Sin respuesta de Firebase (10s). Verifica conexión o permisos.'));},10000);});
+    await Promise.race([
+      db.ref('/equipos/'+tid+'/jugadores').update(jugadoresObj),
+      _timeout
+    ]);
     ok=true;
 
-    // Update teamInfo in memory so coordinators see players immediately (no reload needed)
+    // Update teamInfo in memory so coordinators see players immediately
     if(!teamInfo[tid])teamInfo[tid]={};
     if(!teamInfo[tid].jugadores)teamInfo[tid].jugadores={};
     Object.assign(teamInfo[tid].jugadores,jugadoresObj);
@@ -5040,10 +5044,14 @@ async function syncPlantillaTeam(tid, silent){
     _plSynced[tid]=rows.length;
     if(!silent)showToast('info','✅ '+tn(tid)+' sincronizado',rows.length+' jugadores guardados · El coordinador ya los puede ver',4000,'#10b981');
   }catch(e){
-    if(!silent)showToast('warn','⚠️ Error al sincronizar '+tn(tid),e.message||'Verifica permisos Firebase',5000);
+    if(!silent)showToast('warn','⚠️ Error — '+tn(tid),e.message||'Verifica conexión y permisos Firebase',6000);
+  }finally{
+    // SIEMPRE re-habilita el botón — aunque la promesa se cuelgue o falle
+    var b=document.getElementById('syncBtn'+tid);
+    if(b){b.disabled=false;b.textContent='🔄 Sincronizar '+tn(tid);}
   }
 
-  // Best-effort socios update
+  // Best-effort socios update (silencioso)
   if(ok&&Object.keys(sociosUpdates).length){
     db.ref('/').update(sociosUpdates).catch(function(){});
   }
