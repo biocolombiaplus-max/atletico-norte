@@ -4869,10 +4869,12 @@ function checkMatchDayReminder(){
 // ═══════════════════════════════════════════════
 // ── SOCIOS CON EQUIPO (admin) ──
 // ═══════════════════════════════════════════════
+var _sociosMap={};
 async function shSociosEq(){
   if(!cEd()||!fbR||!db){adCnt('<div class="es"><p>Sin acceso</p></div>');return;}
   var s=await db.ref('/socios').get();
   var so=s.val()||{};
+  _sociosMap=so;
   var isAdmin=cr==='Administrador';
   var h='<div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:900;color:var(--t)">&#128100; Socios · Equipos</div>';
   if(isAdmin)h+='<button class="btns" onclick="adSocioForm()">+ Agregar</button>';
@@ -4883,13 +4885,14 @@ async function shSociosEq(){
     var teamBadgeHtml=sc.equipo?bdg(parseInt(sc.equipo),'bs'):'<span style="font-size:16px">👤</span>';
     var teamName=sc.equipo?tn(parseInt(sc.equipo)):'Sin equipo';
     var camNum=sc.camiseta?'<span style="font-size:9px;font-weight:900;color:rgba(255,215,0,.9);background:rgba(255,215,0,.12);padding:1px 6px;border-radius:4px;margin-left:4px">#'+sc.camiseta+'</span>':'';
+    var cedSafe=c.replace(/'/g,"\\'");
     h+='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">';
     h+=teamBadgeHtml;
-    h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--t);display:flex;align-items:center;flex-wrap:wrap;gap:2px">'+(sc.nombre||c)+camNum+'</div>';
-    h+='<div style="font-size:10px;color:var(--m);margin-top:1px">'+(sc.rol||'Socio')+' · '+teamName+'</div></div>';
+    h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--t);display:flex;align-items:center;flex-wrap:wrap;gap:2px">'+escHtml(sc.nombre||c)+camNum+'</div>';
+    h+='<div style="font-size:10px;color:var(--m);margin-top:1px">'+(sc.rol||'Socio')+' · '+escHtml(teamName)+'</div></div>';
     h+='<div style="display:flex;gap:5px">';
-    h+='<button class="btns" onclick="edSocioEq(\''+c+'\','+JSON.stringify(sc.equipo||null)+')" style="font-size:10px;padding:5px 10px">Equipo</button>';
-    h+='<button class="btns" onclick="edSocioCamiseta(\''+c+'\','+JSON.stringify(sc.nombre||c)+','+JSON.stringify(sc.equipo||null)+','+JSON.stringify(sc.camiseta||'')+')" style="font-size:10px;padding:5px 10px;background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.3);color:#ffd700">✏️ #</button>';
+    h+='<button class="btns" onclick="edSocioEq(\''+cedSafe+'\','+JSON.stringify(sc.equipo||null)+')" style="font-size:10px;padding:5px 10px">Equipo</button>';
+    h+='<button class="btns" onclick="edSocioCamiseta(\''+cedSafe+'\')" style="font-size:10px;padding:5px 10px;background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.3);color:#ffd700">✏️ #</button>';
     h+='</div></div>';
   });
   h+='</div>';
@@ -4912,17 +4915,21 @@ async function setSocioEq(ced,tid){
   cM('mDlg');showToast('info','Equipo asignado',tn(tid)+' → '+ced,3000,'#10b981');
   shSociosEq();
 }
-function edSocioCamiseta(ced,nombre,equipo,camActual){
+function edSocioCamiseta(ced){
+  var sc=_sociosMap[ced]||{};
+  var nombre=sc.nombre||ced;
+  var camActual=sc.camiseta||'';
   var h='<div style="font-size:12px;color:var(--m);margin-bottom:12px">Jugador: <b style="color:var(--t)">'+escHtml(nombre)+'</b></div>';
   h+='<div class="ctrl-l" style="margin-bottom:6px">Número de camiseta</div>';
-  h+='<input id="dlgCamisetaNum" type="number" inputmode="numeric" min="1" max="99" placeholder="Ej. 10" value="'+escHtml(camActual)+'" style="width:100%;box-sizing:border-box;background:var(--b2);border:1.5px solid var(--bd);color:var(--t);padding:12px 14px;border-radius:10px;font-size:22px;font-weight:900;text-align:center;-webkit-appearance:none;margin-bottom:16px">';
-  h+='<button onclick="saveSocioCamiseta(\''+ced+'\','+JSON.stringify(equipo)+')" style="width:100%;padding:13px;background:#ffd700;border:none;border-radius:12px;font-size:14px;font-weight:900;color:#000;cursor:pointer">💾 Guardar número</button>';
+  h+='<input id="dlgCamisetaNum" type="number" inputmode="numeric" min="1" max="99" placeholder="Ej. 10" value="'+escHtml(camActual)+'" style="width:100%;box-sizing:border-box;background:var(--b2);border:1.5px solid var(--bd);color:var(--t);padding:12px 14px;border-radius:10px;font-size:28px;font-weight:900;text-align:center;-webkit-appearance:none;margin-bottom:16px">';
+  h+='<button onclick="saveSocioCamiseta(\''+ced.replace(/'/g,"\\'")+'\')" style="width:100%;padding:13px;background:#ffd700;border:none;border-radius:12px;font-size:14px;font-weight:900;color:#000;cursor:pointer">💾 Guardar número</button>';
   document.getElementById('mDlgT').textContent='Cambiar camiseta';
   document.getElementById('mDlgB').innerHTML=h;
   openM('mDlg');
   setTimeout(function(){var f=document.getElementById('dlgCamisetaNum');if(f){f.focus();f.select();}},200);
 }
-async function saveSocioCamiseta(ced,equipo){
+async function saveSocioCamiseta(ced){
+  var equipo=(_sociosMap[ced]||{}).equipo||null;
   var num=(document.getElementById('dlgCamisetaNum').value||'').trim();
   if(!num){showToast('warn','Número inválido','Ingresa un número de camiseta',3000);return;}
   var updates={};
