@@ -20,51 +20,34 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.33';
-// Reload once per session when a new SW takes control (guard against loops)
+var APP_VER='8.46';
+// Auto-reload when new SW takes control — guard prevents infinite loops
+// Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
-  if(sessionStorage.getItem('_swr')==='1')return;
-  sessionStorage.setItem('_swr','1');
-  window.location.reload();
-}
-function _showUpdateBanner(){
-  // Show update banner to ALL users (not just admins)
-  var b=document.getElementById('_updBanner');
-  if(b)return; // already showing
-  b=document.createElement('div');
-  b.id='_updBanner';
-  b.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;border:1.5px solid rgba(200,16,46,.5);border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);font-family:inherit;max-width:92vw';
-  b.innerHTML='<span style="font-size:20px">🔄</span>'
-    +'<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#f1f5f9">Nueva versión disponible</div>'
-    +'<div style="font-size:11px;color:#94a3b8;margin-top:2px">Toca Actualizar para ver los últimos cambios</div></div>'
-    +'<button onclick="clearCacheReload()" style="background:#c8102e;border:none;color:#fff;font-size:12px;font-weight:900;border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap">Actualizar</button>';
-  document.body.appendChild(b);
+  var key='_swr_'+APP_VER;
+  if(sessionStorage.getItem(key)==='1')return;
+  sessionStorage.setItem(key,'1');
+  window.location.reload(true);
 }
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').then(function(reg){
-    reg.update();
-    // New SW already waiting → activate immediately
-    if(reg.waiting){
-      _showUpdateBanner();
-      reg.waiting.postMessage({type:'SKIP_WAITING'});
-    }
+    reg.update(); // check for new SW immediately on every page load
+    // New SW already waiting → skip waiting so it activates now
+    if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
     reg.addEventListener('updatefound',function(){
       var nw=reg.installing;
       nw.addEventListener('statechange',function(){
-        if(nw.state==='installed'&&navigator.serviceWorker.controller){
-          _showUpdateBanner();
-          nw.postMessage({type:'SKIP_WAITING'});
-        }
+        if(nw.state==='installed'){nw.postMessage({type:'SKIP_WAITING'});}
       });
     });
-    // When new SW takes controller → reload once silently
+    // When new SW takes control → reload immediately (gets latest HTML/JS)
     navigator.serviceWorker.addEventListener('controllerchange',_swReload);
-    // Check for SW updates every 60s while app is open (catches background updates on iOS)
+    // Periodic check every 60s (catches updates on long sessions / iOS)
     setInterval(function(){reg.update();},60000);
   }).catch(function(){});
-  // Also show banner when SW sends SW_UPDATED message (fires on activate → clients.claim)
+  // SW_UPDATED from activate → also trigger reload
   navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED')_showUpdateBanner();
+    if(e.data&&e.data.type==='SW_UPDATED')_swReload();
   });
 }
 </script>
