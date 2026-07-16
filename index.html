@@ -4873,18 +4873,24 @@ async function shSociosEq(){
   if(!cEd()||!fbR||!db){adCnt('<div class="es"><p>Sin acceso</p></div>');return;}
   var s=await db.ref('/socios').get();
   var so=s.val()||{};
-  var h='<div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:900;color:var(--t)">&#128100; Socios · Equipos</div><button class="btns" onclick="adSocioForm()">+ Agregar</button></div>';
+  var isAdmin=cr==='Administrador';
+  var h='<div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:900;color:var(--t)">&#128100; Socios · Equipos</div>';
+  if(isAdmin)h+='<button class="btns" onclick="adSocioForm()">+ Agregar</button>';
+  h+='</div>';
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
-  Object.entries(so).sort().forEach(function(en){
+  Object.entries(so).sort(function(a,b){return (a[1].nombre||a[0]).localeCompare(b[1].nombre||b[0]);}).forEach(function(en){
     var c=en[0],sc=en[1];
     var teamBadgeHtml=sc.equipo?bdg(parseInt(sc.equipo),'bs'):'<span style="font-size:16px">👤</span>';
     var teamName=sc.equipo?tn(parseInt(sc.equipo)):'Sin equipo';
-    h+='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    var camNum=sc.camiseta?'<span style="font-size:9px;font-weight:900;color:rgba(255,215,0,.9);background:rgba(255,215,0,.12);padding:1px 6px;border-radius:4px;margin-left:4px">#'+sc.camiseta+'</span>':'';
+    h+='<div style="background:var(--b3);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">';
     h+=teamBadgeHtml;
-    h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--t)">'+(sc.nombre||c)+'</div>';
-    h+='<div style="font-size:10px;color:var(--m)">'+(sc.rol||'Socio')+' · '+teamName+'</div></div>';
+    h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--t);display:flex;align-items:center;flex-wrap:wrap;gap:2px">'+(sc.nombre||c)+camNum+'</div>';
+    h+='<div style="font-size:10px;color:var(--m);margin-top:1px">'+(sc.rol||'Socio')+' · '+teamName+'</div></div>';
+    h+='<div style="display:flex;gap:5px">';
     h+='<button class="btns" onclick="edSocioEq(\''+c+'\','+JSON.stringify(sc.equipo||null)+')" style="font-size:10px;padding:5px 10px">Equipo</button>';
-    h+='</div>';
+    h+='<button class="btns" onclick="edSocioCamiseta(\''+c+'\','+JSON.stringify(sc.nombre||c)+','+JSON.stringify(sc.equipo||null)+','+JSON.stringify(sc.camiseta||'')+')" style="font-size:10px;padding:5px 10px;background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.3);color:#ffd700">✏️ #</button>';
+    h+='</div></div>';
   });
   h+='</div>';
   adCnt(h);
@@ -4905,6 +4911,48 @@ async function setSocioEq(ced,tid){
   await db.ref('/socios/'+ced+'/equipo').set(tid);
   cM('mDlg');showToast('info','Equipo asignado',tn(tid)+' → '+ced,3000,'#10b981');
   shSociosEq();
+}
+function edSocioCamiseta(ced,nombre,equipo,camActual){
+  var h='<div style="font-size:12px;color:var(--m);margin-bottom:12px">Jugador: <b style="color:var(--t)">'+escHtml(nombre)+'</b></div>';
+  h+='<div class="ctrl-l" style="margin-bottom:6px">Número de camiseta</div>';
+  h+='<input id="dlgCamisetaNum" type="number" inputmode="numeric" min="1" max="99" placeholder="Ej. 10" value="'+escHtml(camActual)+'" style="width:100%;box-sizing:border-box;background:var(--b2);border:1.5px solid var(--bd);color:var(--t);padding:12px 14px;border-radius:10px;font-size:22px;font-weight:900;text-align:center;-webkit-appearance:none;margin-bottom:16px">';
+  h+='<button onclick="saveSocioCamiseta(\''+ced+'\','+JSON.stringify(equipo)+')" style="width:100%;padding:13px;background:#ffd700;border:none;border-radius:12px;font-size:14px;font-weight:900;color:#000;cursor:pointer">💾 Guardar número</button>';
+  document.getElementById('mDlgT').textContent='Cambiar camiseta';
+  document.getElementById('mDlgB').innerHTML=h;
+  openM('mDlg');
+  setTimeout(function(){var f=document.getElementById('dlgCamisetaNum');if(f){f.focus();f.select();}},200);
+}
+async function saveSocioCamiseta(ced,equipo){
+  var num=(document.getElementById('dlgCamisetaNum').value||'').trim();
+  if(!num){showToast('warn','Número inválido','Ingresa un número de camiseta',3000);return;}
+  var updates={};
+  updates['/socios/'+ced+'/camiseta']=num;
+  // Also update in /equipos/{tid}/jugadores if the socio has a team
+  if(equipo){
+    var tid=parseInt(equipo);
+    // Find the jugador key that matches this socio
+    var jSnap=await db.ref('/equipos/'+tid+'/jugadores').get();
+    var jugs=jSnap.val()||{};
+    Object.entries(jugs).forEach(function(kv){
+      var key=kv[0],jug=kv[1];
+      // Match by socioNum (key like s001) or by nombre
+      var socioNumKey='s'+String(jug.socioNum||'').padStart(3,'0');
+      if(socioNumKey===key||jug.nombre&&jug.nombre===(jugs[key]&&jugs[key].nombre)){
+        updates['/equipos/'+tid+'/jugadores/'+key+'/camiseta']=num;
+        // also update teamInfo in memory
+        if(teamInfo[tid]&&teamInfo[tid].jugadores&&teamInfo[tid].jugadores[key])
+          teamInfo[tid].jugadores[key].camiseta=num;
+      }
+    });
+  }
+  try{
+    await db.ref('/').update(updates);
+    cM('mDlg');
+    showToast('info','✅ Camiseta actualizada','#'+num+' guardado para '+ced,3000,'#10b981');
+    shSociosEq();
+  }catch(e){
+    showToast('warn','Error al guardar',e.message||'Verifica conexión',4000);
+  }
 }
 
 // ═══════════════════════════════════════════════
