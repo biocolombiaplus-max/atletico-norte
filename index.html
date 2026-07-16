@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.32';
+var APP_VER='8.33';
 // Reload once per session when a new SW takes control (guard against loops)
 function _swReload(){
   if(sessionStorage.getItem('_swr')==='1')return;
@@ -1878,7 +1878,20 @@ function onIn(){
       var byT={};
       Object.values(so).forEach(function(sc){var eq=parseInt(sc.equipo)||0;if(eq>=1){if(!byT[eq])byT[eq]=[];byT[eq].push(sc);}});
       EQ_LOADED=byT;
-    }).catch(function(){});
+    }).catch(function(){
+      // Permiso denegado en /socios (coordinador) → pre-cargar desde teamInfo que ya está en memoria
+      var byT={};
+      Object.keys(teamInfo).forEach(function(tid){
+        var jugs=teamInfo[tid]&&teamInfo[tid].jugadores;
+        if(jugs&&Object.keys(jugs).length){
+          var tid2=parseInt(tid);
+          byT[tid2]=Object.keys(jugs).map(function(k){
+            var v=jugs[k];return{cedula:k,nombre:v.nombre||v.name||k,num:v.camiseta||'',equipo:tid2};
+          });
+        }
+      });
+      if(Object.keys(byT).length)EQ_LOADED=byT;
+    });
   }
 }
 function showDatosBanner(sinNombre,sinFoto){
@@ -2127,6 +2140,7 @@ function oRs(id){
   rsRender(m);openM("mRs");
   if(needFirebase&&fbR&&db){
     var _loadId=id;
+    // Intentar primero /socios (admin); si falla permisos, usar /equipos/{tid}/jugadores (público)
     db.ref('/socios').get().then(function(snap){
       var so=snap.val()||{};
       var byT={};
@@ -2139,7 +2153,23 @@ function oRs(id){
         _pickerRosters[side]=_buildRosterFromSocios(byT[tid]||[],tid);
       });
       rsRender(MF.find(function(x){return x.id===cri;}));
-    }).catch(function(){});
+    }).catch(function(){
+      // /socios denegado (coordinador) → leer jugadores desde /equipos/{tid}/jugadores
+      var mx=MF.find(function(x){return x.id===_loadId;});if(!mx||cri!==_loadId)return;
+      var tids=[mx.l,mx.v];
+      var pending=tids.length;
+      tids.forEach(function(tid,idx){
+        var side=idx===0?'l':'v';
+        if(_pickerRosters[side].length){pending--;if(!pending)rsRender(MF.find(function(x){return x.id===cri;}));return;}
+        db.ref('/equipos/'+tid+'/jugadores').get().then(function(jSnap){
+          var jugs=jSnap.val()||{};
+          if(Object.keys(jugs).length){
+            _pickerRosters[side]=_buildRosterFromJugs(jugs,tid);
+          }
+          pending--;if(!pending)rsRender(MF.find(function(x){return x.id===cri;}));
+        }).catch(function(){pending--;if(!pending)rsRender(MF.find(function(x){return x.id===cri;}));});
+      });
+    });
   }
 }
 
