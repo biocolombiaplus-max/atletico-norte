@@ -1584,14 +1584,31 @@ async function tGoleadores(ctx){
   ctx.fillText('LIGA INTERNA · S2 2026',W/2,492);
   rule(ctx,518,.4);
 
-  // Aggregate goals by player
-  const goals={}; // key: "name|teamId" -> {name,corto,teamId,goles}
+  // Aggregate goals by player — with dedup for same player typed differently across jornadas
+  const goals={};
   ALL.forEach(m=>{
     const r=results[m.id];if(!r||!r.scorers)return;
     r.scorers.forEach(s=>{
-      if(s.autogol)return; // autogols no cuentan para goleadores
-      const k=(s.name||'?')+'|'+(s.teamId||0);
-      if(!goals[k])goals[k]={name:s.name||'?',corto:s.corto||s.name||'?',teamId:s.teamId||0,goles:0};
+      if(s.autogol)return;
+      let nm=(s.name||'').replace(/[\s ]+/g,' ').trim();
+      nm=nm.replace(/^manual_/i,'').replace(/_\d+_\d+$/,'').replace(/[\s ]+/g,' ').trim();
+      if(!nm)return;
+      const tid=s.teamId||0;
+      const kLow=nm.toLowerCase();
+      // merge if same team shares >=2 word tokens
+      let existKey=null;
+      const words=kLow.split(' ').filter(w=>w.length>2);
+      if(words.length>=2){
+        Object.keys(goals).forEach(ex=>{
+          if(existKey)return;
+          const parts=ex.split('|');
+          if(parseInt(parts[1])!==tid)return;
+          const eWords=parts[0].split(' ').filter(w=>w.length>2);
+          if(words.filter(w=>eWords.includes(w)).length>=2)existKey=ex;
+        });
+      }
+      const k=existKey||(kLow+'|'+tid);
+      if(!goals[k])goals[k]={name:nm,corto:s.corto||nm,teamId:tid,goles:0};
       goals[k].goles++;
     });
   });
@@ -1631,14 +1648,16 @@ async function tGoleadores(ctx){
     // Team badge
     await drawBadge(ctx,p.teamId,C.bdg,my,64);
     // Player name + team
-    ctx.textAlign='left';
-    ctx.font='800 34px sans-serif';ctx.fillStyle='#fff';ctx.letterSpacing='0';
-    // Truncate long names
+    ctx.textAlign='left';ctx.letterSpacing='0';
     let nm=p.name||p.corto||'Jugador';
-    if(ctx.measureText(nm).width>460){ctx.font='800 30px sans-serif';}
-    ctx.fillText(nm,C.nm,my+2);
-    ctx.font='600 24px sans-serif';ctx.fillStyle='rgba(255,255,255,.45)';
-    ctx.fillText(tn(p.teamId),C.nm,my+30);
+    // Truncate with ellipsis if too wide
+    const maxNmW=C.gls-C.nm-30;
+    ctx.font='800 34px sans-serif';ctx.fillStyle='#fff';
+    while(ctx.measureText(nm).width>maxNmW&&nm.length>4)nm=nm.slice(0,-1);
+    if(nm!==p.name&&nm!==p.corto)nm=nm.trim()+'…';
+    ctx.fillText(nm,C.nm,my-8);
+    ctx.font='600 26px sans-serif';ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fillText(tn(p.teamId),C.nm,my+26);
     // Goals — big gold number
     const golC=i===0?'#ffd700':i<3?'rgba(255,215,0,.75)':'rgba(255,255,255,.8)';
     ctx.font='900 '+(i<3?42:34)+'px sans-serif';ctx.fillStyle=golC;ctx.textAlign='center';
