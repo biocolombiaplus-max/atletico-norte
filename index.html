@@ -3624,13 +3624,12 @@ async function genMatchCard(mid){
 var _mvpPhotoFile=null,_mvpPhotoUrl=null;
 
 // MVP state
-var _mvpNombre='',_mvpEquipo='',_mvpCedTimer=null;
+var _mvpNombre='',_mvpEquipo='',_mvpPickerTeam=0,_mvpPickerQuery='',_mvpPickerSel=null;
 
 function shMVPGen(){
   // Build match options — only matches with saved results
   var matchOpts='<option value="">— Sin partido seleccionado —</option>';
   var withRes=MF.filter(function(m){return res&&res[m.id]&&res[m.id].l!==undefined;});
-  // Sort most recent first
   withRes.sort(function(a,b){return b.fecha.localeCompare(a.fecha)||b.id-a.id;});
   withRes.forEach(function(m){
     var r=res[m.id];
@@ -3641,19 +3640,18 @@ function shMVPGen(){
   var h='<div style="padding:16px 16px 24px">';
   h+='<div style="font-size:11px;font-weight:900;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">⭐ MVP del Partido — Generador</div>';
 
-  // 1. Player search
+  // 1. Match selector (primero para cargar los jugadores)
   h+='<div style="background:var(--b2);border-radius:12px;padding:14px;margin-bottom:12px">';
-  h+='<div style="font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">1. Jugador</div>';
-  h+='<input id="mvpCedInput" type="number" inputmode="numeric" placeholder="Cédula del jugador" style="width:100%;box-sizing:border-box;background:var(--b3);border:1px solid var(--b3);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--t);-webkit-appearance:none;margin-bottom:8px" oninput="mvpCedAuto()">';
-  h+='<div id="mvpNomResult" style="font-size:13px;min-height:18px;padding:2px 0"></div>';
-  h+='</div>';
-
-  // 2. Match selector
-  h+='<div style="background:var(--b2);border-radius:12px;padding:14px;margin-bottom:12px">';
-  h+='<div style="font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">2. Partido</div>';
-  h+='<select id="mvpMatchSel" onchange="mvpMatchPick()" style="width:100%;background:var(--b3);border:1px solid var(--b3);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--t);-webkit-appearance:none;appearance:none">';
+  h+='<div style="font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">1. Partido</div>';
+  h+='<select id="mvpMatchSel" onchange="mvpMatchPick()" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--t);-webkit-appearance:none;appearance:none">';
   h+=matchOpts+'</select>';
   h+='<div id="mvpMatchInfo" style="margin-top:8px;font-size:11px;color:var(--m)"></div>';
+  h+='</div>';
+
+  // 2. Player picker
+  h+='<div style="background:var(--b2);border-radius:12px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">2. ⭐ Jugador MVP</div>';
+  h+='<div id="mvpPickerSec">'+_mvpPickerHtml(null)+'</div>';
   h+='</div>';
 
   // 3. Photo
@@ -3670,43 +3668,163 @@ function shMVPGen(){
   h+='<button onclick="genMVPCard()" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none;border-radius:12px;padding:16px;font-size:14px;font-weight:900;cursor:pointer;-webkit-appearance:none;letter-spacing:.3px">⭐ Generar imagen MVP</button>';
   h+='</div>';
   adCnt(h);
-  _mvpPhotoFile=null;_mvpPhotoUrl=null;_mvpNombre='';_mvpEquipo='';
+  _mvpPhotoFile=null;_mvpPhotoUrl=null;_mvpNombre='';_mvpEquipo='';_mvpPickerSel=null;_mvpPickerTeam=0;_mvpPickerQuery='';
 }
 
-function mvpCedAuto(){
-  clearTimeout(_mvpCedTimer);
-  var ced=(document.getElementById('mvpCedInput').value||'').trim();
-  var el=document.getElementById('mvpNomResult');
-  _mvpNombre='';_mvpEquipo='';
-  if(!ced){el.innerHTML='';return;}
-  el.innerHTML='<span style="color:var(--m)">Buscando...</span>';
-  _mvpCedTimer=setTimeout(function(){
-    db.ref('/socios/'+ced).once('value',function(s){
-      var d=s.val();
-      if(d&&d.nombre){
-        _mvpNombre=d.nombre;
-        _mvpEquipo=d.equipo?tn(d.equipo):'';
-        var eqLabel=_mvpEquipo?' &middot; <span style="color:var(--ac)">'+_mvpEquipo+'</span>':'';
-        el.innerHTML='<span style="color:var(--green)">✅ <strong>'+d.nombre+'</strong>'+eqLabel+'</span>';
-      } else {
-        el.innerHTML='<span style="color:var(--red)">❌ Cédula no encontrada</span>';
-      }
-    },function(){
-      el.innerHTML='<span style="color:var(--red)">Error al buscar</span>';
+function _mvpPickerHtml(m){
+  var h='';
+  if(!m){
+    h+='<div style="font-size:12px;color:var(--m);text-align:center;padding:12px 0;opacity:.7">👆 Selecciona el partido primero</div>';
+    return h;
+  }
+  // Team filter buttons
+  h+='<div style="display:flex;gap:6px;margin-bottom:10px">';
+  var teams=[{id:0,label:'Todos'},{id:m.l,label:tn(m.l)},{id:m.v,label:tn(m.v)}];
+  teams.forEach(function(t){
+    var active=_mvpPickerTeam===t.id;
+    h+='<button onclick="mvpPickerTeam('+t.id+')" id="mvpPT'+t.id+'" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid '+(active?'#a78bfa':'var(--bd)')+';background:'+(active?'rgba(167,139,250,.2)':'var(--b3)')+';color:'+(active?'#a78bfa':'var(--m)')+';font-size:10px;font-weight:800;cursor:pointer;-webkit-appearance:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(t.label)+'</button>';
+  });
+  h+='</div>';
+  // Search
+  h+='<input id="mvpPSearch" type="search" placeholder="🔍 Buscar por nombre o número…" oninput="mvpPickerFilter()" value="'+escHtml(_mvpPickerQuery)+'" style="width:100%;box-sizing:border-box;background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:9px 10px;font-size:12px;color:var(--t);-webkit-appearance:none;margin-bottom:8px">';
+  // Player list
+  h+='<div id="mvpPList" style="max-height:200px;overflow-y:auto;border-radius:8px"></div>';
+  // Manual input fallback
+  h+='<div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--bd)">';
+  h+='<div style="font-size:9px;color:var(--m);font-weight:900;letter-spacing:.5px;margin-bottom:6px">¿NO ESTÁ EN LA LISTA? ESCRÍBELO</div>';
+  h+='<div style="display:flex;gap:6px">';
+  h+='<input id="mvpPManual" type="text" placeholder="✍️ Nombre del jugador…" onkeydown="if(event.key===\'Enter\')mvpPickerManual()" style="flex:1;min-width:0;background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--t);-webkit-appearance:none;font-family:inherit">';
+  h+='<button onclick="mvpPickerManual()" style="flex-shrink:0;background:#a78bfa;border:none;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:900;color:#fff;cursor:pointer;-webkit-appearance:none;white-space:nowrap">+ Usar</button>';
+  h+='</div></div>';
+  // Selected chip (hidden by default)
+  h+='<div id="mvpPSel" style="display:none;margin-top:10px;background:rgba(167,139,250,.15);border:1.5px solid #a78bfa;border-radius:10px;padding:10px 12px;align-items:center;gap:8px">';
+  h+='<span style="font-size:20px;flex-shrink:0">⭐</span>';
+  h+='<div id="mvpPSelTxt" style="flex:1;min-width:0"></div>';
+  h+='<span onclick="mvpPickerClear()" style="color:#a78bfa;font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;line-height:1">×</span>';
+  h+='</div>';
+  return h;
+}
+
+function _mvpGetRoster(tid){
+  var tid2=parseInt(tid);
+  if(EQ_LOADED&&EQ_LOADED[tid2]&&EQ_LOADED[tid2].length)return EQ_LOADED[tid2];
+  if(teamInfo[tid]&&teamInfo[tid].jugadores){
+    var jugs=teamInfo[tid].jugadores;
+    return Object.keys(jugs).map(function(k){
+      var v=jugs[k];return{nombre:v.nombre||v.name||k,num:v.camiseta||v.num||'',equipo:tid2};
     });
-  },600);
+  }
+  return [];
+}
+
+function _mvpPickerRenderList(m){
+  var listEl=document.getElementById('mvpPList');
+  if(!listEl||!m)return;
+  var q=(_mvpPickerQuery||'').toLowerCase().trim();
+  var players=[];
+  [m.l,m.v].forEach(function(tid){
+    if(_mvpPickerTeam&&_mvpPickerTeam!==tid)return;
+    _mvpGetRoster(tid).forEach(function(p){
+      players.push({name:p.nombre||p.name||'',num:String(p.num||p.camiseta||''),teamId:tid});
+    });
+  });
+  if(q)players=players.filter(function(p){return p.name.toLowerCase().indexOf(q)>=0||p.num.indexOf(q)>=0;});
+  if(!players.length){
+    listEl.innerHTML='<div style="font-size:12px;color:var(--m);text-align:center;padding:14px;opacity:.7">Sin jugadores encontrados — usa el campo manual</div>';
+    return;
+  }
+  var h='';
+  players.forEach(function(p){
+    var corto=toCorto(p.name);
+    var numBadge=p.num?'<span style="background:rgba(167,139,250,.25);color:#c4b5fd;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:900;flex-shrink:0">#'+p.num+'</span>':'';
+    h+='<button onclick="mvpPickerSelect(\''+escHtml(p.name)+'\',\''+escHtml(corto)+'\','+p.teamId+')" style="display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--b3);cursor:pointer;-webkit-appearance:none;margin-bottom:5px;text-align:left;transition:background .1s">';
+    h+=numBadge;
+    h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(p.name)+'</div>';
+    h+='<div style="font-size:10px;color:var(--m);margin-top:1px">'+escHtml(tn(p.teamId))+'</div></div>';
+    h+='<span style="color:#a78bfa;font-size:14px;flex-shrink:0">›</span>';
+    h+='</button>';
+  });
+  listEl.innerHTML=h;
+}
+
+function mvpPickerRefresh(){
+  var sec=document.getElementById('mvpPickerSec');
+  if(!sec)return;
+  var sel=document.getElementById('mvpMatchSel');
+  var mid=sel?parseInt(sel.value)||0:0;
+  var m=mid?MF.find(function(x){return x.id===mid;}):null;
+  _mvpPickerTeam=0;_mvpPickerQuery='';_mvpNombre='';_mvpEquipo='';_mvpPickerSel=null;
+  sec.innerHTML=_mvpPickerHtml(m);
+  if(m)_mvpPickerRenderList(m);
+}
+
+function mvpPickerTeam(tid){
+  _mvpPickerTeam=tid;
+  var sel=document.getElementById('mvpMatchSel');
+  var mid=sel?parseInt(sel.value)||0:0;
+  var m=mid?MF.find(function(x){return x.id===mid;}):null;
+  if(!m)return;
+  [0,m.l,m.v].forEach(function(t){
+    var btn=document.getElementById('mvpPT'+t);
+    if(!btn)return;
+    var active=t===tid;
+    btn.style.borderColor=active?'#a78bfa':'var(--bd)';
+    btn.style.background=active?'rgba(167,139,250,.2)':'var(--b3)';
+    btn.style.color=active?'#a78bfa':'var(--m)';
+  });
+  _mvpPickerRenderList(m);
+}
+
+function mvpPickerFilter(){
+  _mvpPickerQuery=(document.getElementById('mvpPSearch')||{}).value||'';
+  var sel=document.getElementById('mvpMatchSel');
+  var mid=sel?parseInt(sel.value)||0:0;
+  var m=mid?MF.find(function(x){return x.id===mid;}):null;
+  _mvpPickerRenderList(m);
+}
+
+function mvpPickerSelect(name,corto,teamId){
+  _mvpNombre=name;
+  _mvpEquipo=teamId?tn(teamId):'';
+  _mvpPickerSel={name:name,corto:corto,teamId:teamId};
+  var chip=document.getElementById('mvpPSel');
+  var txt=document.getElementById('mvpPSelTxt');
+  if(chip)chip.style.display='flex';
+  if(txt)txt.innerHTML='<div style="font-size:13px;font-weight:900;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(corto)+'</div>'+(teamId?'<div style="font-size:10px;color:#a78bfa;font-weight:700;margin-top:1px">'+escHtml(tn(teamId))+'</div>':'');
+  var listEl=document.getElementById('mvpPList');if(listEl)listEl.innerHTML='';
+  var searchEl=document.getElementById('mvpPSearch');if(searchEl)searchEl.value='';
+  _mvpPickerQuery='';
+}
+
+function mvpPickerClear(){
+  _mvpNombre='';_mvpEquipo='';_mvpPickerSel=null;
+  var chip=document.getElementById('mvpPSel');if(chip)chip.style.display='none';
+  var sel=document.getElementById('mvpMatchSel');
+  var mid=sel?parseInt(sel.value)||0:0;
+  var m=mid?MF.find(function(x){return x.id===mid;}):null;
+  _mvpPickerRenderList(m);
+}
+
+function mvpPickerManual(){
+  var inp=document.getElementById('mvpPManual');
+  if(!inp)return;
+  var val=(inp.value||'').trim();
+  if(!val){inp.focus();return;}
+  inp.value='';
+  mvpPickerSelect(val,toCorto(val),0);
 }
 
 function mvpMatchPick(){
   var sel=document.getElementById('mvpMatchSel');
   var mid=parseInt(sel.value)||0;
   var infoEl=document.getElementById('mvpMatchInfo');
-  if(!mid){infoEl.textContent='';return;}
+  if(!mid){if(infoEl)infoEl.textContent='';mvpPickerRefresh();return;}
   var m=MF.find(function(x){return x.id===mid;});
   var r=res&&res[mid];
-  if(!m||!r){infoEl.textContent='';return;}
+  if(!m||!r){if(infoEl)infoEl.textContent='';mvpPickerRefresh();return;}
   var sc=r.wo?'Walkover':r.l+' – '+r.v;
-  infoEl.innerHTML='<span style="color:var(--green)">⚽ '+tn(m.l)+' <strong>'+sc+'</strong> '+tn(m.v)+'</span> <span style="color:var(--m)">· Semana '+m.week+'</span>';
+  if(infoEl)infoEl.innerHTML='<span style="color:var(--green)">⚽ '+tn(m.l)+' <strong>'+sc+'</strong> '+tn(m.v)+'</span> <span style="color:var(--m)">· Semana '+m.week+'</span>';
+  mvpPickerRefresh();
 }
 
 function mvpPhotoSel(inp){
@@ -3724,7 +3842,7 @@ function mvpPhotoSel(inp){
 
 async function genMVPCard(){
   var nombre=_mvpNombre||'';
-  if(!nombre){showToast('⚠️ Ingresa la cédula del jugador primero','var(--amber)',3000);return;}
+  if(!nombre){showToast('warn','⚠️ Selecciona o escribe el jugador MVP','Elige un jugador de la lista o escríbelo manualmente',3000);return;}
   var equipo=_mvpEquipo||'';
 
   // Build match text from selector
