@@ -1813,7 +1813,7 @@ async function tPartidosHoy(ctx){
   topStripe(ctx);
 
   // ── CLUB LOGO ──
-  const logoImg=imgCache['club'];
+  const logoImg=getImg('club');
   const logoSz=110;
   if(logoImg){
     ctx.save();
@@ -1914,7 +1914,7 @@ async function tPartidosHoy(ctx){
       const halfW=teamW/2-40;
 
       // LOCAL
-      const lbdg=imgCache['b'+m.l];
+      const lbdg=getImg('b'+m.l);
       const bdgSz=cH*.38;
       const lx=teamArea+halfW/2;
       if(lbdg){ctx.drawImage(lbdg,lx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz);}
@@ -1938,7 +1938,7 @@ async function tPartidosHoy(ctx){
 
       // VISITANTE
       const vx=teamArea+halfW+80+halfW/2;
-      const vbdg=imgCache['b'+m.v];
+      const vbdg=getImg('b'+m.v);
       if(vbdg){ctx.drawImage(vbdg,vx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz);}
       else{
         ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.roundRect(vx-bdgSz/2,midY-bdgSz*.65,bdgSz,bdgSz,8);ctx.fill();
