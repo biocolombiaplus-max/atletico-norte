@@ -316,10 +316,18 @@ function startApp(){
   });
 
   // Load team rosters for MVP picker
-  db.ref('/equipos').once('value',s=>{_equiposData=s.val()||{};});
+  db.ref('/equipos').once('value',s=>{
+    _equiposData=s.val()||{};
+    if(document.getElementById('mvpPanel').style.display!=='none')mvpBuildTeamGrid();
+  });
 
   let _urlInit=false;
-  db.ref('/resultados').on('value',s=>{results=s.val()||{};if(!_urlInit){_urlInit=true;setTimeout(applyUrlParams,120);}});
+  db.ref('/resultados').on('value',s=>{
+    results=s.val()||{};
+    // refresh MVP match cards if the panel is open
+    if(document.getElementById('mvpPanel').style.display!=='none')mvpBuildCards();
+    if(!_urlInit){_urlInit=true;setTimeout(applyUrlParams,120);}
+  });
 
   // Init week selector
   const weeks=[...new Set(ALL.map(m=>m.week))].sort((a,b)=>a-b);
@@ -916,8 +924,7 @@ function mvpBuildTeamGrid(){
     if(!_mvpMatchTeams){
       grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">Primero selecciona un partido ↑</div>';
     } else {
-      grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">Cargando jugadores…</div>';
-      if(!_equiposData._retried){_equiposData._retried=true;setTimeout(()=>{db.ref('/equipos').once('value',s=>{_equiposData=s.val()||{};mvpBuildTeamGrid();});},1500);}
+      grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">Sin jugadores sincronizados para este partido</div>';
     }
     return;
   }
