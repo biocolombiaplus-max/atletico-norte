@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.50';
+var APP_VER='8.51';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -1546,6 +1546,27 @@ window.addEventListener("load",function(){
           var noTeam=!pf.equipo||pf.equipo===0||pf.equipo==='0';
           var sinNombre=!pf.nombre||pf.nombre.trim().length<3;
           var sinFoto=!pf.photoURL;
+          if(!isStaff && noTeam){
+            // Cross-reference against teamInfo jugadores by name before showing modal
+            (function(){
+              if(!pf.nombre)return;
+              var tokA=pf.nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z\s]/g,'').split(/\s+/).filter(function(w){return w.length>2;});
+              if(tokA.length<1)return;
+              for(var tid in teamInfo){
+                var jugs=(teamInfo[tid]||{}).jugadores||{};
+                for(var jk in jugs){
+                  var jn=(jugs[jk].name||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z\s]/g,'').split(/\s+/).filter(function(w){return w.length>2;});
+                  var shared=tokA.filter(function(t){return jn.indexOf(t)>=0;});
+                  if(shared.length>=2){
+                    pf.equipo=parseInt(tid);
+                    noTeam=false;
+                    try{db.ref('/socios/'+c+'/equipo').set(parseInt(tid));}catch(ex){}
+                    return;
+                  }
+                }
+              }
+            })();
+          }
           if(!isStaff && noTeam){
             openContactModal('no_team', c, pf.nombre||null);
           }else if(!pf.privacyOk){
