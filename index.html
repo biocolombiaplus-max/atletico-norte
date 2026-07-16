@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.51';
+var APP_VER='8.52';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2703,10 +2703,40 @@ async function adLoadEqPlayers(){
   var s=await db.ref('/socios').get();
   var so=s.val()||{};
   var byTeam={};
+  // Track which jugador names already covered by a linked socio (to avoid double-count)
+  var linkedNames={};
   Object.values(so).forEach(function(sc){
     var eq=parseInt(sc.equipo)||0;
-    if(eq>=1&&eq<=10){if(!byTeam[eq])byTeam[eq]=[];byTeam[eq].push(sc);}
+    if(eq>=1&&eq<=10){
+      if(!byTeam[eq])byTeam[eq]=[];
+      byTeam[eq].push(sc);
+      if(sc.nombre)linkedNames[sc.nombre.toLowerCase().trim()]=true;
+    }
   });
+  // Also add jugadores from teamInfo roster who have no linked socio
+  for(var tid in teamInfo){
+    var t=parseInt(tid);
+    if(t<1||t>10)continue;
+    var jugs=(teamInfo[tid]||{}).jugadores||{};
+    Object.values(jugs).forEach(function(j){
+      var nm=(j.name||'').toLowerCase().trim();
+      if(!nm)return;
+      // Check if any socio name is close enough (shares ≥2 words) to avoid duplicates
+      var jToks=nm.split(/\s+/).filter(function(w){return w.length>2;});
+      var alreadyLinked=false;
+      if(!byTeam[t])byTeam[t]=[];
+      byTeam[t].forEach(function(sc){
+        if(alreadyLinked)return;
+        var sToks=(sc.nombre||'').toLowerCase().trim().split(/\s+/).filter(function(w){return w.length>2;});
+        var shared=jToks.filter(function(tk){return sToks.indexOf(tk)>=0;});
+        if(shared.length>=2)alreadyLinked=true;
+      });
+      if(!alreadyLinked){
+        if(!byTeam[t])byTeam[t]=[];
+        byTeam[t].push({nombre:j.name||'Sin nombre',num:j.camiseta||j.num||'?',pos:j.pos||'—',cedula:'',_fromRoster:true});
+      }
+    });
+  }
   EQ_LOADED=byTeam;
   for(var t=1;t<=10;t++){
     var cnt=document.getElementById('eqjug'+t);
@@ -2738,7 +2768,11 @@ function adTogEq(tid,card){
     sorted.forEach(function(sc){
       h+='<div class="eqpli">';
       h+='<div class="eqnum">'+(sc.num||'?')+'</div>';
-      h+='<div style="flex:1"><div class="eqpnm">'+(sc.nombre||'Sin nombre')+'</div><div style="font-size:8.5px;color:var(--m)">CC '+(sc.cedula||'')+'</div></div>';
+      if(sc._fromRoster){
+        h+='<div style="flex:1"><div class="eqpnm" style="opacity:.7">'+(sc.nombre||'Sin nombre')+'</div><div style="font-size:8.5px;color:var(--m)">Sin socio vinculado</div></div>';
+      }else{
+        h+='<div style="flex:1"><div class="eqpnm">'+(sc.nombre||'Sin nombre')+'</div><div style="font-size:8.5px;color:var(--m)">CC '+(sc.cedula||'')+'</div></div>';
+      }
       h+='<span class="eqpos">'+(sc.pos||'—')+'</span>';
       h+='</div>';
     });
@@ -2769,7 +2803,8 @@ function editEq(tid){
   h+='<div class="eqed-info">';
   h+='<div class="eqed-tag">Equipo '+tid+'</div>';
   h+='<div class="eqed-nm">'+tn(tid)+'</div>';
-  h+='<div class="eqed-sub">'+(EQ_LOADED[tid]||[]).length+' jugadores registrados</div>';
+  var _total=(EQ_LOADED[tid]||[]).length;var _linked=_total-(EQ_LOADED[tid]||[]).filter(function(x){return x._fromRoster;}).length;
+  h+='<div class="eqed-sub">'+_total+' jugadores'+(_total!==_linked?' · '+_linked+' con socio':'')+'</div>';
   h+='</div></div>';
   // Campos
   h+='<div class="eqed-sec">&#128100; Delegado</div>';
