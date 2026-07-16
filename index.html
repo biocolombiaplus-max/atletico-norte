@@ -4856,26 +4856,47 @@ async function syncPlantillaTeam(tid){
   if(!fbR||!db){alert('Firebase no disponible');return;}
   var rows=_plMatches[tid]||[];
   if(!rows.length){alert('No hay jugadores para sincronizar');return;}
-  var updates={};
+  var equiposUpdates={};
+  var sociosUpdates={};
   rows.forEach(function(r){
     var p=r.player,m=r.match;
     var corto=toCorto(p.n);
     var key='s'+String(p.s).padStart(3,'0');
-    updates['/equipos/'+tid+'/jugadores/'+key+'/nombre']=p.n;
-    updates['/equipos/'+tid+'/jugadores/'+key+'/corto']=corto;
-    updates['/equipos/'+tid+'/jugadores/'+key+'/camiseta']=p.c||'';
-    updates['/equipos/'+tid+'/jugadores/'+key+'/socioNum']=p.s;
+    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/nombre']=p.n;
+    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/corto']=corto;
+    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/camiseta']=p.c||'';
+    equiposUpdates['/equipos/'+tid+'/jugadores/'+key+'/socioNum']=p.s;
     if(m&&m.score>=2){
-      updates['/socios/'+m.ced+'/equipo']=tid;
-      updates['/socios/'+m.ced+'/camiseta']=p.c||'';
-      updates['/socios/'+m.ced+'/socioNum']=p.s;
+      sociosUpdates['/socios/'+m.ced+'/equipo']=tid;
+      sociosUpdates['/socios/'+m.ced+'/camiseta']=p.c||'';
+      sociosUpdates['/socios/'+m.ced+'/socioNum']=p.s;
     }
   });
   try{
-    await db.ref('/').update(updates);
-    showToast('info','✅ '+tn(tid)+' sincronizado','Jugadores y camisetas actualizados',3500,'#10b981');
+    await db.ref('/').update(equiposUpdates);
+    // Update teamInfo in memory so coordinators see jugadores immediately
+    if(!teamInfo[tid])teamInfo[tid]={};
+    if(!teamInfo[tid].jugadores)teamInfo[tid].jugadores={};
+    rows.forEach(function(r){
+      var p=r.player;
+      var key='s'+String(p.s).padStart(3,'0');
+      teamInfo[tid].jugadores[key]={nombre:p.n,corto:toCorto(p.n),camiseta:p.c||'',socioNum:p.s};
+    });
+    // Update EQ_LOADED so picker can use it right away
+    var tid2=parseInt(tid);
+    EQ_LOADED[tid2]=rows.map(function(r){
+      var p=r.player;return{cedula:'s'+String(p.s).padStart(3,'0'),nombre:p.n,num:p.c||'',equipo:tid2};
+    });
+    showToast('info','✅ '+tn(tid)+' sincronizado','Jugadores guardados en Firebase',3500,'#10b981');
     renderPlantillasUI();
-  }catch(e){alert('Error: '+e.message);}
+  }catch(e){
+    showToast('warn','Error al sincronizar',e.message||'Intenta de nuevo',4000);
+    return;
+  }
+  // Best-effort socios update (may fail for non-admin)
+  if(Object.keys(sociosUpdates).length){
+    db.ref('/').update(sociosUpdates).catch(function(){});
+  }
 }
 
 // ═══════════════════════════════════════════════
