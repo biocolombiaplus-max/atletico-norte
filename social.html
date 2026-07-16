@@ -137,22 +137,51 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
 
   <!-- MVP PANEL — shown only when MVP template selected -->
   <div id="mvpPanel" style="display:none;background:rgba(245,159,11,.06);border:1.5px solid rgba(245,159,11,.22);border-radius:14px;padding:16px;margin-bottom:14px">
-    <div class="sec" style="margin-top:0;margin-bottom:10px">⭐ Jugador MVP</div>
-    <input id="mvpCed" type="number" inputmode="numeric" placeholder="Cédula del jugador" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;-webkit-appearance:none;margin-bottom:8px" oninput="mvpAutoSocial()">
-    <div id="mvpNom" style="font-size:12px;font-weight:700;min-height:18px;margin-bottom:12px"></div>
+    <div class="sec" style="margin-top:0;margin-bottom:12px">⭐ Jugador MVP</div>
 
-    <div class="ctrl-l" style="margin-bottom:6px">Partido · toca para seleccionar</div>
+    <!-- Step 1: Equipo -->
+    <div class="ctrl-l" style="margin-bottom:6px">1 · Selecciona el equipo</div>
+    <div id="mvpTeamGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:4px 0">Cargando equipos…</div>
+    </div>
+
+    <!-- Step 2: Jugador -->
+    <div id="mvpPlayerSection" style="display:none">
+      <div class="ctrl-l" style="margin-bottom:6px">2 · Selecciona el jugador</div>
+      <input id="mvpPlayerSearch" type="text" placeholder="Buscar jugador…" oninput="mvpFilterPlayers()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-bottom:8px;-webkit-appearance:none">
+      <div id="mvpPlayerList" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:6px"></div>
+      <!-- Manual fallback -->
+      <details style="margin-top:4px">
+        <summary style="font-size:11px;color:var(--m);cursor:pointer;padding:4px 0">✏️ No está en la lista — ingresar manual</summary>
+        <input id="mvpManualName" type="text" placeholder="Nombre completo del jugador" oninput="mvpSetManual()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-top:8px;-webkit-appearance:none">
+      </details>
+      <div id="mvpNom" style="font-size:12px;font-weight:700;min-height:18px;margin-top:8px;margin-bottom:4px"></div>
+    </div>
+
+    <!-- Partido -->
+    <div class="ctrl-l" style="margin-bottom:6px;margin-top:8px">Partido · toca para seleccionar</div>
     <div id="mvpMatchCards" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px">
       <div style="font-size:11px;color:var(--m);padding:8px 0">Cargando partidos con resultado…</div>
     </div>
-    <div id="mvpMatchInfoS" style="font-size:11px;color:var(--gn);font-weight:700;min-height:16px;margin-bottom:12px"></div>
+    <div id="mvpMatchInfoS" style="font-size:11px;color:var(--gn);font-weight:700;min-height:16px;margin-bottom:14px"></div>
 
-    <div class="ctrl-l" style="margin-bottom:6px">Foto del jugador</div>
-    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.35);border-radius:10px;padding:12px 14px">
-      <span style="font-size:22px">📷</span>
-      <div><div style="font-size:12px;font-weight:700;color:var(--t)">Subir foto</div><div id="mvpPhNm" style="font-size:10px;color:var(--m);margin-top:2px">Recomendado: foto cuadrada, cara centrada</div></div>
-      <input type="file" accept="image/*" id="mvpPhFile" onchange="mvpLoadPhoto(this)" style="display:none">
-    </label>
+    <!-- Foto -->
+    <div class="ctrl-l" style="margin-bottom:8px">📸 Foto del jugador</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.4);border-radius:12px;padding:14px 8px;text-align:center">
+        <span style="font-size:28px">📷</span>
+        <span style="font-size:12px;font-weight:700;color:var(--t)">Tomar foto</span>
+        <span style="font-size:10px;color:var(--m)">Cámara</span>
+        <input type="file" accept="image/*" capture="user" id="mvpPhCamera" onchange="mvpLoadPhoto(this)" style="display:none">
+      </label>
+      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.4);border-radius:12px;padding:14px 8px;text-align:center">
+        <span style="font-size:28px">🖼️</span>
+        <span style="font-size:12px;font-weight:700;color:var(--t)">Galería</span>
+        <span style="font-size:10px;color:var(--m)">Elegir foto</span>
+        <input type="file" accept="image/*" id="mvpPhFile" onchange="mvpLoadPhoto(this)" style="display:none">
+      </label>
+    </div>
+    <div id="mvpPhNm" style="font-size:11px;color:var(--m);text-align:center;min-height:16px"></div>
   </div>
 
   <div class="row2">
@@ -448,7 +477,7 @@ function setTpl(t,b){
   const isMvp=t==='mvp';
   document.getElementById('mvpPanel').style.display=isMvp?'block':'none';
   document.getElementById('matchSec').style.display=isMvp?'none':'block';
-  if(isMvp){ mvpBuildCards(); } else { loadMs(); }
+  if(isMvp){ mvpBuildTeamGrid(); mvpBuildCards(); } else { loadMs(); }
 }
 function mvpBuildCards(){
   const el=document.getElementById('mvpMatchCards');
@@ -860,32 +889,78 @@ function drawMetaRow(ctx,y,parts,pill=true){
 }
 
 // ═══ MVP ═════════════════════════════════════════════
-let mvpPhotoImg=null,mvpNombreS='',mvpEquipoS='',_mvpCedTimerS=null;
+let mvpPhotoImg=null,mvpNombreS='',mvpEquipoS='',_mvpSelTeam=0,_mvpAllPlayers=[],_mvpQuery='';
 
-function mvpAutoSocial(){
-  clearTimeout(_mvpCedTimerS);
-  const ced=(document.getElementById('mvpCed').value||'').trim();
-  const el=document.getElementById('mvpNom');
-  mvpNombreS='';mvpEquipoS='';
-  if(!ced){el.innerHTML='';return;}
-  el.innerHTML='<span style="color:var(--gl)">Buscando…</span>';
-  _mvpCedTimerS=setTimeout(()=>{
-    db.ref('/socios/'+ced).once('value',s=>{
-      const d=s.val();
-      if(d&&d.nombre){
-        mvpNombreS=d.nombre;
-        mvpEquipoS=d.equipo?tn(d.equipo):'';
-        const eq=mvpEquipoS?` · <span style="color:#38bdf8">${mvpEquipoS}</span>`:'';
-        el.innerHTML=`<span style="color:var(--gn)">✅ <strong>${d.nombre}</strong>${eq}</span>`;
-      }else{el.innerHTML='<span style="color:var(--rd)">❌ Cédula no encontrada</span>';}
-    },()=>{el.innerHTML='<span style="color:var(--rd)">Error</span>';});
-  },600);
+function mvpBuildTeamGrid(){
+  const grid=document.getElementById('mvpTeamGrid');
+  if(!grid)return;
+  // collect teams that have players in teamInfo
+  const teams=[];
+  for(let t=1;t<=10;t++){
+    const jugs=teamInfo[t]&&teamInfo[t].jugadores;
+    if(jugs&&Object.keys(jugs).length)teams.push(t);
+  }
+  if(!teams.length){grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:4px 0">Sin jugadores sincronizados aún</div>';return;}
+  grid.innerHTML=teams.map(t=>`
+    <button id="mvpTB${t}" onclick="mvpSelectTeam(${t})" style="display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--b3);border:1.5px solid var(--bd);border-radius:10px;color:var(--t);font-size:13px;font-weight:700;cursor:pointer;text-align:left;transition:.15s">
+      <span style="font-size:18px">${B[t]||'⚽'}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${tn(t)}</span>
+    </button>`).join('');
 }
 
+function mvpSelectTeam(tid){
+  _mvpSelTeam=tid;
+  // highlight selected
+  document.querySelectorAll('[id^="mvpTB"]').forEach(b=>{
+    const active=b.id==='mvpTB'+tid;
+    b.style.borderColor=active?'rgba(245,159,11,.9)':'var(--bd)';
+    b.style.background=active?'rgba(245,159,11,.12)':'var(--b3)';
+  });
+  // build player list
+  const jugs=teamInfo[tid]&&teamInfo[tid].jugadores||{};
+  _mvpAllPlayers=Object.values(jugs).map(j=>({nombre:j.nombre||j.name||'',corto:j.corto||j.nombre||'',num:j.camiseta||''}))
+    .filter(p=>p.nombre).sort((a,b)=>(parseInt(a.num)||99)-(parseInt(b.num)||99)||a.corto.localeCompare(b.corto));
+  const sec=document.getElementById('mvpPlayerSection');
+  if(sec)sec.style.display='block';
+  document.getElementById('mvpPlayerSearch').value='';
+  _mvpQuery='';
+  mvpFilterPlayers();
+}
+
+function mvpFilterPlayers(){
+  _mvpQuery=(document.getElementById('mvpPlayerSearch').value||'').toLowerCase();
+  const filtered=_mvpAllPlayers.filter(p=>!_mvpQuery||p.nombre.toLowerCase().includes(_mvpQuery)||p.corto.toLowerCase().includes(_mvpQuery));
+  const list=document.getElementById('mvpPlayerList');
+  list.innerHTML=filtered.length?filtered.map(p=>`
+    <div onclick="mvpSelectPlayer(${JSON.stringify(p.nombre)},${JSON.stringify(p.corto)})" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;cursor:pointer">
+      ${p.num?`<span style="font-size:11px;font-weight:900;color:var(--gl);min-width:22px;text-align:center">#${p.num}</span>`:''}
+      <span style="font-size:14px;font-weight:700;flex:1">${p.nombre}</span>
+    </div>`).join('')
+  :'<div style="font-size:12px;color:var(--m);padding:8px">Sin resultados</div>';
+}
+
+function mvpSelectPlayer(nombre,corto){
+  mvpNombreS=nombre;
+  mvpEquipoS=tn(_mvpSelTeam);
+  document.getElementById('mvpNom').innerHTML=`<span style="color:var(--gn)">✅ <strong>${nombre}</strong> · <span style="color:#38bdf8">${mvpEquipoS}</span></span>`;
+  // highlight selected row
+  document.querySelectorAll('#mvpPlayerList > div').forEach(d=>{
+    const match=d.querySelector('span:last-child')&&d.querySelector('span:last-child').textContent===nombre;
+    d.style.borderColor=match?'rgba(245,159,11,.8)':'var(--bd)';
+    d.style.background=match?'rgba(245,159,11,.1)':'var(--b3)';
+  });
+}
+
+function mvpSetManual(){
+  const v=(document.getElementById('mvpManualName').value||'').trim();
+  if(!v){mvpNombreS='';mvpEquipoS='';document.getElementById('mvpNom').innerHTML='';return;}
+  mvpNombreS=v;
+  mvpEquipoS=_mvpSelTeam?tn(_mvpSelTeam):'';
+  document.getElementById('mvpNom').innerHTML=`<span style="color:var(--gn)">✅ <strong>${v}</strong>${mvpEquipoS?' · <span style="color:#38bdf8">'+mvpEquipoS+'</span>':''}</span>`;
+}
 
 function mvpLoadPhoto(inp){
   const f=inp.files[0];if(!f)return;
-  document.getElementById('mvpPhNm').textContent=f.name;
+  document.getElementById('mvpPhNm').textContent='📸 '+f.name;
   const rd=new FileReader();
   rd.onload=ev=>loadImg(ev.target.result,'mvpph').then(img=>{mvpPhotoImg=img||null;});
   rd.readAsDataURL(f);
