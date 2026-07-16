@@ -1,6 +1,6 @@
 // Atlético Norte FC — Service Worker
 // Increment SW_VER on every deploy to force cache invalidation
-const SW_VER = 'v8.44-2026-07-16';
+const SW_VER = 'v8.45-2026-07-16';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 // Icon cache — NOT versioned so it survives SW updates
 const ICON_CACHE = 'an-club-icon';
