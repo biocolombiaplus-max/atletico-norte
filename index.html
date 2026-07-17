@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.71';
+var APP_VER='8.72';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2007,7 +2007,9 @@ function rFx(){
 // ── STANDINGS ──
 function wlPenalty(n){if(n<=0)return 0;if(n===1)return-1;if(n===2)return-3;return-6-(n-3)*3;}
 function cSt(){
-  var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[],ww:0,wl:0,wpen:0,wwD:[],wlD:[]};
+  // wwD = W ganados (WO o retiro), wlD = W perdidos por NO presentarse (penalizados)
+  // retD = retiros del equipo (informativo, SIN penalización de puntos)
+  var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[],ww:0,wl:0,wpen:0,wwD:[],wlD:[],retD:[]};
   MF.forEach(function(m){
     var r=res[m.id];if(!r||r.l===undefined)return;
     st[m.l].pj++;st[m.v].pj++;
@@ -2015,17 +2017,19 @@ function cSt(){
     var wo=r.wo||false,ret=r.retiro||false;
     if(r.l>r.v){
       st[m.l].g++;st[m.l].pts+=3;st[m.l].fm.push("W");st[m.v].p++;st[m.v].fm.push("L");
+      // WO puro: penaliza al perdedor
       if(wo){st[m.l].ww++;st[m.v].wl++;st[m.l].wwD.push({opp:m.v,t:'wo'});st[m.v].wlD.push({opp:m.l,t:'wo'});}
-      if(ret&&r.retiroWho==='v'){st[m.l].ww++;st[m.v].wl++;st[m.l].wwD.push({opp:m.v,t:'ret'});st[m.v].wlD.push({opp:m.l,t:'ret'});}
+      // Retiro: el ganador anota W+, pero el que se retiró NO pierde puntos (solo registra informativo)
+      if(ret&&r.retiroWho==='v'){st[m.l].ww++;st[m.l].wwD.push({opp:m.v,t:'ret'});st[m.v].retD.push({opp:m.l});}
     }
     else if(r.l===r.v){st[m.l].e++;st[m.l].pts++;st[m.l].fm.push("D");st[m.v].e++;st[m.v].pts++;st[m.v].fm.push("D");}
     else{
       st[m.v].g++;st[m.v].pts+=3;st[m.v].fm.push("W");st[m.l].p++;st[m.l].fm.push("L");
       if(wo){st[m.v].ww++;st[m.l].wl++;st[m.v].wwD.push({opp:m.l,t:'wo'});st[m.l].wlD.push({opp:m.v,t:'wo'});}
-      if(ret&&r.retiroWho==='l'){st[m.v].ww++;st[m.l].wl++;st[m.v].wwD.push({opp:m.l,t:'ret'});st[m.l].wlD.push({opp:m.v,t:'ret'});}
+      if(ret&&r.retiroWho==='l'){st[m.v].ww++;st[m.v].wwD.push({opp:m.l,t:'ret'});st[m.l].retD.push({opp:m.v});}
     }
   });
-  // Apply W-loss penalties
+  // Penalización solo por WO (no presentarse) — retiro NO penaliza
   Object.values(st).forEach(function(t){
     t.wpen=wlPenalty(t.wl);
     t.pts=Math.max(0,t.pts+t.wpen);
@@ -2057,7 +2061,13 @@ function rTb(){
     h+='<td><div class="trn">'+bdg(t.id,'bs')+'<span>'+tn(t.id)+'</span></div></td>';
     h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
     h+='<td>'+_wCell(t.wwD,'#10b981')+'</td>';
-    h+='<td>'+_wCell(t.wlD,'#ef4444')+'</td>';
+    // W-: solo WOs penalizados. Si además hubo retiro, se muestra como nota sin color rojo fuerte
+    var wlCell=_wCell(t.wlD,'#ef4444');
+    if(t.retD&&t.retD.length){
+      var retLabs=t.retD.map(function(d){return ts(d.opp);}).join(' ');
+      wlCell+='<br><span style="font-size:7px;color:#f59e0b;opacity:.8">🏃'+retLabs+'</span>';
+    }
+    h+='<td>'+wlCell+'</td>';
     var penTxt=t.wpen<0?'<span class="wpen">'+t.wpen+'</span>':'';
     h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+penTxt+'</td>';
     h+='<td><div class="fd2">'+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join('')+'</div></td></tr>';
