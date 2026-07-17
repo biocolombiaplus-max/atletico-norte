@@ -1106,28 +1106,58 @@ async function tMVP(ctx){
   ctx.fillText('⭐  MVP DEL PARTIDO  ⭐',W/2,bY+bH/2+1);ctx.restore();
   cy=bY+bH+24;
 
-  // ── NOMBRE DEL JUGADOR ──
+  // ── NOMBRE DEL JUGADOR (2-line support) ──
   const nomDisplay=(mvpNombreS||'JUGADOR').toUpperCase();
   ctx.textAlign='center';ctx.textBaseline='top';ctx.letterSpacing='0';
-  let fs=96;ctx.font='900 '+fs+'px Arial Black,sans-serif';
-  while(ctx.measureText(nomDisplay).width>W-40&&fs>34){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
-  // Texto con sutil degradado blanco→plata
-  const nGrad=lGrad(ctx,W/2-400,cy,W/2+400,cy+fs,[0,'#ffffff'],[.5,'#e8eeff'],[1,'#ffffff']);
+  const maxW=W-80;
+  let fs=88;ctx.font='900 '+fs+'px Arial Black,sans-serif';
+  // Try single line first; if too wide, split into 2 lines at the best word boundary
+  let nomLines=[nomDisplay];
+  if(ctx.measureText(nomDisplay).width>maxW){
+    // Find best split near middle
+    const words=nomDisplay.split(' ');
+    let bestSplit=1,bestDiff=Infinity;
+    for(let i=1;i<words.length;i++){
+      const l=words.slice(0,i).join(' '),r=words.slice(i).join(' ');
+      const diff=Math.abs(ctx.measureText(l).width-ctx.measureText(r).width);
+      if(diff<bestDiff){bestDiff=diff;bestSplit=i;}
+    }
+    nomLines=[words.slice(0,bestSplit).join(' '),words.slice(bestSplit).join(' ')];
+    // Shrink until both lines fit
+    while(fs>44&&nomLines.some(l=>ctx.measureText(l).width>maxW)){
+      fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';
+    }
+  } else {
+    // Single line — allow slight shrink only if still needed
+    while(ctx.measureText(nomDisplay).width>maxW&&fs>44){fs-=4;ctx.font='900 '+fs+'px Arial Black,sans-serif';}
+  }
+  const nGrad=lGrad(ctx,W/2-440,cy,W/2+440,cy+fs,[0,'#ffffff'],[.5,'#e8eeff'],[1,'#ffffff']);
   ctx.save();ctx.shadowColor='rgba(0,0,0,.98)';ctx.shadowBlur=28;ctx.fillStyle=nGrad;
-  ctx.fillText(nomDisplay,W/2,cy);ctx.restore();
-  cy+=fs+10;
+  const lineH=fs*1.12;
+  nomLines.forEach((ln,i)=>ctx.fillText(ln,W/2,cy+i*lineH));
+  ctx.restore();
+  cy+=lineH*nomLines.length+8;
 
-  // ── EQUIPO ──
+  // ── EQUIPO — pastilla coloreada ──
   if(mvpEquipoS){
-    ctx.save();ctx.shadowColor='rgba(255,170,0,.35)';ctx.shadowBlur=12;
-    ctx.font='800 34px sans-serif';ctx.letterSpacing='4px';ctx.fillStyle='#ffd700';
-    ctx.fillText(mvpEquipoS.toUpperCase(),W/2,cy);ctx.restore();
-    cy+=46;
-  }else{cy+=16;}
+    ctx.letterSpacing='0';
+    const eqTxt=mvpEquipoS.toUpperCase();
+    ctx.font='800 28px sans-serif';ctx.letterSpacing='3px';
+    const eqW=ctx.measureText(eqTxt).width+48,eqH=50,eqX=(W-eqW)/2,eqY=cy;
+    // Pill background
+    ctx.fillStyle=lGrad(ctx,eqX,eqY,eqX+eqW,eqY+eqH,[0,'rgba(200,16,46,.18)'],[.5,'rgba(200,16,46,.32)'],[1,'rgba(200,16,46,.18)']);
+    ctx.beginPath();ctx.roundRect(eqX,eqY,eqW,eqH,eqH/2);ctx.fill();
+    ctx.strokeStyle='rgba(200,16,46,.55)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(eqX,eqY,eqW,eqH,eqH/2);ctx.stroke();
+    ctx.save();ctx.shadowColor='rgba(255,80,80,.25)';ctx.shadowBlur=10;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ff9eae';
+    ctx.fillText(eqTxt,W/2,eqY+eqH/2+1);ctx.restore();
+    cy+=eqH+18;
+  }else{cy+=14;}
   ctx.letterSpacing='0';
 
   // ── CAJA MARCADOR ──
-  const SBY=Math.max(cy+10,1430),SBH=154,SBW=960,SBX=(W-SBW)/2;
+  const SBY=Math.max(cy+4,1440),SBH=154,SBW=960,SBX=(W-SBW)/2;
   // Fondo glass oscuro-dorado
   ctx.fillStyle=lGrad(ctx,SBX,SBY,SBX+SBW,SBY+SBH,[0,'rgba(255,215,0,.10)'],[.5,'rgba(8,16,40,.45)'],[1,'rgba(255,215,0,.10)']);
   ctx.beginPath();ctx.roundRect(SBX,SBY,SBW,SBH,26);ctx.fill();
