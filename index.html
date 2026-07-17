@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.58';
+var APP_VER='8.59';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2226,7 +2226,7 @@ function rsRender(m){
     // ── SCOREBOARD ──
     h+='<div class="rs-board">';
     h+='<div class="rs-team">';
-    h+='<div style="width:46px;height:54px">'+bdg(m.l,'bs')+'</div>';
+    h+='<div style="width:46px;height:54px;display:flex;align-items:center;justify-content:center">'+bdg(m.l,'bs')+'</div>';
     h+='<div style="font-size:11px;font-weight:900;text-align:center;color:var(--t);line-height:1.2;width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+escHtml(tn(m.l))+'</div>';
     h+='</div>';
     h+='<div class="rs-score-center">';
@@ -2234,7 +2234,7 @@ function rsRender(m){
     h+='<div style="font-size:8px;font-weight:900;letter-spacing:1px;color:var(--m);margin-top:2px">MARCADOR</div>';
     h+='</div>';
     h+='<div class="rs-team">';
-    h+='<div style="width:46px;height:54px">'+bdg(m.v,'bs')+'</div>';
+    h+='<div style="width:46px;height:54px;display:flex;align-items:center;justify-content:center">'+bdg(m.v,'bs')+'</div>';
     h+='<div style="font-size:11px;font-weight:900;text-align:center;color:var(--t);line-height:1.2;width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+escHtml(tn(m.v))+'</div>';
     h+='</div>';
     h+='</div>';
@@ -2420,11 +2420,11 @@ function rsRetiroHtml(m){
   // Mostrar scoreboard editable para registrar goles del partido (que sí cuentan)
   h+='<div style="font-size:9px;font-weight:900;letter-spacing:.5px;color:var(--m);margin-bottom:8px">GOLES MARCADOS ANTES DEL RETIRO</div>';
   h+='<div class="rs-board" style="margin-bottom:8px">';
-  h+='<div class="rs-team"><div style="width:46px;height:54px">'+bdg(m.l,'bs')+'</div>';
+  h+='<div class="rs-team"><div style="width:46px;height:54px;display:flex;align-items:center;justify-content:center">'+bdg(m.l,'bs')+'</div>';
   h+='<div style="font-size:10px;font-weight:900;text-align:center;color:var(--t)">'+escHtml(tn(m.l))+'</div></div>';
   h+='<div class="rs-score-center"><div class="rs-score-val"><span style="color:'+lCol+'">'+lG+'</span><span class="rs-score-sep">–</span><span style="color:'+vCol+'">'+vG+'</span></div>';
   h+='<div style="font-size:8px;font-weight:900;letter-spacing:1px;color:var(--m);margin-top:2px">EN CAMPO</div></div>';
-  h+='<div class="rs-team"><div style="width:46px;height:54px">'+bdg(m.v,'bs')+'</div>';
+  h+='<div class="rs-team"><div style="width:46px;height:54px;display:flex;align-items:center;justify-content:center">'+bdg(m.v,'bs')+'</div>';
   h+='<div style="font-size:10px;font-weight:900;text-align:center;color:var(--t)">'+escHtml(tn(m.v))+'</div></div>';
   h+='</div>';
   h+='<div class="rs-actions">';

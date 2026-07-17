@@ -1627,17 +1627,34 @@ async function tResultado(ctx,m){
   // ── RETIRO BADGE ──
   if(r.retiro){
     const retTid=r.retiroWho==='l'?m.l:m.v;
+    const winTid=r.retiroWho==='l'?m.v:m.l;
     const retNm=tn(retTid).toUpperCase();
-    const bW=860,bH=82,bX=W/2-bW/2,bY3=1512;
-    ctx.save();ctx.globalAlpha=.92;
-    ctx.fillStyle='rgba(239,68,68,.14)';ctx.beginPath();ctx.roundRect(bX,bY3,bW,bH,bH/2);ctx.fill();
-    ctx.strokeStyle='rgba(239,68,68,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(bX,bY3,bW,bH,bH/2);ctx.stroke();
-    ctx.restore();
-    let rfs=34,rtxt=`🏃 ${retNm} SE RETIRÓ · +3 GOLES DE PENALIDAD`;
-    ctx.font=`800 ${rfs}px sans-serif`;ctx.letterSpacing='0';
-    while(ctx.measureText(rtxt).width>bW-48&&rfs>20){rfs-=2;ctx.font=`800 ${rfs}px sans-serif`;}
-    ctx.fillStyle='#f87171';ctx.textAlign='center';ctx.letterSpacing='.5px';
-    ctx.fillText(rtxt,W/2,bY3+bH*.65);
+    const winNm=tn(winTid).toUpperCase();
+    const bW=900,bH=112,bX=W/2-bW/2,bY3=1508;
+    // Solid red background
+    ctx.save();
+    ctx.shadowColor='rgba(220,30,30,.6)';ctx.shadowBlur=40;
+    const retGrad=ctx.createLinearGradient(bX,bY3,bX+bW,bY3+bH);
+    retGrad.addColorStop(0,'rgba(153,27,27,.97)');
+    retGrad.addColorStop(.5,'rgba(185,28,28,.98)');
+    retGrad.addColorStop(1,'rgba(153,27,27,.97)');
+    ctx.fillStyle=retGrad;ctx.beginPath();ctx.roundRect(bX,bY3,bW,bH,16);ctx.fill();ctx.restore();
+    // Gold border
+    ctx.strokeStyle='rgba(255,215,0,.45)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(bX,bY3,bW,bH,16);ctx.stroke();
+    // Inner highlight
+    ctx.save();ctx.globalAlpha=.12;ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(bX+4,bY3+4,bW-8,bH*.45,12);ctx.fill();ctx.restore();
+    // Line 1: runner + team name
+    let rfs=36,rtxt=`🏃 ${retNm} SE RETIRÓ DEL PARTIDO`;
+    ctx.font=`900 ${rfs}px Arial Black,sans-serif`;ctx.letterSpacing='.5px';
+    while(ctx.measureText(rtxt).width>bW-60&&rfs>22){rfs-=2;ctx.font=`900 ${rfs}px Arial Black,sans-serif`;}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=10;
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(rtxt,W/2,bY3+bH*.42);ctx.restore();
+    // Line 2: penalty info
+    let rfs2=26,rtxt2=`+3 GOLES DE PENALIDAD · ${winNm} GANA POR REGLAMENTO`;
+    ctx.font=`700 ${rfs2}px sans-serif`;ctx.letterSpacing='.3px';
+    while(ctx.measureText(rtxt2).width>bW-80&&rfs2>17){rfs2-=1;ctx.font=`700 ${rfs2}px sans-serif`;}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=6;
+    ctx.fillStyle='rgba(255,220,100,.95)';ctx.textAlign='center';ctx.fillText(rtxt2,W/2,bY3+bH*.78);ctx.restore();
     ctx.letterSpacing='0';
   }
 
@@ -1675,7 +1692,7 @@ async function tResultado(ctx,m){
   }
   const scorers=r.scorers||[];
   if(scorers.length){
-    const scTop=r.retiro?1612:1510;
+    const scTop=r.retiro?1638:1510;
     goldRule(ctx,scTop);
     ctx.font='700 22px sans-serif';ctx.letterSpacing='4px';ctx.fillStyle='rgba(255,215,0,.60)';ctx.textAlign='center';
     ctx.fillText('ANOTADORES',W/2,scTop+36);
