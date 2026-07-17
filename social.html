@@ -496,7 +496,7 @@ function mvpBuildCards(){
   withRes.sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id-a.id);
   if(!withRes.length){el.innerHTML='<div style="font-size:11px;color:var(--m);padding:8px 0">Sin partidos con resultado guardado.</div>';return;}
   el.innerHTML=withRes.map(m=>{
-    const r=results[m.id],sc=r.wo?'W/O':`${r.l}–${r.v}`;
+    const r=results[m.id],sc=r.wo?'W/O':r.retiro?`${r.l}–${r.v} 🏃`:`${r.l}–${r.v}`;
     const local=tn(m.l).length>12?ts(m.l):tn(m.l);
     const visit=tn(m.v).length>12?ts(m.v):tn(m.v);
     return `<div onclick="mvpPickCard(${m.id},this)" id="mvpC${m.id}" style="display:flex;align-items:center;gap:8px;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;padding:8px 12px;cursor:pointer;transition:.15s">
@@ -1116,7 +1116,7 @@ async function tMVP(ctx){
   if(mvpSelectedMid){
     const mm=ALL.find(x=>x.id===mvpSelectedMid),rr=results[mvpSelectedMid];
     if(mm&&rr){
-      const sc=rr.wo?'W / O':`${rr.l}  –  ${rr.v}`;
+      const sc=rr.wo?'W / O':`${rr.l}  –  ${rr.v}`+(rr.retiro?' 🏃':'');
       // Marcador grande
       ctx.save();ctx.shadowColor='rgba(255,200,0,.75)';ctx.shadowBlur=30;
       ctx.font='900 92px Arial Black,sans-serif';ctx.fillStyle='#ffd700';

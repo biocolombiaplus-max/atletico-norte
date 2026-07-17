@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.54';
+var APP_VER='8.55';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2382,14 +2382,13 @@ function rsRetiroHtml(m){
   var lG=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
   var vG=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
   var lCol=TC[m.l]||'#0ea5e9',vCol=TC[m.v]||'#f59e0b';
-  // Winner is whoever did NOT retire
-  var winner=curRetWho==='l'?'v':curRetWho==='v'?'l':null;
-  var winG=winner?3:0,loseG=0;
-  var finalL=winner==='l'?winG:winner==='v'?loseG:lG;
-  var finalV=winner==='v'?winG:winner==='l'?loseG:vG;
+  // Winner is whoever did NOT retire; they keep field goals + 3 penalty
+  // Loser keeps their field goals (count for scorers, not for win)
+  var finalL=lG+(curRetWho==='v'?3:0);
+  var finalV=vG+(curRetWho==='l'?3:0);
   var h='<div class="rs-ret-box">';
   h+='<div style="font-size:11px;font-weight:900;color:#f59e0b;letter-spacing:.5px;margin-bottom:4px;text-align:center">🏃 ¿Qué equipo se RETIRA?</div>';
-  h+='<div style="font-size:10px;color:var(--m);text-align:center;margin-bottom:12px">El ganador recibe 3–0 oficial · los goles marcados cuentan para goleadores</div>';
+  h+='<div style="font-size:10px;color:var(--m);text-align:center;margin-bottom:12px">Al ganador se le suman 3 goles de penalidad · todos los goles en campo cuentan para goleadores</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
   ['l','v'].forEach(function(s){
     var tid=s==='l'?m.l:m.v;
@@ -2412,8 +2411,9 @@ function rsRetiroHtml(m){
     h+='<div style="text-align:center"><div style="font-size:9px;font-weight:800;color:'+(curRetWho==='v'?'#ef4444':vCol)+';margin-bottom:4px">'+escHtml(tn(m.v))+'</div>';
     h+='<div style="font-size:28px;font-weight:900;color:'+(curRetWho==='v'?'#ef4444':vCol)+'">'+finalV+'</div></div>';
     h+='</div>';
-    if(lG||vG)h+='<div style="font-size:10px;color:var(--m);margin-top:8px">Goles en campo: '+lG+' – '+vG+' (cuentan para goleadores ✅)</div>';
-    h+='<div style="font-size:10px;color:#ef4444;font-weight:700;margin-top:6px">'+escHtml(tn(retTid))+' pierde 3–0 por retiro</div>';
+    var winTid2=curRetWho==='l'?m.v:m.l,penG=3;
+    h+='<div style="font-size:10px;color:var(--m);margin-top:8px">Goles en campo: '+lG+' – '+vG+' ✅ · +'+penG+' penalidad a '+escHtml(tn(winTid2))+'</div>';
+    h+='<div style="font-size:10px;color:#ef4444;font-weight:700;margin-top:6px">'+escHtml(tn(retTid))+' se retira · resultado final '+finalL+' – '+finalV+'</div>';
     h+='</div>';
   }
   h+='</div>';
@@ -2521,16 +2521,14 @@ async function doSR(){
   }else if(curRType==='retiro'){
     if(!curRetWho){alert('Selecciona qué equipo se retiró');return;}
     var m=MF.find(function(x){return x.id===cri;});
-    // Goles en campo (cuentan para goleadores)
+    // Goles en campo (cuentan para goleadores, NO incluyen los 3 de penalidad)
     var fieldL=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
     var fieldV=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
     var sc2=_evGoals.map(function(g){return{name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
-    // Resultado oficial 3-0 para el ganador
-    var finalL=curRetWho==='l'?0:3,finalV=curRetWho==='v'?0:3;
-    // Si ganador ya tenía más goles en campo, respetar eso (caso raro)
-    if(curRetWho==='l'){finalV=Math.max(finalV,fieldV);finalL=Math.min(finalL,fieldL);}
-    else{finalL=Math.max(finalL,fieldL);finalV=Math.min(finalV,fieldV);}
-    data={l:finalL,v:finalV,scorers:sc2,yellows:_evYellows.slice(),reds:_evReds.slice(),retiro:true,retiroWho:curRetWho,fieldL:fieldL,fieldV:fieldV,ts:Date.now()};
+    // Resultado oficial: cada equipo conserva sus goles de campo + ganador suma 3 de penalidad
+    var finalL=fieldL+(curRetWho==='v'?3:0);
+    var finalV=fieldV+(curRetWho==='l'?3:0);
+    data={l:finalL,v:finalV,scorers:sc2,yellows:_evYellows.slice(),reds:_evReds.slice(),retiro:true,retiroWho:curRetWho,fieldL:fieldL,fieldV:fieldV,penalty:3,ts:Date.now()};
   }else{
     var m=MF.find(function(x){return x.id===cri;});
     var l=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
