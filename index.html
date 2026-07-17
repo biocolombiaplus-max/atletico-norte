@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.59';
+var APP_VER='8.60';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -580,6 +580,9 @@ tbody td:nth-child(2){text-align:left}
 .rs-btn-goal{width:100%;background:rgba(16,185,129,.12);border:2px solid #10b981;color:#10b981;border-radius:12px;padding:13px 6px;font-size:15px;font-weight:900;cursor:pointer;-webkit-appearance:none;letter-spacing:.2px;transition:.15s;line-height:1}
 .rs-btn-goal:active{background:rgba(16,185,129,.3);transform:scale(.96)}
 .rs-btn-goal.open{background:rgba(16,185,129,.25);box-shadow:0 0 0 3px rgba(16,185,129,.3)}
+.rs-btn-ag{width:100%;background:rgba(251,146,60,.1);border:1.5px dashed #fb923c;color:#fb923c;border-radius:10px;padding:7px 6px;font-size:11px;font-weight:900;cursor:pointer;-webkit-appearance:none;letter-spacing:.3px;transition:.15s;line-height:1}
+.rs-btn-ag:active{background:rgba(251,146,60,.25);transform:scale(.96)}
+.rs-btn-ag.open{background:rgba(251,146,60,.2);box-shadow:0 0 0 3px rgba(251,146,60,.25);border-style:solid}
 .rs-btn-cards{display:flex;gap:6px}
 .rs-btn-card{background:var(--cd);border:1.5px solid var(--bd);border-radius:9px;padding:8px 13px;font-size:19px;cursor:pointer;-webkit-appearance:none;transition:.12s;line-height:1}
 .rs-btn-card:active{transform:scale(.9)}
@@ -2269,9 +2272,11 @@ function rsRender(m){
 function rsActionSide(side,m,col){
   var pk=_rsPicker;
   var goalKey='goal_'+side,ylKey='yellow_'+side,rdKey='red_'+side;
+  var agKey='autogol_'+side;
   var h='<div class="rs-side">';
   h+='<div class="rs-side-lbl">'+escHtml(tn(side==='l'?m.l:m.v))+'</div>';
   h+='<button class="rs-btn-goal'+(pk===goalKey?' open':'')+'" onclick="rsOpenPicker(\''+goalKey+'\')">+ ⚽ GOL</button>';
+  h+='<button class="rs-btn-ag'+(pk===agKey?' open':'')+'" onclick="rsOpenPicker(\''+agKey+'\')" title="Autogol del equipo contrario a favor de este equipo">🔄 AUTOGOL</button>';
   h+='<div class="rs-btn-cards">';
   h+='<button class="rs-btn-card'+(pk===ylKey?' open-y':'')+'" onclick="rsOpenPicker(\''+ylKey+'\')" title="Amarilla">🟨</button>';
   h+='<button class="rs-btn-card'+(pk===rdKey?' open-r':'')+'" onclick="rsOpenPicker(\''+rdKey+'\')" title="Roja">🟥</button>';
@@ -2284,35 +2289,52 @@ function rsOpenPicker(key){_rsPicker=(_rsPicker===key)?null:key;rsRender();}
 
 function rsPickerHtml(m){
   var parts=_rsPicker.split('_'),evtType=parts[0],side=parts[1];
-  var tid=side==='l'?m.l:m.v;
-  var players=_pickerRosters[side]||[];
-  var tCol=TC[tid]||'#0ea5e9';
-  var evtCol=evtType==='goal'?'#10b981':evtType==='yellow'?'#f59e0b':'#ef4444';
-  var evtIcon=evtType==='goal'?'⚽':evtType==='yellow'?'🟨':'🟥';
-  var arr=evtType==='goal'?_evGoals:evtType==='yellow'?_evYellows:_evReds;
-  // For goals: count per player (name is unique-keyed, so match by corto+teamId)
-  var selKeys=evtType==='goal'
+  var isAG=evtType==='autogol';
+  // For autogol: benefiting team = side; players shown come from OPPOSITE side
+  var benefitTid=side==='l'?m.l:m.v;
+  var playerSide=isAG?(side==='l'?'v':'l'):side;
+  var tid=isAG?benefitTid:(side==='l'?m.l:m.v);
+  var oppTid=isAG?(side==='l'?m.v:m.l):0;
+  var players=_pickerRosters[playerSide]||[];
+  var tCol=isAG?(TC[oppTid]||'#fb923c'):(TC[tid]||'#0ea5e9');
+  var evtCol=isAG?'#fb923c':(evtType==='goal'?'#10b981':evtType==='yellow'?'#f59e0b':'#ef4444');
+  var evtIcon=isAG?'🔄⚽':(evtType==='goal'?'⚽':evtType==='yellow'?'🟨':'🟥');
+  var arr=isAG||evtType==='goal'?_evGoals:evtType==='yellow'?_evYellows:_evReds;
+  var selKeys=isAG||evtType==='goal'
     ?arr.map(function(e){return e.corto+'|'+e.teamId;})
     :arr.map(function(e){return e.name+'|'+e.teamId;});
   var h='<div class="rs-picker-box" style="--picker-col:'+evtCol+'">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-  h+='<div style="font-size:10px;font-weight:900;letter-spacing:.5px;color:'+evtCol+'">'+evtIcon+' '+escHtml(tn(tid))+'</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+  if(isAG){
+    h+='<div style="font-size:10px;font-weight:900;letter-spacing:.3px;color:'+evtCol+'">🔄 AUTOGOL <span style="opacity:.6">→ gol para</span> <span style="color:#fff">'+escHtml(tn(benefitTid))+'</span></div>';
+  } else {
+    h+='<div style="font-size:10px;font-weight:900;letter-spacing:.5px;color:'+evtCol+'">'+evtIcon+' '+escHtml(tn(tid))+'</div>';
+  }
   h+='<button onclick="rsOpenPicker(\''+_rsPicker+'\')" style="background:none;border:none;color:var(--m);font-size:18px;cursor:pointer;-webkit-appearance:none;padding:0">✕</button>';
   h+='</div>';
+  if(isAG){
+    h+='<div style="font-size:10px;color:var(--m);margin-bottom:8px;line-height:1.4">Selecciona el jugador de <strong style="color:'+tCol+'">'+escHtml(tn(oppTid))+'</strong> que anotó en su propio arco. No suma en tabla de goleadores.</div>';
+  }
   if(!players.length){
     h+='<div style="font-size:11px;color:var(--m);text-align:center;padding:12px">'+(_rsRostersReady?'Sin jugadores registrados':'⏳ Cargando jugadores…')+'</div>';
   } else {
     h+='<div class="rs-pl-grid">';
     players.forEach(function(p){
-      var pKey=evtType==='goal'?(p.corto+'|'+p.teamId):(p.name+'|'+p.teamId);
-      var goalCount=evtType==='goal'?selKeys.filter(function(k){return k===pKey;}).length:0;
-      var isOn=evtType==='goal'?(goalCount>0):(selKeys.indexOf(pKey)>=0);
+      // For autogol: the player's teamId is oppTid, but goal is credited to benefitTid
+      var displayKey=isAG?(p.corto+'|'+benefitTid):(evtType==='goal'?(p.corto+'|'+p.teamId):(p.name+'|'+p.teamId));
+      var agCount=isAG?selKeys.filter(function(k){return k===displayKey;}).length:0;
+      var goalCount=evtType==='goal'?selKeys.filter(function(k){return k===(p.corto+'|'+p.teamId);}).length:0;
+      var isOn=isAG?(agCount>0):(evtType==='goal'?(goalCount>0):(selKeys.indexOf(p.name+'|'+p.teamId)>=0));
       var numBg=isOn?evtCol:tCol;
       var num=p.camiseta||'?';
+      var clickCall=isAG
+        ?'rsPickPlayer(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+benefitTid+',\'autogol\')'
+        :'rsPickPlayer(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+',\''+evtType+'\')';
       h+='<button class="rs-pl-btn'+(isOn?' on':'')+'" ';
       h+='style="'+(isOn?'border-color:'+evtCol+';background:rgba('+hexRgb(evtCol)+',.18)':'')+'"';
-      h+=' onclick="rsPickPlayer(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+',\''+evtType+'\')">';
-      if(evtType==='goal'&&goalCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px">'+goalCount+'⚽</div>';
+      h+=' onclick="'+clickCall+'">';
+      if(isAG&&agCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px;background:#fb923c">'+agCount+'🔄</div>';
+      else if(evtType==='goal'&&goalCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px">'+goalCount+'⚽</div>';
       else if(isOn)h+='<div class="rs-pl-badge">'+evtIcon+'</div>';
       h+='<div class="rs-pl-num" style="background:'+numBg+';font-size:'+(num.length>2?'9':'12')+'px">'+escHtml(num)+'</div>';
       h+='<div class="rs-pl-name" style="color:'+(isOn?evtCol:'var(--t)')+'">'+escHtml(p.corto)+'</div>';
@@ -2320,11 +2342,12 @@ function rsPickerHtml(m){
     });
     h+='</div>';
   }
-  // Input manual para jugadores no registrados
-  var manualId='rsManual_'+evtType+'_'+tid;
+  // Input manual
+  var manualTid=isAG?benefitTid:tid;
+  var manualId='rsManual_'+evtType+'_'+manualTid;
   h+='<div style="display:flex;gap:6px;margin-top:8px">';
-  h+='<input id="'+manualId+'" type="text" placeholder="✍️ Escribir jugador manualmente…" style="flex:1;min-width:0;background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--t);-webkit-appearance:none;font-family:inherit" onkeydown="if(event.key===\'Enter\'){rsManualPick(\''+evtType+'\','+tid+',\''+manualId+'\');}">';
-  h+='<button onclick="rsManualPick(\''+evtType+'\','+tid+',\''+manualId+'\')" style="background:'+evtCol+';border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:900;color:#fff;cursor:pointer;-webkit-appearance:none;white-space:nowrap">+ Agregar</button>';
+  h+='<input id="'+manualId+'" type="text" placeholder="'+(isAG?'✍️ Nombre del jugador que anotó en propia…':'✍️ Escribir jugador manualmente…')+'" style="flex:1;min-width:0;background:var(--b3);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--t);-webkit-appearance:none;font-family:inherit" onkeydown="if(event.key===\'Enter\'){rsManualPick(\''+evtType+'\','+manualTid+',\''+manualId+'\');}">';
+  h+='<button onclick="rsManualPick(\''+evtType+'\','+manualTid+',\''+manualId+'\')" style="background:'+evtCol+';border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:900;color:#fff;cursor:pointer;-webkit-appearance:none;white-space:nowrap">+ Agregar</button>';
   h+='</div>';
   if(evtType==='goal'){
     h+='<button onclick="rsAnonGoal('+tid+')" style="width:100%;margin-top:6px;background:none;border:1px dashed rgba(255,255,255,.2);color:var(--m);border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;-webkit-appearance:none">＋ Gol sin identificar</button>';
@@ -2334,11 +2357,16 @@ function rsPickerHtml(m){
 }
 
 function rsPickPlayer(name,corto,teamId,evtType){
-  var rp=[].concat(_pickerRosters.l||[],_pickerRosters.v||[]).find(function(p){return p.name===name&&p.teamId===teamId;});
+  // For autogol: teamId is the BENEFITING team; player comes from the opposing roster
+  var rp=[].concat(_pickerRosters.l||[],_pickerRosters.v||[]).find(function(p){return p.name===name;});
   var cam=rp?rp.camiseta:'';
   if(evtType==='goal'){
     // Goals always add — same player can score multiple times; uid keeps entries unique
     _evGoals.push({name:name+'_g'+Date.now(),playerName:name,corto:corto,teamId:teamId,camiseta:cam});
+    _rsPicker=null;
+  }else if(evtType==='autogol'){
+    // Autogol: credited to benefiting team (teamId), player did NOT score intentionally
+    _evGoals.push({name:name+'_ag'+Date.now(),playerName:name,corto:corto,teamId:teamId,camiseta:cam,autogol:true});
     _rsPicker=null;
   }else{
     var arr=evtType==='yellow'?_evYellows:_evReds;
@@ -2354,16 +2382,19 @@ function rsManualPick(evtType,teamId,inputId){
   var val=(el.value||'').trim();
   if(!val){el.focus();return;}
   var corto=toCorto(val);
-  var arr=evtType==='goal'?_evGoals:evtType==='yellow'?_evYellows:_evReds;
-  arr.push({name:'manual_'+val+'_'+teamId+'_'+Date.now(),corto:corto,teamId:teamId,camiseta:''});
-  if(evtType==='goal')_rsPicker=null;
+  var isAG=evtType==='autogol';
+  var arr=(evtType==='goal'||isAG)?_evGoals:evtType==='yellow'?_evYellows:_evReds;
+  var entry={name:(isAG?'manual_ag_':'manual_')+val+'_'+teamId+'_'+Date.now(),corto:corto,teamId:teamId,camiseta:''};
+  if(isAG)entry.autogol=true;
+  arr.push(entry);
+  if(evtType==='goal'||isAG)_rsPicker=null;
   rsRender();
 }
 
 function rsEvtLogHtml(m){
   var all=[];
   function cam(e){return e.camiseta?'<span style="font-size:9px;opacity:.55;margin-right:2px">#'+e.camiseta+'</span>':'';}
-  _evGoals.forEach(function(e){all.push({icon:'⚽',col:TC[e.teamId]||'#10b981',team:tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'goal\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
+  _evGoals.forEach(function(e){all.push({icon:e.autogol?'🔄⚽':'⚽',col:e.autogol?'#fb923c':(TC[e.teamId]||'#10b981'),team:e.autogol?(tn(e.teamId)+' (AG)'):tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'goal\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
   _evYellows.forEach(function(e){all.push({icon:'🟨',col:'#f59e0b',team:tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'yellow\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
   _evReds.forEach(function(e){all.push({icon:'🟥',col:'#ef4444',team:tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'red\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
   if(!all.length)return '<div style="text-align:center;color:var(--m);font-size:11px;padding:10px 0;margin-bottom:8px">Sin eventos registrados</div>';
@@ -2524,7 +2555,7 @@ async function doSR(){
     // Goles en campo (cuentan para goleadores, NO incluyen los 3 de penalidad)
     var fieldL=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
     var fieldV=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
-    var sc2=_evGoals.map(function(g){return{name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
+    var sc2=_evGoals.map(function(g){var o={name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};if(g.autogol)o.autogol=true;return o;});
     // Resultado oficial: cada equipo conserva sus goles de campo + ganador suma 3 de penalidad
     var finalL=fieldL+(curRetWho==='v'?3:0);
     var finalV=fieldV+(curRetWho==='l'?3:0);
@@ -2533,7 +2564,7 @@ async function doSR(){
     var m=MF.find(function(x){return x.id===cri;});
     var l=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
     var v=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
-    var sc2=_evGoals.map(function(g){return{name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
+    var sc2=_evGoals.map(function(g){var o={name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};if(g.autogol)o.autogol=true;return o;});
     data={l:l,v:v,scorers:sc2,yellows:_evYellows.slice(),reds:_evReds.slice(),ts:Date.now()};
   }
   if(fbR&&db){
