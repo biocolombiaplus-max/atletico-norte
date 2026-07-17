@@ -140,47 +140,49 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <div class="sec" style="margin-top:0;margin-bottom:14px">⭐ Jugador MVP</div>
 
     <!-- PASO 1: Partido -->
-    <div class="ctrl-l" style="margin-bottom:6px">1 · Elige el partido</div>
-    <div id="mvpMatchCards" style="display:flex;flex-direction:column;gap:5px;max-height:190px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px">
+    <div class="ctrl-l" style="margin-bottom:7px">1 · Elige el partido</div>
+    <div id="mvpMatchCards" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px">
       <div style="font-size:11px;color:var(--m);padding:8px 0">Cargando partidos…</div>
     </div>
-    <div id="mvpMatchInfoS" style="font-size:11px;color:var(--gn);font-weight:700;min-height:16px;margin-bottom:14px"></div>
+    <div id="mvpMatchInfoS" style="font-size:11px;color:var(--gn);font-weight:700;min-height:14px;margin-bottom:4px"></div>
 
-    <!-- PASO 2: Equipo (se filtra al elegir partido) -->
-    <div id="mvpStep2Lbl" class="ctrl-l" style="margin-bottom:6px;transition:color .2s">2 · Elige el equipo</div>
-    <div id="mvpTeamGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px;border-radius:10px;transition:box-shadow .3s">
-      <div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:4px 0">Primero selecciona un partido ↑</div>
+    <!-- PASO 2: Equipo — aparece dinámicamente cuando se elige partido -->
+    <div id="mvpStep2" style="display:none;margin-top:14px">
+      <div class="ctrl-l" style="margin-bottom:8px;color:rgba(245,159,11,.9)">2 · ¿De qué equipo es el MVP?</div>
+      <div id="mvpTeamGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px"></div>
     </div>
 
-    <!-- PASO 3: Jugador -->
-    <div id="mvpPlayerSection" style="display:none">
-      <div class="ctrl-l" style="margin-bottom:6px">3 · Elige el jugador</div>
-      <input id="mvpPlayerSearch" type="search" placeholder="🔍 Buscar por nombre…" oninput="mvpFilterPlayers()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-bottom:8px;-webkit-appearance:none">
-      <div id="mvpPlayerList" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:6px"></div>
-      <details style="margin-top:4px">
-        <summary style="font-size:11px;color:var(--m);cursor:pointer;padding:4px 0">✏️ No está en la lista — escribir nombre</summary>
-        <input id="mvpManualName" type="text" placeholder="Nombre completo del jugador" oninput="mvpSetManual()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-top:8px;-webkit-appearance:none">
-      </details>
-      <div id="mvpNom" style="font-size:12px;font-weight:700;min-height:18px;margin-top:10px;margin-bottom:4px"></div>
+    <!-- PASO 3: Jugador — aparece dinámicamente cuando se elige equipo -->
+    <div id="mvpPlayerSection" style="display:none;margin-top:14px">
+      <div class="ctrl-l" style="margin-bottom:8px;color:rgba(245,159,11,.9)">3 · Elige el jugador</div>
+      <input id="mvpPlayerSearch" type="search" placeholder="🔍 Buscar jugador…" oninput="mvpFilterPlayers()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid rgba(245,159,11,.5);color:var(--t);padding:10px 13px;border-radius:11px;font-size:14px;font-weight:600;margin-bottom:8px;-webkit-appearance:none">
+      <div id="mvpPlayerList" style="display:flex;flex-direction:column;gap:5px;max-height:260px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:8px"></div>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--b3);border:1.5px dashed var(--bd);border-radius:11px;cursor:pointer">
+        <span style="font-size:18px">✏️</span>
+        <input id="mvpManualName" type="text" placeholder="Escribir nombre manualmente…" oninput="mvpSetManual()" style="flex:1;background:none;border:none;color:var(--t);font-size:13px;font-weight:600;outline:none;-webkit-appearance:none">
+      </label>
+      <div id="mvpNom" style="font-size:12px;font-weight:700;min-height:18px;margin-top:10px;margin-bottom:2px"></div>
     </div>
 
     <!-- PASO 4: Foto -->
-    <div class="ctrl-l" style="margin-bottom:8px;margin-top:14px">4 · Foto del jugador</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.4);border-radius:12px;padding:14px 8px;text-align:center">
-        <span style="font-size:28px">📷</span>
-        <span style="font-size:12px;font-weight:700;color:var(--t)">Tomar foto</span>
-        <span style="font-size:10px;color:var(--m)">Abre la cámara</span>
-        <input type="file" accept="image/*" capture="user" id="mvpPhCamera" onchange="mvpLoadPhoto(this)" style="display:none">
-      </label>
-      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.4);border-radius:12px;padding:14px 8px;text-align:center">
-        <span style="font-size:28px">🖼️</span>
-        <span style="font-size:12px;font-weight:700;color:var(--t)">Desde galería</span>
-        <span style="font-size:10px;color:var(--m)">Elegir foto</span>
-        <input type="file" accept="image/*" id="mvpPhFile" onchange="mvpLoadPhoto(this)" style="display:none">
-      </label>
+    <div id="mvpStep4" style="margin-top:14px">
+      <div class="ctrl-l" style="margin-bottom:8px">4 · Foto del jugador</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+        <label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.35);border-radius:12px;padding:14px 8px;text-align:center">
+          <span style="font-size:28px">📷</span>
+          <span style="font-size:12px;font-weight:700;color:var(--t)">Tomar foto</span>
+          <span style="font-size:10px;color:var(--m)">Abre la cámara</span>
+          <input type="file" accept="image/*" capture="user" id="mvpPhCamera" onchange="mvpLoadPhoto(this)" style="display:none">
+        </label>
+        <label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:var(--b3);border:2px dashed rgba(245,159,11,.35);border-radius:12px;padding:14px 8px;text-align:center">
+          <span style="font-size:28px">🖼️</span>
+          <span style="font-size:12px;font-weight:700;color:var(--t)">Desde galería</span>
+          <span style="font-size:10px;color:var(--m)">Elegir foto</span>
+          <input type="file" accept="image/*" id="mvpPhFile" onchange="mvpLoadPhoto(this)" style="display:none">
+        </label>
+      </div>
+      <div id="mvpPhNm" style="font-size:11px;color:var(--gn);font-weight:700;text-align:center;min-height:16px"></div>
     </div>
-    <div id="mvpPhNm" style="font-size:11px;color:var(--gn);font-weight:700;text-align:center;min-height:16px"></div>
   </div>
 
   <div class="row2">
@@ -319,11 +321,9 @@ function startApp(){
   db.ref('/equipos').once('value',s=>{
     _equiposData=s.val()||{};
     mvpBuildTeamGrid();
-    // If user already picked a match before data arrived, scroll into view
+    // If user already picked a match before data arrived, rebuild with player counts
     if(_mvpMatchTeams){
-      const tg=document.getElementById('mvpTeamGrid');
-      if(tg)setTimeout(()=>tg.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
-      mvpPulseStep('mvpTeamGrid');
+      mvpBuildTeamGrid();
     }
   });
 
@@ -513,41 +513,35 @@ function mvpBuildCards(){
   }).join('');
 }
 function mvpPickCard(mid,el){
-  mvpSelectedMid=mvpSelectedMid===mid?0:mid;
+  const prev=mvpSelectedMid;
+  mvpSelectedMid=prev===mid?0:mid;
+  // Reset all cards
   document.querySelectorAll('[id^="mvpC"]').forEach(c=>{c.style.borderColor='var(--bd)';c.style.background='var(--b3)';});
   document.querySelectorAll('[id^="mvpCk"]').forEach(c=>{c.textContent='';c.style.background='';c.style.borderColor='var(--bd)';});
   const infoEl=document.getElementById('mvpMatchInfoS');
+  const step2=document.getElementById('mvpStep2');
+  const sec=document.getElementById('mvpPlayerSection');
   if(mvpSelectedMid){
-    el.style.borderColor='rgba(245,159,11,.6)';el.style.background='rgba(245,159,11,.07)';
-    document.getElementById('mvpCk'+mid).textContent='✓';
-    document.getElementById('mvpCk'+mid).style.background='rgba(245,159,11,.8)';
-    document.getElementById('mvpCk'+mid).style.borderColor='rgba(245,159,11,.8)';
+    el.style.borderColor='rgba(245,159,11,.7)';el.style.background='rgba(245,159,11,.1)';
+    const ck=document.getElementById('mvpCk'+mid);
+    if(ck){ck.textContent='✓';ck.style.background='rgba(245,159,11,.85)';ck.style.borderColor='rgba(245,159,11,.85)';}
     const m=ALL.find(x=>x.id===mid),r=results[mid];
-    if(m&&r){
-      const sc=r.wo?'Walkover':`${r.l} – ${r.v}`;
-      infoEl.textContent=`⚽ ${tn(m.l)} ${sc} ${tn(m.v)} · Semana ${m.week}`;
+    if(m){
+      const sc=r?(r.wo?'W/O':`${r.l}–${r.v}`):'–';
+      infoEl.textContent=`${tn(m.l)} ${sc} ${tn(m.v)} · S${m.week}`;
       _mvpMatchTeams=[m.l,m.v];
+      _mvpSelTeam=0;
+      if(sec)sec.style.display='none';
       mvpBuildTeamGrid();
-      // Activate step 2 label
-      const lbl2=document.getElementById('mvpStep2Lbl');
-      if(lbl2)lbl2.style.color='rgba(245,159,11,.9)';
-      // Scroll to team section and pulse it
-      const tg=document.getElementById('mvpTeamGrid');
-      if(tg){setTimeout(()=>tg.scrollIntoView({behavior:'smooth',block:'nearest'}),120);}
-      mvpPulseStep('mvpTeamGrid');
+      if(step2){step2.style.display='block';setTimeout(()=>step2.scrollIntoView({behavior:'smooth',block:'nearest'}),100);}
     }
   } else {
     infoEl.textContent='';
     _mvpMatchTeams=null;
-    mvpBuildTeamGrid();
+    _mvpSelTeam=0;
+    if(step2)step2.style.display='none';
+    if(sec)sec.style.display='none';
   }
-}
-function mvpPulseStep(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.style.transition='box-shadow .15s';
-  el.style.boxShadow='0 0 0 3px rgba(245,159,11,.5)';
-  setTimeout(()=>{el.style.boxShadow='none';},600);
 }
 function setBg(t,b){bgType=t;document.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
 function loadBgImg(inp){
@@ -932,34 +926,19 @@ let mvpPhotoImg=null,mvpNombreS='',mvpEquipoS='',_mvpSelTeam=0,_mvpAllPlayers=[]
 
 function mvpBuildTeamGrid(){
   const grid=document.getElementById('mvpTeamGrid');
-  if(!grid)return;
-  // If data not loaded yet and a match is already selected, show loading
-  const dataEmpty=Object.keys(_equiposData).length===0;
-  if(dataEmpty&&_mvpMatchTeams){
-    grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">⏳ Cargando jugadores…</div>';
-    return;
-  }
-  const teams=[];
-  for(let t=1;t<=10;t++){
-    if(_mvpMatchTeams&&!_mvpMatchTeams.includes(t))continue;
-    const jugs=(_equiposData[t]||{}).jugadores;
-    if(jugs&&Object.keys(jugs).length)teams.push(t);
-  }
-  if(!teams.length){
-    if(!_mvpMatchTeams){
-      grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">Primero selecciona un partido ↑</div>';
-    } else {
-      grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">Sin jugadores sincronizados para este partido</div>';
-    }
-    return;
-  }
-  const TCOLORS={1:'#c8102e',2:'#ffd700',3:'#009c3b',4:'#c8102e',5:'#003087',6:'#009c3b',7:'#c8a000',8:'#c8102e',9:'#e40046',10:'#c8102e'};
-  grid.innerHTML=teams.map(t=>{
+  if(!grid||!_mvpMatchTeams)return;
+  const TCOLORS={1:'#c8102e',2:'#e8b800',3:'#009c3b',4:'#c8102e',5:'#003087',6:'#009c3b',7:'#c8a000',8:'#c8102e',9:'#e40046',10:'#c8102e'};
+  // Always show BOTH match teams — never hide them due to missing player data
+  grid.innerHTML=_mvpMatchTeams.map(t=>{
     const col=TCOLORS[t]||'#f59e0b';
-    return `<button id="mvpTB${t}" onclick="mvpSelectTeam(${t})" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--b3);border:2px solid var(--bd);border-radius:12px;color:var(--t);font-size:13px;font-weight:700;cursor:pointer;text-align:left;transition:.15s;width:100%;-webkit-tap-highlight-color:transparent">
-      <span style="width:28px;height:28px;border-radius:7px;background:${col}22;border:1.5px solid ${col}55;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">${B[t]||'⚽'}</span>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${tn(t)}</span>
-      <span style="font-size:14px;opacity:.4">›</span>
+    const jugs=(_equiposData[t]||{}).jugadores;
+    const nPlayers=jugs?Object.keys(jugs).length:0;
+    const badge=B[t]?`<span style="font-size:22px">${B[t]}</span>`
+      :`<span style="width:32px;height:32px;border-radius:8px;background:${col}33;border:1.5px solid ${col}66;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:${col}">${ts(t)}</span>`;
+    return `<button id="mvpTB${t}" onclick="mvpSelectTeam(${t})" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px 8px;background:var(--b3);border:2px solid var(--bd);border-radius:14px;color:var(--t);font-size:12px;font-weight:800;cursor:pointer;text-align:center;transition:.15s;width:100%;min-height:82px;-webkit-tap-highlight-color:transparent">
+      ${badge}
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%">${tn(t)}</span>
+      ${nPlayers?`<span style="font-size:10px;font-weight:600;color:rgba(245,159,11,.7)">${nPlayers} jugadores</span>`:``}
     </button>`;
   }).join('');
 }
@@ -969,7 +948,8 @@ function mvpSelectTeam(tid){
   document.querySelectorAll('[id^="mvpTB"]').forEach(b=>{
     const active=b.id==='mvpTB'+tid;
     b.style.borderColor=active?'rgba(245,159,11,.9)':'var(--bd)';
-    b.style.background=active?'rgba(245,159,11,.12)':'var(--b3)';
+    b.style.background=active?'rgba(245,159,11,.13)':'var(--b3)';
+    b.style.transform=active?'scale(1.02)':'scale(1)';
   });
   const jugs=(_equiposData[tid]||{}).jugadores||{};
   _mvpAllPlayers=Object.values(jugs)
@@ -978,12 +958,11 @@ function mvpSelectTeam(tid){
     .sort((a,b)=>(parseInt(a.num)||99)-(parseInt(b.num)||99)||a.corto.localeCompare(b.corto));
   const sec=document.getElementById('mvpPlayerSection');
   if(sec){sec.style.display='block';}
-  document.getElementById('mvpPlayerSearch').value='';
+  const srch=document.getElementById('mvpPlayerSearch');
+  if(srch)srch.value='';
   _mvpQuery='';
   mvpFilterPlayers();
-  // Scroll to player section and pulse it
   if(sec){setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
-  mvpPulseStep('mvpPlayerList');
 }
 
 function mvpFilterPlayers(){
