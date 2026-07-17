@@ -147,8 +147,8 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <div id="mvpMatchInfoS" style="font-size:11px;color:var(--gn);font-weight:700;min-height:16px;margin-bottom:14px"></div>
 
     <!-- PASO 2: Equipo (se filtra al elegir partido) -->
-    <div class="ctrl-l" style="margin-bottom:6px">2 · Elige el equipo</div>
-    <div id="mvpTeamGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px">
+    <div id="mvpStep2Lbl" class="ctrl-l" style="margin-bottom:6px;transition:color .2s">2 · Elige el equipo</div>
+    <div id="mvpTeamGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px;border-radius:10px;transition:box-shadow .3s">
       <div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:4px 0">Primero selecciona un partido ↑</div>
     </div>
 
@@ -319,6 +319,12 @@ function startApp(){
   db.ref('/equipos').once('value',s=>{
     _equiposData=s.val()||{};
     mvpBuildTeamGrid();
+    // If user already picked a match before data arrived, scroll into view
+    if(_mvpMatchTeams){
+      const tg=document.getElementById('mvpTeamGrid');
+      if(tg)setTimeout(()=>tg.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+      mvpPulseStep('mvpTeamGrid');
+    }
   });
 
   let _urlInit=false;
@@ -520,15 +526,28 @@ function mvpPickCard(mid,el){
     if(m&&r){
       const sc=r.wo?'Walkover':`${r.l} – ${r.v}`;
       infoEl.textContent=`⚽ ${tn(m.l)} ${sc} ${tn(m.v)} · Semana ${m.week}`;
-      // Rebuild team grid filtered to match teams only
       _mvpMatchTeams=[m.l,m.v];
       mvpBuildTeamGrid();
+      // Activate step 2 label
+      const lbl2=document.getElementById('mvpStep2Lbl');
+      if(lbl2)lbl2.style.color='rgba(245,159,11,.9)';
+      // Scroll to team section and pulse it
+      const tg=document.getElementById('mvpTeamGrid');
+      if(tg){setTimeout(()=>tg.scrollIntoView({behavior:'smooth',block:'nearest'}),120);}
+      mvpPulseStep('mvpTeamGrid');
     }
   } else {
     infoEl.textContent='';
     _mvpMatchTeams=null;
     mvpBuildTeamGrid();
   }
+}
+function mvpPulseStep(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.style.transition='box-shadow .15s';
+  el.style.boxShadow='0 0 0 3px rgba(245,159,11,.5)';
+  setTimeout(()=>{el.style.boxShadow='none';},600);
 }
 function setBg(t,b){bgType=t;document.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
 function loadBgImg(inp){
@@ -914,6 +933,12 @@ let mvpPhotoImg=null,mvpNombreS='',mvpEquipoS='',_mvpSelTeam=0,_mvpAllPlayers=[]
 function mvpBuildTeamGrid(){
   const grid=document.getElementById('mvpTeamGrid');
   if(!grid)return;
+  // If data not loaded yet and a match is already selected, show loading
+  const dataEmpty=Object.keys(_equiposData).length===0;
+  if(dataEmpty&&_mvpMatchTeams){
+    grid.innerHTML='<div style="font-size:11px;color:var(--m);grid-column:1/-1;padding:6px 0">⏳ Cargando jugadores…</div>';
+    return;
+  }
   const teams=[];
   for(let t=1;t<=10;t++){
     if(_mvpMatchTeams&&!_mvpMatchTeams.includes(t))continue;
@@ -928,10 +953,15 @@ function mvpBuildTeamGrid(){
     }
     return;
   }
-  grid.innerHTML=teams.map(t=>`
-    <button id="mvpTB${t}" onclick="mvpSelectTeam(${t})" style="display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--b3);border:1.5px solid var(--bd);border-radius:10px;color:var(--t);font-size:13px;font-weight:700;cursor:pointer;text-align:left;transition:.15s">
-      <span style="font-size:18px">${B[t]||'⚽'}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${tn(t)}</span>
-    </button>`).join('');
+  const TCOLORS={1:'#c8102e',2:'#ffd700',3:'#009c3b',4:'#c8102e',5:'#003087',6:'#009c3b',7:'#c8a000',8:'#c8102e',9:'#e40046',10:'#c8102e'};
+  grid.innerHTML=teams.map(t=>{
+    const col=TCOLORS[t]||'#f59e0b';
+    return `<button id="mvpTB${t}" onclick="mvpSelectTeam(${t})" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--b3);border:2px solid var(--bd);border-radius:12px;color:var(--t);font-size:13px;font-weight:700;cursor:pointer;text-align:left;transition:.15s;width:100%;-webkit-tap-highlight-color:transparent">
+      <span style="width:28px;height:28px;border-radius:7px;background:${col}22;border:1.5px solid ${col}55;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">${B[t]||'⚽'}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${tn(t)}</span>
+      <span style="font-size:14px;opacity:.4">›</span>
+    </button>`;
+  }).join('');
 }
 
 function mvpSelectTeam(tid){
@@ -947,10 +977,13 @@ function mvpSelectTeam(tid){
     .filter(p=>p.nombre)
     .sort((a,b)=>(parseInt(a.num)||99)-(parseInt(b.num)||99)||a.corto.localeCompare(b.corto));
   const sec=document.getElementById('mvpPlayerSection');
-  if(sec)sec.style.display='block';
+  if(sec){sec.style.display='block';}
   document.getElementById('mvpPlayerSearch').value='';
   _mvpQuery='';
   mvpFilterPlayers();
+  // Scroll to player section and pulse it
+  if(sec){setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
+  mvpPulseStep('mvpPlayerList');
 }
 
 function mvpFilterPlayers(){
@@ -1676,6 +1709,7 @@ async function tResultado(ctx,m){
 
   const scorers=r.scorers||[];
   const yellows=r.yellows||[];
+  const reds=r.reds||[];
   const rawL=[],rawR=[];
   scorers.forEach(s=>{
     const tid=s.teamId||(s.team==='Local'?m.l:(s.team==='Visitante'?m.v:null));
@@ -1684,76 +1718,96 @@ async function tResultado(ctx,m){
   const scL=aggregateScorers(rawL),scR=aggregateScorers(rawR);
   const ylL=yellows.filter(y=>(y.teamId||0)===m.l);
   const ylR=yellows.filter(y=>(y.teamId||0)===m.v);
+  const rdL=reds.filter(y=>(y.teamId||0)===m.l);
+  const rdR=reds.filter(y=>(y.teamId||0)===m.v);
 
-  // Build combined event list per column: goals first, then yellows
+  // Build combined event list per column: goals → yellows → reds
   const evL=[
     ...scL.map(s=>({...s,evType:s.autogol?'ag':'goal'})),
-    ...ylL.map(y=>({...y,evType:'yellow',count:1}))
+    ...ylL.map(y=>({...y,evType:'yellow',count:1})),
+    ...rdL.map(y=>({...y,evType:'red',count:1}))
   ];
   const evR=[
     ...scR.map(s=>({...s,evType:s.autogol?'ag':'goal'})),
-    ...ylR.map(y=>({...y,evType:'yellow',count:1}))
+    ...ylR.map(y=>({...y,evType:'yellow',count:1})),
+    ...rdR.map(y=>({...y,evType:'red',count:1}))
   ];
 
   const hasEvents=evL.length||evR.length;
-  const hasYellows=ylL.length||ylR.length;
+  const hasCards=ylL.length||ylR.length||rdL.length||rdR.length;
+
+  // Helper: draw a thin labeled separator between event sections
+  function evSep(rowY,rH,label,col){
+    const sepY=rowY-rH*.45;
+    ctx.save();ctx.globalAlpha=.35;
+    ctx.strokeStyle=col;ctx.lineWidth=1;ctx.setLineDash([3,5]);
+    const lblW=ctx.measureText(label).width+20;
+    ctx.beginPath();ctx.moveTo(lColX,sepY);ctx.lineTo(W/2-14-lblW/2,sepY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W/2+14+lblW/2,sepY);ctx.lineTo(rColX+colW,sepY);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+    ctx.font=`700 17px sans-serif`;ctx.letterSpacing='2px';ctx.fillStyle=col;ctx.globalAlpha=.6;
+    ctx.textAlign='center';ctx.fillText(label,W/2,sepY+6);ctx.globalAlpha=1;ctx.letterSpacing='0';
+  }
 
   if(hasEvents){
     goldRule(ctx,evTop);
-    // Section header
-    const hdrTxt=hasYellows?'EVENTOS DEL PARTIDO':'ANOTADORES';
+    // Dynamic header
+    const hdrTxt=hasCards?'EVENTOS DEL PARTIDO':'ANOTADORES';
     ctx.font='700 20px sans-serif';ctx.letterSpacing='4px';ctx.fillStyle='rgba(255,215,0,.60)';ctx.textAlign='center';
     ctx.fillText(hdrTxt,W/2,evTop+28);
 
     const colW=W/2-mx-28,lColX=mx+18,rColX=W/2+10;
     const totalRows=Math.max(evL.length,evR.length);
-    const maxRows=Math.min(totalRows,10);
-    const rowH=maxRows>7?28:maxRows>5?32:maxRows>3?36:40;
-    const nfs=maxRows>7?19:maxRows>5?21:maxRows>3?23:26;
-    const startY=evTop+46;
+    const maxRows=Math.min(totalRows,12);
+    const rowH=maxRows>8?26:maxRows>6?30:maxRows>4?34:maxRows>2?38:44;
+    const nfs=maxRows>8?18:maxRows>6?20:maxRows>4?22:maxRows>2?24:27;
+    const startY=evTop+48;
 
-    // Subtle separator between goals and yellows sections (draw divider line mid-column)
-    const goalCountL=scL.length,goalCountR=scR.length;
-    const sepRow=Math.max(goalCountL,goalCountR);
+    // Separator row indices
+    const goalRows=Math.max(scL.length,scR.length);
+    const cardRows=goalRows+Math.max(ylL.length,ylR.length);
 
+    let lastRenderedY=startY;
     for(let i=0;i<maxRows;i++){
       const rowY=startY+i*rowH;
-      if(rowY>H-200)break;
+      if(rowY>H-198)break;
+      lastRenderedY=rowY;
 
-      // Draw subtle separator before yellows rows
-      if(i===sepRow&&(ylL.length||ylR.length)&&i>0){
-        ctx.save();ctx.globalAlpha=.25;ctx.strokeStyle='rgba(251,191,36,.5)';ctx.lineWidth=1;ctx.setLineDash([4,6]);
-        ctx.beginPath();ctx.moveTo(lColX,rowY-rowH*.4);ctx.lineTo(W/2-14,rowY-rowH*.4);ctx.stroke();
-        ctx.beginPath();ctx.moveTo(W/2+14,rowY-rowH*.4);ctx.lineTo(rColX+colW,rowY-rowH*.4);ctx.stroke();
-        ctx.setLineDash([]);ctx.restore();
+      // Section separator: before cards (yellow) block
+      if(i===goalRows&&(ylL.length||ylR.length||rdL.length||rdR.length)&&i>0){
+        evSep(rowY,rowH,'TARJETAS','rgba(251,191,36,.8)');
+      }
+      // Section separator: before reds block (only if yellows also exist)
+      if(i===cardRows&&(rdL.length||rdR.length)&&(ylL.length||ylR.length)&&i>0){
+        evSep(rowY,rowH,'ROJAS','rgba(239,68,68,.8)');
       }
 
       const el=evL[i],er=evR[i];
       ctx.font=`600 ${nfs}px sans-serif`;ctx.letterSpacing='0';
 
       if(el){
-        const icon=el.evType==='yellow'?'🟨':el.evType==='ag'?'🔄':'⚽';
+        const icon=el.evType==='red'?'🟥':el.evType==='yellow'?'🟨':el.evType==='ag'?'🔄':'⚽';
         const cnt=el.count>1?` ×${el.count}`:'';
-        const agSfx=el.evType==='ag'?' (AG)':'';
-        let txt=`${icon} ${scorerShort(el)}${agSfx}${cnt}`;
-        const col=el.evType==='yellow'?'#fbbf24':el.evType==='ag'?'#fb923c':'rgba(255,255,255,.90)';
+        const sfx=el.evType==='ag'?' (AG)':'';
+        let txt=`${icon} ${scorerShort(el)}${sfx}${cnt}`;
+        const col=el.evType==='red'?'#f87171':el.evType==='yellow'?'#fbbf24':el.evType==='ag'?'#fb923c':'rgba(255,255,255,.90)';
         while(ctx.measureText(txt).width>colW-6&&txt.length>4)txt=txt.slice(0,-1);
         ctx.fillStyle=col;ctx.textAlign='left';ctx.fillText(txt,lColX,rowY);
       }
       if(er){
-        const icon=er.evType==='yellow'?'🟨':er.evType==='ag'?'🔄':'⚽';
+        const icon=er.evType==='red'?'🟥':er.evType==='yellow'?'🟨':er.evType==='ag'?'🔄':'⚽';
         const cnt=er.count>1?` ×${er.count}`:'';
-        const agSfx=er.evType==='ag'?' (AG)':'';
-        let txt=`${scorerShort(er)}${agSfx}${cnt} ${icon}`;
-        const col=er.evType==='yellow'?'#fbbf24':er.evType==='ag'?'#fb923c':'rgba(255,255,255,.90)';
+        const sfx=er.evType==='ag'?' (AG)':'';
+        let txt=`${scorerShort(er)}${sfx}${cnt} ${icon}`;
+        const col=er.evType==='red'?'#f87171':er.evType==='yellow'?'#fbbf24':er.evType==='ag'?'#fb923c':'rgba(255,255,255,.90)';
         while(ctx.measureText(txt).width>colW-6&&txt.length>4)txt=txt.slice(0,-1);
         ctx.fillStyle=col;ctx.textAlign='right';ctx.fillText(txt,rColX+colW,rowY);
       }
     }
     // Divisor vertical central
-    const divEndY=Math.min(startY+maxRows*rowH-8,H-205);
+    const divEndY=Math.min(lastRenderedY+rowH*.4,H-202);
     ctx.strokeStyle='rgba(255,215,0,.16)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(W/2,startY-12);ctx.lineTo(W/2,divEndY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W/2,startY-14);ctx.lineTo(W/2,divEndY);ctx.stroke();
   }
 
   // ── PIE ──
