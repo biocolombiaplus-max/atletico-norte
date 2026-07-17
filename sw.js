@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v8.67-2026-07-17';
+const SW_VER = 'v8.68-2026-07-17';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER; // versioned — cleared on every deploy
 
