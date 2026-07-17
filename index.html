@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.72';
+var APP_VER='8.73';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -888,7 +888,7 @@ tbody td:nth-child(2){text-align:left}
 <div class="pg" id="pg-tabla">
   <div class="stl">Posiciones <span>Liga Interna S2 2026</span></div>
   <div class="twtbl"><table>
-    <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th title="Walkover Ganado" style="color:#f59e0b">W+</th><th title="Walkover Perdido" style="color:#ef4444">W-</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th></tr></thead>
+    <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th title="Walkover Ganado" style="color:#10b981">W+</th><th title="Walkover Perdido" style="color:#ef4444">W-</th><th title="Retiros" style="color:#f59e0b">🏃</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th></tr></thead>
     <tbody id="tb"></tbody>
   </table></div>
   <div class="tinfo">&#128309; Top 8 clasifican a Playoffs &nbsp;|&nbsp; &#9651; Eliminados los 2 &#250;ltimos</div>
@@ -2034,20 +2034,28 @@ function cSt(){
     t.wpen=wlPenalty(t.wl);
     t.pts=Math.max(0,t.pts+t.wpen);
   });
-  // Tiebreakers (equal points): 1) fewer WO losses, 2) more goals scored, 3) better goal diff
+  // Tiebreakers: 1) pts, 2) menos WO perdidos, 3) mejor diferencia de gol, 4) más goles marcados
   return Object.values(st).sort(function(a,b){
     if(b.pts!==a.pts)return b.pts-a.pts;
     if(a.wl!==b.wl)return a.wl-b.wl;
-    if(b.gf!==a.gf)return b.gf-a.gf;
-    return(b.gf-b.gc)-(a.gf-a.gc);
+    var dgA=a.gf-a.gc,dgB=b.gf-b.gc;
+    if(dgB!==dgA)return dgB-dgA;
+    return b.gf-a.gf;
   });
 }
 function _wCell(arr,col){
   if(!arr||!arr.length)return'<span style="color:var(--m)">–</span>';
   var cnt=arr.length;
-  var labs=arr.map(function(d){return ts(d.opp)+(d.t==='ret'?'🏃':'');}).join(' ');
+  var labs=arr.map(function(d){return ts(d.opp);}).join(' ');
   return'<span style="font-size:12px;font-weight:900;color:'+col+'">'+cnt+'</span>'
        +'<br><span style="font-size:7px;color:'+col+';opacity:.75;letter-spacing:.2px">'+labs+'</span>';
+}
+function _retCell(arr){
+  if(!arr||!arr.length)return'<span style="color:var(--m)">–</span>';
+  var cnt=arr.length;
+  var labs=arr.map(function(d){return ts(d.opp);}).join(' ');
+  return'<span style="font-size:12px;font-weight:900;color:#f59e0b">'+cnt+'</span>'
+       +'<br><span style="font-size:7px;color:#f59e0b;opacity:.75;letter-spacing:.2px">'+labs+'</span>';
 }
 function rTb(){
   var st=cSt();var h="";
@@ -2061,13 +2069,8 @@ function rTb(){
     h+='<td><div class="trn">'+bdg(t.id,'bs')+'<span>'+tn(t.id)+'</span></div></td>';
     h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
     h+='<td>'+_wCell(t.wwD,'#10b981')+'</td>';
-    // W-: solo WOs penalizados. Si además hubo retiro, se muestra como nota sin color rojo fuerte
-    var wlCell=_wCell(t.wlD,'#ef4444');
-    if(t.retD&&t.retD.length){
-      var retLabs=t.retD.map(function(d){return ts(d.opp);}).join(' ');
-      wlCell+='<br><span style="font-size:7px;color:#f59e0b;opacity:.8">🏃'+retLabs+'</span>';
-    }
-    h+='<td>'+wlCell+'</td>';
+    h+='<td>'+_wCell(t.wlD,'#ef4444')+'</td>';
+    h+='<td>'+_retCell(t.retD)+'</td>';
     var penTxt=t.wpen<0?'<span class="wpen">'+t.wpen+'</span>':'';
     h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+penTxt+'</td>';
     h+='<td><div class="fd2">'+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join('')+'</div></td></tr>';
