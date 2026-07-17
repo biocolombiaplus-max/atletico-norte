@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.69';
+var APP_VER='8.70';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -477,10 +477,10 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
 tbody td{padding:8px;text-align:center;font-size:11px}
 tbody td:first-child{padding-left:12px}
 tbody td:nth-child(2){text-align:left}
-.pos-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:var(--b3);color:var(--m);border:1.5px solid var(--bd)}
-.pos-badge.pg{background:rgba(16,185,129,.14);border-color:#10b981;color:#10b981;box-shadow:0 0 7px rgba(16,185,129,.25)}
-.pos-badge.pt{background:rgba(245,159,11,.15);border-color:var(--gl);color:var(--gl);box-shadow:0 0 7px rgba(245,159,11,.2)}
-.pos-badge.el{background:rgba(200,16,46,.13);border-color:var(--anr);color:var(--anr);box-shadow:0 0 7px rgba(200,16,46,.18)}
+.pos-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;border:2px solid var(--bd);background:transparent;color:var(--m)}
+.pos-badge.pg{border-color:#10b981;color:#10b981;background:rgba(16,185,129,.12);box-shadow:0 0 8px rgba(16,185,129,.3)}
+.pos-badge.pt{border-color:#f59e0b;color:#f59e0b;background:rgba(245,159,11,.12);box-shadow:0 0 8px rgba(245,159,11,.3)}
+.pos-badge.el{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,.12);box-shadow:0 0 8px rgba(239,68,68,.28)}
 .trn{display:flex;align-items:center;gap:7px}
 .bs{width:20px;height:24px;flex-shrink:0}
 .fd2{display:flex;gap:2px;justify-content:center}
@@ -2042,11 +2042,12 @@ function cSt(){
     return(b.gf-b.gc)-(a.gf-a.gc);
   });
 }
-function _wCell(arr,col,icon){
-  if(!arr||!arr.length)return'<span style="color:var(--m);font-size:11px">0</span>';
+function _wCell(arr,col){
+  if(!arr||!arr.length)return'<span style="color:var(--m)">–</span>';
   var cnt=arr.length;
-  var tips=arr.map(function(d){return'<span style="font-size:8px;font-weight:700;color:'+col+';background:rgba(255,255,255,.06);border-radius:4px;padding:1px 4px">'+icon+(d.t==='ret'?'🏃':'')+ts(d.opp)+'</span>';}).join('');
-  return'<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-size:13px;font-weight:900;color:'+col+'">'+cnt+'</span><div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center">'+tips+'</div></div>';
+  var labs=arr.map(function(d){return ts(d.opp)+(d.t==='ret'?'🏃':'');}).join(' ');
+  return'<span style="font-size:12px;font-weight:900;color:'+col+'">'+cnt+'</span>'
+       +'<br><span style="font-size:7px;color:'+col+';opacity:.75;letter-spacing:.2px">'+labs+'</span>';
 }
 function rTb(){
   var st=cSt();var h="";
@@ -2057,8 +2058,8 @@ function rTb(){
     h+='<tr><td><span class="pos-badge '+cls+'">'+(i+1)+'</span></td>';
     h+='<td><div class="trn">'+bdg(t.id,'bs')+'<span>'+tn(t.id)+'</span></div></td>';
     h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
-    h+='<td>'+_wCell(t.wwD,'#10b981','✅')+'</td>';
-    h+='<td>'+_wCell(t.wlD,'#f87171','❌')+'</td>';
+    h+='<td>'+_wCell(t.wwD,'#10b981')+'</td>';
+    h+='<td>'+_wCell(t.wlD,'#ef4444')+'</td>';
     var penTxt=t.wpen<0?'<span class="wpen">'+t.wpen+'</span>':'';
     h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+penTxt+'</td>';
     h+='<td><div class="fd2">'+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join('')+'</div></td></tr>';
