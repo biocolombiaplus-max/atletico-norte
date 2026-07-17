@@ -933,8 +933,10 @@ function mvpBuildTeamGrid(){
     const col=TCOLORS[t]||'#f59e0b';
     const jugs=(_equiposData[t]||{}).jugadores;
     const nPlayers=jugs?Object.keys(jugs).length:0;
-    const badge=B[t]?`<span style="font-size:22px">${B[t]}</span>`
-      :`<span style="width:32px;height:32px;border-radius:8px;background:${col}33;border:1.5px solid ${col}66;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:${col}">${ts(t)}</span>`;
+    const imgUrl=custBadges[t];
+    const badge=imgUrl
+      ?`<img src="${imgUrl}" style="width:36px;height:36px;object-fit:contain;border-radius:6px">`
+      :`<span style="width:36px;height:36px;border-radius:8px;background:${col}33;border:1.5px solid ${col}66;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:${col}">${ts(t)}</span>`;
     return `<button id="mvpTB${t}" onclick="mvpSelectTeam(${t})" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px 8px;background:var(--b3);border:2px solid var(--bd);border-radius:14px;color:var(--t);font-size:12px;font-weight:800;cursor:pointer;text-align:center;transition:.15s;width:100%;min-height:82px;-webkit-tap-highlight-color:transparent">
       ${badge}
       <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%">${tn(t)}</span>
