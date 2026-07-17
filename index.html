@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.53';
+var APP_VER='8.54';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2290,7 +2290,10 @@ function rsPickerHtml(m){
   var evtCol=evtType==='goal'?'#10b981':evtType==='yellow'?'#f59e0b':'#ef4444';
   var evtIcon=evtType==='goal'?'⚽':evtType==='yellow'?'🟨':'🟥';
   var arr=evtType==='goal'?_evGoals:evtType==='yellow'?_evYellows:_evReds;
-  var selKeys=arr.map(function(e){return e.name+'|'+e.teamId;});
+  // For goals: count per player (name is unique-keyed, so match by corto+teamId)
+  var selKeys=evtType==='goal'
+    ?arr.map(function(e){return e.corto+'|'+e.teamId;})
+    :arr.map(function(e){return e.name+'|'+e.teamId;});
   var h='<div class="rs-picker-box" style="--picker-col:'+evtCol+'">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
   h+='<div style="font-size:10px;font-weight:900;letter-spacing:.5px;color:'+evtCol+'">'+evtIcon+' '+escHtml(tn(tid))+'</div>';
@@ -2301,13 +2304,16 @@ function rsPickerHtml(m){
   } else {
     h+='<div class="rs-pl-grid">';
     players.forEach(function(p){
-      var key=p.name+'|'+p.teamId,isOn=selKeys.indexOf(key)>=0;
+      var pKey=evtType==='goal'?(p.corto+'|'+p.teamId):(p.name+'|'+p.teamId);
+      var goalCount=evtType==='goal'?selKeys.filter(function(k){return k===pKey;}).length:0;
+      var isOn=evtType==='goal'?(goalCount>0):(selKeys.indexOf(pKey)>=0);
       var numBg=isOn?evtCol:tCol;
       var num=p.camiseta||'?';
       h+='<button class="rs-pl-btn'+(isOn?' on':'')+'" ';
       h+='style="'+(isOn?'border-color:'+evtCol+';background:rgba('+hexRgb(evtCol)+',.18)':'')+'"';
       h+=' onclick="rsPickPlayer(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+',\''+evtType+'\')">';
-      if(isOn)h+='<div class="rs-pl-badge">'+evtIcon+'</div>';
+      if(evtType==='goal'&&goalCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px">'+goalCount+'⚽</div>';
+      else if(isOn)h+='<div class="rs-pl-badge">'+evtIcon+'</div>';
       h+='<div class="rs-pl-num" style="background:'+numBg+';font-size:'+(num.length>2?'9':'12')+'px">'+escHtml(num)+'</div>';
       h+='<div class="rs-pl-name" style="color:'+(isOn?evtCol:'var(--t)')+'">'+escHtml(p.corto)+'</div>';
       h+='</button>';
@@ -2328,11 +2334,17 @@ function rsPickerHtml(m){
 }
 
 function rsPickPlayer(name,corto,teamId,evtType){
-  var arr=evtType==='goal'?_evGoals:evtType==='yellow'?_evYellows:_evReds;
-  var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
-  if(idx>=0){arr.splice(idx,1);}
-  else{var rp=[].concat(_pickerRosters.l||[],_pickerRosters.v||[]).find(function(p){return p.name===name&&p.teamId===teamId;});arr.push({name:name,corto:corto,teamId:teamId,camiseta:rp?rp.camiseta:''});}
-  if(evtType==='goal')_rsPicker=null;
+  var rp=[].concat(_pickerRosters.l||[],_pickerRosters.v||[]).find(function(p){return p.name===name&&p.teamId===teamId;});
+  var cam=rp?rp.camiseta:'';
+  if(evtType==='goal'){
+    // Goals always add — same player can score multiple times; uid keeps entries unique
+    _evGoals.push({name:name+'_g'+Date.now(),playerName:name,corto:corto,teamId:teamId,camiseta:cam});
+    _rsPicker=null;
+  }else{
+    var arr=evtType==='yellow'?_evYellows:_evReds;
+    var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
+    if(idx>=0){arr.splice(idx,1);}else{arr.push({name:name,corto:corto,teamId:teamId,camiseta:cam});}
+  }
   rsRender();
 }
 function rsAnonGoal(teamId){_evGoals.push({name:'anon_'+Date.now(),corto:'Sin identificar',teamId:teamId,camiseta:''});_rsPicker=null;rsRender();}
@@ -2512,7 +2524,7 @@ async function doSR(){
     // Goles en campo (cuentan para goleadores)
     var fieldL=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
     var fieldV=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
-    var sc2=_evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
+    var sc2=_evGoals.map(function(g){return{name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
     // Resultado oficial 3-0 para el ganador
     var finalL=curRetWho==='l'?0:3,finalV=curRetWho==='v'?0:3;
     // Si ganador ya tenía más goles en campo, respetar eso (caso raro)
@@ -2523,7 +2535,7 @@ async function doSR(){
     var m=MF.find(function(x){return x.id===cri;});
     var l=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
     var v=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
-    var sc2=_evGoals.map(function(g){return{name:g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
+    var sc2=_evGoals.map(function(g){return{name:g.playerName||g.name,corto:g.corto,teamId:g.teamId,team:g.teamId===m.l?'Local':'Visitante',goals:1};});
     data={l:l,v:v,scorers:sc2,yellows:_evYellows.slice(),reds:_evReds.slice(),ts:Date.now()};
   }
   if(fbR&&db){
