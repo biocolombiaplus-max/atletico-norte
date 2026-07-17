@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.68';
+var APP_VER='8.69';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -477,9 +477,10 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
 tbody td{padding:8px;text-align:center;font-size:11px}
 tbody td:first-child{padding-left:12px}
 tbody td:nth-child(2){text-align:left}
-.pos-badge{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:var(--b3);color:var(--m);border:1px solid var(--bd)}
-.pos-badge.t8{background:rgba(200,16,46,.15);border-color:var(--anr);color:var(--anr)}
-.pos-badge.t3{background:rgba(245,159,11,.15);border-color:var(--gl);color:var(--gl)}
+.pos-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:var(--b3);color:var(--m);border:1.5px solid var(--bd)}
+.pos-badge.pg{background:rgba(16,185,129,.14);border-color:#10b981;color:#10b981;box-shadow:0 0 7px rgba(16,185,129,.25)}
+.pos-badge.pt{background:rgba(245,159,11,.15);border-color:var(--gl);color:var(--gl);box-shadow:0 0 7px rgba(245,159,11,.2)}
+.pos-badge.el{background:rgba(200,16,46,.13);border-color:var(--anr);color:var(--anr);box-shadow:0 0 7px rgba(200,16,46,.18)}
 .trn{display:flex;align-items:center;gap:7px}
 .bs{width:20px;height:24px;flex-shrink:0}
 .fd2{display:flex;gap:2px;justify-content:center}
@@ -899,13 +900,13 @@ tbody td:nth-child(2){text-align:left}
     <div class="stl" style="margin-top:14px">&#127942; Playoffs <span>Mata-mata</span></div>
     <div class="brkw" id="brc"></div>
   </div>
-  <!-- Equidad pública -->
-  <div id="pubEqd"></div>
-
   <!-- ── DISCIPLINA ── -->
   <div class="stl" style="margin-top:20px">🟨 Disciplina <span>Tarjetas del Torneo</span></div>
   <div id="disc-teams" style="margin-bottom:4px"></div>
   <div id="disc-players"></div>
+
+  <!-- Equidad pública -->
+  <div id="pubEqd"></div>
 </div>
 
 <!-- ═══ GOLES ═══ -->
@@ -2010,17 +2011,25 @@ function rFx(){
 // ── STANDINGS ──
 function wlPenalty(n){if(n<=0)return 0;if(n===1)return-1;if(n===2)return-3;return-6-(n-3)*3;}
 function cSt(){
-  var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[],ww:0,wl:0,wpen:0};
+  var st={};for(var i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,fm:[],ww:0,wl:0,wpen:0,wwD:[],wlD:[]};
   MF.forEach(function(m){
     var r=res[m.id];if(!r||r.l===undefined)return;
     st[m.l].pj++;st[m.v].pj++;
     st[m.l].gf+=r.l;st[m.l].gc+=r.v;st[m.v].gf+=r.v;st[m.v].gc+=r.l;
-    var wo=r.wo||false;
-    if(r.l>r.v){st[m.l].g++;st[m.l].pts+=3;st[m.l].fm.push("W");st[m.v].p++;st[m.v].fm.push("L");if(wo){st[m.l].ww++;st[m.v].wl++;}}
+    var wo=r.wo||false,ret=r.retiro||false;
+    if(r.l>r.v){
+      st[m.l].g++;st[m.l].pts+=3;st[m.l].fm.push("W");st[m.v].p++;st[m.v].fm.push("L");
+      if(wo){st[m.l].ww++;st[m.v].wl++;st[m.l].wwD.push({opp:m.v,t:'wo'});st[m.v].wlD.push({opp:m.l,t:'wo'});}
+      if(ret&&r.retiroWho==='v'){st[m.l].ww++;st[m.v].wl++;st[m.l].wwD.push({opp:m.v,t:'ret'});st[m.v].wlD.push({opp:m.l,t:'ret'});}
+    }
     else if(r.l===r.v){st[m.l].e++;st[m.l].pts++;st[m.l].fm.push("D");st[m.v].e++;st[m.v].pts++;st[m.v].fm.push("D");}
-    else{st[m.v].g++;st[m.v].pts+=3;st[m.v].fm.push("W");st[m.l].p++;st[m.l].fm.push("L");if(wo){st[m.v].ww++;st[m.l].wl++;}}
+    else{
+      st[m.v].g++;st[m.v].pts+=3;st[m.v].fm.push("W");st[m.l].p++;st[m.l].fm.push("L");
+      if(wo){st[m.v].ww++;st[m.l].wl++;st[m.v].wwD.push({opp:m.l,t:'wo'});st[m.l].wlD.push({opp:m.v,t:'wo'});}
+      if(ret&&r.retiroWho==='l'){st[m.v].ww++;st[m.l].wl++;st[m.v].wwD.push({opp:m.l,t:'ret'});st[m.l].wlD.push({opp:m.v,t:'ret'});}
+    }
   });
-  // Apply W-loss penalties: 1st=-1, 2nd=-2, 3rd+=-3 each
+  // Apply W-loss penalties
   Object.values(st).forEach(function(t){
     t.wpen=wlPenalty(t.wl);
     t.pts=Math.max(0,t.pts+t.wpen);
@@ -2033,14 +2042,23 @@ function cSt(){
     return(b.gf-b.gc)-(a.gf-a.gc);
   });
 }
+function _wCell(arr,col,icon){
+  if(!arr||!arr.length)return'<span style="color:var(--m);font-size:11px">0</span>';
+  var cnt=arr.length;
+  var tips=arr.map(function(d){return'<span style="font-size:8px;font-weight:700;color:'+col+';background:rgba(255,255,255,.06);border-radius:4px;padding:1px 4px">'+icon+(d.t==='ret'?'🏃':'')+ts(d.opp)+'</span>';}).join('');
+  return'<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-size:13px;font-weight:900;color:'+col+'">'+cnt+'</span><div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center">'+tips+'</div></div>';
+}
 function rTb(){
   var st=cSt();var h="";
   st.forEach(function(t,i){
-    var cls=i<3?"g1 t8":i<8?"t8":"";var f5=t.fm.slice(-5);
+    // pos 1-3 = gold, 4-8 = green, 9-10 = red
+    var cls=i<3?'pt':i<8?'pg':'el';
+    var f5=t.fm.slice(-5);
     h+='<tr><td><span class="pos-badge '+cls+'">'+(i+1)+'</span></td>';
     h+='<td><div class="trn">'+bdg(t.id,'bs')+'<span>'+tn(t.id)+'</span></div></td>';
     h+='<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>';
-    h+='<td style="color:#f59e0b;font-weight:800">'+(t.ww||0)+'</td><td style="color:#ef4444;font-weight:800">'+(t.wl||0)+'</td>';
+    h+='<td>'+_wCell(t.wwD,'#10b981','✅')+'</td>';
+    h+='<td>'+_wCell(t.wlD,'#f87171','❌')+'</td>';
     var penTxt=t.wpen<0?'<span class="wpen">'+t.wpen+'</span>':'';
     h+='<td>'+t.gf+'</td><td>'+t.gc+'</td><td>'+(t.gf-t.gc)+'</td><td class="pts">'+t.pts+penTxt+'</td>';
     h+='<td><div class="fd2">'+f5.map(function(f){return'<div class="f'+f+'"></div>';}).join('')+'</div></td></tr>';
