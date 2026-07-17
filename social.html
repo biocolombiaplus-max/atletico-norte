@@ -156,7 +156,7 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <div id="mvpPlayerSection" style="display:none">
       <div class="ctrl-l" style="margin-bottom:6px">3 · Elige el jugador</div>
       <input id="mvpPlayerSearch" type="search" placeholder="🔍 Buscar por nombre…" oninput="mvpFilterPlayers()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-bottom:8px;-webkit-appearance:none">
-      <div id="mvpPlayerList" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:6px"></div>
+      <div id="mvpPlayerList" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:6px"></div>
       <details style="margin-top:4px">
         <summary style="font-size:11px;color:var(--m);cursor:pointer;padding:4px 0">✏️ No está en la lista — escribir nombre</summary>
         <input id="mvpManualName" type="text" placeholder="Nombre completo del jugador" oninput="mvpSetManual()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);color:var(--t);padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-top:8px;-webkit-appearance:none">
@@ -315,17 +315,17 @@ function startApp(){
     }else{updateClubPreview();updateTopLogo();}
   });
 
-  // Load team rosters for MVP picker
+  // Load team rosters for MVP picker — always refresh, panel may open after data arrives
   db.ref('/equipos').once('value',s=>{
     _equiposData=s.val()||{};
-    if(document.getElementById('mvpPanel').style.display!=='none')mvpBuildTeamGrid();
+    mvpBuildTeamGrid();
   });
 
   let _urlInit=false;
   db.ref('/resultados').on('value',s=>{
     results=s.val()||{};
-    // refresh MVP match cards if the panel is open
-    if(document.getElementById('mvpPanel').style.display!=='none')mvpBuildCards();
+    // Always rebuild MVP cards so data is ready when panel opens
+    mvpBuildCards();
     if(!_urlInit){_urlInit=true;setTimeout(applyUrlParams,120);}
   });
 
@@ -957,10 +957,18 @@ function mvpFilterPlayers(){
   _mvpQuery=(document.getElementById('mvpPlayerSearch').value||'').toLowerCase();
   const filtered=_mvpAllPlayers.filter(p=>!_mvpQuery||p.nombre.toLowerCase().includes(_mvpQuery)||p.corto.toLowerCase().includes(_mvpQuery));
   const list=document.getElementById('mvpPlayerList');
+  const TCOLORS={1:'#c8102e',2:'#ffd700',3:'#009c3b',4:'#c8102e',5:'#003087',6:'#009c3b',7:'#c8a000',8:'#c8102e',9:'#e40046',10:'#c8102e'};
+  const col=_mvpSelTeam?(TCOLORS[_mvpSelTeam]||'#f59e0b'):'#f59e0b';
   list.innerHTML=filtered.length?filtered.map(p=>`
-    <div onclick="mvpSelectPlayer(${JSON.stringify(p.nombre)},${JSON.stringify(p.corto)})" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;cursor:pointer">
-      ${p.num?`<span style="font-size:11px;font-weight:900;color:var(--gl);min-width:22px;text-align:center">#${p.num}</span>`:''}
-      <span style="font-size:14px;font-weight:700;flex:1">${p.nombre}</span>
+    <div onclick="mvpSelectPlayer(${JSON.stringify(p.nombre)},${JSON.stringify(p.corto)})" style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--b3);border:1.5px solid var(--bd);border-radius:11px;cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent">
+      <div style="width:38px;height:38px;border-radius:9px;background:${col}22;border:1.5px solid ${col}55;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="font-size:${p.num&&p.num.length>2?'11':'14'}px;font-weight:900;color:${col}">${p.num?'#'+p.num:'—'}</span>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:800;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+        ${p.corto&&p.corto!==p.nombre?`<div style="font-size:11px;color:var(--m);margin-top:1px">${p.corto}</div>`:''}
+      </div>
+      <span style="font-size:18px;opacity:.35">›</span>
     </div>`).join('')
   :'<div style="font-size:12px;color:var(--m);padding:8px">Sin resultados</div>';
 }
