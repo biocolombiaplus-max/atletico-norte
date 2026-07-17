@@ -1275,10 +1275,18 @@ async function jorCard(ctx,m,y,h){
   const r=results[m.id],sc=r&&r.l!==undefined;
   if(sc){
     ctx.save();ctx.shadowColor='rgba(255,255,255,.35)';ctx.shadowBlur=16;
-    const sfs=Math.round(topH*.46);
+    const sfs=Math.round(topH*(r.retiro?.38:.46));
     ctx.font=`900 ${sfs}px Arial Black,sans-serif`;ctx.fillStyle='#fff';
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
-    ctx.fillText(`${Number(r.l)}-${Number(r.v)}`,W/2,cy);ctx.restore();ctx.textBaseline='alphabetic';
+    ctx.fillText(`${Number(r.l)}-${Number(r.v)}`,W/2,cy-(r.retiro?topH*.1:0));ctx.restore();ctx.textBaseline='alphabetic';
+    if(r.retiro){
+      const retNm=tn(r.retiroWho==='l'?m.l:m.v);
+      let rfs=Math.round(topH*.13),rtxt=`🏃 ${retNm.toUpperCase()} SE RETIRÓ`;
+      ctx.font=`700 ${rfs}px sans-serif`;ctx.letterSpacing='0';
+      while(ctx.measureText(rtxt).width>mw*.7&&rfs>10){rfs-=1;ctx.font=`700 ${rfs}px sans-serif`;}
+      ctx.fillStyle='rgba(248,113,113,.95)';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(rtxt,W/2,cy+topH*.18);ctx.textBaseline='alphabetic';
+    }
   }else{
     ctx.save();ctx.shadowColor='rgba(200,16,46,.5)';ctx.shadowBlur=18;
     const vfs=Math.round(topH*.27);
@@ -1431,6 +1439,27 @@ async function tPartido(ctx,m){
     ctx.fillStyle=ag;ctx.textAlign='center';ctx.fillText(ts(id),x,ny+46);ctx.letterSpacing='0';
   }
   teamLbl(tlx,m.l);teamLbl(trx,m.v);
+
+  // ── RETIRO BADGE (si el partido ya tiene resultado por retiro) ──
+  const rtp=results[m.id];
+  if(rtp&&rtp.retiro){
+    const retTidP=rtp.retiroWho==='l'?m.l:m.v;
+    const retNmP=tn(retTidP).toUpperCase();
+    const rbW=820,rbH=100,rbX=W/2-rbW/2,rbY=H-380;
+    ctx.save();ctx.globalAlpha=.95;
+    ctx.fillStyle='rgba(239,68,68,.16)';ctx.beginPath();ctx.roundRect(rbX,rbY,rbW,rbH,rbH/2);ctx.fill();
+    ctx.strokeStyle='rgba(239,68,68,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(rbX,rbY,rbW,rbH,rbH/2);ctx.stroke();
+    ctx.restore();
+    let prfs=36,prtxt=`🏃 ${retNmP} SE RETIRÓ`;
+    ctx.font=`900 ${prfs}px sans-serif`;ctx.letterSpacing='1px';
+    while(ctx.measureText(prtxt).width>rbW-60&&prfs>22){prfs-=2;ctx.font=`900 ${prfs}px sans-serif`;}
+    ctx.fillStyle='#f87171';ctx.textAlign='center';ctx.fillText(prtxt,W/2,rbY+rbH*.43);
+    let prfs2=26,prtxt2=`+3 GOLES DE PENALIDAD PARA ${tn(rtp.retiroWho==='l'?m.v:m.l).toUpperCase()}`;
+    ctx.font=`700 ${prfs2}px sans-serif`;ctx.letterSpacing='.5px';
+    while(ctx.measureText(prtxt2).width>rbW-60&&prfs2>16){prfs2-=2;ctx.font=`700 ${prfs2}px sans-serif`;}
+    ctx.fillStyle='rgba(248,113,113,.7)';ctx.fillText(prtxt2,W/2,rbY+rbH*.78);
+    ctx.letterSpacing='0';
+  }
 
   rule(ctx,H-320,.38);
   ctx.font='700 28px sans-serif';ctx.fillStyle='rgba(255,255,255,.28)';ctx.textAlign='center';ctx.letterSpacing='3px';
@@ -1587,6 +1616,23 @@ async function tResultado(ctx,m){
     ctx.textAlign='center';ctx.letterSpacing='5px';ctx.fillText('⚖️  EMPATE',W/2,bY2+bH*.67);ctx.restore();
   }
 
+  // ── RETIRO BADGE ──
+  if(r.retiro){
+    const retTid=r.retiroWho==='l'?m.l:m.v;
+    const retNm=tn(retTid).toUpperCase();
+    const bW=860,bH=82,bX=W/2-bW/2,bY3=1512;
+    ctx.save();ctx.globalAlpha=.92;
+    ctx.fillStyle='rgba(239,68,68,.14)';ctx.beginPath();ctx.roundRect(bX,bY3,bW,bH,bH/2);ctx.fill();
+    ctx.strokeStyle='rgba(239,68,68,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(bX,bY3,bW,bH,bH/2);ctx.stroke();
+    ctx.restore();
+    let rfs=34,rtxt=`🏃 ${retNm} SE RETIRÓ · +3 GOLES DE PENALIDAD`;
+    ctx.font=`800 ${rfs}px sans-serif`;ctx.letterSpacing='0';
+    while(ctx.measureText(rtxt).width>bW-48&&rfs>20){rfs-=2;ctx.font=`800 ${rfs}px sans-serif`;}
+    ctx.fillStyle='#f87171';ctx.textAlign='center';ctx.letterSpacing='.5px';
+    ctx.fillText(rtxt,W/2,bY3+bH*.65);
+    ctx.letterSpacing='0';
+  }
+
   // ── ANOTADORES (2 columnas: local izq, visitante der) ──
   // Compact name: "#15 W. Atheortua" or "W. Atheortua" if no number
   function scorerShort(s){
@@ -1621,7 +1667,7 @@ async function tResultado(ctx,m){
   }
   const scorers=r.scorers||[];
   if(scorers.length){
-    const scTop=1510;
+    const scTop=r.retiro?1612:1510;
     goldRule(ctx,scTop);
     ctx.font='700 22px sans-serif';ctx.letterSpacing='4px';ctx.fillStyle='rgba(255,215,0,.60)';ctx.textAlign='center';
     ctx.fillText('ANOTADORES',W/2,scTop+36);
