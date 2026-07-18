@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.73';
+var APP_VER='8.74';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2017,16 +2017,16 @@ function cSt(){
     var wo=r.wo||false,ret=r.retiro||false;
     if(r.l>r.v){
       st[m.l].g++;st[m.l].pts+=3;st[m.l].fm.push("W");st[m.v].p++;st[m.v].fm.push("L");
-      // WO puro: penaliza al perdedor
-      if(wo){st[m.l].ww++;st[m.v].wl++;st[m.l].wwD.push({opp:m.v,t:'wo'});st[m.v].wlD.push({opp:m.l,t:'wo'});}
-      // Retiro: el ganador anota W+, pero el que se retiró NO pierde puntos (solo registra informativo)
-      if(ret&&r.retiroWho==='v'){st[m.l].ww++;st[m.l].wwD.push({opp:m.v,t:'ret'});st[m.v].retD.push({opp:m.l});}
+      // WO puro (no se presentó): penaliza al perdedor, suma W+ al ganador
+      if(wo){st[m.l].ww++;st[m.v].wl++;st[m.l].wwD.push({opp:m.v});st[m.v].wlD.push({opp:m.l});}
+      // Retiro: va a columna 🏃 para AMBOS — NO suma W+ al ganador
+      if(ret&&r.retiroWho==='v'){st[m.l].retD.push({opp:m.v,won:true});st[m.v].retD.push({opp:m.l,won:false});}
     }
     else if(r.l===r.v){st[m.l].e++;st[m.l].pts++;st[m.l].fm.push("D");st[m.v].e++;st[m.v].pts++;st[m.v].fm.push("D");}
     else{
       st[m.v].g++;st[m.v].pts+=3;st[m.v].fm.push("W");st[m.l].p++;st[m.l].fm.push("L");
-      if(wo){st[m.v].ww++;st[m.l].wl++;st[m.v].wwD.push({opp:m.l,t:'wo'});st[m.l].wlD.push({opp:m.v,t:'wo'});}
-      if(ret&&r.retiroWho==='l'){st[m.v].ww++;st[m.v].wwD.push({opp:m.l,t:'ret'});st[m.l].retD.push({opp:m.v});}
+      if(wo){st[m.v].ww++;st[m.l].wl++;st[m.v].wwD.push({opp:m.l});st[m.l].wlD.push({opp:m.v});}
+      if(ret&&r.retiroWho==='l'){st[m.v].retD.push({opp:m.l,won:true});st[m.l].retD.push({opp:m.v,won:false});}
     }
   });
   // Penalización solo por WO (no presentarse) — retiro NO penaliza
@@ -2052,10 +2052,13 @@ function _wCell(arr,col){
 }
 function _retCell(arr){
   if(!arr||!arr.length)return'<span style="color:var(--m)">–</span>';
-  var cnt=arr.length;
-  var labs=arr.map(function(d){return ts(d.opp);}).join(' ');
-  return'<span style="font-size:12px;font-weight:900;color:#f59e0b">'+cnt+'</span>'
-       +'<br><span style="font-size:7px;color:#f59e0b;opacity:.75;letter-spacing:.2px">'+labs+'</span>';
+  var labs=arr.map(function(d){
+    var col=d.won?'#10b981':'#f59e0b';
+    var pfx=d.won?'↑':'↓';
+    return'<span style="font-size:7px;font-weight:700;color:'+col+'">'+pfx+ts(d.opp)+'</span>';
+  }).join(' ');
+  return'<span style="font-size:12px;font-weight:900;color:#f59e0b">'+arr.length+'</span>'
+       +'<br>'+labs;
 }
 function rTb(){
   var st=cSt();var h="";
