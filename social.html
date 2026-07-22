@@ -2384,88 +2384,101 @@ async function shareOrDownload(){
 }
 function dl(){shareOrDownload();}
 
-// ═══ LLUVIA — SUSPENDIDO POR LLUVIA · SE DA POR JUGADO ══════
+// ═══ LLUVIA — SUSPENDIDO POR LLUVIA · EMPATE 0-0 ════════════
 async function tLluvia(ctx,m){
   if(!m){
-    ctx.fillStyle='#060d1a';ctx.fillRect(0,0,W,H);
-    ctx.font='700 36px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='center';
+    ctx.fillStyle='#060e1f';ctx.fillRect(0,0,W,H);
+    ctx.font='700 36px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='center';ctx.letterSpacing='0';
     ctx.fillText('Selecciona un partido',W/2,H/2);return;
   }
-  await drawBg(ctx);topStripe(ctx);
 
-  // ── Deep blue rain overlay ──
-  const rainGrad=ctx.createRadialGradient(W/2,H*.35,0,W/2,H*.35,900);
-  rainGrad.addColorStop(0,'rgba(14,120,200,.22)');rainGrad.addColorStop(1,'rgba(14,120,200,0)');
-  ctx.fillStyle=rainGrad;ctx.fillRect(0,0,W,H);
+  // ── Fondo azul profundo propio (no usa drawBg para no heredar el rojo) ──
+  ctx.fillStyle='#060e1f';ctx.fillRect(0,0,W,H);
+  // Gradiente superior azul
+  const skyG=ctx.createLinearGradient(0,0,0,H*.6);
+  skyG.addColorStop(0,'rgba(10,50,120,.70)');skyG.addColorStop(1,'rgba(6,14,31,0)');
+  ctx.fillStyle=skyG;ctx.fillRect(0,0,W,H*.6);
+  // Glow central
+  rGlow(ctx,W/2,H*.42,780,'rgba(30,120,220,.22)');
+  rGlow(ctx,W/2,H*.72,600,'rgba(14,80,180,.15)');
 
-  clubHeader(ctx,50);
-
-  // ── Rain drop lines (decorative) ──
-  ctx.save();ctx.strokeStyle='rgba(100,200,255,.10)';ctx.lineWidth=1.5;
-  for(let i=0;i<30;i++){
-    const x=Math.sin(i*137)*W*0.9+W/2,y=(i*97)%H;
-    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-18,y+55);ctx.stroke();
+  // ── Lluvia diagonal (líneas) ──
+  ctx.save();ctx.strokeStyle='rgba(147,210,255,.13)';ctx.lineWidth=1.2;
+  for(let i=0;i<70;i++){
+    const x=((i*W/23)+(i%3)*180)%W;const y=(i*H/37)%H;
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-22,y+80);ctx.stroke();
   }
   ctx.restore();
 
-  // ── Big rain emoji ──
-  ctx.save();ctx.font='160px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='rgba(56,189,248,.5)';ctx.shadowBlur=70;
+  topStripe(ctx);
+  clubHeader(ctx,52);
+
+  // ── Pill: SUSPENDIDO POR LLUVIA ──
+  {const lW=720,lH=70,lX=W/2-lW/2,lY=310;
+  ctx.fillStyle='rgba(30,120,220,.18)';ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
+  ctx.strokeStyle='rgba(100,180,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
+  ctx.font='800 30px sans-serif';ctx.fillStyle='#7dd3fc';ctx.textAlign='center';ctx.letterSpacing='4px';
+  ctx.fillText('🌧️  SUSPENDIDO POR LLUVIA',W/2,lY+lH*.68);}
+
+  // ── Fecha ──
+  const d=new Date(m.fecha+'T12:00:00');
+  ctx.font='700 30px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(147,210,255,.70)';ctx.textAlign='center';
+  ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · SEMANA ${m.week}`,W/2,420);
+
+  // ── Emoji lluvia grande ──
+  ctx.save();ctx.font='190px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(56,189,248,.55)';ctx.shadowBlur=80;
   ctx.fillText('🌧️',W/2,620);ctx.restore();ctx.textBaseline='alphabetic';
 
-  // ── Label pill: SUSPENDIDO POR LLUVIA ──
-  {const lW=680,lH=66,lX=W/2-lW/2,lY=790;
-  const lg=lGrad(ctx,lX,lY,lX+lW,lY+lH,[0,'rgba(56,189,248,.05)'],[.5,'rgba(56,189,248,.22)'],[1,'rgba(56,189,248,.05)']);
-  ctx.fillStyle=lg;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
-  ctx.strokeStyle='rgba(56,189,248,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
-  ctx.font='800 28px sans-serif';ctx.fillStyle='#7dd3fc';ctx.textAlign='center';ctx.letterSpacing='4px';
-  ctx.fillText('🌧️  SUSPENDIDO POR LLUVIA',W/2,lY+lH*.67);}
+  // ── Regla azul ──
+  {const rg=lGrad(ctx,0,0,W,0,[0,'transparent'],[.5,'rgba(56,189,248,.55)'],[1,'transparent']);
+  ctx.strokeStyle=rg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,740);ctx.lineTo(W,740);ctx.stroke();}
 
-  // ── Rule ──
-  goldRule(ctx,880);
+  // ── Nombres de equipos ──
+  const nm=`${tn(m.l).toUpperCase()}  ·  ${tn(m.v).toUpperCase()}`;
+  let fs=48;ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0';
+  while(ctx.measureText(nm).width>900&&fs>28){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+  const ntg=lGrad(ctx,W/2-400,0,W/2+400,0,[0,'#8eb8d8'],[.5,'#dff0ff'],[1,'#8eb8d8']);
+  ctx.fillStyle=ntg;ctx.textAlign='center';ctx.fillText(nm,W/2,806);
 
-  // ── Team names ──
-  const ng=lGrad(ctx,W/2-320,0,W/2+320,0,[0,'#9bb8d4'],[.5,'#e8f4ff'],[1,'#9bb8d4']);
-  ctx.fillStyle=ng;
-  const nm=`${tn(m.l).toUpperCase()}  vs  ${tn(m.v).toUpperCase()}`;
-  let fs=52;ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0';
-  while(ctx.measureText(nm).width>920&&fs>28){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
-  ctx.textAlign='center';ctx.fillText(nm,W/2,960);
+  // ── Logos grandes ──
+  const loCx=W*.25,roCx=W*.75,loY=1030,sz=330;
+  await drawBadge(ctx,m.l,loCx,loY,sz);
+  await drawBadge(ctx,m.v,roCx,loY,sz);
 
-  // ── Date info ──
-  const d=new Date(m.fecha+'T12:00:00');
-  ctx.font='700 32px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(125,211,252,.75)';
-  ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · S${m.week}`,W/2,1012);
+  // ── EMPATE — texto central entre logos ──
+  {const eW=220,eH=64,eX=W/2-eW/2,eY=loY-eH/2;
+  ctx.fillStyle='rgba(30,120,220,.28)';ctx.beginPath();ctx.roundRect(eX,eY,eW,eH,12);ctx.fill();
+  ctx.strokeStyle='rgba(100,200,255,.4)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(eX,eY,eW,eH,12);ctx.stroke();
+  ctx.font='900 28px sans-serif';ctx.fillStyle='#bae6fd';ctx.letterSpacing='5px';ctx.textAlign='center';
+  ctx.fillText('EMPATE',W/2,eY+eH*.70);}
 
-  // ── Logos con tint azul ──
-  const midY=1220,tSz=280;
-  await drawBadge(ctx,m.l,W*.27,midY,tSz);
-  await drawBadge(ctx,m.v,W*.73,midY,tSz);
-  ctx.save();ctx.globalAlpha=0.18;ctx.fillStyle='#0a4080';
-  ctx.beginPath();ctx.arc(W*.27,midY,tSz*.55,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(W*.73,midY,tSz*.55,0,Math.PI*2);ctx.fill();
-  ctx.restore();
+  // ── Score box grande: 0 — 0 ──
+  const sbW=460,sbH=130,sbX=W/2-sbW/2,sbY=loY+sz*.58+30;
+  ctx.fillStyle='rgba(14,80,180,.30)';ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,20);ctx.fill();
+  ctx.strokeStyle='rgba(56,189,248,.55)';ctx.lineWidth=2.5;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,20);ctx.stroke();
+  // Glow interno
+  ctx.save();ctx.shadowColor='rgba(56,189,248,.5)';ctx.shadowBlur=30;
+  ctx.font='900 88px Arial Black,sans-serif';ctx.fillStyle='#e0f2fe';ctx.letterSpacing='0';ctx.textAlign='center';
+  ctx.fillText('0  —  0',W/2,sbY+sbH*.78);ctx.restore();
 
-  // ── Score box: 0 - 0 ──
-  const sbW=380,sbH=110,sbX=W/2-sbW/2,sbY=midY+tSz*.6+40;
-  const sbG=lGrad(ctx,sbX,sbY,sbX+sbW,sbY+sbH,[0,'rgba(56,189,248,.05)'],[.5,'rgba(56,189,248,.18)'],[1,'rgba(56,189,248,.05)']);
-  ctx.fillStyle=sbG;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,18);ctx.fill();
-  ctx.strokeStyle='rgba(56,189,248,.45)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,18);ctx.stroke();
-  ctx.font='900 72px Arial Black,sans-serif';ctx.fillStyle='#7dd3fc';ctx.letterSpacing='0';ctx.textAlign='center';
-  ctx.fillText('0  –  0',W/2,sbY+sbH*.76);
+  // ── SE DA POR JUGADO ──
+  ctx.font='800 28px sans-serif';ctx.fillStyle='#38bdf8';ctx.letterSpacing='3px';ctx.textAlign='center';
+  ctx.fillText('SE DA POR JUGADO',W/2,sbY+sbH+58);
 
-  // ── SE DA POR JUGADO pill ──
-  const pW=540,pH=58,pX=W/2-pW/2,pY=sbY+sbH+22;
-  const pG=lGrad(ctx,pX,pY,pX+pW,pY+pH,[0,'rgba(14,165,233,.0)'],[.5,'rgba(14,165,233,.20)'],[1,'rgba(14,165,233,.0)']);
+  // ── 1 PUNTO PARA CADA EQUIPO ──
+  {const pW=580,pH=56,pX=W/2-pW/2,pY=sbY+sbH+78;
+  const pG=lGrad(ctx,pX,pY,pX+pW,pY+pH,[0,'rgba(14,165,233,0)'],[.5,'rgba(14,165,233,.18)'],[1,'rgba(14,165,233,0)']);
   ctx.fillStyle=pG;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.fill();
-  ctx.strokeStyle='rgba(14,165,233,.4)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.stroke();
-  ctx.font='800 24px sans-serif';ctx.fillStyle='#38bdf8';ctx.letterSpacing='3px';ctx.textAlign='center';
-  ctx.fillText('SE DA POR JUGADO · 1 PTO CADA EQUIPO',W/2,pY+pH*.67);
+  ctx.strokeStyle='rgba(56,189,248,.3)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.stroke();
+  ctx.font='700 24px sans-serif';ctx.fillStyle='rgba(147,210,255,.85)';ctx.letterSpacing='2px';ctx.textAlign='center';
+  ctx.fillText('1 PUNTO PARA CADA EQUIPO',W/2,pY+pH*.70);}
 
-  // ── Bottom ──
-  rule(ctx,H-320,.3);
-  ctx.font='700 26px sans-serif';ctx.fillStyle='rgba(255,255,255,.22)';ctx.letterSpacing='3px';ctx.textAlign='center';
-  ctx.fillText('LIGA INTERNA · TEMPORADA S2 2026',W/2,H-272);
+  // ── Footer ──
+  {const rg=lGrad(ctx,0,0,W,0,[0,'transparent'],[.5,'rgba(56,189,248,.3)'],[1,'transparent']);
+  ctx.strokeStyle=rg;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,H-300);ctx.lineTo(W,H-300);ctx.stroke();}
+  ctx.font='700 24px sans-serif';ctx.fillStyle='rgba(255,255,255,.20)';ctx.letterSpacing='4px';ctx.textAlign='center';
+  ctx.fillText('LIGA INTERNA · TEMPORADA S2 2026',W/2,H-256);
   botStripe(ctx);
 }
 
