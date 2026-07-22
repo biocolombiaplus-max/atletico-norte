@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.74';
+var APP_VER='8.75';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -563,8 +563,11 @@ tbody td:nth-child(2){text-align:left}
 .rs-type-btn.on{background:rgba(16,185,129,.15);border-color:#10b981;color:#10b981}
 .rs-type-btn.on.wo{background:rgba(239,68,68,.12);border-color:#ef4444;color:#ef4444}
 .rs-type-btn.on.ret{background:rgba(245,159,11,.12);border-color:#f59e0b;color:#f59e0b}
+.rs-type-btn.on.lluvia{background:rgba(56,189,248,.12);border-color:#38bdf8;color:#38bdf8}
 /* Retiro panel */
 .rs-ret-box{background:rgba(245,159,11,.07);border:1.5px solid rgba(245,159,11,.3);border-radius:14px;padding:16px;margin-bottom:12px}
+/* Lluvia badge en fixture */
+.lluvia-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);border-radius:20px;padding:2px 9px;font-size:9px;font-weight:900;color:#38bdf8;letter-spacing:.5px;margin-top:3px}
 .rs-ret-team{width:100%;padding:13px 10px;border-radius:12px;border:2px solid var(--bd);background:var(--b3);color:var(--t);font-size:12px;font-weight:800;cursor:pointer;-webkit-appearance:none;transition:.15s;display:flex;align-items:center;gap:10px}
 .rs-ret-team.on{border-color:#f59e0b;background:rgba(245,159,11,.18);color:#f59e0b}
 .rs-board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;background:var(--b3);border:1px solid var(--bd);border-radius:16px;padding:14px 10px;margin-bottom:10px}
@@ -1984,7 +1987,11 @@ function rFx(){
       h+='<div class="mc'+(ip?' pl':'')+'">';
       h+='<div class="ts">'+bdg(m.l,'bw')+'<div><div class="tnm">'+tn(m.l)+'</div><div class="tsb">'+ts(m.l)+'</div></div></div>';
       h+='<div class="sb">';
-      if(ip)h+='<div class="sn"><span class="sn-num left">'+(r.wo?'W':r.l)+'</span><span class="sn-sep">'+(r.retiro?'<span title="Retiro" style="font-size:8px">🏃</span>':'–')+'</span><span class="sn-num right">'+(r.wo?'W':r.v)+'</span></div>';
+      if(ip){
+        var sep=r.wo?'<span style="font-size:8px;color:#ef4444">W</span>':r.retiro?'<span style="font-size:8px">🏃</span>':r.lluvia?'<span style="font-size:8px">🌧️</span>':'–';
+        h+='<div class="sn"><span class="sn-num left">'+(r.wo?'W':r.l)+'</span><span class="sn-sep">'+sep+'</span><span class="sn-num right">'+(r.wo?'W':r.v)+'</span></div>';
+        if(r.lluvia)h+='<div style="text-align:center;margin-top:2px"><span class="lluvia-badge">🌧️ SUSPENDIDO · SE DA POR JUGADO</span></div>';
+      }
       else h+='<div class="sn" style="font-size:13px;font-weight:700;color:var(--dm);grid-column:1/-1;text-align:center;letter-spacing:.5px">VS</div>';
       var mhora=getHora(m);
       h+='<div class="mm"><span class="mhora"'+(mhora!==m.hora?' style="color:#38bdf8"':'')+'>'+mhora+'</span><span class="mcancha '+cc+'">'+m.cancha+'</span><span class="mvu">V'+m.vu+'</span></div>';
@@ -2014,6 +2021,8 @@ function cSt(){
     var r=res[m.id];if(!r||r.l===undefined)return;
     st[m.l].pj++;st[m.v].pj++;
     st[m.l].gf+=r.l;st[m.l].gc+=r.v;st[m.v].gf+=r.v;st[m.v].gc+=r.l;
+    // Lluvia: empate 0-0 reglamentario, 1 punto cada uno — no aplica WO ni retiro
+    if(r.lluvia){st[m.l].e++;st[m.l].pts++;st[m.l].fm.push("D");st[m.v].e++;st[m.v].pts++;st[m.v].fm.push("D");return;}
     var wo=r.wo||false,ret=r.retiro||false;
     if(r.l>r.v){
       st[m.l].g++;st[m.l].pts+=3;st[m.l].fm.push("W");st[m.v].p++;st[m.v].fm.push("L");
@@ -2279,7 +2288,7 @@ function rVl(){
 
 // ── RESULTS EDIT ──
 function oRsEl(el){oRs(parseInt(el.getAttribute("data-mid")));}
-var curRType='normal',curWOWinner=null,curRetWho=null,_rsPicker=null,_rsSaved=false,_rsMvpQuery='',_rsRostersReady=false;
+var curRType='normal',curWOWinner=null,curRetWho=null,_rsPicker=null,_rsSaved=false,_rsMvpQuery='',_rsRostersReady=false,_rsLluviaConfirmed=false;
 // legacy stubs kept for doSR compatibility
 function setRType(t){curRType=t;}
 function setWOWinner(side){curWOWinner=side;}
@@ -2287,11 +2296,12 @@ function updWOBtns(){}
 
 function oRs(id){
   cri=id;var m=MF.find(function(x){return x.id===id;});if(!m)return;
-  curRType='normal';curWOWinner=null;curRetWho=null;_rsPicker=null;_rsSaved=false;_rsMvpQuery='';
+  curRType='normal';curWOWinner=null;curRetWho=null;_rsPicker=null;_rsSaved=false;_rsMvpQuery='';_rsLluviaConfirmed=false;
   _evGoals=[];_evYellows=[];_evReds=[];_pickerRosters={l:[],v:[]};_rsRostersReady=false;
   var r=res[id];
   if(r&&r.wo){curRType='wo';curWOWinner=r.woWinner;}
   else if(r&&r.retiro){curRType='retiro';curRetWho=r.retiroWho;}
+  else if(r&&r.lluvia){curRType='lluvia';_rsLluviaConfirmed=true;}
   else if(r){
     _evGoals=r.scorers?r.scorers.map(function(s){return{name:s.name,corto:s.corto||s.name,teamId:s.teamId||0,camiseta:s.camiseta||''};}):[];
     _evYellows=r.yellows?r.yellows.slice():[];_evReds=r.reds?r.reds.slice():[];
@@ -2363,16 +2373,29 @@ function rsRender(m){
   var lCol=TC[m.l]||'#0ea5e9',vCol=TC[m.v]||'#f59e0b';
   var lG=_evGoals.filter(function(g){return g.teamId===m.l;}).length;
   var vG=_evGoals.filter(function(g){return g.teamId===m.v;}).length;
-  var isWO=curRType==='wo',isRet=curRType==='retiro';
+  var isWO=curRType==='wo',isRet=curRType==='retiro',isLluvia=curRType==='lluvia';
   var h='';
   // Match info
   h+='<div style="text-align:center;font-size:11px;font-weight:800;color:var(--m);margin-bottom:10px;letter-spacing:.2px">'+escHtml(dw(m.fecha)+' '+fd(m.fecha))+' · '+escHtml(m.hora)+' · '+escHtml(m.cancha)+'</div>';
-  // Type toggle — 3 buttons
-  h+='<div style="display:flex;gap:6px;margin-bottom:12px">';
-  h+='<button class="rs-type-btn'+((!isWO&&!isRet)?' on':'')+'" onclick="rsSetType(\'normal\')">⚽ Normal</button>';
+  // Type toggle — 4 buttons
+  h+='<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">';
+  h+='<button class="rs-type-btn'+((!isWO&&!isRet&&!isLluvia)?' on':'')+'" onclick="rsSetType(\'normal\')">⚽ Normal</button>';
   h+='<button class="rs-type-btn'+(isWO?' on wo':'')+'" onclick="rsSetType(\'wo\')">🚫 Walkover</button>';
   h+='<button class="rs-type-btn'+(isRet?' on ret':'')+'" onclick="rsSetType(\'retiro\')">🏃 Retiro</button>';
+  h+='<button class="rs-type-btn'+(isLluvia?' on lluvia':'')+'" onclick="rsSetType(\'lluvia\')">🌧️ Lluvia</button>';
   h+='</div>';
+  // Lluvia panel
+  if(isLluvia){
+    h+='<div style="background:rgba(56,189,248,.07);border:1.5px solid rgba(56,189,248,.3);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center">';
+    h+='<div style="font-size:48px;margin-bottom:8px">🌧️</div>';
+    h+='<div style="font-size:13px;font-weight:900;color:#38bdf8;letter-spacing:.5px;margin-bottom:4px">PARTIDO SUSPENDIDO POR LLUVIA</div>';
+    h+='<div style="font-size:11px;color:var(--m);margin-bottom:12px">El reglamento establece que se da por jugado · Empate <strong style="color:#fff">0 – 0</strong> · 1 punto para cada equipo</div>';
+    h+='<div style="display:flex;align-items:center;justify-content:center;gap:16px">';
+    h+='<div style="text-align:center">'+bdg(m.l,'bw')+'<div style="font-size:10px;color:var(--m);margin-top:4px">'+ts(m.l)+'</div></div>';
+    h+='<div style="font-size:28px;font-weight:900;color:#38bdf8">0 – 0</div>';
+    h+='<div style="text-align:center">'+bdg(m.v,'bw')+'<div style="font-size:10px;color:var(--m);margin-top:4px">'+ts(m.v)+'</div></div>';
+    h+='</div></div>';
+  }
   if(isWO){
     h+=rsWOHtml(m);
   } else if(isRet){
@@ -2558,7 +2581,7 @@ function rsEvtLogHtml(m){
 }
 function rsRemoveEvt(type,name,teamId){var arr=type==='goal'?_evGoals:type==='yellow'?_evYellows:_evReds;var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});if(idx>=0)arr.splice(idx,1);rsRender();}
 
-function rsSetType(t){curRType=t;if(t==='wo')curWOWinner=null;if(t==='retiro')curRetWho=null;_rsPicker=null;rsRender();}
+function rsSetType(t){curRType=t;if(t==='wo')curWOWinner=null;if(t==='retiro')curRetWho=null;_rsPicker=null;_rsLluviaConfirmed=false;rsRender();}
 function rsWOWin(side){curWOWinner=side;rsRender();}
 function rsRetWho(side){curRetWho=side;rsRender();}
 function rsRetiroHtml(m){
@@ -2697,7 +2720,9 @@ function rsMvpPhoto(source){var inp=document.getElementById('rsMvpInput');if(!in
 function rsMvpPhotoSelected(inp){var file=inp.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(e){var url=e.target.result;localStorage.setItem('mvpPhoto_'+cri,url);var pv=document.getElementById('rsMvpPreview'),img=document.getElementById('rsMvpImg');if(pv)pv.style.display='block';if(img)img.src=url;};rd.readAsDataURL(file);}
 async function doSR(){
   var data;
-  if(curRType==='wo'){
+  if(curRType==='lluvia'){
+    data={l:0,v:0,scorers:[],yellows:[],reds:[],lluvia:true,ts:Date.now()};
+  }else if(curRType==='wo'){
     if(!curWOWinner){alert('Selecciona qué equipo gana por W');return;}
     var l=curWOWinner==='l'?3:0,v=curWOWinner==='v'?3:0;
     data={l:l,v:v,scorers:[],wo:true,woWinner:curWOWinner,ts:Date.now()};

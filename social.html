@@ -127,6 +127,7 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <button class="pill" onclick="setTpl('partido',this)">⚽ Partido</button>
     <button class="pill" onclick="setTpl('resultado',this)">🏆 Resultado</button>
     <button class="pill" onclick="setTpl('tabla',this)">📊 Tabla</button>
+    <button class="pill" onclick="setTpl('lluvia',this)">🌧️ Lluvia</button>
     <button class="pill" onclick="setTpl('suspendido',this)">⚠️ Susp.</button>
     <button class="pill" onclick="setTpl('reprogramado',this)">📅 Reprog.</button>
     <button class="pill" onclick="setTpl('mvp',this)">⭐ MVP</button>
@@ -450,7 +451,7 @@ function loadMs(){
 }
 function renderMs(ms){
   const el=document.getElementById('mList');
-  const single=curTpl==='partido'||curTpl==='resultado'||curTpl==='suspendido'||curTpl==='reprogramado';
+  const single=curTpl==='partido'||curTpl==='resultado'||curTpl==='lluvia'||curTpl==='suspendido'||curTpl==='reprogramado';
   if(!ms.length){el.innerHTML='<div class="no-ms">Sin partidos</div>';return;}
   let h='';
   if(single)h+='<div style="font-size:10px;color:var(--gl);font-weight:800;letter-spacing:1px;padding:4px 0 10px;text-align:center">TAP PARA SELECCIONAR UN PARTIDO</div>';
@@ -473,7 +474,7 @@ function renderMs(ms){
   el.innerHTML=h;
 }
 function togM(id,el){
-  const single=curTpl==='partido'||curTpl==='resultado'||curTpl==='suspendido'||curTpl==='reprogramado';
+  const single=curTpl==='partido'||curTpl==='resultado'||curTpl==='lluvia'||curTpl==='suspendido'||curTpl==='reprogramado';
   if(single){
     if(selMs.has(id)){selMs.delete(id);el.classList.remove('on');el.querySelector('.mi-chk').textContent='';}
     else{
@@ -580,6 +581,7 @@ async function gen(){
     else if(curTpl==='jornada')await tJornada(ctx,ms);
     else if(curTpl==='partido')await tPartido(ctx,ms[0]);
     else if(curTpl==='resultado')await tResultado(ctx,ms[0]);
+    else if(curTpl==='lluvia')await tLluvia(ctx,ms[0]);
     else if(curTpl==='suspendido')await tSuspendido(ctx,ms[0]);
     else if(curTpl==='reprogramado')await tReprogramado(ctx,ms[0]);
     else if(curTpl==='goleadores')await tGoleadores(ctx);
@@ -2381,6 +2383,91 @@ async function shareOrDownload(){
   }
 }
 function dl(){shareOrDownload();}
+
+// ═══ LLUVIA — SUSPENDIDO POR LLUVIA · SE DA POR JUGADO ══════
+async function tLluvia(ctx,m){
+  if(!m){
+    ctx.fillStyle='#060d1a';ctx.fillRect(0,0,W,H);
+    ctx.font='700 36px sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='center';
+    ctx.fillText('Selecciona un partido',W/2,H/2);return;
+  }
+  await drawBg(ctx);topStripe(ctx);
+
+  // ── Deep blue rain overlay ──
+  const rainGrad=ctx.createRadialGradient(W/2,H*.35,0,W/2,H*.35,900);
+  rainGrad.addColorStop(0,'rgba(14,120,200,.22)');rainGrad.addColorStop(1,'rgba(14,120,200,0)');
+  ctx.fillStyle=rainGrad;ctx.fillRect(0,0,W,H);
+
+  clubHeader(ctx,50);
+
+  // ── Rain drop lines (decorative) ──
+  ctx.save();ctx.strokeStyle='rgba(100,200,255,.10)';ctx.lineWidth=1.5;
+  for(let i=0;i<30;i++){
+    const x=Math.sin(i*137)*W*0.9+W/2,y=(i*97)%H;
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-18,y+55);ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── Big rain emoji ──
+  ctx.save();ctx.font='160px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(56,189,248,.5)';ctx.shadowBlur=70;
+  ctx.fillText('🌧️',W/2,620);ctx.restore();ctx.textBaseline='alphabetic';
+
+  // ── Label pill: SUSPENDIDO POR LLUVIA ──
+  {const lW=680,lH=66,lX=W/2-lW/2,lY=790;
+  const lg=lGrad(ctx,lX,lY,lX+lW,lY+lH,[0,'rgba(56,189,248,.05)'],[.5,'rgba(56,189,248,.22)'],[1,'rgba(56,189,248,.05)']);
+  ctx.fillStyle=lg;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
+  ctx.strokeStyle='rgba(56,189,248,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
+  ctx.font='800 28px sans-serif';ctx.fillStyle='#7dd3fc';ctx.textAlign='center';ctx.letterSpacing='4px';
+  ctx.fillText('🌧️  SUSPENDIDO POR LLUVIA',W/2,lY+lH*.67);}
+
+  // ── Rule ──
+  goldRule(ctx,880);
+
+  // ── Team names ──
+  const ng=lGrad(ctx,W/2-320,0,W/2+320,0,[0,'#9bb8d4'],[.5,'#e8f4ff'],[1,'#9bb8d4']);
+  ctx.fillStyle=ng;
+  const nm=`${tn(m.l).toUpperCase()}  vs  ${tn(m.v).toUpperCase()}`;
+  let fs=52;ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0';
+  while(ctx.measureText(nm).width>920&&fs>28){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+  ctx.textAlign='center';ctx.fillText(nm,W/2,960);
+
+  // ── Date info ──
+  const d=new Date(m.fecha+'T12:00:00');
+  ctx.font='700 32px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(125,211,252,.75)';
+  ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · S${m.week}`,W/2,1012);
+
+  // ── Logos con tint azul ──
+  const midY=1220,tSz=280;
+  await drawBadge(ctx,m.l,W*.27,midY,tSz);
+  await drawBadge(ctx,m.v,W*.73,midY,tSz);
+  ctx.save();ctx.globalAlpha=0.18;ctx.fillStyle='#0a4080';
+  ctx.beginPath();ctx.arc(W*.27,midY,tSz*.55,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(W*.73,midY,tSz*.55,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // ── Score box: 0 - 0 ──
+  const sbW=380,sbH=110,sbX=W/2-sbW/2,sbY=midY+tSz*.6+40;
+  const sbG=lGrad(ctx,sbX,sbY,sbX+sbW,sbY+sbH,[0,'rgba(56,189,248,.05)'],[.5,'rgba(56,189,248,.18)'],[1,'rgba(56,189,248,.05)']);
+  ctx.fillStyle=sbG;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,18);ctx.fill();
+  ctx.strokeStyle='rgba(56,189,248,.45)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(sbX,sbY,sbW,sbH,18);ctx.stroke();
+  ctx.font='900 72px Arial Black,sans-serif';ctx.fillStyle='#7dd3fc';ctx.letterSpacing='0';ctx.textAlign='center';
+  ctx.fillText('0  –  0',W/2,sbY+sbH*.76);
+
+  // ── SE DA POR JUGADO pill ──
+  const pW=540,pH=58,pX=W/2-pW/2,pY=sbY+sbH+22;
+  const pG=lGrad(ctx,pX,pY,pX+pW,pY+pH,[0,'rgba(14,165,233,.0)'],[.5,'rgba(14,165,233,.20)'],[1,'rgba(14,165,233,.0)']);
+  ctx.fillStyle=pG;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.fill();
+  ctx.strokeStyle='rgba(14,165,233,.4)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(pX,pY,pW,pH,pH/2);ctx.stroke();
+  ctx.font='800 24px sans-serif';ctx.fillStyle='#38bdf8';ctx.letterSpacing='3px';ctx.textAlign='center';
+  ctx.fillText('SE DA POR JUGADO · 1 PTO CADA EQUIPO',W/2,pY+pH*.67);
+
+  // ── Bottom ──
+  rule(ctx,H-320,.3);
+  ctx.font='700 26px sans-serif';ctx.fillStyle='rgba(255,255,255,.22)';ctx.letterSpacing='3px';ctx.textAlign='center';
+  ctx.fillText('LIGA INTERNA · TEMPORADA S2 2026',W/2,H-272);
+  botStripe(ctx);
+}
 
 // ═══ SUSPENDIDO ═════════════════════════════════════
 async function tSuspendido(ctx,m){
