@@ -1242,9 +1242,11 @@ async function tJornada(ctx,ms){
   const startY=pY+pH+18,endY=H-160;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
-  const cH=Math.max(170,Math.floor((available-overhead)/Math.max(nCards,1)));
-
-  let curY=startY;
+  const rawCH=Math.floor((available-overhead)/Math.max(nCards,1));
+  const cH=Math.min(220,Math.max(170,rawCH));
+  const totalContent=nCards*cH+overhead;
+  const extraSpace=Math.max(0,available-totalContent);
+  let curY=startY+Math.floor(extraSpace/2);
   for(let gi=0;gi<grps.length;gi++){
     const{dt,ms:gms}=grps[gi];
     jorDayHeader(ctx,dt,curY,dhH);
