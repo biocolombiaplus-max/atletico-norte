@@ -1845,14 +1845,26 @@ async function tTabla(ctx){
   const sg2=lGrad(ctx,W/2-160,0,W/2+160,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
   ctx.fillStyle=sg2;ctx.font='700 26px sans-serif';ctx.letterSpacing='4px';ctx.fillText('LIGA INTERNA · S2 2026',W/2,490);
   rule(ctx,516,.5);
-  const st={};for(let i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0};
-  ALL.forEach(m=>{const res=results[m.id];if(!res||res.l===undefined)return;if(!st[m.l]||!st[m.v])return;
-    st[m.l].pj++;st[m.v].pj++;st[m.l].gf+=res.l;st[m.l].gc+=res.v;st[m.v].gf+=res.v;st[m.v].gc+=res.l;
-    if(res.l>res.v){st[m.l].g++;st[m.l].pts+=3;st[m.v].p++;}
-    else if(res.l<res.v){st[m.v].g++;st[m.v].pts+=3;st[m.l].p++;}
+  // Full standings: WO penalty + retiro + lluvia + correct tiebreakers
+  const wlPen=n=>{if(n<=0)return 0;if(n===1)return-1;if(n===2)return-3;return-6-(n-3)*3;};
+  const st={};for(let i=1;i<=10;i++)st[i]={id:i,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,wl:0};
+  ALL.forEach(m=>{
+    const r=results[m.id];if(!r||r.l===undefined)return;if(!st[m.l]||!st[m.v])return;
+    st[m.l].pj++;st[m.v].pj++;st[m.l].gf+=r.l;st[m.l].gc+=r.v;st[m.v].gf+=r.v;st[m.v].gc+=r.l;
+    if(r.lluvia){st[m.l].e++;st[m.l].pts++;st[m.v].e++;st[m.v].pts++;return;}
+    const wo=r.wo||false;
+    if(r.l>r.v){st[m.l].g++;st[m.l].pts+=3;st[m.v].p++;if(wo)st[m.v].wl++;}
+    else if(r.l<r.v){st[m.v].g++;st[m.v].pts+=3;st[m.l].p++;if(wo)st[m.l].wl++;}
     else{st[m.l].e++;st[m.v].e++;st[m.l].pts++;st[m.v].pts++;}
   });
-  const sorted=Object.values(st).sort((a,b)=>b.pts-a.pts||b.g-a.g||(b.gf-b.gc)-(a.gf-a.gc));
+  Object.values(st).forEach(t=>{t.pts=Math.max(0,t.pts+wlPen(t.wl));});
+  const sorted=Object.values(st).sort((a,b)=>{
+    if(b.pts!==a.pts)return b.pts-a.pts;
+    if(a.wl!==b.wl)return a.wl-b.wl;
+    const dgA=a.gf-a.gc,dgB=b.gf-b.gc;
+    if(dgB!==dgA)return dgB-dgA;
+    return b.gf-a.gf;
+  });
   const rH=116,tY=534,tX=42,tW=W-84;
   ctx.fillStyle='rgba(200,16,46,.14)';ctx.beginPath();ctx.roundRect(tX,tY,tW,52,12);ctx.fill();
   ctx.strokeStyle='rgba(200,16,46,.22)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(tX,tY,tW,52,12);ctx.stroke();

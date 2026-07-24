@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.78';
+var APP_VER='8.79';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -730,6 +730,20 @@ tbody td:nth-child(2){text-align:left}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 @media(min-width:640px){.app{max-width:640px;margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,.6)}.bnv{max-width:640px;left:50%;transform:translateX(-50%);right:auto;width:100%}}
 @media(max-width:360px){.sortgrd{grid-template-columns:repeat(5,1fr);gap:4px}.tpc .tpbdg{width:24px;height:29px}.tpc{padding:6px 2px 4px}.hstats .v{font-size:22px}}
+/* ── MATCH STATUS BADGES ── */
+@keyframes pulseLive{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6),0 2px 12px rgba(239,68,68,.35)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0),0 2px 16px rgba(239,68,68,.5)}}
+@keyframes pulseNext{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5),0 2px 10px rgba(16,185,129,.28)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0),0 2px 14px rgba(16,185,129,.45)}}
+@keyframes shimmerHoy{0%{background-position:-200% center}100%{background-position:200% center}}
+.mc-badge-wrap{grid-column:1/-1;display:flex;justify-content:center;padding-bottom:8px}
+.mc-badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 14px;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;line-height:1}
+.mc-badge.live{background:linear-gradient(90deg,#7f1d1d,#ef4444,#7f1d1d);color:#fff;animation:pulseLive 1.8s ease-in-out infinite;border:1px solid rgba(239,68,68,.5)}
+.mc-badge.live .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulseLive 1s ease-in-out infinite;flex-shrink:0}
+.mc-badge.hoy{background:linear-gradient(270deg,#b8860b,#ffd700,#fff7b0,#ffd700,#b8860b);background-size:300% auto;color:#1a0f00;animation:shimmerHoy 3s linear infinite;border:1px solid rgba(255,215,0,.5)}
+.mc-badge.next{background:linear-gradient(90deg,#064e3b,#10b981,#064e3b);color:#fff;animation:pulseNext 2.2s ease-in-out infinite;border:1px solid rgba(16,185,129,.45)}
+.mc.has-badge{grid-template-columns:1fr 118px 1fr;padding-top:10px}
+.mc.live-match{border-left:3px solid #ef4444;background:rgba(239,68,68,.04)}
+.mc.hoy-match{border-left:3px solid #ffd700;background:rgba(255,215,0,.03)}
+.mc.next-match{border-left:3px solid #10b981;background:rgba(16,185,129,.04)}
 </style>
 </head>
 <body>
@@ -1658,9 +1672,14 @@ function updHdr(){
   var pl=Object.keys(res).filter(function(k){return res[k]&&res[k].l!==undefined;}).length;
   document.getElementById("hPl").textContent=pl;
   document.getElementById("hRm").textContent=135-pl;
-  var mx=0;MF.forEach(function(m){if(res[m.id]&&m.vu>mx)mx=m.vu;});
-  document.getElementById("hWk").textContent=mx||"\u2014";
-  var cvn=document.getElementById("cvn");if(cvn)cvn.textContent=mx;
+  // Semana: pr\u00f3xima jornada no jugada; si todo jugado, \u00faltima semana jugada
+  var todayStr=new Date().toISOString().slice(0,10);
+  var pendFut=MF.filter(function(m){return !(res[m.id]&&res[m.id].l!==undefined)&&m.fecha>=todayStr;});
+  var curWk;
+  if(pendFut.length){pendFut.sort(function(a,b){return a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora);});curWk=pendFut[0].week;}
+  else{var mx=0;MF.forEach(function(m){if(res[m.id]&&res[m.id].l!==undefined&&m.week>mx)mx=m.week;});curWk=mx;}
+  document.getElementById("hWk").textContent=curWk||"\u2014";
+  var cvn=document.getElementById("cvn");if(cvn)cvn.textContent=curWk;
   var pct=Math.round(pl/135*100);
   document.getElementById("progBar").style.width=pct+"%";
   var c=document.getElementById("chipSt");
@@ -1957,6 +1976,22 @@ function initFltEq(){
   row.innerHTML=h;
 }
 function twk(hdr){var b=hdr.nextElementSibling;b.classList.toggle("open");}
+function _matchStatus(m){
+  // Returns: 'played'|'live'|'hoy'|'next'|'future'
+  var r=res[m.id];
+  if(r&&r.l!==undefined)return'played';
+  var now=new Date();
+  var todayStr=now.toISOString().slice(0,10);
+  if(m.fecha>todayStr)return'future';
+  if(m.fecha<todayStr)return'played'; // past unregistered \u2192 treat as future (won't badge)
+  // Today's match
+  var hora=getHora(m).split(':');
+  var kickoff=new Date(now);kickoff.setHours(+hora[0],+hora[1],0,0);
+  var diff=(now-kickoff)/60000;
+  if(diff<0)return'hoy';
+  if(diff<=80)return'live';
+  return'future'; // ended but not entered
+}
 function rFx(){
   updHdr();
   var ms=MF.filter(function(m){
@@ -1964,17 +1999,43 @@ function rFx(){
     var eqOk=(cfe===0||(m.l===cfe||m.v===cfe));
     return vuOk&&eqOk;
   });
+  // Find next upcoming unplayed match across all (ignoring filters for badge logic)
+  var todayStr=new Date().toISOString().slice(0,10);
+  var allPend=MF.filter(function(m){return !(res[m.id]&&res[m.id].l!==undefined)&&m.fecha>=todayStr;});
+  allPend.sort(function(a,b){return a.fecha.localeCompare(b.fecha)||getHora(a).localeCompare(getHora(b));});
+  var nextMid=allPend.length?allPend[0].id:-1;
+  // But if that next match is today and live/hoy, next=first future match after today's live ones
+  if(nextMid>0){var ns=_matchStatus(allPend[0]);if(ns==='live'||ns==='hoy')nextMid=-1;} // badge separately
+  // First truly 'future' (not today) becomes PR\u00d3XIMA FECHA only if no today matches pending
+  var todayPending=allPend.filter(function(m){return m.fecha===todayStr;});
+  var futurePending=allPend.filter(function(m){return m.fecha>todayStr;});
+  if(todayPending.length){nextMid=-1;} // today matches take priority; no PR\u00d3XIMA on today's future
+  else{nextMid=futurePending.length?futurePending[0].id:-1;}
+
   var bd={};ms.forEach(function(m){if(!bd[m.fecha])bd[m.fecha]=[];bd[m.fecha].push(m);});
   var h="";var first=true;
   Object.keys(bd).sort().forEach(function(dt){
     var dm=bd[dt].slice().sort(function(a,b){return getHora(a).localeCompare(getHora(b));});var isF=dm[0].festivo;
     var dayFull=["Domingo","Lunes","Martes","Mi\u00e9rcoles","Jueves","Viernes","S\u00e1bado"][new Date(dt+"T12:00:00").getDay()];
-    var openCls=first?" open":"";first=false;
+    // Auto-open today and next sections
+    var isToday=(dt===todayStr);
+    var hasNextMatch=dm.some(function(m){return m.id===nextMid;});
+    var openCls=(first||isToday||hasNextMatch)?" open":"";first=false;
     var wk=dm[0].week;
+    // Section badge
+    var secBadge='';
+    if(isToday&&dm.some(function(m){var st=_matchStatus(m);return st==='live'||st==='hoy';})){
+      var hasLive=dm.some(function(m){return _matchStatus(m)==='live';});
+      secBadge=hasLive
+        ?'<span style="display:inline-flex;align-items:center;gap:4px;background:#ef4444;color:#fff;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-left:6px;animation:pulseLive 1.8s ease-in-out infinite"><span style="width:6px;height:6px;border-radius:50%;background:#fff;flex-shrink:0"></span>EN VIVO</span>'
+        :'<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg,#b8860b,#ffd700);color:#1a0f00;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-left:6px">\u2b50 HOY</span>';
+    } else if(hasNextMatch){
+      secBadge='<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg,#064e3b,#10b981);color:#fff;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-left:6px;animation:pulseNext 2.2s ease-in-out infinite">PR\u00d3XIMA FECHA</span>';
+    }
     h+='<div class="wb">';
     h+='<div class="wh" onclick="twk(this)">';
     h+='<div class="whl">';
-    h+='<div class="wday">'+dayFull+(isF?' <span class="fest">&#127881;</span>':'')+'</div>';
+    h+='<div class="wday">'+dayFull+(isF?' <span class="fest">&#127881;</span>':'')+secBadge+'</div>';
     h+='<div class="wdate">'+fd(dt)+' <span class="wdsem">Sem '+wk+'</span></div>';
     h+='</div>';
     h+='<div class="whc"><div class="whcn">'+dm.length+'</div><div style="font-size:9px;margin-top:1px">partidos</div></div>';
@@ -1983,8 +2044,17 @@ function rFx(){
     h+='<div class="wbdy'+openCls+'">';
     dm.forEach(function(m){
       var r=res[m.id],ip=!!r;
+      var mst=_matchStatus(m);
       var cc=m.cancha==="Coveadse"?"cov":m.cancha==="Comfanorte"?"cnf":"vls";
-      h+='<div class="mc'+(ip?' pl':'')+'">';
+      // Per-match status badge
+      var bdgHtml='',extraCls='';
+      if(!ip){
+        if(mst==='live'){bdgHtml='<div class="mc-badge-wrap"><span class="mc-badge live"><span class="dot"></span>EN VIVO · SE ESTÁ JUGANDO</span></div>';extraCls=' live-match has-badge';}
+        else if(mst==='hoy'){bdgHtml='<div class="mc-badge-wrap"><span class="mc-badge hoy">⭐ HOY · DÍA DE PARTIDO</span></div>';extraCls=' hoy-match has-badge';}
+        else if(m.id===nextMid){bdgHtml='<div class="mc-badge-wrap"><span class="mc-badge next">⏭ PRÓXIMA FECHA</span></div>';extraCls=' next-match has-badge';}
+      }
+      h+='<div class="mc'+(ip?' pl':'')+extraCls+'">';
+      h+=bdgHtml;
       h+='<div class="ts">'+bdg(m.l,'bw')+'<div><div class="tnm">'+tn(m.l)+'</div><div class="tsb">'+ts(m.l)+'</div></div></div>';
       h+='<div class="sb">';
       if(ip){
