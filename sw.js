@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v8.78-2026-07-22';
+const SW_VER = 'v8.79-2026-07-24';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER; // versioned — cleared on every deploy
 
@@ -21,7 +21,6 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      // Delete ALL old caches — including old icon caches with stale data
       .then(keys => Promise.all(
         keys.filter(k => k !== STATIC_CACHE && k !== ICON_CACHE)
             .map(k => caches.delete(k))
@@ -35,8 +34,6 @@ self.addEventListener('activate', e => {
 self.addEventListener('message', e => {
   if (!e.data) return;
   if (e.data.type === 'SKIP_WAITING') { self.skipWaiting(); return; }
-
-  // Store club logo as PWA icons (used as offline fallback)
   if (e.data.type === 'SET_CLUB_ICON') {
     const { buf192, buf512 } = e.data;
     caches.open(ICON_CACHE).then(cache => {
@@ -55,7 +52,6 @@ self.addEventListener('message', e => {
   }
 });
 
-// ── PUSH NOTIFICATIONS ──
 self.addEventListener('push', e => {
   if (!e.data) return;
   let payload;
@@ -85,42 +81,27 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-
-  // ── Manifest: always fresh so Chrome sees icon changes immediately ──
   if (url.pathname === '/manifest.json') {
     e.respondWith(fetch(new Request(e.request.url, {cache:'no-store'})));
     return;
   }
-
-  // ── PWA Icons: network-first, bypass HTTP cache, then store for offline ──
   const iconPaths = ['/an-logo-192.png','/an-logo-512.png','/an-logo-192m.png','/an-logo-512m.png',
                      '/icon-192.png','/icon-512.png','/icon-192-maskable.png','/icon-512-maskable.png'];
   if (iconPaths.includes(url.pathname)) {
     e.respondWith(
       fetch(new Request(e.request.url, {cache: 'no-store'}))
         .then(r => {
-          if (r && r.ok) {
-            caches.open(ICON_CACHE).then(c => c.put(url.pathname, r.clone()));
-          }
+          if (r && r.ok) { caches.open(ICON_CACHE).then(c => c.put(url.pathname, r.clone())); }
           return r;
         })
-        .catch(() =>
-          caches.open(ICON_CACHE).then(c => c.match(url.pathname))
-        )
+        .catch(() => caches.open(ICON_CACHE).then(c => c.match(url.pathname)))
     );
     return;
   }
-
-  // ── HTML pages: ALWAYS network-first, no-store cache ──
   if (e.request.mode === 'navigate') {
-    e.respondWith(
-      fetch(e.request, { cache: 'no-store' })
-        .catch(() => caches.match(e.request))
-    );
+    e.respondWith(fetch(e.request, { cache: 'no-store' }).catch(() => caches.match(e.request)));
     return;
   }
-
-  // ── Firebase SDK + gstatic: cache-first ──
   if (url.hostname === 'www.gstatic.com') {
     e.respondWith(
       caches.match(e.request).then(cached => {
@@ -133,6 +114,4 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
-
-  // ── Everything else: network (Firebase RTDB, images, etc.) ──
 });
