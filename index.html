@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.79';
+var APP_VER='8.80';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2013,30 +2013,31 @@ function rFx(){
   else{nextMid=futurePending.length?futurePending[0].id:-1;}
 
   var bd={};ms.forEach(function(m){if(!bd[m.fecha])bd[m.fecha]=[];bd[m.fecha].push(m);});
-  var h="";var first=true;
+  var h="";
   Object.keys(bd).sort().forEach(function(dt){
     var dm=bd[dt].slice().sort(function(a,b){return getHora(a).localeCompare(getHora(b));});var isF=dm[0].festivo;
     var dayFull=["Domingo","Lunes","Martes","Mi\u00e9rcoles","Jueves","Viernes","S\u00e1bado"][new Date(dt+"T12:00:00").getDay()];
-    // Auto-open today and next sections
     var isToday=(dt===todayStr);
     var hasNextMatch=dm.some(function(m){return m.id===nextMid;});
-    var openCls=(first||isToday||hasNextMatch)?" open":"";first=false;
+    // Only auto-open today's date or the next-match date \u2014 never the first past date
+    var openCls=(isToday||hasNextMatch)?" open":"";
     var wk=dm[0].week;
-    // Section badge
+    // Section badge \u2014 shown as its own centered row inside the header
     var secBadge='';
     if(isToday&&dm.some(function(m){var st=_matchStatus(m);return st==='live'||st==='hoy';})){
       var hasLive=dm.some(function(m){return _matchStatus(m)==='live';});
       secBadge=hasLive
-        ?'<span style="display:inline-flex;align-items:center;gap:4px;background:#ef4444;color:#fff;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-left:6px;animation:pulseLive 1.8s ease-in-out infinite"><span style="width:6px;height:6px;border-radius:50%;background:#fff;flex-shrink:0"></span>EN VIVO</span>'
-        :'<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg,#b8860b,#ffd700);color:#1a0f00;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-left:6px">\u2b50 HOY</span>';
+        ?'<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;background:#ef4444;color:#fff;border-radius:20px;padding:4px 12px;font-size:9.5px;font-weight:900;letter-spacing:.8px;animation:pulseLive 1.8s ease-in-out infinite"><span style="width:7px;height:7px;border-radius:50%;background:#fff;flex-shrink:0"></span>EN VIVO \u00b7 SE EST\u00c1 JUGANDO</span></div>'
+        :'<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,#b8860b,#ffd700,#b8860b);color:#1a0f00;border-radius:20px;padding:4px 12px;font-size:9.5px;font-weight:900;letter-spacing:.8px">\u2b50 HOY \u00b7 D\u00cdA DE PARTIDO</span></div>';
     } else if(hasNextMatch){
-      secBadge='<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg,#064e3b,#10b981);color:#fff;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-left:6px;animation:pulseNext 2.2s ease-in-out infinite">PR\u00d3XIMA FECHA</span>';
+      secBadge='<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,#064e3b,#10b981,#064e3b);color:#fff;border-radius:20px;padding:4px 12px;font-size:9.5px;font-weight:900;letter-spacing:.8px;animation:pulseNext 2.2s ease-in-out infinite">\u23ed\ufe0f PR\u00d3XIMA FECHA</span></div>';
     }
     h+='<div class="wb">';
     h+='<div class="wh" onclick="twk(this)">';
     h+='<div class="whl">';
-    h+='<div class="wday">'+dayFull+(isF?' <span class="fest">&#127881;</span>':'')+secBadge+'</div>';
+    h+='<div class="wday">'+dayFull+(isF?' <span class="fest">&#127881;</span>':'')+'</div>';
     h+='<div class="wdate">'+fd(dt)+' <span class="wdsem">Sem '+wk+'</span></div>';
+    if(secBadge)h+=secBadge;
     h+='</div>';
     h+='<div class="whc"><div class="whcn">'+dm.length+'</div><div style="font-size:9px;margin-top:1px">partidos</div></div>';
     if(cEd())h+='<button class="wh-img-btn no-print" onclick="event.stopPropagation();genWkImg('+wk+')" title="Generar imagen">&#128247;</button>';
