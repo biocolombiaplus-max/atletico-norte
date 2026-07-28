@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.80';
+var APP_VER='8.81';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2570,17 +2570,21 @@ function rsPickerHtml(m){
       var displayKey=isAG?(p.corto+'|'+benefitTid):(evtType==='goal'?(p.corto+'|'+p.teamId):(p.name+'|'+p.teamId));
       var agCount=isAG?selKeys.filter(function(k){return k===displayKey;}).length:0;
       var goalCount=evtType==='goal'?selKeys.filter(function(k){return k===(p.corto+'|'+p.teamId);}).length:0;
-      var isOn=isAG?(agCount>0):(evtType==='goal'?(goalCount>0):(selKeys.indexOf(p.name+'|'+p.teamId)>=0));
-      var numBg=isOn?evtCol:tCol;
+      var yellowCount=evtType==='yellow'?_evYellows.filter(function(e){return e.name===p.name&&e.teamId===p.teamId;}).length:0;
+      var hasDoubleY=yellowCount>=2;
+      var isOn=isAG?(agCount>0):(evtType==='goal'?(goalCount>0):(evtType==='yellow'?(yellowCount>0):(selKeys.indexOf(p.name+'|'+p.teamId)>=0)));
+      var dynCol=isOn?(hasDoubleY?'#ef4444':evtCol):tCol;
+      var numBg=isOn?dynCol:tCol;
       var num=p.camiseta||'?';
       var clickCall=isAG
         ?'rsPickPlayer(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+benefitTid+',\'autogol\')'
         :'rsPickPlayer(\''+escHtml(p.name)+'\',\''+escHtml(p.corto)+'\','+p.teamId+',\''+evtType+'\')';
       h+='<button class="rs-pl-btn'+(isOn?' on':'')+'" ';
-      h+='style="'+(isOn?'border-color:'+evtCol+';background:rgba('+hexRgb(evtCol)+',.18)':'')+'"';
+      h+='style="'+(isOn?'border-color:'+dynCol+';background:rgba('+hexRgb(dynCol)+',.18)':'')+'"';
       h+=' onclick="'+clickCall+'">';
       if(isAG&&agCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px;background:#fb923c">'+agCount+'🔄</div>';
       else if(evtType==='goal'&&goalCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px">'+goalCount+'⚽</div>';
+      else if(evtType==='yellow'&&yellowCount>0)h+='<div class="rs-pl-badge" style="min-width:16px;padding:0 3px;background:'+(hasDoubleY?'#ef4444':'#f59e0b')+'">'+(hasDoubleY?'🟨🟨🟥':'🟨')+'</div>';
       else if(isOn)h+='<div class="rs-pl-badge">'+evtIcon+'</div>';
       h+='<div class="rs-pl-num" style="background:'+numBg+';font-size:'+(num.length>2?'9':'12')+'px">'+escHtml(num)+'</div>';
       h+='<div class="rs-pl-name" style="color:'+(isOn?evtCol:'var(--t)')+'">'+escHtml(p.corto)+'</div>';
@@ -2614,9 +2618,27 @@ function rsPickPlayer(name,corto,teamId,evtType){
     // Autogol: credited to benefiting team (teamId), player did NOT score intentionally
     _evGoals.push({name:name+'_ag'+Date.now(),playerName:name,corto:corto,teamId:teamId,camiseta:cam,autogol:true});
     _rsPicker=null;
+  }else if(evtType==='yellow'){
+    // Count existing yellows for this player in this match
+    var yCount=_evYellows.filter(function(e){return e.name===name&&e.teamId===teamId;}).length;
+    if(yCount>=2){
+      // Already has 2 yellows (= red already issued) — remove last yellow and its auto-red
+      var lastIdx=_evYellows.map(function(e,i){return e.name===name&&e.teamId===teamId?i:-1;}).filter(function(i){return i>=0;}).pop();
+      if(lastIdx!==undefined)_evYellows.splice(lastIdx,1);
+      // Remove the auto-issued red for this player if it came from 2Y
+      var rIdx=_evReds.findIndex(function(e){return e.name===name&&e.teamId===teamId&&e.fromDoubleYellow;});
+      if(rIdx>=0)_evReds.splice(rIdx,1);
+    }else{
+      _evYellows.push({name:name,corto:corto,teamId:teamId,camiseta:cam});
+      if(yCount===1){
+        // Second yellow in the same match → automatic red card
+        _evReds.push({name:name,corto:corto,teamId:teamId,camiseta:cam,fromDoubleYellow:true});
+      }
+    }
   }else{
-    var arr=evtType==='yellow'?_evYellows:_evReds;
-    var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
+    // Red card: toggle (click again to remove)
+    var arr=_evReds;
+    var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId&&!e.fromDoubleYellow;});
     if(idx>=0){arr.splice(idx,1);}else{arr.push({name:name,corto:corto,teamId:teamId,camiseta:cam});}
   }
   rsRender();
@@ -2642,7 +2664,10 @@ function rsEvtLogHtml(m){
   function cam(e){return e.camiseta?'<span style="font-size:9px;opacity:.55;margin-right:2px">#'+e.camiseta+'</span>':'';}
   _evGoals.forEach(function(e){all.push({icon:e.autogol?'🔄⚽':'⚽',col:e.autogol?'#fb923c':(TC[e.teamId]||'#10b981'),team:e.autogol?(tn(e.teamId)+' (AG)'):tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'goal\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
   _evYellows.forEach(function(e){all.push({icon:'🟨',col:'#f59e0b',team:tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'yellow\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
-  _evReds.forEach(function(e){all.push({icon:'🟥',col:'#ef4444',team:tn(e.teamId),name:e.corto,cam:cam(e),rm:'rsRemoveEvt(\'red\',\''+escHtml(e.name)+'\','+e.teamId+')'});});
+  _evReds.forEach(function(e){
+    var label=e.fromDoubleYellow?(e.corto+' (2ª 🟨→🟥)'):e.corto;
+    all.push({icon:'🟥',col:e.fromDoubleYellow?'#fb923c':'#ef4444',team:tn(e.teamId),name:label,cam:cam(e),rm:'rsRemoveEvt(\''+(e.fromDoubleYellow?'red2y':'red')+'\',\''+escHtml(e.name)+'\','+e.teamId+')'});
+  });
   if(!all.length)return '<div style="text-align:center;color:var(--m);font-size:11px;padding:10px 0;margin-bottom:8px">Sin eventos registrados</div>';
   var h='<div style="font-size:9px;font-weight:900;letter-spacing:1px;color:var(--m);margin-bottom:6px">EVENTOS DEL PARTIDO</div>';
   h+='<div class="rs-evt-list">';
@@ -2650,7 +2675,21 @@ function rsEvtLogHtml(m){
   h+='</div>';
   return h;
 }
-function rsRemoveEvt(type,name,teamId){var arr=type==='goal'?_evGoals:type==='yellow'?_evYellows:_evReds;var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});if(idx>=0)arr.splice(idx,1);rsRender();}
+function rsRemoveEvt(type,name,teamId){
+  if(type==='red2y'){
+    // Remove auto-red from double yellow
+    var ri=_evReds.findIndex(function(e){return e.name===name&&e.teamId===teamId&&e.fromDoubleYellow;});
+    if(ri>=0)_evReds.splice(ri,1);
+    // Also remove one yellow for that player
+    var yi=_evYellows.map(function(e,i){return e.name===name&&e.teamId===teamId?i:-1;}).filter(function(i){return i>=0;}).pop();
+    if(yi!==undefined)_evYellows.splice(yi,1);
+  }else{
+    var arr=type==='goal'?_evGoals:type==='yellow'?_evYellows:_evReds;
+    var idx=arr.findIndex(function(e){return e.name===name&&e.teamId===teamId;});
+    if(idx>=0)arr.splice(idx,1);
+  }
+  rsRender();
+}
 
 function rsSetType(t){curRType=t;if(t==='wo')curWOWinner=null;if(t==='retiro')curRetWho=null;_rsPicker=null;_rsLluviaConfirmed=false;rsRender();}
 function rsWOWin(side){curWOWinner=side;rsRender();}
