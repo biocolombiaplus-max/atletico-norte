@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.82';
+var APP_VER='8.83';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -5540,40 +5540,58 @@ function cdDrawQR(uid, seed){
 
 /* ── List view ── */
 function cdShowList(){
-  if(!db){adCnt('<div class="cdn-wrap"><div class="cdn-empty">Firebase no conectado</div></div>');return;}
-  adCnt('<div class="cdn-wrap"><div style="text-align:center;padding:30px 0;color:var(--m);font-size:12px">⏳ Cargando carnets…</div></div>');
-  db.ref('/carnets').once('value').then(function(snap){
-    var carnets=snap.val()||{};
-    cdInit();
-    var h='<div class="cdn-wrap">';
-    h+='<div class="cdn-top"><h3>🪪 Carnet Digital</h3><button class="cdn-btn-new" onclick="cdOpenForm(null)">+ Nuevo Carnet</button></div>';
-    // Config sheet URL
-    h+='<div class="cdn-cfg"><label>Google Sheets Webhook (Apps Script URL)</label>'
-      +'<input type="url" id="cdSheetInp" value="'+escHtml(_cdSheetUrl)+'" placeholder="https://script.google.com/macros/s/…/exec" onblur="cdSaveSheetUrl()">'
-      +'<div style="font-size:9px;color:var(--m);margin-top:5px">Al escanear el QR se registrará automáticamente la visita en este Sheet. Deja vacío para omitir.</div>'
+  cdInit();
+  cdRenderList({});
+  // Load real data from Firebase (may fail if rules not yet set — degrade gracefully)
+  if(db){
+    db.ref('/carnets').once('value').then(function(snap){
+      var carnets=snap.val()||{};
+      if(Object.keys(carnets).length) cdRenderList(carnets);
+    }).catch(function(){}); // silent — empty state already shown
+  }
+}
+
+function cdRenderList(carnets){
+  var h='<div class="cdn-wrap">';
+  h+='<div class="cdn-top"><h3>🪪 Carnet Digital</h3><button class="cdn-btn-new" onclick="cdOpenForm(null)">+ Nuevo Carnet</button></div>';
+  // Config sheet URL
+  h+='<div class="cdn-cfg"><label>Google Sheets Webhook (Apps Script URL)</label>'
+    +'<input type="url" id="cdSheetInp" value="'+escHtml(_cdSheetUrl)+'" placeholder="https://script.google.com/macros/s/…/exec" onblur="cdSaveSheetUrl()">'
+    +'<div style="font-size:9px;color:var(--m);margin-top:5px">Al escanear el QR se registra la visita en ese Sheet. Deja vacío para omitir.</div>'
+    +'</div>';
+
+  var keys=Object.keys(carnets);
+  if(!keys.length){
+    // Empty state: show sample card + CTA
+    var demo={nombre:'CÉSAR AUGUSTO GALAVIS LEÓN',cedula:'88262162',posicion:'Arquero',cargo:'Presidente del Club',estado:'activo',vigencia:'2026-07-27',codigo:'AN-001'};
+    h+='<div style="background:rgba(200,16,46,.07);border:1px dashed rgba(200,16,46,.25);border-radius:14px;padding:16px;margin-bottom:18px;text-align:center">'
+      +'<div style="font-size:11px;font-weight:800;color:#d05070;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px">Ejemplo de carnet — así lucirá cada socio</div>'
+      +'<div class="cdn-card-wrap" id="cdDemoWrap">'+cdCardHtml(demo,'demo')+'</div>'
+      +'<div style="font-size:11px;color:var(--m);margin-top:12px;line-height:1.6">Crea el primer carnet tocando <strong style="color:var(--t)">+ Nuevo Carnet</strong>.<br>Puedes tomarle la foto al socio directamente desde la app.</div>'
       +'</div>';
-    var keys=Object.keys(carnets);
-    if(!keys.length){
-      h+='<div class="cdn-empty">🪪<br><br>Sin carnets creados.<br>Crea el primero con el botón de arriba.</div>';
-    } else {
-      h+='<div class="cdn-list">';
-      keys.forEach(function(uid){
-        var d=carnets[uid];
-        var activo=(d.estado||'activo')==='activo';
-        var initials=(d.nombre||'?').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
-        var photoEl=d.foto?'<img src="'+d.foto+'" class="cdn-item-photo" style="display:block" alt="">':'<div class="cdn-item-photo">'+initials+'</div>';
-        h+='<div class="cdn-item" onclick="cdOpenForm(\''+uid+'\')">'
-          +photoEl
-          +'<div class="cdn-item-info"><div class="cdn-item-name">'+escHtml(d.nombre||'Sin nombre')+'</div>'
-          +'<div class="cdn-item-sub">'+escHtml(d.cedula||'')+(d.cargo?' · '+escHtml(d.cargo):'')+'</div></div>'
-          +'<div class="cdn-item-status"><span class="'+(activo?'cdn-pill-on':'cdn-pill-off')+'">'+(activo?'Activo':'Inactivo')+'</span></div>'
-          +'</div>';
-      });
-      h+='</div>';
-    }
+  } else {
+    h+='<div class="cdn-list">';
+    keys.forEach(function(uid){
+      var d=carnets[uid];
+      var activo=(d.estado||'activo')==='activo';
+      var initials=(d.nombre||'?').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+      var photoEl=d.foto?'<img src="'+d.foto+'" class="cdn-item-photo" style="display:block;width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #c8102e" alt="">':'<div class="cdn-item-photo">'+initials+'</div>';
+      h+='<div class="cdn-item" onclick="cdOpenForm(\''+uid+'\')">'
+        +photoEl
+        +'<div class="cdn-item-info"><div class="cdn-item-name">'+escHtml(d.nombre||'Sin nombre')+'</div>'
+        +'<div class="cdn-item-sub">'+escHtml(d.cedula||'')+(d.cargo?' · '+escHtml(d.cargo):'')+'</div></div>'
+        +'<div class="cdn-item-status"><span class="'+(activo?'cdn-pill-on':'cdn-pill-off')+'">'+(activo?'Activo':'Inactivo')+'</span></div>'
+        +'</div>';
+    });
     h+='</div>';
-    adCnt(h);
-  }).catch(function(){adCnt('<div class="cdn-wrap"><div class="cdn-empty">Error cargando datos</div></div>');});
+  }
+  h+='</div>';
+  adCnt(h);
+  // Draw QR on demo card if shown
+  if(!keys.length){
+    var seed=0;var cod='AN-001';for(var i=0;i<cod.length;i++)seed=(seed*31+cod.charCodeAt(i))>>>0;
+    cdDrawQR('demo', seed);
+  }
 }
 
 function cdSaveSheetUrl(){
