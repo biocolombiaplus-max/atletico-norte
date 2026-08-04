@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.81';
+var APP_VER='8.82';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -744,6 +744,146 @@ tbody td:nth-child(2){text-align:left}
 .mc.live-match{border-left:3px solid #ef4444;background:rgba(239,68,68,.04)}
 .mc.hoy-match{border-left:3px solid #ffd700;background:rgba(255,215,0,.03)}
 .mc.next-match{border-left:3px solid #10b981;background:rgba(16,185,129,.04)}
+
+/* ═══ CARNET DIGITAL MODULE ═══ */
+.cdn-wrap{padding:14px 16px 24px}
+.cdn-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cdn-top h3{font-size:15px;font-weight:900;letter-spacing:-.3px}
+.cdn-btn-new{background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.3px}
+.cdn-list{display:flex;flex-direction:column;gap:10px}
+.cdn-item{background:var(--b2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s}
+.cdn-item:active{opacity:.75}
+.cdn-item-photo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #c8102e;background:#1a2e48;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#7a9ab8}
+.cdn-item-info{flex:1;min-width:0}
+.cdn-item-name{font-size:13px;font-weight:900;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdn-item-sub{font-size:10px;color:var(--m);margin-top:2px}
+.cdn-item-status{flex-shrink:0}
+.cdn-pill-on{background:rgba(22,163,74,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:2px 9px;font-size:9px;font-weight:800}
+.cdn-pill-off{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.28);border-radius:10px;padding:2px 9px;font-size:9px;font-weight:800}
+.cdn-empty{text-align:center;padding:40px 20px;color:var(--m);font-size:12px}
+/* Form */
+.cdn-form{background:var(--b2);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px}
+.cdn-form h4{font-size:13px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cdn-field{margin-bottom:12px}
+.cdn-field label{display:block;font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cdn-field input,.cdn-field select{width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none}
+.cdn-field input:focus,.cdn-field select:focus{border-color:rgba(200,16,46,.5)}
+.cdn-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cdn-photo-area{display:flex;align-items:center;gap:12px;padding:12px;background:var(--b3);border:1px dashed var(--bd);border-radius:10px;cursor:pointer}
+.cdn-photo-preview{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #c8102e;background:#0d1f32;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.cdn-photo-hint{font-size:11px;color:var(--m);line-height:1.5}
+.cdn-photo-hint strong{color:var(--t);display:block;font-size:12px}
+.cdn-btn-save{width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px}
+.cdn-btn-del{width:100%;background:var(--b3);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.cdn-btn-prev{width:100%;background:var(--b3);border:1px solid var(--bd);color:var(--t);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.cdn-btn-back{background:none;border:none;color:var(--m);font-size:13px;cursor:pointer;padding:0;margin-bottom:14px;display:flex;align-items:center;gap:5px}
+/* Config section */
+.cdn-cfg{background:rgba(212,165,32,.06);border:1px solid rgba(212,165,32,.18);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.cdn-cfg label{font-size:9px;font-weight:800;color:#d4a520;letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px}
+.cdn-cfg input{width:100%;background:var(--b3);border:1px solid rgba(212,165,32,.2);border-radius:8px;color:var(--t);font-size:11px;padding:7px 10px;outline:none;font-family:ui-monospace,monospace}
+
+/* ── CARNET CARD (impresión y preview) ── */
+.cdn-card-wrap{display:flex;justify-content:center;padding:10px 0 20px}
+.cdn-card{
+  width:320px;height:508px;border-radius:18px;position:relative;overflow:hidden;
+  font-family:'Arial Black',system-ui,sans-serif;
+  box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.07);
+  flex-shrink:0;background:#111418;
+}
+/* Left red stripe */
+.cdn-c-stripe{
+  position:absolute;left:0;top:0;bottom:0;width:38px;
+  background:linear-gradient(180deg,#c8102e 0%,#950c22 100%);
+  display:flex;align-items:center;justify-content:center;z-index:5;
+  overflow:hidden;
+}
+.cdn-c-stripe::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(0,0,0,.12) 6px,rgba(0,0,0,.12) 7px);
+}
+.cdn-c-stripe-txt{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:8px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,.9);
+  text-transform:uppercase;position:relative;z-index:2;white-space:nowrap;
+}
+.cdn-c-stripe-bars{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:3px;z-index:2}
+.cdn-c-stripe-bar{width:16px;height:5px;background:#111;border-radius:1px}
+/* Right status tab */
+.cdn-c-tab{
+  position:absolute;right:-2px;top:50%;transform:translateY(-50%);
+  width:24px;height:110px;background:#1a1a1a;border-radius:6px 0 0 6px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  z-index:5;box-shadow:-2px 0 8px rgba(0,0,0,.4);
+}
+.cdn-c-tab-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e}
+.cdn-c-tab-txt{writing-mode:vertical-rl;transform:rotate(180deg);font-size:6px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;white-space:nowrap}
+/* Top dark header */
+.cdn-c-hdr{
+  position:absolute;left:38px;right:22px;top:0;height:168px;
+  background:linear-gradient(160deg,#0d1117 0%,#161b22 60%,#1a0608 100%);
+  display:flex;align-items:center;gap:10px;padding:14px 12px 14px 14px;overflow:hidden;
+}
+.cdn-c-hdr::before{
+  content:'';position:absolute;right:0;top:0;bottom:0;width:50%;
+  background-image:radial-gradient(circle,rgba(200,16,46,.18) 1px,transparent 1px);
+  background-size:10px 10px;pointer-events:none;
+}
+.cdn-c-crest{width:78px;height:auto;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,.7));position:relative;z-index:2}
+.cdn-c-wordmark{position:relative;z-index:2;flex:1}
+.cdn-c-wordmark .wl1{font-size:22px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;text-transform:uppercase}
+.cdn-c-wordmark .wl2{font-size:26px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;text-transform:uppercase}
+.cdn-c-wordmark .wl3{font-size:11px;font-weight:900;color:#c8102e;letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+.cdn-c-wordmark .wl4{font-size:7px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+/* White content area */
+.cdn-c-body{
+  position:absolute;left:38px;right:22px;top:168px;bottom:0;
+  background:#f5f5f7;border-radius:0 0 14px 0;
+  display:flex;flex-direction:column;padding:10px 12px 8px;
+}
+/* Photo */
+.cdn-c-photo-wrap{display:flex;justify-content:center;margin-bottom:8px;flex-shrink:0}
+.cdn-c-photo{
+  width:88px;height:88px;border-radius:50%;
+  border:3px solid #c8102e;
+  object-fit:cover;background:#c0c8d4;
+  flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.cdn-c-photo svg{width:60%;height:60%;opacity:.45}
+.cdn-c-name{text-align:center;font-size:15px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:-.5px;line-height:1.2;margin-bottom:8px;flex-shrink:0}
+.cdn-c-divider{height:1.5px;background:#c8102e;margin-bottom:8px;flex-shrink:0}
+/* Data + QR row */
+.cdn-c-datarow{display:flex;gap:8px;flex:1;min-height:0}
+.cdn-c-fields{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:flex-start}
+.cdn-c-field{display:flex;align-items:center;gap:7px}
+.cdn-c-ficon{width:24px;height:24px;background:#c8102e;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cdn-c-ficon svg{width:13px;height:13px;fill:#fff}
+.cdn-c-ftxt{flex:1;min-width:0}
+.cdn-c-flabel{font-size:7px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase}
+.cdn-c-fval{font-size:10.5px;font-weight:900;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.cdn-c-qr{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.cdn-c-qr canvas{display:block;image-rendering:pixelated}
+.cdn-c-qr-hint{font-size:6px;font-weight:700;color:#888;letter-spacing:.5px;text-transform:uppercase;text-align:center;max-width:72px;line-height:1.3}
+/* Status bar */
+.cdn-c-status{
+  background:#111;border-radius:8px;padding:7px 10px;
+  display:flex;align-items:center;gap:8px;margin-top:8px;flex-shrink:0;
+}
+.cdn-c-status-ico{width:22px;height:22px;flex-shrink:0}
+.cdn-c-status-txt .l1{font-size:11px;font-weight:900;color:#fff;letter-spacing:.5px;text-transform:uppercase}
+.cdn-c-status-txt .l2{font-size:9px;font-weight:700;color:#22c55e}
+/* Signature */
+.cdn-c-sig{display:flex;flex-direction:column;align-items:center;margin-top:6px;flex-shrink:0}
+.cdn-c-sig-line{width:100px;height:1px;background:#bbb;margin-top:3px}
+.cdn-c-sig-name{font-size:7px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+
+/* Verification page */
+.cdn-verif{padding:20px 16px 40px;max-width:440px;margin:0 auto}
+.cdn-verif-hdr{text-align:center;margin-bottom:20px}
+.cdn-verif-ok{background:rgba(22,163,74,.12);border:1.5px solid rgba(34,197,94,.3);border-radius:14px;padding:16px;text-align:center;margin-bottom:16px}
+.cdn-verif-err{background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.28);border-radius:14px;padding:16px;text-align:center;margin-bottom:16px}
+.cdn-verif-select{width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:14px;padding:11px 14px;outline:none;font-family:inherit;margin-bottom:12px;-webkit-appearance:none}
+.cdn-verif-log-btn{width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:900;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1539,9 +1679,20 @@ setTimeout(function(){
 },5000);
 
 window.addEventListener("load",function(){
+  // Check if this is a QR verification scan before anything else
+  if(window.location.search.indexOf('verificar=')>=0){
+    cdInit();
+    // Show minimal loading UI until Firebase is ready
+    document.body.style.background='#060d1a';
+  }
   try{
     var app=firebase.initializeApp(FB);
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
+    // If this is a verification scan, handle it now that Firebase is ready
+    if(window.location.search.indexOf('verificar=')>=0){
+      cdCheckVerifParam();
+      return; // Don't proceed with normal auth flow
+    }
     au.onAuthStateChanged(async function(u){
       if(u && u.isAnonymous){
         // Anonymous visitor — load public data, stay in public mode
@@ -2988,7 +3139,7 @@ function rPn(){
   if(cEd())h+='<a href="#" onclick="event.preventDefault();showTab(\'fixture\')" style="display:flex;align-items:center;gap:14px;margin:12px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(245,158,11,.1));border:1.5px solid rgba(200,16,46,.22);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#9917;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Panel de Resultados</div><div style="font-size:11px;color:var(--m);margin-top:3px">Goles &middot; Amarillas &middot; Rojas &middot; Walkover</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
   if(cEd())h+='<a href="social.html" style="display:flex;align-items:center;gap:14px;margin:10px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.08));border:1.5px solid rgba(99,102,241,.25);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#127912;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Generador de Im&aacute;genes</div><div style="font-size:11px;color:var(--m);margin-top:3px">P&oacute;sters &middot; Jornada &middot; Resultados &middot; Tabla &middot; 9:16</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
   if(isAdm){
-    h+='<div class="admpntabs" id="admpntabs"><button class="admpntab active" onclick="adNav(\'overview\')">&#9881; Panel</button><button class="admpntab" onclick="adNav(\'equipos\')">&#128101; Equipos</button><button class="admpntab" onclick="adNav(\'fixture\')">&#128197; Fixture</button><button class="admpntab" onclick="adNav(\'equidad\')">&#128202; Equidad</button><button class="admpntab" onclick="adNav(\'stats\')">&#9889; Estad\u00edsticas</button></div>';
+    h+='<div class="admpntabs" id="admpntabs"><button class="admpntab active" onclick="adNav(\'overview\')">&#9881; Panel</button><button class="admpntab" onclick="adNav(\'equipos\')">&#128101; Equipos</button><button class="admpntab" onclick="adNav(\'fixture\')">&#128197; Fixture</button><button class="admpntab" onclick="adNav(\'equidad\')">&#128202; Equidad</button><button class="admpntab" onclick="adNav(\'stats\')">&#9889; Estad\u00edsticas</button><button class="admpntab" onclick="adNav(\'carnet\')">&#127977; Carnet</button></div>';
     h+='<div id="admPnCnt" style="min-height:200px"></div>';
   } else {
     h+='<div id="admPnCnt"></div>';
@@ -3001,7 +3152,7 @@ function rPn(){
 
 function adNav(tab){
   var tabs=document.querySelectorAll('.admpntab');
-  tabs.forEach(function(t,i){var names=['overview','equipos','fixture','equidad','stats'];t.classList.toggle('active',names[i]===tab);});
+  tabs.forEach(function(t,i){var names=['overview','equipos','fixture','equidad','stats','carnet'];t.classList.toggle('active',names[i]===tab);});
   if(tab==='overview') adShowOverview();
   else if(tab==='equipos') adShowEq();
   else if(tab==='escudos'){adShowEq();shBdg();}
@@ -3012,6 +3163,7 @@ function adNav(tab){
   else if(tab==='socios-eq') shSociosEq();
   else if(tab==='plantillas') shPlantillas();
   else if(tab==='notif') shNotifSender();
+  else if(tab==='carnet') cdShowList();
 }
 
 function adCnt(h){var el=document.getElementById('admPnCnt');if(el)el.innerHTML=h;}
@@ -5260,6 +5412,374 @@ async function pushInicioPartido(m){
     tag:'kickoff-'+m.id,teamId:0,ts:Date.now()});
 }
 
+// ══════════════════════════════════════════════
+// MÓDULO CARNET DIGITAL — solo administrador
+// ══════════════════════════════════════════════
+var _cdSheetUrl=''; // Google Apps Script webhook URL (configurado por admin)
+
+function cdInit(){_cdSheetUrl=safeGet('an_cdSheetUrl')||'';}
+
+/* ── Render helpers ── */
+function cdCrestSvg(){
+  return '<svg viewBox="0 0 100 122" fill="none" xmlns="http://www.w3.org/2000/svg" class="cdn-c-crest">'
+    +'<path d="M50 3 L8 16 L8 58 C8 88 26 108 50 119 C74 108 92 88 92 58 L92 16 Z" fill="#0a0f1e" stroke="#d4a520" stroke-width="2.2"/>'
+    +'<path d="M14 21 L50 9 L50 68 L14 68 Z" fill="#c8102e"/>'
+    +'<path d="M50 9 L86 21 L86 68 L50 68 Z" fill="#1a0812"/>'
+    +'<line x1="14" y1="68" x2="86" y2="68" stroke="#d4a520" stroke-width=".8" opacity=".6"/>'
+    +'<path d="M14 68 L86 68 L86 90 C86 103 70 110 50 113 C30 110 14 103 14 90 Z" fill="#0c1929"/>'
+    +'<text x="32" y="61" font-family="Georgia,serif" font-size="28" font-weight="900" fill="rgba(255,255,255,.95)" text-anchor="middle">A</text>'
+    +'<text x="68" y="61" font-family="Georgia,serif" font-size="28" font-weight="900" fill="#d4a520" text-anchor="middle">N</text>'
+    +'<line x1="50" y1="34" x2="50" y2="66" stroke="rgba(212,165,32,.5)" stroke-width=".7"/>'
+    +'<text x="50" y="25" font-size="9" fill="#d4a520" text-anchor="middle">★</text>'
+    +'<text x="28" y="30" font-size="7.5" fill="#d4a520" text-anchor="middle">★</text>'
+    +'<text x="72" y="30" font-size="7.5" fill="#d4a520" text-anchor="middle">★</text>'
+    +'<text x="50" y="84" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8.5" font-weight="900" fill="#d4a520" letter-spacing="2">NORTE</text>'
+    +'<path d="M24 93 Q50 106 76 93" fill="none" stroke="rgba(212,165,32,.4)" stroke-width="1.5"/>'
+    +'<text x="50" y="100" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="700" fill="rgba(212,165,32,.55)" letter-spacing="1.5">2020</text>'
+    +'<circle cx="9" cy="16" r="2.2" fill="#d4a520" opacity=".7"/><circle cx="91" cy="16" r="2.2" fill="#d4a520" opacity=".7"/>'
+    +'</svg>';
+}
+
+function cdIco(type){
+  if(type==='id') return '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" stroke="white" stroke-width="1.8" fill="none"/><circle cx="8.5" cy="11" r="2" fill="white"/><path d="M5 18c0-2 1.5-3 3.5-3s3.5 1 3.5 3" fill="white"/><path d="M14 10h4M14 13h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  if(type==='pos') return '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 100 14A7 7 0 0012 2zM4.929 19.071A10 10 0 0012 22a10 10 0 007.071-2.929" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>';
+  if(type==='cargo') return '<svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" stroke="white" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>';
+  return '';
+}
+
+function cdStatusIco(activo){
+  var col=activo?'#22c55e':'#ef4444';
+  return '<svg class="cdn-c-status-ico" viewBox="0 0 24 24" fill="none">'
+    +'<path d="M12 2L4 6v5c0 5 3.5 9.3 8 10.5C16.5 20.3 20 16 20 11V6z" fill="'+col+'" opacity=".2"/>'
+    +'<path d="M12 2L4 6v5c0 5 3.5 9.3 8 10.5C16.5 20.3 20 16 20 11V6z" stroke="'+col+'" stroke-width="1.8" fill="none"/>'
+    +(activo?'<path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M10 10l4 4M14 10l-4 4" stroke="white" stroke-width="2" stroke-linecap="round"/>')
+    +'</svg>';
+}
+
+function cdSigSvg(){
+  return '<svg viewBox="0 0 120 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100px;height:26px">'
+    +'<path d="M5 20 Q20 5 35 18 Q45 26 55 12 Q65 0 75 15 Q82 24 90 10 Q98 0 110 18" stroke="#444" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<path d="M100 22 Q104 28 108 22 Q112 16 115 20" stroke="#444" stroke-width="1.2" fill="none" stroke-linecap="round"/>'
+    +'</svg>';
+}
+
+/* ── QR for carnet ── */
+function cdQR(canvas, seed, size){
+  var N=21,dpr=window.devicePixelRatio||1,px=size*dpr;
+  canvas.width=canvas.height=px; canvas.style.width=canvas.style.height=size+'px';
+  var ctx=canvas.getContext('2d'); ctx.imageSmoothingEnabled=false;
+  var mod=px/N,m=[],fn=[];
+  for(var i=0;i<N;i++){m.push(new Array(N).fill(0));fn.push(new Array(N).fill(false));}
+  function finder(r0,c0){for(var dr=0;dr<7;dr++) for(var dc=0;dc<7;dc++){m[r0+dr][c0+dc]=(dr===0||dr===6||dc===0||dc===6||(dr>=2&&dr<=4&&dc>=2&&dc<=4))?1:0;fn[r0+dr][c0+dc]=true;}}
+  finder(0,0);finder(0,14);finder(14,0);
+  for(var i=0;i<8;i++)fn[7][i]=fn[i][7]=fn[7][N-1-i]=fn[i][N-8]=fn[N-8][i]=fn[N-1-i][7]=true;
+  for(var i=8;i<N-8;i++){m[6][i]=i%2?0:1;m[i][6]=i%2?0:1;fn[6][i]=fn[i][6]=true;}
+  m[13][8]=1;fn[13][8]=true;
+  for(var i=0;i<9;i++)fn[8][i]=fn[i][8]=fn[8][N-1-i]=fn[N-1-i][8]=true;
+  for(var r=8;r<=12;r++) for(var c=8;c<=12;c++) fn[r][c]=true;
+  var s=seed|0;
+  function bit(){s=Math.imul(s,1664525)+1013904223|0;return(s>>>31)&1;}
+  for(var r=0;r<N;r++) for(var c=0;c<N;c++) if(!fn[r][c]) m[r][c]=bit();
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,px,px);
+  function rr(x,y,w,h,rd){ctx.beginPath();ctx.moveTo(x+rd,y);ctx.lineTo(x+w-rd,y);ctx.arcTo(x+w,y,x+w,y+rd,rd);ctx.lineTo(x+w,y+h-rd);ctx.arcTo(x+w,y+h,x+w-rd,y+h,rd);ctx.lineTo(x+rd,y+h);ctx.arcTo(x,y+h,x,y+h-rd,rd);ctx.lineTo(x,y+rd);ctx.arcTo(x,y,x+rd,y,rd);ctx.closePath();ctx.fill();}
+  function dFinder(r0,c0){var x=c0*mod,y=r0*mod;ctx.fillStyle='#111';rr(x+.5,y+.5,7*mod-1,7*mod-1,mod*.7);ctx.fillStyle='#fff';rr(x+mod+.5,y+mod+.5,5*mod-1,5*mod-1,mod*.5);ctx.fillStyle='#111';rr(x+2*mod+.5,y+2*mod+.5,3*mod-1,3*mod-1,mod*.4);}
+  dFinder(0,0);dFinder(0,14);dFinder(14,0);
+  ctx.fillStyle='#111';
+  for(var r=0;r<N;r++) for(var c=0;c<N;c++){
+    if((r<8&&c<8)||(r<8&&c>13)||(r>13&&c<8))continue;
+    if(!fn[r][c]&&m[r][c]){var pad=mod*.15;rr(c*mod+pad,r*mod+pad,mod-pad*2,mod-pad*2,mod*.25);}
+  }
+  /* logo AN center */
+  var cx=N/2*mod,cy=N/2*mod,lr=mod*2.4;
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,lr+2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#c8102e';ctx.beginPath();ctx.arc(cx,cy,lr,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='900 '+Math.round(lr*.95)+'px Georgia,serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('AN',cx,cy+1);
+}
+
+/* ── Build carnet HTML ── */
+function cdCardHtml(d, uid){
+  var seed=0;for(var i=0;i<(d.codigo||'AN').length;i++)seed=(seed*31+((d.codigo||'AN').charCodeAt(i)))>>>0;
+  var activo=(d.estado||'activo')==='activo';
+  var vigFmt='';if(d.vigencia){var v=d.vigencia.split('-');vigFmt=v[2]+'/'+v[1]+'/'+v[0].slice(2);}
+  var photoHtml=d.foto
+    ?'<img class="cdn-c-photo" src="'+d.foto+'" alt="foto">'
+    :'<div class="cdn-c-photo"><svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="22" r="12" fill="#9aa5b4"/><ellipse cx="32" cy="52" rx="20" ry="12" fill="#9aa5b4"/></svg></div>';
+  var verUrl=window.location.origin+window.location.pathname+'?verificar='+encodeURIComponent(uid||d.codigo||'AN001');
+  return '<div class="cdn-card" id="cdCard_'+(uid||'prev')+'">'
+    +'<div class="cdn-c-stripe"><div class="cdn-c-stripe-txt">Carnet Digital de Socio</div><div class="cdn-c-stripe-bars"><div class="cdn-c-stripe-bar"></div><div class="cdn-c-stripe-bar"></div><div class="cdn-c-stripe-bar"></div></div></div>'
+    +'<div class="cdn-c-tab"><div class="cdn-c-tab-dot" style="background:'+(activo?'#22c55e':'#ef4444')+';box-shadow:0 0 6px '+(activo?'#22c55e':'#ef4444')+'"></div><div class="cdn-c-tab-txt">'+(activo?'Socio Activo':'Inactivo')+'</div></div>'
+    +'<div class="cdn-c-hdr">'+cdCrestSvg()
+    +'<div class="cdn-c-wordmark"><div class="wl1">Atlético</div><div class="wl2">Norte</div><div class="wl3">Fútbol Club</div><div class="wl4">Más que un club, una familia</div></div></div>'
+    +'<div class="cdn-c-body">'
+    +'<div class="cdn-c-photo-wrap">'+photoHtml+'</div>'
+    +'<div class="cdn-c-name">'+escHtml(d.nombre||'Nombre del Socio')+'</div>'
+    +'<div class="cdn-c-divider"></div>'
+    +'<div class="cdn-c-datarow">'
+    +'<div class="cdn-c-fields">'
+    +'<div class="cdn-c-field"><div class="cdn-c-ficon">'+cdIco('id')+'</div><div class="cdn-c-ftxt"><div class="cdn-c-flabel">Cédula</div><div class="cdn-c-fval">'+escHtml(d.cedula||'—')+'</div></div></div>'
+    +'<div class="cdn-c-field"><div class="cdn-c-ficon">'+cdIco('pos')+'</div><div class="cdn-c-ftxt"><div class="cdn-c-flabel">Posición</div><div class="cdn-c-fval">'+escHtml(d.posicion||'—')+'</div></div></div>'
+    +'<div class="cdn-c-field"><div class="cdn-c-ficon">'+cdIco('cargo')+'</div><div class="cdn-c-ftxt"><div class="cdn-c-flabel">Cargo</div><div class="cdn-c-fval">'+escHtml(d.cargo||'—')+'</div></div></div>'
+    +'</div>'
+    +'<div class="cdn-c-qr"><canvas id="cdQRC_'+(uid||'prev')+'" width="70" height="70"></canvas><div class="cdn-c-qr-hint">Verificación en tiempo real</div></div>'
+    +'</div>'
+    +'<div class="cdn-c-status">'+cdStatusIco(activo)
+    +'<div class="cdn-c-status-txt"><div class="l1">'+(activo?'Socio Activo':'Inactivo')+'</div><div class="l2" style="color:'+(activo?'#22c55e':'#ef4444')+'">'+(activo&&vigFmt?'Activo al '+vigFmt:(activo?'Activo':'Inactivo'))+'</div></div>'
+    +'</div>'
+    +'<div class="cdn-c-sig">'+cdSigSvg()+'<div class="cdn-c-sig-line"></div><div class="cdn-c-sig-name">Atlético Norte F.C.</div></div>'
+    +'</div>'
+    +'</div>';
+}
+
+function cdDrawQR(uid, seed){
+  setTimeout(function(){
+    var el=document.getElementById('cdQRC_'+(uid||'prev'));
+    if(el) cdQR(el, seed, 70);
+  }, 60);
+}
+
+/* ── List view ── */
+function cdShowList(){
+  if(!db){adCnt('<div class="cdn-wrap"><div class="cdn-empty">Firebase no conectado</div></div>');return;}
+  adCnt('<div class="cdn-wrap"><div style="text-align:center;padding:30px 0;color:var(--m);font-size:12px">⏳ Cargando carnets…</div></div>');
+  db.ref('/carnets').once('value').then(function(snap){
+    var carnets=snap.val()||{};
+    cdInit();
+    var h='<div class="cdn-wrap">';
+    h+='<div class="cdn-top"><h3>🪪 Carnet Digital</h3><button class="cdn-btn-new" onclick="cdOpenForm(null)">+ Nuevo Carnet</button></div>';
+    // Config sheet URL
+    h+='<div class="cdn-cfg"><label>Google Sheets Webhook (Apps Script URL)</label>'
+      +'<input type="url" id="cdSheetInp" value="'+escHtml(_cdSheetUrl)+'" placeholder="https://script.google.com/macros/s/…/exec" onblur="cdSaveSheetUrl()">'
+      +'<div style="font-size:9px;color:var(--m);margin-top:5px">Al escanear el QR se registrará automáticamente la visita en este Sheet. Deja vacío para omitir.</div>'
+      +'</div>';
+    var keys=Object.keys(carnets);
+    if(!keys.length){
+      h+='<div class="cdn-empty">🪪<br><br>Sin carnets creados.<br>Crea el primero con el botón de arriba.</div>';
+    } else {
+      h+='<div class="cdn-list">';
+      keys.forEach(function(uid){
+        var d=carnets[uid];
+        var activo=(d.estado||'activo')==='activo';
+        var initials=(d.nombre||'?').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+        var photoEl=d.foto?'<img src="'+d.foto+'" class="cdn-item-photo" style="display:block" alt="">':'<div class="cdn-item-photo">'+initials+'</div>';
+        h+='<div class="cdn-item" onclick="cdOpenForm(\''+uid+'\')">'
+          +photoEl
+          +'<div class="cdn-item-info"><div class="cdn-item-name">'+escHtml(d.nombre||'Sin nombre')+'</div>'
+          +'<div class="cdn-item-sub">'+escHtml(d.cedula||'')+(d.cargo?' · '+escHtml(d.cargo):'')+'</div></div>'
+          +'<div class="cdn-item-status"><span class="'+(activo?'cdn-pill-on':'cdn-pill-off')+'">'+(activo?'Activo':'Inactivo')+'</span></div>'
+          +'</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+    adCnt(h);
+  }).catch(function(){adCnt('<div class="cdn-wrap"><div class="cdn-empty">Error cargando datos</div></div>');});
+}
+
+function cdSaveSheetUrl(){
+  var el=document.getElementById('cdSheetInp');
+  if(el){_cdSheetUrl=el.value.trim();safeSet('an_cdSheetUrl',_cdSheetUrl);}
+}
+
+/* ── Create / Edit form ── */
+function cdOpenForm(uid){
+  var go=function(d){
+    var h='<div class="cdn-wrap">';
+    h+='<button class="cdn-btn-back" onclick="cdShowList()">← Volver</button>';
+    // Preview card
+    h+='<div class="cdn-card-wrap" id="cdCardWrap">'+cdCardHtml(d||{}, uid)+'</div>';
+    h+='<div class="cdn-form">';
+    h+='<h4>📝 '+(uid?'Editar Carnet':'Nuevo Carnet')+'</h4>';
+    // Photo upload
+    h+='<div class="cdn-field"><label>Foto del Socio</label>'
+      +'<div class="cdn-photo-area" onclick="document.getElementById(\'cdFotoInp\').click()">'
+      +'<div class="cdn-photo-preview" id="cdFotoPrev">'+(d&&d.foto?'<img src="'+d.foto+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">':'📷')+'</div>'
+      +'<div class="cdn-photo-hint"><strong>Agregar Foto</strong>JPG o PNG recomendado<br>Se ajusta automáticamente</div>'
+      +'</div>'
+      +'<input type="file" id="cdFotoInp" accept="image/*" capture="user" style="display:none" onchange="cdFotoChanged(this)">'
+      +'</div>';
+    h+='<div class="cdn-field"><label>Nombre Completo</label><input type="text" id="cdNombre" value="'+escHtml((d&&d.nombre)||'')+'" placeholder="CÉSAR AUGUSTO GALAVIS LEÓN" oninput="cdLiveUpdate()"></div>';
+    h+='<div class="cdn-row2">'
+      +'<div class="cdn-field"><label>Cédula</label><input type="text" id="cdCedula" value="'+escHtml((d&&d.cedula)||'')+'" placeholder="88262162" oninput="cdLiveUpdate()"></div>'
+      +'<div class="cdn-field"><label>Código Carnet</label><input type="text" id="cdCodigo" value="'+escHtml((d&&d.codigo)||(uid||'AN-001'))+'" placeholder="AN-001" oninput="cdLiveUpdate()"></div>'
+      +'</div>';
+    h+='<div class="cdn-row2">'
+      +'<div class="cdn-field"><label>Posición</label><input type="text" id="cdPosicion" value="'+escHtml((d&&d.posicion)||'')+'" placeholder="Arquero" oninput="cdLiveUpdate()"></div>'
+      +'<div class="cdn-field"><label>Cargo</label><input type="text" id="cdCargo" value="'+escHtml((d&&d.cargo)||'')+'" placeholder="Presidente del Club" oninput="cdLiveUpdate()"></div>'
+      +'</div>';
+    h+='<div class="cdn-row2">'
+      +'<div class="cdn-field"><label>Estado</label><select id="cdEstado" onchange="cdLiveUpdate()"><option value="activo"'+((!d||d.estado==='activo')?' selected':'')+'>Activo</option><option value="inactivo"'+((d&&d.estado==='inactivo')?' selected':'')+'>Inactivo</option></select></div>'
+      +'<div class="cdn-field"><label>Vigencia (hasta)</label><input type="date" id="cdVigencia" value="'+((d&&d.vigencia)||'')+'" oninput="cdLiveUpdate()"></div>'
+      +'</div>';
+    h+='<button class="cdn-btn-save" onclick="cdSave(\''+uid+'\')">💾 Guardar Carnet</button>';
+    if(uid)h+='<button class="cdn-btn-del" onclick="cdDelete(\''+uid+'\')">🗑 Eliminar Carnet</button>';
+    h+='</div></div>';
+    adCnt(h);
+    // store current foto data
+    window._cdFotoData=(d&&d.foto)||null;
+    // Draw QR on card
+    var seed=0;var cod=(d&&d.codigo)||(uid||'AN001');for(var i=0;i<cod.length;i++)seed=(seed*31+cod.charCodeAt(i))>>>0;
+    cdDrawQR(uid, seed);
+  };
+  if(uid){
+    db.ref('/carnets/'+uid).once('value').then(function(sn){go(sn.val()||{});});
+  } else {
+    go(null);
+  }
+}
+
+/* Store foto base64 */
+window._cdFotoData=null;
+function cdFotoChanged(inp){
+  var f=inp.files[0]; if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    window._cdFotoData=e.target.result;
+    var prev=document.getElementById('cdFotoPrev');
+    if(prev)prev.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+    cdLiveUpdate();
+  };
+  reader.readAsDataURL(f);
+}
+
+function cdGetFormData(){
+  function v(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+  return {nombre:v('cdNombre').toUpperCase(),cedula:v('cdCedula'),codigo:v('cdCodigo'),posicion:v('cdPosicion'),cargo:v('cdCargo'),estado:v('cdEstado'),vigencia:v('cdVigencia'),foto:window._cdFotoData||''};
+}
+
+function cdLiveUpdate(){
+  var d=cdGetFormData();
+  var wrap=document.getElementById('cdCardWrap');
+  var uid=document.getElementById('cdCodigo')?document.getElementById('cdCodigo').value.trim():'prev';
+  if(wrap){wrap.innerHTML=cdCardHtml(d, uid);}
+  var seed=0;var cod=d.codigo||'AN001';for(var i=0;i<cod.length;i++)seed=(seed*31+cod.charCodeAt(i))>>>0;
+  cdDrawQR(uid, seed);
+}
+
+function cdSave(uid){
+  var d=cdGetFormData();
+  if(!d.nombre){alert('El nombre es requerido');return;}
+  if(!d.codigo){alert('El código de carnet es requerido');return;}
+  var key=uid||d.codigo.replace(/[^a-zA-Z0-9_-]/g,'').toLowerCase();
+  if(!key){alert('Código de carnet inválido');return;}
+  d.ts=Date.now();
+  db.ref('/carnets/'+key).set(d).then(function(){
+    showToast('info','Carnet guardado','El carnet de '+d.nombre.split(' ')[0]+' fue guardado correctamente',3500,'#22c55e');
+    cdShowList();
+  }).catch(function(e){alert('Error al guardar: '+e.message);});
+}
+
+function cdDelete(uid){
+  if(!uid)return;
+  if(!confirm('¿Eliminar el carnet de este socio? Esta acción no se puede deshacer.'))return;
+  db.ref('/carnets/'+uid).remove().then(function(){
+    showToast('warn','Carnet eliminado','El carnet fue eliminado',2500,'#f59e0b');
+    cdShowList();
+  });
+}
+
+/* ── VERIFICACIÓN QR (cuando alguien escanea el QR del carnet) ── */
+function cdCheckVerifParam(){
+  var params=new URLSearchParams(window.location.search);
+  var vid=params.get('verificar');
+  if(!vid)return false;
+  // Show verification UI instead of normal app
+  cdShowVerifPage(vid);
+  return true;
+}
+
+function cdShowVerifPage(uid){
+  // Hide normal app shell, show full-screen verification
+  var app=document.querySelector('.app');
+  if(app)app.style.display='none';
+  var wrap=document.createElement('div');
+  wrap.id='cdVerifPage';
+  wrap.style.cssText='position:fixed;inset:0;background:#060d1a;overflow-y:auto;z-index:99999;padding:0 0 40px';
+  document.body.appendChild(wrap);
+
+  // Wait for Firebase
+  var attempts=0;
+  var tryLoad=function(){
+    attempts++;
+    if(db){
+      db.ref('/carnets/'+uid).once('value').then(function(sn){
+        cdRenderVerif(wrap, uid, sn.val());
+      });
+    } else if(attempts<20){
+      setTimeout(tryLoad,300);
+    } else {
+      cdRenderVerif(wrap, uid, null);
+    }
+  };
+  setTimeout(tryLoad, 500);
+}
+
+function cdRenderVerif(wrap, uid, d){
+  if(!d){
+    wrap.innerHTML='<div class="cdn-verif">'
+      +'<div class="cdn-verif-hdr"><div style="font-size:40px;margin-bottom:8px">⚠️</div><h2 style="font-size:18px;font-weight:900;color:#f87171">Socio no encontrado</h2><p style="color:var(--m);font-size:13px;margin-top:6px">Este carnet no existe o ha sido desactivado.</p></div>'
+      +'<div class="cdn-verif-err"><div style="font-size:14px;font-weight:700;color:#f87171">No autorizado para descuentos</div></div>'
+      +'</div>';
+    return;
+  }
+  var activo=(d.estado||'activo')==='activo';
+  var vigOk=true;
+  if(d.vigencia){var vd=new Date(d.vigencia+'T23:59:59');vigOk=vd>=new Date();}
+  var valid=activo&&vigOk;
+  var h='<div class="cdn-verif">';
+  h+='<div class="cdn-verif-hdr">'
+    +'<div style="font-size:13px;font-weight:900;color:var(--m);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">Atlético Norte F.C. · Verificación</div>'
+    +'</div>';
+  // Card preview
+  h+='<div class="cdn-card-wrap">'+cdCardHtml(d, uid)+'</div>';
+  if(valid){
+    h+='<div class="cdn-verif-ok">'
+      +'<div style="font-size:32px;margin-bottom:4px">✅</div>'
+      +'<div style="font-size:16px;font-weight:900;color:#4ade80">SOCIO ACTIVO</div>'
+      +'<div style="font-size:12px;color:var(--m);margin-top:4px">Aplica descuentos en comercios aliados</div>'
+      +'</div>';
+    h+='<div style="font-size:12px;font-weight:800;color:var(--m);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Seleccionar comercio</div>';
+    var comercios=['Restaurante El Estadio','Farmacia Norte Salud','Lavandería Express','Café Gol','Transporte Norteño','Sportzone Cúcuta','Otro'];
+    h+='<select class="cdn-verif-select" id="cvComercio"><option value="">-- Elige el comercio --</option>';
+    comercios.forEach(function(c){h+='<option value="'+c+'">'+c+'</option>';});
+    h+='</select>';
+    h+='<button class="cdn-verif-log-btn" onclick="cdLogVisit(\''+uid+'\','+JSON.stringify(d.nombre)+')">📋 Registrar Visita</button>';
+  } else {
+    h+='<div class="cdn-verif-err">'
+      +'<div style="font-size:32px;margin-bottom:4px">❌</div>'
+      +'<div style="font-size:16px;font-weight:900;color:#f87171">'+(activo?'CARNET VENCIDO':'SOCIO INACTIVO')+'</div>'
+      +'<div style="font-size:12px;color:var(--m);margin-top:4px">Este socio no aplica para descuentos en este momento</div>'
+      +'</div>';
+  }
+  h+='</div>';
+  wrap.innerHTML=h;
+  // Draw QR
+  var seed=0;var cod=d.codigo||uid;for(var i=0;i<cod.length;i++)seed=(seed*31+cod.charCodeAt(i))>>>0;
+  cdDrawQR(uid, seed);
+}
+
+function cdLogVisit(uid, nombre){
+  var comercioEl=document.getElementById('cvComercio');
+  var comercio=comercioEl?comercioEl.value:'';
+  if(!comercio){alert('Por favor selecciona el comercio');return;}
+  var ahora=new Date();
+  var entry={socioId:uid,nombre:nombre,comercio:comercio,fecha:ahora.toISOString().slice(0,10),hora:ahora.toTimeString().slice(0,5),ts:ahora.getTime()};
+  // Log to Firebase
+  if(db)db.ref('/visitas_aliados').push(entry);
+  // Log to Google Sheets (webhook)
+  _cdSheetUrl=safeGet('an_cdSheetUrl')||'';
+  if(_cdSheetUrl){
+    fetch(_cdSheetUrl,{method:'POST',mode:'no-cors',body:JSON.stringify(entry),headers:{'Content-Type':'application/json'}}).catch(function(){});
+  }
+  // Update UI
+  var btn=document.querySelector('.cdn-verif-log-btn');
+  if(btn){btn.disabled=true;btn.textContent='✅ Visita Registrada';}
+  var sel=document.getElementById('cvComercio');if(sel)sel.disabled=true;
+  var ok=document.querySelector('.cdn-verif-ok');
+  if(ok){var conf=document.createElement('div');conf.style.cssText='margin-top:10px;font-size:12px;color:#4ade80;font-weight:700';conf.textContent='Visita en '+comercio+' registrada el '+entry.fecha+' a las '+entry.hora;ok.appendChild(conf);}
+}
+
+// ══════════════════════════════════════════════
 // ── Event arrays for result modal ──
 var _evGoals=[],_evYellows=[],_evReds=[];
 var _pickerRosters={l:[],v:[]};
