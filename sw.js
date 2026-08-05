@@ -1,9 +1,8 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v8.89-2026-08-05';
+const SW_VER = 'v8.90-2026-08-05';
 const STATIC_CACHE = 'an-static-' + SW_VER;
-const ICON_CACHE   = 'an-club-icon-' + SW_VER; // versioned — cleared on every deploy
+const ICON_CACHE   = 'an-club-icon-' + SW_VER;
 
-// Firebase SDK scripts — heavy, rarely change, cache aggressively
 const PRECACHE = [
   'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js',
@@ -27,7 +26,16 @@ self.addEventListener('activate', e => {
       ))
       .then(() => self.clients.claim())
       .then(() => self.clients.matchAll({type:'window', includeUncontrolled:true}))
-      .then(cls => cls.forEach(c => c.postMessage({type:'SW_UPDATED', ver:SW_VER})))
+      .then(cls => {
+        // Force a real navigation reload on every open tab.
+        // client.navigate() creates a fresh page load — bypasses any
+        // sessionStorage guard that blocks the postMessage path.
+        cls.forEach(c => {
+          try { c.navigate(c.url); } catch(err) {
+            c.postMessage({type:'SW_UPDATED', ver:SW_VER});
+          }
+        });
+      })
   );
 });
 

@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.89';
+var APP_VER='8.90';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -1756,8 +1756,8 @@ window.addEventListener("load",function(){
   try{
     var app=firebase.initializeApp(FB);
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
-    // Attach sponsors listener immediately — no auth required (rules: .read:true)
-    db.ref('/patrocinadores').on('value',function(sn){_spData=sn.val()||{};spRender();},function(){});
+    // Sponsors: try SDK listener first, REST fallback handles .read:true rules
+    spAttachListener();
     // If this is a verification scan, handle it now that Firebase is ready
     if(window.location.search.indexOf('verificar=')>=0){
       cdCheckVerifParam();
@@ -2183,19 +2183,27 @@ function closeAdSocioBanner(){
 var _spData={};
 
 var _spListenerOn=false;
+var _SP_REST='https://atletico-norte-default-rtdb.firebaseio.com/patrocinadores.json';
+function spRestFallback(){
+  // Direct REST fetch — works when Firebase rules have .read:true, no SDK auth needed
+  fetch(_SP_REST).then(function(r){return r.ok?r.json():null;}).then(function(d){
+    if(d&&typeof d==='object'){_spData=d;spRender();}
+  }).catch(function(){});
+}
 function spAttachListener(){
-  if(_spListenerOn||!db)return;
+  if(_spListenerOn)return;
+  if(!db){spRestFallback();return;}
   _spListenerOn=true;
   db.ref('/patrocinadores').on('value',function(sn){
-    _spData=sn.val()||{};
-    spRender();
+    _spData=sn.val()||{};spRender();
   },function(){
-    // Permission denied — try again after brief delay (auth may not be ready yet)
+    // SDK permission denied — use REST fallback then retry SDK later
     _spListenerOn=false;
-    setTimeout(spAttachListener,2000);
+    spRestFallback();
+    setTimeout(spAttachListener,3000);
   });
 }
-function spLoad(){spRender();}
+function spLoad(){spRender();spAttachListener();}
 
 function spRender(){
   var sec=document.getElementById('spSection');
