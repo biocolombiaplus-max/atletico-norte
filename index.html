@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.93';
+var APP_VER='8.94';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2486,6 +2486,7 @@ function adSpForm(uid){
     var ctaVal={'wa':s.wa,'url':s.ctaUrl,'ig':s.ctaIg,'otro':s.ctaUrl};
     h+='<div id="spCtaField">'+fld('spAdmCtaVal',ctaLbl[ctaTipo]||'Enlace',ctaVal[ctaTipo],''+ctaPh[ctaTipo])+'</div>';
     h+='<button onclick="adSpSave('+(uid?'\''+uid+'\'':'null')+')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
+    if(uid)h+='<a href="social.html?tpl=aliado&sp='+uid+'" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));border:1.5px solid rgba(99,102,241,.3);border-radius:10px;padding:11px;font-size:12px;font-weight:900;cursor:pointer;margin-top:8px;text-decoration:none;color:var(--t)">&#127912; Generar imagen para redes</a>';
     if(uid)h+='<button onclick="adSpDel(\''+uid+'\')" style="width:100%;background:var(--b3);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑 Eliminar patrocinador</button>';
     h+='</div>';
     adCnt(h);
