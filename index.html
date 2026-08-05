@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.90';
+var APP_VER='8.91';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -761,17 +761,43 @@ tbody td:nth-child(2){text-align:left}
 .sp-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
 .sp-header-sub{font-size:9.5px;color:var(--m);margin-top:5px;margin-left:11px}
 /* Grid 2 columnas — logos grandes y llamativos */
+@keyframes sp-pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,16,46,.35)}70%{box-shadow:0 0 0 8px rgba(200,16,46,0)}}
+@keyframes sp-ripple{0%{transform:scale(.85);opacity:.7}100%{transform:scale(1.6);opacity:0}}
 .sp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
-.sp-card{background:var(--b2);border:1px solid var(--bd);border-radius:18px;padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:.18s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 12px rgba(0,0,0,.25)}
-.sp-card:active{transform:scale(.95);opacity:.8}
-.sp-card::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(200,16,46,.06) 0%,transparent 60%);pointer-events:none}
-.sp-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(200,16,46,.5),transparent);border-radius:18px 18px 0 0}
-.sp-logo{width:76px;height:76px;border-radius:16px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:38px;border:1.5px solid var(--bd);flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.3);overflow:hidden}
+.sp-card{background:var(--b2);border:1px solid rgba(200,16,46,.25);border-radius:20px;padding:20px 12px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.sp-card:active{transform:scale(.94)}
+.sp-card::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(200,16,46,.08) 0%,transparent 55%);pointer-events:none}
+.sp-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(200,16,46,.7),transparent);border-radius:20px 20px 0 0}
+.sp-logo-wrap{position:relative;flex-shrink:0}
+.sp-logo{width:80px;height:80px;border-radius:18px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:40px;border:2px solid rgba(200,16,46,.3);box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;animation:sp-pulse 2.4s ease-in-out infinite}
 .sp-logo img{width:100%;height:100%;object-fit:cover}
-.sp-name{font-size:12px;font-weight:900;color:var(--t);text-align:center;line-height:1.25;letter-spacing:-.2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%}
-.sp-benefit{font-size:9.5px;font-weight:900;color:#fff;text-align:center;background:linear-gradient(135deg,#c8102e,#950c22);border-radius:20px;padding:4px 10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 8px rgba(200,16,46,.4);letter-spacing:.1px}
-.sp-wa-hint{font-size:8.5px;color:var(--m);opacity:.7;display:flex;align-items:center;gap:3px}
+.sp-tap-ring{position:absolute;inset:-4px;border-radius:22px;border:2px solid rgba(200,16,46,.5);animation:sp-ripple 2.4s ease-out infinite}
+.sp-name{font-size:12.5px;font-weight:900;color:var(--t);text-align:center;line-height:1.25;letter-spacing:-.2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%}
+.sp-benefit{font-size:9px;font-weight:900;color:#fff;text-align:center;background:linear-gradient(135deg,#c8102e,#950c22);border-radius:20px;padding:4px 10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 3px 10px rgba(200,16,46,.5);letter-spacing:.1px}
+.sp-tap-cta{font-size:8px;font-weight:800;color:rgba(200,16,46,.8);text-align:center;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:3px}
 .sp-clicks{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border-radius:8px;padding:2px 6px;font-size:7.5px;font-weight:800;color:rgba(255,255,255,.55)}
+/* Modal aliado premium */
+.sp-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9800;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(6px)}
+.sp-modal-ov.op{opacity:1;pointer-events:all}
+.sp-modal-box{background:var(--b1);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;transform:translateY(60px);transition:transform .3s cubic-bezier(.22,1,.36,1);padding-bottom:env(safe-area-inset-bottom,0)}
+.sp-modal-ov.op .sp-modal-box{transform:translateY(0)}
+.sp-modal-hero{position:relative;background:linear-gradient(160deg,#1a0a0f 0%,#0d0d12 100%);border-radius:28px 28px 0 0;padding:28px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.sp-modal-hero::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c8102e,#ff3b5c,#c8102e);border-radius:28px 28px 0 0}
+.sp-modal-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sp-modal-logo{width:100px;height:100px;border-radius:22px;overflow:hidden;border:3px solid rgba(200,16,46,.4);box-shadow:0 8px 30px rgba(200,16,46,.3);background:var(--b2);display:flex;align-items:center;justify-content:center;font-size:52px}
+.sp-modal-logo img{width:100%;height:100%;object-fit:cover}
+.sp-modal-name{font-size:22px;font-weight:900;color:#fff;text-align:center;letter-spacing:-.5px;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.sp-modal-badge{background:linear-gradient(135deg,#c8102e,#ff3b5c);color:#fff;font-size:13px;font-weight:900;padding:7px 18px;border-radius:24px;text-align:center;box-shadow:0 4px 16px rgba(200,16,46,.5);letter-spacing:.2px}
+.sp-modal-body{padding:20px 20px 24px;display:flex;flex-direction:column;gap:16px}
+.sp-modal-resena{background:var(--b2);border:1px solid var(--bd);border-radius:16px;padding:16px;font-size:13px;color:var(--t);line-height:1.6;border-left:3px solid #c8102e}
+.sp-modal-resena-lbl{font-size:9px;font-weight:900;color:#c8102e;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+.sp-modal-wa{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:16px;padding:16px 24px;font-size:15px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 6px 20px rgba(37,211,102,.35);letter-spacing:-.2px;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.sp-modal-wa:active{transform:scale(.96)}
+.sp-modal-wa-ico{font-size:22px}
+.sp-modal-wa-txt{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.sp-modal-wa-txt strong{font-size:15px;font-weight:900;line-height:1}
+.sp-modal-wa-txt span{font-size:10px;opacity:.85;font-weight:600}
+.sp-modal-nota{font-size:9.5px;color:var(--m);text-align:center;line-height:1.5}
 /* Paute CTA */
 .sp-paute-btn{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(200,16,46,.12),rgba(200,16,46,.05));border:1.5px dashed rgba(200,16,46,.4);border-radius:16px;padding:15px 16px;cursor:pointer;width:100%;text-align:left;transition:.18s;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;margin-top:2px}
 .sp-paute-btn:active{opacity:.7;transform:scale(.98)}
@@ -2213,21 +2239,24 @@ function spRender(){
   var h='<div class="sp-section">';
   h+='<div class="sp-header">'
     +'<div class="sp-title">Aliados &amp; Patrocinadores</div>'
-    +'<div class="sp-header-sub">Beneficios exclusivos para la comunidad Atl&#233;tico Norte</div>'
+    +'<div class="sp-header-sub">&#128293; Beneficios exclusivos para la comunidad Atl&#233;tico Norte &#8212; &#161;toca una tarjeta!</div>'
     +'</div>';
   if(keys.length){
     h+='<div class="sp-grid">';
     keys.forEach(function(uid){
       var s=_spData[uid];
       var logoHtml=s.logo
-        ?'<div class="sp-logo"><img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'"></div>'
-        :'<div class="sp-logo">'+escHtml(s.emoji||'🏪')+'</div>';
+        ?'<img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'">'
+        :escHtml(s.emoji||'🏪');
       h+='<div class="sp-card" onclick="spClick(\''+uid+'\')">'
         +(isAdm?'<div class="sp-clicks">'+((s.clicks||0))+' clics</div>':'')
-        +logoHtml
+        +'<div class="sp-logo-wrap">'
+          +'<div class="sp-logo">'+logoHtml+'</div>'
+          +'<div class="sp-tap-ring"></div>'
+        +'</div>'
         +'<div class="sp-name">'+escHtml(s.nombre||'Aliado')+'</div>'
         +'<div class="sp-benefit">'+escHtml(s.beneficio||'Ver beneficio')+'</div>'
-        +'<div class="sp-wa-hint">📲 Ver en WhatsApp</div>'
+        +'<div class="sp-tap-cta">&#128070; Toca para ver tu beneficio</div>'
         +'</div>';
     });
     h+='</div>';
@@ -2241,23 +2270,68 @@ function spRender(){
     +'<div class="sp-paute-arr">&#8250;</div>'
     +'</button>';
   h+='</div>';
+  // Modal container (singleton)
+  if(!document.getElementById('spModalOv')){
+    var mo=document.createElement('div');
+    mo.id='spModalOv';
+    mo.className='sp-modal-ov';
+    mo.innerHTML='<div class="sp-modal-box" id="spModalBox"></div>';
+    mo.addEventListener('click',function(e){if(e.target===mo)spCloseModal();});
+    document.body.appendChild(mo);
+  }
   sec.innerHTML=h;
+}
+
+function spCloseModal(){
+  var ov=document.getElementById('spModalOv');
+  if(ov)ov.classList.remove('op');
+}
+
+function spOpenWa(uid){
+  var s=_spData[uid];
+  if(!s)return;
+  if(db){
+    db.ref('/sp_clics').push({uid:uid,nombre:s.nombre,wa:s.wa,ts:Date.now(),fecha:new Date().toISOString().slice(0,10)});
+    db.ref('/patrocinadores/'+uid+'/clicks').transaction(function(v){return(v||0)+1;});
+  }
+  var msg=encodeURIComponent('Hola '+s.nombre+' 👋 Vi tu anuncio en la app de Atlético Norte F.C. y quiero aprovechar: '+(s.beneficio||'su beneficio')+'. ¡Gracias!');
+  var waNum=(s.wa||'').replace(/\D/g,'');
+  if(waNum) window.open('https://wa.me/'+waNum+'?text='+msg,'_blank');
+  else alert('Este aliado aún no tiene número de WhatsApp registrado.');
 }
 
 function spClick(uid){
   var s=_spData[uid];
   if(!s)return;
-  // Track click
-  var ts=Date.now();
-  var entry={uid:uid,nombre:s.nombre,wa:s.wa,ts:ts,fecha:new Date().toISOString().slice(0,10)};
-  if(db){
-    db.ref('/sp_clics').push(entry);
-    db.ref('/patrocinadores/'+uid+'/clicks').transaction(function(v){return(v||0)+1;});
-  }
-  // Open WhatsApp with predefined message
-  var msg=encodeURIComponent('Hola '+s.nombre+' 👋 Vi tu anuncio en la app de Atlético Norte F.C. y quiero conocer más sobre '+(s.beneficio||'sus servicios')+'. ¡Gracias!');
+  // Track view
+  if(db) db.ref('/patrocinadores/'+uid+'/views').transaction(function(v){return(v||0)+1;});
+  var logoHtml=s.logo
+    ?'<div class="sp-modal-logo"><img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'"></div>'
+    :'<div class="sp-modal-logo">'+escHtml(s.emoji||'🏪')+'</div>';
+  var resena=s.resena||'';
   var waNum=(s.wa||'').replace(/\D/g,'');
-  if(waNum) window.open('https://wa.me/'+waNum+'?text='+msg,'_blank');
+  var html=''
+    +'<div class="sp-modal-hero">'
+      +'<button class="sp-modal-close" onclick="spCloseModal()">&#10005;</button>'
+      +logoHtml
+      +'<div class="sp-modal-name">'+escHtml(s.nombre||'Aliado')+'</div>'
+      +'<div class="sp-modal-badge">'+escHtml(s.beneficio||'Beneficio exclusivo')+'</div>'
+    +'</div>'
+    +'<div class="sp-modal-body">'
+      +(resena
+        ?'<div class="sp-modal-resena"><div class="sp-modal-resena-lbl">&#128203; Sobre este aliado</div>'+escHtml(resena)+'</div>'
+        :'')
+      +(waNum
+        ?'<button class="sp-modal-wa" onclick="spOpenWa(\''+uid+'\')">'
+          +'<div class="sp-modal-wa-ico">&#128242;</div>'
+          +'<div class="sp-modal-wa-txt"><strong>Contactar por WhatsApp</strong><span>Menciona que vienes de Atl&#233;tico Norte</span></div>'
+          +'</button>'
+        :'<div style="text-align:center;padding:12px;color:var(--m);font-size:12px">📞 Próximamente contacto directo</div>')
+      +'<div class="sp-modal-nota">&#11088; Beneficio exclusivo para la comunidad Atl&#233;tico Norte F.C.</div>'
+    +'</div>';
+  var box=document.getElementById('spModalBox');
+  var ov=document.getElementById('spModalOv');
+  if(box&&ov){box.innerHTML=html;ov.classList.add('op');}
 }
 
 function openPauta(){var m=document.getElementById('mPauta');if(m)m.classList.add('op');}
