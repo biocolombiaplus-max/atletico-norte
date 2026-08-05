@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.92';
+var APP_VER='8.93';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -1793,7 +1793,8 @@ window.addEventListener("load",function(){
     }
     au.onAuthStateChanged(async function(u){
       if(u && u.isAnonymous){
-        // Anonymous visitor — load public data, stay in public mode
+        // Anonymous visitor — now we have a valid token, attach listeners
+        _listenersActive=false; // reset guard in case a prior attempt failed
         setupFirebaseListeners();
         spAttachListener();
         onOut();
@@ -1858,11 +1859,16 @@ window.addEventListener("load",function(){
         },800);
         return;
       }
-      // u === null — no auth at all, request anonymous session
+      // u === null — no auth yet; request anonymous session first,
+      // then onAuthStateChanged fires again with u.isAnonymous=true and
+      // setupFirebaseListeners() runs with a valid token.
       onOut();
-      setupFirebaseListeners(); // attempt public reads (works if rules allow; silent fail otherwise)
       spAttachListener();
-      try{ au.signInAnonymously(); }catch(e){}
+      try{ au.signInAnonymously(); }catch(e){
+        // If anonymous sign-in fails (e.g. network), attach listeners anyway
+        // so cached / locally-computed data still renders.
+        setupFirebaseListeners();
+      }
     });
   }catch(e){
     console.warn("Firebase init failed:",e.message);
