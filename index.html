@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.87';
+var APP_VER='8.88';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -1725,8 +1725,6 @@ function setupFirebaseListeners(){
     }
   }catch(e){}},function(){try{var sh=document.getElementById("anShield");if(!_lsClub){sh.className='hshield';sh.innerHTML=AN_SVG;}}catch(e){}});
   db.ref("/equipos").on("value",function(s){try{teamInfo=s.val()||{};}catch(e){}},function(){});
-  // Sponsors — attach live listener now that Firebase is ready
-  db.ref('/patrocinadores').on('value',function(sn){_spData=sn.val()||{};spRender();},function(){spRender();});
 }
 
 // Fallback: remove shield shimmer after 5s if Firebase hasn't resolved it
@@ -1754,12 +1752,14 @@ window.addEventListener("load",function(){
       if(u && u.isAnonymous){
         // Anonymous visitor — load public data, stay in public mode
         setupFirebaseListeners();
+        spAttachListener();
         onOut();
         return;
       }
       if(u && !u.isAnonymous){
         // Real authenticated user
         setupFirebaseListeners();
+        spAttachListener();
         var c=u.email.replace("@atleticonorte.co","");
         var s=await db.ref("/socios/"+c).get();
         pf=s.exists()?s.val():{cedula:c};cu=c;
@@ -1818,6 +1818,7 @@ window.addEventListener("load",function(){
       // u === null — no auth at all, request anonymous session
       onOut();
       setupFirebaseListeners(); // attempt public reads (works if rules allow; silent fail otherwise)
+      spAttachListener();
       try{ au.signInAnonymously(); }catch(e){}
     });
   }catch(e){
@@ -2166,11 +2167,20 @@ function closeAdSocioBanner(){
 // ══════════════════════════════════════════════
 var _spData={};
 
-function spLoad(){
-  // If Firebase already active the listener in setupFirebaseListeners handles updates.
-  // Just render current state (may be empty until Firebase fires).
-  spRender();
+var _spListenerOn=false;
+function spAttachListener(){
+  if(_spListenerOn||!db)return;
+  _spListenerOn=true;
+  db.ref('/patrocinadores').on('value',function(sn){
+    _spData=sn.val()||{};
+    spRender();
+  },function(){
+    // Permission denied — try again after brief delay (auth may not be ready yet)
+    _spListenerOn=false;
+    setTimeout(spAttachListener,2000);
+  });
 }
+function spLoad(){spRender();}
 
 function spRender(){
   var sec=document.getElementById('spSection');
@@ -2350,12 +2360,21 @@ function adSpSave(uid){
   if(!d.nombre){alert('El nombre del negocio es requerido');return;}
   var key=uid||d.nombre.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30)+'-'+Date.now().toString(36);
   if(!db){alert('Firebase no disponible');return;}
+  var btn=document.querySelector('[onclick^="adSpSave"]');
+  if(btn){btn.textContent='⏳ Guardando…';btn.disabled=true;}
   db.ref('/patrocinadores/'+key).update(d).then(function(){
-    showToast('info','Patrocinador guardado',d.nombre+' aparecerá en la sección de aliados',3500,'#22c55e');
     adShowSp();
-    // Refresh home
-    setTimeout(spLoad,500);
-  }).catch(function(e){alert('Error: '+e.message);});
+    spRender();
+    // Show inline success banner inside admin panel
+    var ok=document.createElement('div');
+    ok.style.cssText='position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;z-index:9999;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-size:13px;font-weight:800;text-align:center;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.4)';
+    ok.textContent='✅ '+d.nombre+' guardado correctamente';
+    document.body.appendChild(ok);
+    setTimeout(function(){if(ok.parentNode)ok.parentNode.removeChild(ok);},2800);
+  }).catch(function(e){
+    if(btn){btn.textContent='💾 Guardar';btn.disabled=false;}
+    alert('Error: '+e.message);
+  });
 }
 
 function adSpDel(uid){
