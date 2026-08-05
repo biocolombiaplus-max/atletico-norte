@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.88';
+var APP_VER='8.89';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -31,21 +31,28 @@ function _swReload(){
 }
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').then(function(reg){
-    reg.update(); // check for new SW immediately on every page load
-    // New SW already waiting → skip waiting so it activates now
+    reg.update();
     if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
     reg.addEventListener('updatefound',function(){
       var nw=reg.installing;
       nw.addEventListener('statechange',function(){
-        if(nw.state==='installed'){nw.postMessage({type:'SKIP_WAITING'});}
+        if(nw.state==='installed'){
+          nw.postMessage({type:'SKIP_WAITING'});
+          // Show update banner instead of silent reload — user must tap
+          setTimeout(function(){
+            var b=document.getElementById('_updBanner');
+            if(b)b.style.display='flex';
+          },500);
+        }
       });
     });
-    // When new SW takes control → reload immediately (gets latest HTML/JS)
     navigator.serviceWorker.addEventListener('controllerchange',_swReload);
-    // Periodic check every 60s (catches updates on long sessions / iOS)
-    setInterval(function(){reg.update();},60000);
+    // iOS foreground: check for new SW every time app becomes visible
+    document.addEventListener('visibilitychange',function(){
+      if(document.visibilityState==='visible')reg.update();
+    });
+    setInterval(function(){reg.update();},30000);
   }).catch(function(){});
-  // SW_UPDATED from activate → also trigger reload
   navigator.serviceWorker.addEventListener('message',function(e){
     if(e.data&&e.data.type==='SW_UPDATED')_swReload();
   });
@@ -1308,6 +1315,12 @@ tbody td:nth-child(2){text-align:left}
   <button class="goal-dismiss">Continuar</button>
 </div>
 
+<!-- Update available banner — shown when new SW is waiting -->
+<div id="_updBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#c8102e,#7f1d1d);color:#fff;padding:14px 16px;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.5)">
+  <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:900">🚀 Nueva versión disponible</div><div style="font-size:10px;opacity:.85;margin-top:2px">Toca para actualizar — solo tarda 3 segundos</div></div>
+  <button onclick="clearCacheReload()" style="background:#fff;color:#c8102e;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;flex-shrink:0">Actualizar</button>
+</div>
+
 <!-- Bottom invite banner (hidden when logged in) -->
 <div id="invBanner" style="display:none">
   <div class="inv-ico">👤</div>
@@ -1743,6 +1756,8 @@ window.addEventListener("load",function(){
   try{
     var app=firebase.initializeApp(FB);
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
+    // Attach sponsors listener immediately — no auth required (rules: .read:true)
+    db.ref('/patrocinadores').on('value',function(sn){_spData=sn.val()||{};spRender();},function(){});
     // If this is a verification scan, handle it now that Firebase is ready
     if(window.location.search.indexOf('verificar=')>=0){
       cdCheckVerifParam();
@@ -5584,9 +5599,10 @@ function showToast(type,title,sub,dur,accentColor){
   dur=dur||5000;
   var id='t'+Date.now();
   var iconMap={goal:'⚽',info:'ℹ️',warn:'⚠️',red:'🚨',kick:'🏁',yellow:'🟨',expulsion:'🟥'};
+  var labelMap={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
   var icon=iconMap[type]||'🔔';
   var ac=accentColor||'#0ea5e9';
-  var label=_toastLabels[type]||'';
+  var label=labelMap[type]||'';
   var el=document.createElement('div');
   el.className='toast';el.id=id;
   el.style.setProperty('--tac',ac);
