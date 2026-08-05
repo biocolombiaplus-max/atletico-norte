@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.91';
+var APP_VER='8.92';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -798,6 +798,8 @@ tbody td:nth-child(2){text-align:left}
 .sp-modal-wa-txt strong{font-size:15px;font-weight:900;line-height:1}
 .sp-modal-wa-txt span{font-size:10px;opacity:.85;font-weight:600}
 .sp-modal-nota{font-size:9.5px;color:var(--m);text-align:center;line-height:1.5}
+.sp-modal-url{background:linear-gradient(135deg,#2563eb,#1d4ed8)!important;box-shadow:0 6px 20px rgba(37,99,235,.35)!important}
+.sp-modal-ig{background:linear-gradient(135deg,#e1306c,#833ab4)!important;box-shadow:0 6px 20px rgba(225,48,108,.35)!important}
 /* Paute CTA */
 .sp-paute-btn{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(200,16,46,.12),rgba(200,16,46,.05));border:1.5px dashed rgba(200,16,46,.4);border-radius:16px;padding:15px 16px;cursor:pointer;width:100%;text-align:left;transition:.18s;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;margin-top:2px}
 .sp-paute-btn:active{opacity:.7;transform:scale(.98)}
@@ -2287,29 +2289,69 @@ function spCloseModal(){
   if(ov)ov.classList.remove('op');
 }
 
-function spOpenWa(uid){
+function spTrackClick(uid,tipo){
   var s=_spData[uid];
   if(!s)return;
   if(db){
-    db.ref('/sp_clics').push({uid:uid,nombre:s.nombre,wa:s.wa,ts:Date.now(),fecha:new Date().toISOString().slice(0,10)});
+    db.ref('/sp_clics').push({uid:uid,nombre:s.nombre,tipo:tipo,ts:Date.now(),fecha:new Date().toISOString().slice(0,10)});
     db.ref('/patrocinadores/'+uid+'/clicks').transaction(function(v){return(v||0)+1;});
   }
+}
+
+function spOpenWa(uid){
+  var s=_spData[uid];if(!s)return;
+  spTrackClick(uid,'wa');
   var msg=encodeURIComponent('Hola '+s.nombre+' 👋 Vi tu anuncio en la app de Atlético Norte F.C. y quiero aprovechar: '+(s.beneficio||'su beneficio')+'. ¡Gracias!');
   var waNum=(s.wa||'').replace(/\D/g,'');
-  if(waNum) window.open('https://wa.me/'+waNum+'?text='+msg,'_blank');
-  else alert('Este aliado aún no tiene número de WhatsApp registrado.');
+  if(waNum)window.open('https://wa.me/'+waNum+'?text='+msg,'_blank');
+}
+function spOpenUrl(uid,url){
+  spTrackClick(uid,'url');
+  if(url)window.open(url,'_blank');
+}
+function spOpenIg(uid,ig){
+  spTrackClick(uid,'ig');
+  if(ig)window.open('https://instagram.com/'+ig.replace(/^@/,''),'_blank');
 }
 
 function spClick(uid){
   var s=_spData[uid];
   if(!s)return;
-  // Track view
   if(db) db.ref('/patrocinadores/'+uid+'/views').transaction(function(v){return(v||0)+1;});
   var logoHtml=s.logo
     ?'<div class="sp-modal-logo"><img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'"></div>'
     :'<div class="sp-modal-logo">'+escHtml(s.emoji||'🏪')+'</div>';
   var resena=s.resena||'';
-  var waNum=(s.wa||'').replace(/\D/g,'');
+  var ctaTipo=s.ctaTipo||'wa';
+  // Build CTA button
+  var ctaBtn='';
+  if(ctaTipo==='wa'){
+    var waNum=(s.wa||'').replace(/\D/g,'');
+    if(waNum){
+      ctaBtn='<button class="sp-modal-wa" onclick="spOpenWa(\''+uid+'\')">'
+        +'<div class="sp-modal-wa-ico">&#128242;</div>'
+        +'<div class="sp-modal-wa-txt"><strong>Contactar por WhatsApp</strong><span>Menciona que vienes de Atl&#233;tico Norte</span></div>'
+        +'</button>';
+    }
+  } else if(ctaTipo==='url'&&s.ctaUrl){
+    ctaBtn='<button class="sp-modal-wa sp-modal-url" onclick="spOpenUrl(\''+uid+'\',\''+escHtml(s.ctaUrl)+'\')">'
+      +'<div class="sp-modal-wa-ico">&#127760;</div>'
+      +'<div class="sp-modal-wa-txt"><strong>Ver m&#225;s informaci&#243;n</strong><span>Ir al sitio web del aliado</span></div>'
+      +'</button>';
+  } else if(ctaTipo==='ig'&&s.ctaIg){
+    ctaBtn='<button class="sp-modal-wa sp-modal-ig" onclick="spOpenIg(\''+uid+'\',\''+escHtml(s.ctaIg)+'\')">'
+      +'<div class="sp-modal-wa-ico">&#128247;</div>'
+      +'<div class="sp-modal-wa-txt"><strong>Ver en Instagram</strong><span>@'+escHtml(s.ctaIg.replace(/^@/,''))+'</span></div>'
+      +'</button>';
+  } else if(ctaTipo==='otro'&&s.ctaUrl){
+    ctaBtn='<button class="sp-modal-wa sp-modal-url" onclick="spOpenUrl(\''+uid+'\',\''+escHtml(s.ctaUrl)+'\')">'
+      +'<div class="sp-modal-wa-ico">&#128279;</div>'
+      +'<div class="sp-modal-wa-txt"><strong>M&#225;s informaci&#243;n</strong><span>Toca para continuar</span></div>'
+      +'</button>';
+  }
+  if(!ctaBtn){
+    ctaBtn='<div style="text-align:center;padding:10px;color:var(--m);font-size:12px">&#128222; Pr&#243;ximamente contacto directo</div>';
+  }
   var html=''
     +'<div class="sp-modal-hero">'
       +'<button class="sp-modal-close" onclick="spCloseModal()">&#10005;</button>'
@@ -2318,15 +2360,8 @@ function spClick(uid){
       +'<div class="sp-modal-badge">'+escHtml(s.beneficio||'Beneficio exclusivo')+'</div>'
     +'</div>'
     +'<div class="sp-modal-body">'
-      +(resena
-        ?'<div class="sp-modal-resena"><div class="sp-modal-resena-lbl">&#128203; Sobre este aliado</div>'+escHtml(resena)+'</div>'
-        :'')
-      +(waNum
-        ?'<button class="sp-modal-wa" onclick="spOpenWa(\''+uid+'\')">'
-          +'<div class="sp-modal-wa-ico">&#128242;</div>'
-          +'<div class="sp-modal-wa-txt"><strong>Contactar por WhatsApp</strong><span>Menciona que vienes de Atl&#233;tico Norte</span></div>'
-          +'</button>'
-        :'<div style="text-align:center;padding:12px;color:var(--m);font-size:12px">📞 Próximamente contacto directo</div>')
+      +(resena?'<div class="sp-modal-resena"><div class="sp-modal-resena-lbl">&#128203; Sobre este aliado</div>'+escHtml(resena)+'</div>':'')
+      +ctaBtn
       +'<div class="sp-modal-nota">&#11088; Beneficio exclusivo para la comunidad Atl&#233;tico Norte F.C.</div>'
     +'</div>';
   var box=document.getElementById('spModalBox');
@@ -2424,11 +2459,26 @@ function adSpForm(uid){
     // Emoji fallback
     h+='<div style="margin-bottom:12px"><div style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px">Emoji (si no hay logo)</div>'
       +'<input type="text" id="spAdmEmoji" value="'+escHtml(s.emoji||'🏪')+'" maxlength="2" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:24px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none"></div>';
-    var fld=function(id,label,val,ph){return '<div style="margin-bottom:12px"><label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px">'+label+'</label><input type="text" id="'+id+'" value="'+escHtml(val||'')+'" placeholder="'+ph+'" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none"></div>';};
+    var fld=function(id,label,val,ph,type){return '<div style="margin-bottom:12px"><label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px">'+label+'</label><input type="'+(type||'text')+'" id="'+id+'" value="'+escHtml(val||'')+'" placeholder="'+ph+'" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none"></div>';};
+    var ta=function(id,label,val,ph){return '<div style="margin-bottom:12px"><label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px">'+label+'</label><textarea id="'+id+'" placeholder="'+ph+'" rows="3" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;resize:vertical;-webkit-appearance:none">'+escHtml(val||'')+'</textarea></div>';};
     h+=fld('spAdmNombre','Nombre del negocio',s.nombre,'Ej: Farmacia Norte Salud');
-    h+=fld('spAdmReseña','Reseña / descripción corta',s.resena,'Breve descripción llamativa para los socios');
-    h+=fld('spAdmBeneficio','Beneficio para socios',s.beneficio,'Ej: 15% OFF, café gratis, primera consulta…');
-    h+=fld('spAdmWa','Número WhatsApp (con país)',s.wa,'573001234567');
+    h+=ta('spAdmReseña','Reseña / descripción (aparece en el modal)',s.resena,'Cuéntale a los socios qué hace este aliado, dónde está, por qué vale la pena…');
+    h+=fld('spAdmBeneficio','Beneficio para socios (badge)',s.beneficio,'Ej: 15% OFF, café gratis, primera consulta…');
+    // Selector destino CTA
+    var ctaTipo=s.ctaTipo||'wa';
+    h+='<div style="margin-bottom:12px"><label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:6px">&#128073; ¿A dónde lleva el botón de acción?</label>'
+      +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px" id="spCtaOpts">'
+      +['wa:📲 WhatsApp','url:🌐 Landing page','ig:📸 Instagram','otro:🔗 Otro enlace'].map(function(opt){
+          var parts=opt.split(':'),v=parts[0],lbl=parts[1];
+          return '<label style="display:flex;align-items:center;gap:7px;background:var(--b3);border:1.5px solid '+(ctaTipo===v?'#c8102e':'var(--bd)')+';border-radius:10px;padding:9px 11px;cursor:pointer;font-size:11.5px;font-weight:700;transition:.15s" onclick="spCtaSelect(\''+v+'\')">'
+            +'<input type="radio" name="spCtaTipo" value="'+v+'" '+(ctaTipo===v?'checked':'')+' style="accent-color:#c8102e;width:14px;height:14px">'+lbl+'</label>';
+        }).join('')
+      +'</div></div>';
+    // Campo dinámico según tipo
+    var ctaLbl={'wa':'Número WhatsApp (con código de país)','url':'URL de la landing page','ig':'Usuario de Instagram (sin @)','otro':'URL o enlace completo'};
+    var ctaPh={'wa':'573001234567','url':'https://minegocio.com','ig':'minegocio.colombia','otro':'https://...'};
+    var ctaVal={'wa':s.wa,'url':s.ctaUrl,'ig':s.ctaIg,'otro':s.ctaUrl};
+    h+='<div id="spCtaField">'+fld('spAdmCtaVal',ctaLbl[ctaTipo]||'Enlace',ctaVal[ctaTipo],''+ctaPh[ctaTipo])+'</div>';
     h+='<button onclick="adSpSave('+(uid?'\''+uid+'\'':'null')+')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
     if(uid)h+='<button onclick="adSpDel(\''+uid+'\')" style="width:100%;background:var(--b3);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑 Eliminar patrocinador</button>';
     h+='</div>';
@@ -2437,6 +2487,18 @@ function adSpForm(uid){
   };
   if(uid&&db) db.ref('/patrocinadores/'+uid).once('value').then(function(sn){go(sn.val());}).catch(function(){go({});});
   else go({});
+}
+
+function spCtaSelect(tipo){
+  var labels={'wa':'Número WhatsApp (con código de país)','url':'URL de la landing page','ig':'Usuario de Instagram (sin @)','otro':'URL o enlace completo'};
+  var phs={'wa':'573001234567','url':'https://minegocio.com','ig':'minegocio.colombia','otro':'https://...'};
+  var f=document.getElementById('spCtaField');
+  if(f)f.innerHTML='<div style="margin-bottom:12px"><label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px">'+(labels[tipo]||'Enlace')+'</label><input type="text" id="spAdmCtaVal" placeholder="'+(phs[tipo]||'https://')+'" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none"></div>';
+  // Update radio card borders
+  document.querySelectorAll('#spCtaOpts label').forEach(function(lbl){
+    var inp=lbl.querySelector('input');
+    lbl.style.borderColor=inp&&inp.value===tipo?'#c8102e':'var(--bd)';
+  });
 }
 
 window._spAdmLogoData=null;
@@ -2453,7 +2515,14 @@ function spAdmLogoChanged(inp){
 
 function adSpSave(uid){
   var g=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
-  var d={nombre:g('spAdmNombre'),resena:g('spAdmReseña'),beneficio:g('spAdmBeneficio'),wa:g('spAdmWa'),emoji:g('spAdmEmoji')||'🏪',logo:window._spAdmLogoData||'',ts:Date.now()};
+  var ctaTipoEl=document.querySelector('input[name="spCtaTipo"]:checked');
+  var ctaTipo=ctaTipoEl?ctaTipoEl.value:'wa';
+  var ctaVal=g('spAdmCtaVal');
+  var d={nombre:g('spAdmNombre'),resena:g('spAdmReseña'),beneficio:g('spAdmBeneficio'),emoji:g('spAdmEmoji')||'🏪',logo:window._spAdmLogoData||'',ctaTipo:ctaTipo,ts:Date.now()};
+  // Store contact value in the right field
+  if(ctaTipo==='wa'){d.wa=ctaVal;d.ctaUrl='';d.ctaIg='';}
+  else if(ctaTipo==='ig'){d.ctaIg=ctaVal;d.ctaUrl='';d.wa='';}
+  else{d.ctaUrl=ctaVal;d.wa='';d.ctaIg='';}
   if(!d.nombre){alert('El nombre del negocio es requerido');return;}
   var key=uid||d.nombre.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30)+'-'+Date.now().toString(36);
   if(!db){alert('Firebase no disponible');return;}
