@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.84';
+var APP_VER='8.85';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -1656,6 +1656,8 @@ const FB={
 };
 
 let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null,cfe=0;
+var _toastTimers={};
+var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
 var horaOverrides={}; // matchId → "HH:MM" from /horariosSwap
 function getHora(m){return horaOverrides[m.id]||m.hora;}
 let sortPos=null,sortAssign={},DLG_CACHE=[],teamInfo={};
@@ -2313,7 +2315,7 @@ function adSpForm(uid){
     h+=fld('spAdmReseña','Reseña / descripción corta',s.resena,'Breve descripción llamativa para los socios');
     h+=fld('spAdmBeneficio','Beneficio para socios',s.beneficio,'Ej: 15% OFF, café gratis, primera consulta…');
     h+=fld('spAdmWa','Número WhatsApp (con país)',s.wa,'573001234567');
-    h+='<button onclick="adSpSave(\''+uid+'\')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
+    h+='<button onclick="adSpSave('+(uid?'\''+uid+'\'':'null')+')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
     if(uid)h+='<button onclick="adSpDel(\''+uid+'\')" style="width:100%;background:var(--b3);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑 Eliminar patrocinador</button>';
     h+='</div>';
     adCnt(h);
@@ -5550,8 +5552,6 @@ setTimeout(function(){rSortGrd();},100);
 // ═══════════════════════════════════════════════
 // ── TOAST NOTIFICATION SYSTEM ──
 // ═══════════════════════════════════════════════
-var _toastTimers={};
-var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
 function showToast(type,title,sub,dur,accentColor){
   dur=dur||5000;
   var id='t'+Date.now();
