@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.84';
+var APP_VER='8.90';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -31,21 +31,28 @@ function _swReload(){
 }
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').then(function(reg){
-    reg.update(); // check for new SW immediately on every page load
-    // New SW already waiting → skip waiting so it activates now
+    reg.update();
     if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
     reg.addEventListener('updatefound',function(){
       var nw=reg.installing;
       nw.addEventListener('statechange',function(){
-        if(nw.state==='installed'){nw.postMessage({type:'SKIP_WAITING'});}
+        if(nw.state==='installed'){
+          nw.postMessage({type:'SKIP_WAITING'});
+          // Show update banner instead of silent reload — user must tap
+          setTimeout(function(){
+            var b=document.getElementById('_updBanner');
+            if(b)b.style.display='flex';
+          },500);
+        }
       });
     });
-    // When new SW takes control → reload immediately (gets latest HTML/JS)
     navigator.serviceWorker.addEventListener('controllerchange',_swReload);
-    // Periodic check every 60s (catches updates on long sessions / iOS)
-    setInterval(function(){reg.update();},60000);
+    // iOS foreground: check for new SW every time app becomes visible
+    document.addEventListener('visibilitychange',function(){
+      if(document.visibilityState==='visible')reg.update();
+    });
+    setInterval(function(){reg.update();},30000);
   }).catch(function(){});
-  // SW_UPDATED from activate → also trigger reload
   navigator.serviceWorker.addEventListener('message',function(e){
     if(e.data&&e.data.type==='SW_UPDATED')_swReload();
   });
@@ -746,28 +753,35 @@ tbody td:nth-child(2){text-align:left}
 .mc.next-match{border-left:3px solid #10b981;background:rgba(16,185,129,.04)}
 
 /* ═══ PATROCINADORES / ALIADOS ═══ */
-.sp-section{padding:0 14px}
-.sp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sp-title{font-size:9px;font-weight:900;color:var(--dm);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:6px}
-.sp-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
-.sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.sp-card{background:var(--b2);border:1px solid var(--bd);border-radius:14px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
-.sp-card:active{transform:scale(.96);opacity:.85}
-.sp-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(200,16,46,.04) 0%,transparent 100%);pointer-events:none}
-.sp-logo{width:56px;height:56px;border-radius:12px;object-fit:cover;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:26px;border:1px solid var(--bd);flex-shrink:0}
-.sp-logo img{width:100%;height:100%;object-fit:cover;border-radius:11px}
-.sp-name{font-size:10px;font-weight:900;color:var(--t);text-align:center;line-height:1.25;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.sp-benefit{font-size:9px;font-weight:800;color:#c8102e;text-align:center;background:rgba(200,16,46,.1);border-radius:6px;padding:2px 6px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sp-clicks{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:8px;padding:1px 5px;font-size:7px;font-weight:800;color:rgba(255,255,255,.5)}
+/* ═══ ALIADOS / SPONSORS ═══ */
+.sp-section{padding:0 14px 4px}
+.sp-header{margin-bottom:14px}
+.sp-title{font-size:9px;font-weight:900;color:var(--dm);text-transform:uppercase;letter-spacing:1.6px;display:flex;align-items:center;gap:8px}
+.sp-title::before{content:'';width:3px;height:14px;background:#c8102e;border-radius:2px;flex-shrink:0}
+.sp-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
+.sp-header-sub{font-size:9.5px;color:var(--m);margin-top:5px;margin-left:11px}
+/* Grid 2 columnas — logos grandes y llamativos */
+.sp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.sp-card{background:var(--b2);border:1px solid var(--bd);border-radius:18px;padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:.18s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.sp-card:active{transform:scale(.95);opacity:.8}
+.sp-card::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(200,16,46,.06) 0%,transparent 60%);pointer-events:none}
+.sp-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(200,16,46,.5),transparent);border-radius:18px 18px 0 0}
+.sp-logo{width:76px;height:76px;border-radius:16px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:38px;border:1.5px solid var(--bd);flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.3);overflow:hidden}
+.sp-logo img{width:100%;height:100%;object-fit:cover}
+.sp-name{font-size:12px;font-weight:900;color:var(--t);text-align:center;line-height:1.25;letter-spacing:-.2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%}
+.sp-benefit{font-size:9.5px;font-weight:900;color:#fff;text-align:center;background:linear-gradient(135deg,#c8102e,#950c22);border-radius:20px;padding:4px 10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 8px rgba(200,16,46,.4);letter-spacing:.1px}
+.sp-wa-hint{font-size:8.5px;color:var(--m);opacity:.7;display:flex;align-items:center;gap:3px}
+.sp-clicks{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border-radius:8px;padding:2px 6px;font-size:7.5px;font-weight:800;color:rgba(255,255,255,.55)}
 /* Paute CTA */
-.sp-paute-btn{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(200,16,46,.1),rgba(200,16,46,.04));border:1.5px dashed rgba(200,16,46,.3);border-radius:14px;padding:13px 15px;cursor:pointer;width:100%;text-align:left;transition:.15s;-webkit-appearance:none;-webkit-tap-highlight-color:transparent}
-.sp-paute-btn:active{opacity:.7}
-.sp-paute-ico{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 12px rgba(200,16,46,.4)}
-.sp-paute-txt strong{display:block;font-size:13px;font-weight:900;color:var(--t);letter-spacing:-.2px}
-.sp-paute-txt span{display:block;font-size:10px;color:var(--m);margin-top:2px;line-height:1.4}
-.sp-paute-arr{margin-left:auto;font-size:20px;color:rgba(200,16,46,.5);flex-shrink:0}
-/* Empty sponsors */
-.sp-empty{text-align:center;padding:28px 20px;color:var(--m);font-size:11px;background:var(--b2);border:1px dashed var(--bd);border-radius:14px;margin-bottom:14px}
+.sp-paute-btn{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(200,16,46,.12),rgba(200,16,46,.05));border:1.5px dashed rgba(200,16,46,.4);border-radius:16px;padding:15px 16px;cursor:pointer;width:100%;text-align:left;transition:.18s;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;margin-top:2px}
+.sp-paute-btn:active{opacity:.7;transform:scale(.98)}
+.sp-paute-ico{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#c8102e,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 14px rgba(200,16,46,.45)}
+.sp-paute-txt{flex:1;min-width:0}
+.sp-paute-txt strong{display:block;font-size:13.5px;font-weight:900;color:var(--t);letter-spacing:-.2px}
+.sp-paute-txt span{display:block;font-size:10px;color:var(--m);margin-top:3px;line-height:1.45}
+.sp-paute-arr{font-size:22px;color:rgba(200,16,46,.55);flex-shrink:0;font-weight:300}
+/* Empty state */
+.sp-empty{text-align:center;padding:32px 20px;color:var(--m);font-size:11px;background:var(--b2);border:1px dashed var(--bd);border-radius:16px;margin-bottom:14px;line-height:1.6}
 
 /* ═══ CARNET DIGITAL MODULE ═══ */
 .cdn-wrap{padding:14px 16px 24px}
@@ -1301,6 +1315,12 @@ tbody td:nth-child(2){text-align:left}
   <button class="goal-dismiss">Continuar</button>
 </div>
 
+<!-- Update available banner — shown when new SW is waiting -->
+<div id="_updBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#c8102e,#7f1d1d);color:#fff;padding:14px 16px;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.5)">
+  <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:900">🚀 Nueva versión disponible</div><div style="font-size:10px;opacity:.85;margin-top:2px">Toca para actualizar — solo tarda 3 segundos</div></div>
+  <button onclick="clearCacheReload()" style="background:#fff;color:#c8102e;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;flex-shrink:0">Actualizar</button>
+</div>
+
 <!-- Bottom invite banner (hidden when logged in) -->
 <div id="invBanner" style="display:none">
   <div class="inv-ico">👤</div>
@@ -1656,6 +1676,8 @@ const FB={
 };
 
 let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null,cfe=0;
+var _toastTimers={};
+var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
 var horaOverrides={}; // matchId → "HH:MM" from /horariosSwap
 function getHora(m){return horaOverrides[m.id]||m.hora;}
 let sortPos=null,sortAssign={},DLG_CACHE=[],teamInfo={};
@@ -1734,6 +1756,8 @@ window.addEventListener("load",function(){
   try{
     var app=firebase.initializeApp(FB);
     db=firebase.database(app);au=firebase.auth(app);fbR=true;
+    // Sponsors: try SDK listener first, REST fallback handles .read:true rules
+    spAttachListener();
     // If this is a verification scan, handle it now that Firebase is ready
     if(window.location.search.indexOf('verificar=')>=0){
       cdCheckVerifParam();
@@ -1743,12 +1767,14 @@ window.addEventListener("load",function(){
       if(u && u.isAnonymous){
         // Anonymous visitor — load public data, stay in public mode
         setupFirebaseListeners();
+        spAttachListener();
         onOut();
         return;
       }
       if(u && !u.isAnonymous){
         // Real authenticated user
         setupFirebaseListeners();
+        spAttachListener();
         var c=u.email.replace("@atleticonorte.co","");
         var s=await db.ref("/socios/"+c).get();
         pf=s.exists()?s.val():{cedula:c};cu=c;
@@ -1807,6 +1833,7 @@ window.addEventListener("load",function(){
       // u === null — no auth at all, request anonymous session
       onOut();
       setupFirebaseListeners(); // attempt public reads (works if rules allow; silent fail otherwise)
+      spAttachListener();
       try{ au.signInAnonymously(); }catch(e){}
     });
   }catch(e){
@@ -2155,48 +2182,63 @@ function closeAdSocioBanner(){
 // ══════════════════════════════════════════════
 var _spData={};
 
-function spLoad(){
-  var sec=document.getElementById('spSection');
-  if(!sec)return;
-  if(db){
-    db.ref('/patrocinadores').on('value',function(sn){
-      _spData=sn.val()||{};
-      spRender();
-    });
-  } else {
-    spRender();
-  }
+var _spListenerOn=false;
+var _SP_REST='https://atletico-norte-default-rtdb.firebaseio.com/patrocinadores.json';
+function spRestFallback(){
+  // Direct REST fetch — works when Firebase rules have .read:true, no SDK auth needed
+  fetch(_SP_REST).then(function(r){return r.ok?r.json():null;}).then(function(d){
+    if(d&&typeof d==='object'){_spData=d;spRender();}
+  }).catch(function(){});
 }
+function spAttachListener(){
+  if(_spListenerOn)return;
+  if(!db){spRestFallback();return;}
+  _spListenerOn=true;
+  db.ref('/patrocinadores').on('value',function(sn){
+    _spData=sn.val()||{};spRender();
+  },function(){
+    // SDK permission denied — use REST fallback then retry SDK later
+    _spListenerOn=false;
+    spRestFallback();
+    setTimeout(spAttachListener,3000);
+  });
+}
+function spLoad(){spRender();spAttachListener();}
 
 function spRender(){
   var sec=document.getElementById('spSection');
   if(!sec)return;
   var keys=Object.keys(_spData);
+  var isAdm=cr==='Administrador'||cr==='Coordinador Financiero';
   var h='<div class="sp-section">';
-  h+='<div class="sp-header"><div class="sp-title">⭐ Aliados &amp; Patrocinadores</div></div>';
+  h+='<div class="sp-header">'
+    +'<div class="sp-title">Aliados &amp; Patrocinadores</div>'
+    +'<div class="sp-header-sub">Beneficios exclusivos para la comunidad Atl&#233;tico Norte</div>'
+    +'</div>';
   if(keys.length){
     h+='<div class="sp-grid">';
     keys.forEach(function(uid){
       var s=_spData[uid];
       var logoHtml=s.logo
         ?'<div class="sp-logo"><img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'"></div>'
-        :'<div class="sp-logo">'+escHtml((s.emoji||'🏪'))+'</div>';
+        :'<div class="sp-logo">'+escHtml(s.emoji||'🏪')+'</div>';
       h+='<div class="sp-card" onclick="spClick(\''+uid+'\')">'
+        +(isAdm?'<div class="sp-clicks">'+((s.clicks||0))+' clics</div>':'')
         +logoHtml
         +'<div class="sp-name">'+escHtml(s.nombre||'Aliado')+'</div>'
         +'<div class="sp-benefit">'+escHtml(s.beneficio||'Ver beneficio')+'</div>'
-        +(isAdm?'<div class="sp-clicks">'+(s.clicks||0)+' clics</div>':'')
+        +'<div class="sp-wa-hint">📲 Ver en WhatsApp</div>'
         +'</div>';
     });
     h+='</div>';
   } else {
-    h+='<div class="sp-empty">🤝 Pronto habrá aliados y descuentos exclusivos para socios.<br><br>¿Tienes un negocio? Pauta gratis abajo.</div>';
+    h+='<div class="sp-empty">🤝 Pronto habrá aliados y descuentos exclusivos para socios.<br>¿Tienes un negocio? Pauta gratis abajo 👇</div>';
   }
-  // Paute CTA — siempre visible
   h+='<button class="sp-paute-btn" onclick="openPauta()">'
     +'<div class="sp-paute-ico">🚀</div>'
-    +'<div class="sp-paute-txt"><strong>¡Pauta aquí GRATIS!</strong><span>¿Tienes empresa, emprendimiento o servicio?<br>Ofrece un beneficio · Llegamos a toda la comunidad</span></div>'
-    +'<div class="sp-paute-arr">›</div>'
+    +'<div class="sp-paute-txt"><strong>&#161;Pauta aqu&#237; GRATIS!</strong>'
+    +'<span>&#191;Tienes empresa o emprendimiento?<br>Ofrece un beneficio &middot; Llegamos a toda la comunidad</span></div>'
+    +'<div class="sp-paute-arr">&#8250;</div>'
     +'</button>';
   h+='</div>';
   sec.innerHTML=h;
@@ -2313,7 +2355,7 @@ function adSpForm(uid){
     h+=fld('spAdmReseña','Reseña / descripción corta',s.resena,'Breve descripción llamativa para los socios');
     h+=fld('spAdmBeneficio','Beneficio para socios',s.beneficio,'Ej: 15% OFF, café gratis, primera consulta…');
     h+=fld('spAdmWa','Número WhatsApp (con país)',s.wa,'573001234567');
-    h+='<button onclick="adSpSave(\''+uid+'\')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
+    h+='<button onclick="adSpSave('+(uid?'\''+uid+'\'':'null')+')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
     if(uid)h+='<button onclick="adSpDel(\''+uid+'\')" style="width:100%;background:var(--b3);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑 Eliminar patrocinador</button>';
     h+='</div>';
     adCnt(h);
@@ -2341,12 +2383,21 @@ function adSpSave(uid){
   if(!d.nombre){alert('El nombre del negocio es requerido');return;}
   var key=uid||d.nombre.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30)+'-'+Date.now().toString(36);
   if(!db){alert('Firebase no disponible');return;}
+  var btn=document.querySelector('[onclick^="adSpSave"]');
+  if(btn){btn.textContent='⏳ Guardando…';btn.disabled=true;}
   db.ref('/patrocinadores/'+key).update(d).then(function(){
-    showToast('info','Patrocinador guardado',d.nombre+' aparecerá en la sección de aliados',3500,'#22c55e');
     adShowSp();
-    // Refresh home
-    setTimeout(spLoad,500);
-  }).catch(function(e){alert('Error: '+e.message);});
+    spRender();
+    // Show inline success banner inside admin panel
+    var ok=document.createElement('div');
+    ok.style.cssText='position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;z-index:9999;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-size:13px;font-weight:800;text-align:center;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.4)';
+    ok.textContent='✅ '+d.nombre+' guardado correctamente';
+    document.body.appendChild(ok);
+    setTimeout(function(){if(ok.parentNode)ok.parentNode.removeChild(ok);},2800);
+  }).catch(function(e){
+    if(btn){btn.textContent='💾 Guardar';btn.disabled=false;}
+    alert('Error: '+e.message);
+  });
 }
 
 function adSpDel(uid){
@@ -5546,19 +5597,20 @@ async function execResetApp(btn){
 // ── INIT ──
 initFltEq();rFx();rCards();rTb();rEqd();rDisc();rDlg(DLG_DEF);updHdr();
 setTimeout(function(){rSortGrd();},100);
+// Load sponsors immediately on page init — visible to everyone, no login required
+spLoad();
 
 // ═══════════════════════════════════════════════
 // ── TOAST NOTIFICATION SYSTEM ──
 // ═══════════════════════════════════════════════
-var _toastTimers={};
-var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
 function showToast(type,title,sub,dur,accentColor){
   dur=dur||5000;
   var id='t'+Date.now();
   var iconMap={goal:'⚽',info:'ℹ️',warn:'⚠️',red:'🚨',kick:'🏁',yellow:'🟨',expulsion:'🟥'};
+  var labelMap={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
   var icon=iconMap[type]||'🔔';
   var ac=accentColor||'#0ea5e9';
-  var label=_toastLabels[type]||'';
+  var label=labelMap[type]||'';
   var el=document.createElement('div');
   el.className='toast';el.id=id;
   el.style.setProperty('--tac',ac);
