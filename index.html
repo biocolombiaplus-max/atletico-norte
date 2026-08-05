@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.83';
+var APP_VER='8.84';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -745,6 +745,30 @@ tbody td:nth-child(2){text-align:left}
 .mc.hoy-match{border-left:3px solid #ffd700;background:rgba(255,215,0,.03)}
 .mc.next-match{border-left:3px solid #10b981;background:rgba(16,185,129,.04)}
 
+/* ═══ PATROCINADORES / ALIADOS ═══ */
+.sp-section{padding:0 14px}
+.sp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sp-title{font-size:9px;font-weight:900;color:var(--dm);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:6px}
+.sp-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.sp-card{background:var(--b2);border:1px solid var(--bd);border-radius:14px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.sp-card:active{transform:scale(.96);opacity:.85}
+.sp-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(200,16,46,.04) 0%,transparent 100%);pointer-events:none}
+.sp-logo{width:56px;height:56px;border-radius:12px;object-fit:cover;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:26px;border:1px solid var(--bd);flex-shrink:0}
+.sp-logo img{width:100%;height:100%;object-fit:cover;border-radius:11px}
+.sp-name{font-size:10px;font-weight:900;color:var(--t);text-align:center;line-height:1.25;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.sp-benefit{font-size:9px;font-weight:800;color:#c8102e;text-align:center;background:rgba(200,16,46,.1);border-radius:6px;padding:2px 6px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-clicks{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:8px;padding:1px 5px;font-size:7px;font-weight:800;color:rgba(255,255,255,.5)}
+/* Paute CTA */
+.sp-paute-btn{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(200,16,46,.1),rgba(200,16,46,.04));border:1.5px dashed rgba(200,16,46,.3);border-radius:14px;padding:13px 15px;cursor:pointer;width:100%;text-align:left;transition:.15s;-webkit-appearance:none;-webkit-tap-highlight-color:transparent}
+.sp-paute-btn:active{opacity:.7}
+.sp-paute-ico{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 12px rgba(200,16,46,.4)}
+.sp-paute-txt strong{display:block;font-size:13px;font-weight:900;color:var(--t);letter-spacing:-.2px}
+.sp-paute-txt span{display:block;font-size:10px;color:var(--m);margin-top:2px;line-height:1.4}
+.sp-paute-arr{margin-left:auto;font-size:20px;color:rgba(200,16,46,.5);flex-shrink:0}
+/* Empty sponsors */
+.sp-empty{text-align:center;padding:28px 20px;color:var(--m);font-size:11px;background:var(--b2);border:1px dashed var(--bd);border-radius:14px;margin-bottom:14px}
+
 /* ═══ CARNET DIGITAL MODULE ═══ */
 .cdn-wrap{padding:14px 16px 24px}
 .cdn-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -1008,23 +1032,45 @@ tbody td:nth-child(2){text-align:left}
     </div>
   </div>
 
-  <!-- Tarjeta publicitaria inline -->
+  <!-- ── ALIADOS / PATROCINADORES ── -->
+  <div style="height:24px"></div>
+  <div id="spSection"></div>
   <div style="height:20px"></div>
-  <div style="padding:0 14px 4px;font-size:9px;font-weight:800;color:var(--dm);text-transform:uppercase;letter-spacing:1.5px">Espacio publicitario</div>
-  <div id="adSocioBanner" style="display:none">
-    <div class="asb-glow"></div>
-    <div class="asb-inner">
-      <div class="asb-ico">🚀</div>
-      <div class="asb-tx">
-        <strong>¿Tienes empresa, emprendimiento o servicio?</strong>
-        <span>Ofrece beneficios a los socios · Ponemos tu logo y link aquí</span>
+</div>
+
+<!-- Modal pauta -->
+<div class="prmo" id="mPauta" onclick="if(event.target===this)closePauta()">
+  <div style="background:var(--b2);border-radius:22px 22px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 20px 40px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:17px;font-weight:900;letter-spacing:-.3px">🚀 Pautar en Atlético Norte</div>
+        <div style="font-size:11px;color:var(--m);margin-top:3px">Llega a socios y familias · Totalmente gratis</div>
       </div>
-      <a class="asb-cta" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%20F.C.%20%F0%9F%91%8B%20Quiero%20ofrecer%20un%20beneficio%20a%20los%20socios%20del%20club%20con%20mi%20empresa%2Femprendimiento%2Fservicio.%20%C2%BFC%C3%B3mo%20puedo%20pautar%20aqu%C3%AD%3F" target="_blank" rel="noopener noreferrer">Pautar ›</a>
-      <button class="asb-cl" onclick="closeAdSocioBanner()" title="Cerrar">×</button>
+      <button onclick="closePauta()" style="background:var(--b3);border:1px solid var(--bd);border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;color:var(--m);display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.7px;text-transform:uppercase;display:block;margin-bottom:5px">Nombre del negocio / empresa / emprendimiento</label>
+        <input id="spfNombre" type="text" placeholder="Ej: Farmacia Norte Salud" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:14px;padding:11px 14px;outline:none;font-family:inherit;-webkit-appearance:none">
+      </div>
+      <div>
+        <label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.7px;text-transform:uppercase;display:block;margin-bottom:5px">Servicio o producto que ofreces</label>
+        <input id="spfServicio" type="text" placeholder="Ej: Medicamentos, asesoría, ropa deportiva…" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:14px;padding:11px 14px;outline:none;font-family:inherit;-webkit-appearance:none">
+      </div>
+      <div>
+        <label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.7px;text-transform:uppercase;display:block;margin-bottom:5px">Beneficio para los socios del club</label>
+        <input id="spfBeneficio" type="text" placeholder="Ej: 15% de descuento, primera consulta gratis…" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:14px;padding:11px 14px;outline:none;font-family:inherit;-webkit-appearance:none">
+      </div>
+      <div>
+        <label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.7px;text-transform:uppercase;display:block;margin-bottom:5px">Tu número de WhatsApp</label>
+        <input id="spfWa" type="tel" placeholder="573001234567" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:14px;padding:11px 14px;outline:none;font-family:inherit;-webkit-appearance:none">
+      </div>
+      <button onclick="spEnviarSolicitud()" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;margin-top:4px;letter-spacing:.3px">
+        Enviar solicitud vía WhatsApp →
+      </button>
+      <div style="font-size:10px;color:var(--m);text-align:center;line-height:1.5">Un coordinador del club revisará tu solicitud y te contactará.<br>Aparecer en la app es <strong style="color:var(--t)">completamente gratis</strong>.</div>
     </div>
   </div>
-
-  <div style="height:16px"></div>
 </div>
 
 <!-- ═══ FIXTURE ═══ -->
@@ -2058,6 +2104,7 @@ function onIn(){
   document.getElementById("admRlTg").textContent=cr;
   rFx();rTb();
   rPn();
+  spLoad();
   setTimeout(function(){initLiveGoalListener();initPush();},1500);
   var isStaff=cr==='Administrador'||cr==='Coordinador Deportivo'||cr==='Coordinador Financiero';
   if(!pf.passChanged&&!isStaff)setTimeout(function(){openM("mCp");},1000);
@@ -2102,6 +2149,210 @@ function closeAdSocioBanner(){
   if(b)b.style.display='none';
   sessionStorage.setItem('adSocioHidden','1');
 }
+
+// ══════════════════════════════════════════════
+// PATROCINADORES / ALIADOS
+// ══════════════════════════════════════════════
+var _spData={};
+
+function spLoad(){
+  var sec=document.getElementById('spSection');
+  if(!sec)return;
+  if(db){
+    db.ref('/patrocinadores').on('value',function(sn){
+      _spData=sn.val()||{};
+      spRender();
+    });
+  } else {
+    spRender();
+  }
+}
+
+function spRender(){
+  var sec=document.getElementById('spSection');
+  if(!sec)return;
+  var keys=Object.keys(_spData);
+  var h='<div class="sp-section">';
+  h+='<div class="sp-header"><div class="sp-title">⭐ Aliados &amp; Patrocinadores</div></div>';
+  if(keys.length){
+    h+='<div class="sp-grid">';
+    keys.forEach(function(uid){
+      var s=_spData[uid];
+      var logoHtml=s.logo
+        ?'<div class="sp-logo"><img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'"></div>'
+        :'<div class="sp-logo">'+escHtml((s.emoji||'🏪'))+'</div>';
+      h+='<div class="sp-card" onclick="spClick(\''+uid+'\')">'
+        +logoHtml
+        +'<div class="sp-name">'+escHtml(s.nombre||'Aliado')+'</div>'
+        +'<div class="sp-benefit">'+escHtml(s.beneficio||'Ver beneficio')+'</div>'
+        +(isAdm?'<div class="sp-clicks">'+(s.clicks||0)+' clics</div>':'')
+        +'</div>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div class="sp-empty">🤝 Pronto habrá aliados y descuentos exclusivos para socios.<br><br>¿Tienes un negocio? Pauta gratis abajo.</div>';
+  }
+  // Paute CTA — siempre visible
+  h+='<button class="sp-paute-btn" onclick="openPauta()">'
+    +'<div class="sp-paute-ico">🚀</div>'
+    +'<div class="sp-paute-txt"><strong>¡Pauta aquí GRATIS!</strong><span>¿Tienes empresa, emprendimiento o servicio?<br>Ofrece un beneficio · Llegamos a toda la comunidad</span></div>'
+    +'<div class="sp-paute-arr">›</div>'
+    +'</button>';
+  h+='</div>';
+  sec.innerHTML=h;
+}
+
+function spClick(uid){
+  var s=_spData[uid];
+  if(!s)return;
+  // Track click
+  var ts=Date.now();
+  var entry={uid:uid,nombre:s.nombre,wa:s.wa,ts:ts,fecha:new Date().toISOString().slice(0,10)};
+  if(db){
+    db.ref('/sp_clics').push(entry);
+    db.ref('/patrocinadores/'+uid+'/clicks').transaction(function(v){return(v||0)+1;});
+  }
+  // Open WhatsApp with predefined message
+  var msg=encodeURIComponent('Hola '+s.nombre+' 👋 Vi tu anuncio en la app de Atlético Norte F.C. y quiero conocer más sobre '+(s.beneficio||'sus servicios')+'. ¡Gracias!');
+  var waNum=(s.wa||'').replace(/\D/g,'');
+  if(waNum) window.open('https://wa.me/'+waNum+'?text='+msg,'_blank');
+}
+
+function openPauta(){var m=document.getElementById('mPauta');if(m)m.classList.add('op');}
+function closePauta(){var m=document.getElementById('mPauta');if(m)m.classList.remove('op');}
+
+function spEnviarSolicitud(){
+  var nombre=(document.getElementById('spfNombre')||{}).value||'';
+  var servicio=(document.getElementById('spfServicio')||{}).value||'';
+  var beneficio=(document.getElementById('spfBeneficio')||{}).value||'';
+  var wa=(document.getElementById('spfWa')||{}).value||'';
+  if(!nombre){alert('Por favor escribe el nombre de tu negocio');return;}
+  // Log to Firebase
+  if(db) db.ref('/sp_solicitudes').push({nombre:nombre,servicio:servicio,beneficio:beneficio,wa:wa,ts:Date.now(),fecha:new Date().toISOString().slice(0,10)});
+  // Open WhatsApp to club
+  var msg='Hola Atlético Norte F.C. 👋 Quiero pautar en la app:\n\n'
+    +'🏢 *Negocio:* '+nombre+'\n'
+    +'🛍️ *Servicio:* '+servicio+'\n'
+    +'🎁 *Beneficio para socios:* '+beneficio+'\n'
+    +'📱 *Mi WhatsApp:* '+wa;
+  window.open('https://wa.me/573171030787?text='+encodeURIComponent(msg),'_blank');
+  closePauta();
+  showToast('info','Solicitud enviada','¡Gracias! Un coordinador te contactará pronto.',4000,'#22c55e');
+}
+
+// ── Admin: gestión de patrocinadores ──
+function adShowSp(){
+  adCnt('<div style="padding:16px;text-align:center;color:var(--m);font-size:12px">⏳ Cargando…</div>');
+  var ref=db?db.ref('/patrocinadores'):null;
+  var go=function(data){
+    var keys=Object.keys(data||{});
+    var h='<div style="padding:14px 16px 24px">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+      +'<h3 style="font-size:15px;font-weight:900">⭐ Patrocinadores</h3>'
+      +'<button style="background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer" onclick="adSpForm(null)">+ Agregar</button>'
+      +'</div>';
+    if(!keys.length){
+      h+='<div style="text-align:center;padding:30px 0;color:var(--m);font-size:12px">Sin patrocinadores aún.<br>Agrega el primero con el botón de arriba.</div>';
+    } else {
+      h+='<div style="display:flex;flex-direction:column;gap:8px">';
+      keys.forEach(function(uid){
+        var s=data[uid];
+        var logoEl=s.logo?'<img src="'+s.logo+'" style="width:40px;height:40px;border-radius:9px;object-fit:cover;border:1px solid var(--bd)" alt="">':'<div style="width:40px;height:40px;border-radius:9px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--bd)">'+(s.emoji||'🏪')+'</div>';
+        h+='<div style="background:var(--b2);border:1px solid var(--bd);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="adSpForm(\''+uid+'\')">'
+          +logoEl
+          +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(s.nombre||'')+'</div>'
+          +'<div style="font-size:10px;color:var(--m);margin-top:1px">'+escHtml(s.beneficio||'')+'</div></div>'
+          +'<div style="font-size:10px;font-weight:800;color:var(--m);text-align:right;flex-shrink:0"><div style="color:#fbbf24">'+((s.clicks||0)+' clics')+'</div><div style="font-size:9px;margin-top:2px">'+((s.wa||'').slice(-7)||'—')+'</div></div>'
+          +'</div>';
+      });
+      h+='</div>';
+      // Stats
+      h+='<div style="margin-top:16px;background:rgba(200,16,46,.07);border:1px solid rgba(200,16,46,.18);border-radius:12px;padding:12px 14px">'
+        +'<div style="font-size:9px;font-weight:800;color:#d05070;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Estadísticas de clics este mes</div>';
+      var mes=new Date().toISOString().slice(0,7);
+      if(db){
+        db.ref('/sp_clics').orderByChild('fecha').startAt(mes+'-01').once('value').then(function(sn){
+          var clics=sn.val()||{};
+          var byNeg={};
+          Object.values(clics).forEach(function(c){byNeg[c.nombre]=(byNeg[c.nombre]||0)+1;});
+          var el=document.getElementById('spStatsArea');
+          if(!el)return;
+          var sh='';
+          Object.keys(byNeg).sort(function(a,b){return byNeg[b]-byNeg[a];}).forEach(function(n){
+            sh+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px"><span>'+escHtml(n)+'</span><span style="font-weight:900;color:#fbbf24">'+byNeg[n]+' clics</span></div>';
+          });
+          el.innerHTML=sh||'<div style="color:var(--m);font-size:11px">Sin clics este mes aún</div>';
+        });
+      }
+      h+='<div id="spStatsArea" style="min-height:20px"><span style="color:var(--m);font-size:11px">Calculando…</span></div></div>';
+    }
+    h+='</div>';
+    adCnt(h);
+  };
+  if(ref) ref.once('value').then(function(sn){go(sn.val());}).catch(function(){go({});});
+  else go({});
+}
+
+function adSpForm(uid){
+  var go=function(s){
+    s=s||{};
+    var h='<div style="padding:14px 16px 24px">';
+    h+='<button style="background:none;border:none;color:var(--m);font-size:13px;cursor:pointer;padding:0;margin-bottom:14px;display:flex;align-items:center;gap:5px" onclick="adShowSp()">← Volver</button>';
+    h+='<div style="font-size:15px;font-weight:900;margin-bottom:16px">'+(uid?'✏️ Editar patrocinador':'➕ Nuevo patrocinador')+'</div>';
+    // Logo preview
+    h+='<div style="margin-bottom:12px"><div style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px">Logo del negocio</div>'
+      +'<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--b3);border:1px dashed var(--bd);border-radius:10px;cursor:pointer" onclick="document.getElementById(\'spAdmLogo\').click()">'
+      +'<div id="spAdmLogoPrev" style="width:56px;height:56px;border-radius:12px;background:var(--b2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden">'+(s.logo?'<img src="'+s.logo+'" style="width:100%;height:100%;object-fit:cover">':'🏪')+'</div>'
+      +'<div style="font-size:11px;color:var(--m);line-height:1.6"><strong style="color:var(--t);display:block">Subir logo</strong>PNG o JPG cuadrado recomendado</div></div>'
+      +'<input type="file" id="spAdmLogo" accept="image/*" style="display:none" onchange="spAdmLogoChanged(this)"></div>';
+    // Emoji fallback
+    h+='<div style="margin-bottom:12px"><div style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px">Emoji (si no hay logo)</div>'
+      +'<input type="text" id="spAdmEmoji" value="'+escHtml(s.emoji||'🏪')+'" maxlength="2" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:24px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none"></div>';
+    var fld=function(id,label,val,ph){return '<div style="margin-bottom:12px"><label style="font-size:9.5px;font-weight:800;color:var(--m);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:5px">'+label+'</label><input type="text" id="'+id+'" value="'+escHtml(val||'')+'" placeholder="'+ph+'" style="width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;-webkit-appearance:none"></div>';};
+    h+=fld('spAdmNombre','Nombre del negocio',s.nombre,'Ej: Farmacia Norte Salud');
+    h+=fld('spAdmReseña','Reseña / descripción corta',s.resena,'Breve descripción llamativa para los socios');
+    h+=fld('spAdmBeneficio','Beneficio para socios',s.beneficio,'Ej: 15% OFF, café gratis, primera consulta…');
+    h+=fld('spAdmWa','Número WhatsApp (con país)',s.wa,'573001234567');
+    h+='<button onclick="adSpSave(\''+uid+'\')" style="width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:900;cursor:pointer;margin-top:4px">💾 Guardar</button>';
+    if(uid)h+='<button onclick="adSpDel(\''+uid+'\')" style="width:100%;background:var(--b3);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑 Eliminar patrocinador</button>';
+    h+='</div>';
+    adCnt(h);
+    window._spAdmLogoData=s.logo||null;
+  };
+  if(uid&&db) db.ref('/patrocinadores/'+uid).once('value').then(function(sn){go(sn.val());}).catch(function(){go({});});
+  else go({});
+}
+
+window._spAdmLogoData=null;
+function spAdmLogoChanged(inp){
+  var f=inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(e){
+    window._spAdmLogoData=e.target.result;
+    var prev=document.getElementById('spAdmLogoPrev');
+    if(prev)prev.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:11px">';
+  };
+  rd.readAsDataURL(f);
+}
+
+function adSpSave(uid){
+  var g=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+  var d={nombre:g('spAdmNombre'),resena:g('spAdmReseña'),beneficio:g('spAdmBeneficio'),wa:g('spAdmWa'),emoji:g('spAdmEmoji')||'🏪',logo:window._spAdmLogoData||'',ts:Date.now()};
+  if(!d.nombre){alert('El nombre del negocio es requerido');return;}
+  var key=uid||d.nombre.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30)+'-'+Date.now().toString(36);
+  if(!db){alert('Firebase no disponible');return;}
+  db.ref('/patrocinadores/'+key).update(d).then(function(){
+    showToast('info','Patrocinador guardado',d.nombre+' aparecerá en la sección de aliados',3500,'#22c55e');
+    adShowSp();
+    // Refresh home
+    setTimeout(spLoad,500);
+  }).catch(function(e){alert('Error: '+e.message);});
+}
+
+function adSpDel(uid){
+  if(!uid||!confirm('¿Eliminar este patrocinador?'))return;
+  db.ref('/patrocinadores/'+uid).remove().then(function(){showToast('warn','Eliminado','Patrocinador eliminado',2500,'#f59e0b');adShowSp();setTimeout(spLoad,500);});
+}
 function onOut(){
   cu=null;cr=null;pf={};
   document.getElementById("btnIn").style.display="flex";
@@ -2109,6 +2360,7 @@ function onOut(){
   document.getElementById("admBk").style.display="none";
   document.getElementById("sortBk").style.display="none";
   showTab("inicio");
+  spLoad();
   // Show invite banner after 3s to let page settle
   setTimeout(function(){
     var b=document.getElementById('invBanner');
@@ -3139,7 +3391,7 @@ function rPn(){
   if(cEd())h+='<a href="#" onclick="event.preventDefault();showTab(\'fixture\')" style="display:flex;align-items:center;gap:14px;margin:12px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(200,16,46,.18),rgba(245,158,11,.1));border:1.5px solid rgba(200,16,46,.22);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#9917;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Panel de Resultados</div><div style="font-size:11px;color:var(--m);margin-top:3px">Goles &middot; Amarillas &middot; Rojas &middot; Walkover</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
   if(cEd())h+='<a href="social.html" style="display:flex;align-items:center;gap:14px;margin:10px 16px 0;padding:16px 18px;background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.08));border:1.5px solid rgba(99,102,241,.25);border-radius:16px;text-decoration:none;color:var(--t);-webkit-tap-highlight-color:transparent"><span style="font-size:34px;flex-shrink:0">&#127912;</span><div style="flex:1"><div style="font-size:15px;font-weight:900;letter-spacing:-.3px">Generador de Im&aacute;genes</div><div style="font-size:11px;color:var(--m);margin-top:3px">P&oacute;sters &middot; Jornada &middot; Resultados &middot; Tabla &middot; 9:16</div></div><span style="font-size:24px;color:var(--m);opacity:.5">&#8250;</span></a>';
   if(isAdm){
-    h+='<div class="admpntabs" id="admpntabs"><button class="admpntab active" onclick="adNav(\'overview\')">&#9881; Panel</button><button class="admpntab" onclick="adNav(\'equipos\')">&#128101; Equipos</button><button class="admpntab" onclick="adNav(\'fixture\')">&#128197; Fixture</button><button class="admpntab" onclick="adNav(\'equidad\')">&#128202; Equidad</button><button class="admpntab" onclick="adNav(\'stats\')">&#9889; Estad\u00edsticas</button><button class="admpntab" onclick="adNav(\'carnet\')">&#127977; Carnet</button></div>';
+    h+='<div class="admpntabs" id="admpntabs"><button class="admpntab active" onclick="adNav(\'overview\')">&#9881; Panel</button><button class="admpntab" onclick="adNav(\'equipos\')">&#128101; Equipos</button><button class="admpntab" onclick="adNav(\'fixture\')">&#128197; Fixture</button><button class="admpntab" onclick="adNav(\'equidad\')">&#128202; Equidad</button><button class="admpntab" onclick="adNav(\'stats\')">&#9889; Stats</button><button class="admpntab" onclick="adNav(\'aliados\')">&#11088; Aliados</button><button class="admpntab" onclick="adNav(\'carnet\')">&#127977; Carnet</button></div>';
     h+='<div id="admPnCnt" style="min-height:200px"></div>';
   } else {
     h+='<div id="admPnCnt"></div>';
@@ -3152,7 +3404,7 @@ function rPn(){
 
 function adNav(tab){
   var tabs=document.querySelectorAll('.admpntab');
-  tabs.forEach(function(t,i){var names=['overview','equipos','fixture','equidad','stats','carnet'];t.classList.toggle('active',names[i]===tab);});
+  tabs.forEach(function(t,i){var names=['overview','equipos','fixture','equidad','stats','aliados','carnet'];t.classList.toggle('active',names[i]===tab);});
   if(tab==='overview') adShowOverview();
   else if(tab==='equipos') adShowEq();
   else if(tab==='escudos'){adShowEq();shBdg();}
@@ -3163,6 +3415,7 @@ function adNav(tab){
   else if(tab==='socios-eq') shSociosEq();
   else if(tab==='plantillas') shPlantillas();
   else if(tab==='notif') shNotifSender();
+  else if(tab==='aliados') adShowSp();
   else if(tab==='carnet') cdShowList();
 }
 
