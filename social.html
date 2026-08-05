@@ -188,6 +188,19 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
           <input type="file" id="alLogoFile" accept="image/*" style="display:none" onchange="aliadoLoadLogo(this)">
         </div>
       </div>
+      <!-- Imagen de fondo -->
+      <div>
+        <div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">🖼 Imagen de fondo (opcional)</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="alBgPreview" style="width:56px;height:44px;border-radius:8px;background:var(--b2);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0;color:var(--m)">🌄</div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+            <button onclick="document.getElementById('alBgFile').click()" style="background:var(--b3);border:1.5px dashed var(--bd);border-radius:9px;color:var(--m);font-size:11px;font-weight:700;padding:8px;cursor:pointer">📁 Subir imagen de fondo</button>
+            <button id="alBgClear" onclick="aliadoClearBg()" style="display:none;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:9px;color:#f87171;font-size:10px;font-weight:700;padding:6px;cursor:pointer">✕ Quitar fondo</button>
+          </div>
+          <input type="file" id="alBgFile" accept="image/*" style="display:none" onchange="aliadoLoadBg(this)">
+        </div>
+        <div style="font-size:9.5px;color:var(--m);margin-top:5px;line-height:1.5">La imagen se oscurece automáticamente para que el texto sea legible</div>
+      </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
         <input type="checkbox" id="alShowClub" onchange="aliadoPreview()" checked style="accent-color:#c8102e;width:15px;height:15px">
         <label for="alShowClub" style="font-size:11px;color:var(--m);cursor:pointer">Mostrar escudo y marca Atlético Norte</label>
@@ -2767,6 +2780,10 @@ let _aliadoLogoImg=null;
 let _aliadoSponsors={};
 
 function aliadoInit(){
+  // Reset bg on each entry to panel
+  _aliadoBgImg=null;
+  const prev=document.getElementById('alBgPreview');if(prev)prev.innerHTML='🌄';
+  const clr=document.getElementById('alBgClear');if(clr)clr.style.display='none';
   // Load sponsors from Firebase once
   const db=firebase.database();
   db.ref('/patrocinadores').once('value').then(sn=>{
@@ -2828,6 +2845,27 @@ function aliadoPickSponsor(uid){
   }
 }
 
+function aliadoLoadBg(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    loadImg(ev.target.result,'aliado_bg').then(img=>{
+      _aliadoBgImg=img;
+      const prev=document.getElementById('alBgPreview');
+      if(prev)prev.innerHTML=`<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`;
+      const clr=document.getElementById('alBgClear');
+      if(clr)clr.style.display='block';
+      aliadoPreview();
+    });
+  };
+  rd.readAsDataURL(f);inp.value='';
+}
+function aliadoClearBg(){
+  _aliadoBgImg=null;
+  const prev=document.getElementById('alBgPreview');if(prev)prev.innerHTML='🌄';
+  const clr=document.getElementById('alBgClear');if(clr)clr.style.display='none';
+  aliadoPreview();
+}
 function aliadoLoadLogo(inp){
   const f=inp.files[0];if(!f)return;
   const rd=new FileReader();
@@ -2847,154 +2885,289 @@ function aliadoPreview(){
   if(curTpl==='aliado')gen();
 }
 
+// ── Helpers texto con wrap automático ──
+function alFitText(ctx,text,maxW,maxFs,minFs,weight='900'){
+  let fs=maxFs;
+  ctx.font=`${weight} ${fs}px sans-serif`;
+  while(ctx.measureText(text).width>maxW&&fs>minFs)fs-=2;
+  ctx.font=`${weight} ${fs}px sans-serif`;
+  return fs;
+}
+function alWrapLines(ctx,text,maxW){
+  const words=text.split(' ');const lines=[];let cur='';
+  for(const w of words){
+    const test=cur?cur+' '+w:w;
+    if(ctx.measureText(test).width>maxW&&cur){lines.push(cur);cur=w;}
+    else cur=test;
+  }
+  if(cur)lines.push(cur);
+  return lines;
+}
+function alFillBadge(ctx,lines,centerX,topY,pillH,fontSize,maxW,shadow=true){
+  const pad=pillH*.55,vPad=pillH*.18;
+  const totalH=lines.length*pillH+(lines.length-1)*vPad;
+  const bg=ctx.createLinearGradient(centerX-maxW/2,topY,centerX+maxW/2,topY);
+  bg.addColorStop(0,'#8b0000');bg.addColorStop(.4,'#c8102e');bg.addColorStop(.6,'#e8102e');bg.addColorStop(1,'#8b0000');
+  if(shadow){ctx.save();ctx.shadowColor='rgba(200,16,46,.8)';ctx.shadowBlur=40;}
+  lines.forEach((ln,i)=>{
+    const lw=Math.min(ctx.measureText(ln).width+pad*2,maxW);
+    const lx=centerX-lw/2,ly=topY+i*(pillH+vPad);
+    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(lx,ly,lw,pillH,pillH/2);ctx.fill();
+  });
+  if(shadow)ctx.restore();
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+  lines.forEach((ln,i)=>{ctx.fillText(ln,centerX,topY+i*(pillH+vPad)+pillH/2);});
+  ctx.textBaseline='alphabetic';
+  return totalH;
+}
+
+let _aliadoBgImg=null;
+
 async function tAliado(ctx,cW,cH){
   const isSquare=cH===cW;
-  const g=id=>(document.getElementById(id)||{}).value||'';
-  const nombre=g('alNombre')||'Aliado Atlético Norte';
-  const beneficio=g('alBeneficio')||'Beneficio exclusivo para socios';
-  const resena=g('alResena')||'';
-  const cta=g('alCta')||'¡Aprovecha este beneficio!';
+  const S=cW/1080; // scale factor
+  const SAFE=isSquare?70*S:80*S; // safe zone margins
+  const gv=id=>(document.getElementById(id)||{}).value||'';
+  const nombre=gv('alNombre')||'Aliado Atlético Norte';
+  const beneficio=gv('alBeneficio')||'Beneficio exclusivo para socios';
+  const resena=gv('alResena')||'';
+  const cta=gv('alCta')||'¡Aprovecha este beneficio!';
   const showClub=document.getElementById('alShowClub')?.checked!==false;
   const uid=(document.getElementById('aliadoSel')||{}).value||'';
   const sp=_aliadoSponsors[uid]||{};
   const emoji=sp.emoji||window._aliadoEmoji||'🏪';
 
-  // ── Fondo oscuro premium ──
-  const bgG=ctx.createLinearGradient(0,0,cW,cH);
-  bgG.addColorStop(0,'#06000d');bgG.addColorStop(.5,'#0a0014');bgG.addColorStop(1,'#120006');
-  ctx.fillStyle=bgG;ctx.fillRect(0,0,cW,cH);
+  // ════ 1. FONDO ════
+  ctx.fillStyle='#060008';ctx.fillRect(0,0,cW,cH);
 
-  // Glow rojo central
-  function rGl(x,y,r,c){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,cW,cH);}
-  rGl(cW*.5,isSquare?cH*.35:cH*.28,isSquare?cW*.7:cW*.6,'rgba(200,16,46,.22)');
-  rGl(cW*.15,isSquare?cH*.8:cH*.85,cW*.45,'rgba(139,0,20,.14)');
-  rGl(cW*.85,isSquare?cH*.2:cH*.15,cW*.4,'rgba(180,0,50,.10)');
+  if(_aliadoBgImg){
+    // Imagen de fondo con cover-fit + overlay oscuro
+    const ir=_aliadoBgImg.width/_aliadoBgImg.height,cr=cW/cH;
+    let sw,sh,sx,sy;
+    if(ir>cr){sh=cH;sw=cH*ir;sx=(cW-sw)/2;sy=0;}
+    else{sw=cW;sh=cW/ir;sx=0;sy=(cH-sh)/2;}
+    ctx.save();ctx.globalAlpha=.35;ctx.drawImage(_aliadoBgImg,sx,sy,sw,sh);ctx.restore();
+    // Multi-layer overlay para legibilidad
+    const ov1=ctx.createLinearGradient(0,0,0,cH);
+    ov1.addColorStop(0,'rgba(4,0,10,.92)');ov1.addColorStop(.4,'rgba(6,0,12,.78)');ov1.addColorStop(.7,'rgba(8,0,14,.88)');ov1.addColorStop(1,'rgba(4,0,10,.97)');
+    ctx.fillStyle=ov1;ctx.fillRect(0,0,cW,cH);
+    // Tinte rojo
+    const ov2=ctx.createRadialGradient(cW*.5,cH*.5,0,cW*.5,cH*.5,cW*.75);
+    ov2.addColorStop(0,'rgba(200,16,46,.18)');ov2.addColorStop(1,'transparent');
+    ctx.fillStyle=ov2;ctx.fillRect(0,0,cW,cH);
+  }else{
+    // Gradiente oscuro premium sin imagen
+    const bgG=ctx.createLinearGradient(0,0,cW,cH);
+    bgG.addColorStop(0,'#07000f');bgG.addColorStop(.35,'#0d0008');bgG.addColorStop(.7,'#0a0010');bgG.addColorStop(1,'#060008');
+    ctx.fillStyle=bgG;ctx.fillRect(0,0,cW,cH);
+    // Glow rojo descentrado
+    const g1=ctx.createRadialGradient(cW*.6,cH*.3,0,cW*.6,cH*.3,cW*.7);
+    g1.addColorStop(0,'rgba(200,16,46,.28)');g1.addColorStop(1,'transparent');
+    ctx.fillStyle=g1;ctx.fillRect(0,0,cW,cH);
+    const g2=ctx.createRadialGradient(cW*.2,cH*.75,0,cW*.2,cH*.75,cW*.5);
+    g2.addColorStop(0,'rgba(120,0,30,.20)');g2.addColorStop(1,'transparent');
+    ctx.fillStyle=g2;ctx.fillRect(0,0,cW,cH);
+  }
 
-  // Grid lines sutil
-  ctx.save();ctx.strokeStyle='rgba(255,255,255,.025)';ctx.lineWidth=1;
-  for(let x=0;x<cW;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cH);ctx.stroke();}
-  for(let y=0;y<cH;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cW,y);ctx.stroke();}
+  // ════ 2. ELEMENTOS DECORATIVOS ════
+  // Líneas diagonales finas (textura)
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.018)';ctx.lineWidth=1.5;
+  for(let i=-cH;i<cW+cH;i+=isSquare?52:60){
+    ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+cH,cH);ctx.stroke();
+  }
   ctx.restore();
 
-  // Stripe top roja
-  const stripe=ctx.createLinearGradient(0,0,cW,0);
-  stripe.addColorStop(0,'transparent');stripe.addColorStop(.3,'#c8102e');stripe.addColorStop(.7,'#c8102e');stripe.addColorStop(1,'transparent');
-  ctx.fillStyle=stripe;ctx.fillRect(0,0,cW,isSquare?10:14);
+  // Línea vertical izquierda — acento de diseñador
+  const accentX=isSquare?SAFE-20:SAFE-24;
+  const accentG=ctx.createLinearGradient(0,cH*.1,0,cH*.9);
+  accentG.addColorStop(0,'transparent');accentG.addColorStop(.3,'#c8102e');accentG.addColorStop(.7,'#c8102e');accentG.addColorStop(1,'transparent');
+  ctx.fillStyle=accentG;ctx.fillRect(accentX,0,isSquare?6:8,cH);
 
-  // ── Club logo (top-left) ──
+  // Arco decorativo detrás del logo
+  const arcCX=cW/2,arcCY=isSquare?cH*.38:cH*.33;
+  const arcR=isSquare?cW*.26:cW*.24;
+  ctx.save();
+  ctx.strokeStyle='rgba(200,16,46,.15)';ctx.lineWidth=isSquare?90:100;
+  ctx.beginPath();ctx.arc(arcCX,arcCY,arcR,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='rgba(200,16,46,.08)';ctx.lineWidth=isSquare?160:180;
+  ctx.beginPath();ctx.arc(arcCX,arcCY,arcR*1.4,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+
+  // ════ 3. HEADER — Club branding ════
+  const headerY=isSquare?SAFE+20:SAFE+30;
   if(showClub){
     const clubImg=getImg('club');
-    const logoSz=isSquare?90:110;
-    const lx=isSquare?54:72,ly=isSquare?54:90;
+    const cLSz=isSquare?72:88;
+    const cLX=SAFE,cLY=headerY;
     if(clubImg){
-      ctx.save();ctx.beginPath();ctx.arc(lx+logoSz/2,ly+logoSz/2,logoSz/2,0,Math.PI*2);ctx.clip();ctx.drawImage(clubImg,lx,ly,logoSz,logoSz);ctx.restore();
+      ctx.save();ctx.beginPath();ctx.arc(cLX+cLSz/2,cLY+cLSz/2,cLSz/2,0,Math.PI*2);ctx.clip();
+      ctx.drawImage(clubImg,cLX,cLY,cLSz,cLSz);ctx.restore();
+      // Aro rojo
+      ctx.strokeStyle='rgba(200,16,46,.7)';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(cLX+cLSz/2,cLY+cLSz/2,cLSz/2+2,0,Math.PI*2);ctx.stroke();
     }
     ctx.save();
-    ctx.font=`900 ${isSquare?26:32}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.9)';ctx.textAlign='left';ctx.letterSpacing='2px';
-    ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=12;
-    ctx.fillText('ATLÉTICO NORTE F.C.',lx+(clubImg?logoSz+14:0),ly+(clubImg?logoSz/2+9:logoSz/2));
+    ctx.font=`900 ${isSquare?24:28}px sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';
+    ctx.letterSpacing='2px';ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=14;
+    ctx.fillText('ATLÉTICO NORTE F.C.',cLX+cLSz+(clubImg?16:0),cLY+cLSz*.44);
+    ctx.font=`500 ${isSquare?18:20}px sans-serif`;ctx.fillStyle='rgba(200,16,46,.9)';ctx.letterSpacing='1px';
+    ctx.fillText('ALIADO OFICIAL',cLX+cLSz+(clubImg?16:0),cLY+cLSz*.78);
     ctx.restore();
   }
 
-  // ── Logo / Emoji del aliado ──
-  const logoSz=isSquare?280:340;
+  // Línea separadora header
+  const hrY=headerY+(isSquare?92:110);
+  const hrG=ctx.createLinearGradient(SAFE,0,cW-SAFE,0);
+  hrG.addColorStop(0,'transparent');hrG.addColorStop(.2,'rgba(200,16,46,.6)');hrG.addColorStop(.8,'rgba(200,16,46,.6)');hrG.addColorStop(1,'transparent');
+  ctx.fillStyle=hrG;ctx.fillRect(SAFE,hrY,cW-SAFE*2,isSquare?2:2.5);
+
+  // ════ 4. LOGO DEL ALIADO ════
+  const logoSz=isSquare?260:300;
   const logoX=cW/2-logoSz/2;
-  const logoY=isSquare?cH*.18:cH*.16;
-  // Shadow glow
-  ctx.save();ctx.shadowColor='rgba(200,16,46,.5)';ctx.shadowBlur=60;
-  const rr=logoSz*.22;
-  ctx.beginPath();ctx.roundRect(logoX,logoY,logoSz,logoSz,rr);ctx.fillStyle='rgba(20,0,6,.9)';ctx.fill();
+  const logoY=hrY+(isSquare?40:55);
+  const logoR=logoSz*.18;
+
+  // Glow pulsante detrás
+  ctx.save();ctx.shadowColor='rgba(200,16,46,.55)';ctx.shadowBlur=isSquare?60:70;
+  ctx.fillStyle='rgba(200,16,46,.08)';ctx.beginPath();ctx.arc(cW/2,logoY+logoSz/2,logoSz*.6,0,Math.PI*2);ctx.fill();
   ctx.restore();
-  // Border
-  const bdG=ctx.createLinearGradient(logoX,logoY,logoX+logoSz,logoY+logoSz);
-  bdG.addColorStop(0,'rgba(200,16,46,.8)');bdG.addColorStop(.5,'rgba(255,60,80,.4)');bdG.addColorStop(1,'rgba(200,16,46,.8)');
-  ctx.strokeStyle=bdG;ctx.lineWidth=isSquare?5:6;
-  ctx.beginPath();ctx.roundRect(logoX,logoY,logoSz,logoSz,rr);ctx.stroke();
-  // Logo image or emoji
+
+  // Fondo del logo
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=30;ctx.shadowOffsetY=8;
+  ctx.fillStyle='rgba(255,255,255,.04)';
+  ctx.beginPath();ctx.roundRect(logoX,logoY,logoSz,logoSz,logoR);ctx.fill();
+  ctx.restore();
+
+  // Borde gradiente
+  ctx.save();
+  const borderG=ctx.createLinearGradient(logoX,logoY,logoX+logoSz,logoY+logoSz);
+  borderG.addColorStop(0,'rgba(255,255,255,.35)');borderG.addColorStop(.4,'rgba(200,16,46,.9)');borderG.addColorStop(.6,'rgba(255,60,80,.7)');borderG.addColorStop(1,'rgba(255,255,255,.25)');
+  ctx.strokeStyle=borderG;ctx.lineWidth=isSquare?5:6;
+  ctx.beginPath();ctx.roundRect(logoX,logoY,logoSz,logoSz,logoR);ctx.stroke();
+  ctx.restore();
+
   if(_aliadoLogoImg){
-    ctx.save();ctx.beginPath();ctx.roundRect(logoX+8,logoY+8,logoSz-16,logoSz-16,rr-4);ctx.clip();
-    ctx.drawImage(_aliadoLogoImg,logoX+8,logoY+8,logoSz-16,logoSz-16);ctx.restore();
+    ctx.save();const inset=isSquare?14:16;
+    ctx.beginPath();ctx.roundRect(logoX+inset,logoY+inset,logoSz-inset*2,logoSz-inset*2,logoR-4);ctx.clip();
+    ctx.drawImage(_aliadoLogoImg,logoX+inset,logoY+inset,logoSz-inset*2,logoSz-inset*2);
+    ctx.restore();
   }else{
-    ctx.font=`${Math.round(logoSz*.52)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(emoji,cW/2,logoY+logoSz/2);ctx.textBaseline='alphabetic';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font=`${Math.round(logoSz*.5)}px sans-serif`;
+    ctx.fillText(emoji,cW/2,logoY+logoSz/2);
+    ctx.textBaseline='alphabetic';
   }
 
-  // ── Nombre aliado ──
-  const nameY=logoY+logoSz+(isSquare?54:70);
+  // ════ 5. NOMBRE DEL ALIADO ════
+  const nameTop=logoY+logoSz+(isSquare?32:44);
+  const nameSafeW=cW-SAFE*2-40;
   ctx.save();
-  ctx.font=`900 ${isSquare?88:96}px sans-serif`;ctx.textAlign='center';ctx.letterSpacing='-2px';
-  ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=20;
-  // Gradient text
-  const ng=ctx.createLinearGradient(0,nameY-80,0,nameY);
-  ng.addColorStop(0,'#fff');ng.addColorStop(1,'rgba(255,200,200,1)');
-  ctx.fillStyle=ng;
-  // Wrap text if too long
-  const maxW=cW-120;
-  let nm=nombre;
-  if(ctx.measureText(nm).width>maxW){ctx.font=`900 ${isSquare?66:72}px sans-serif`;}
-  ctx.fillText(nm,cW/2,nameY);
+  ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=18;ctx.textAlign='center';
+  // Auto-fit: reduce font until fits in 1 line, or split to 2 lines
+  let nameFs=isSquare?82:90;
+  ctx.font=`900 ${nameFs}px sans-serif`;ctx.letterSpacing='-2px';
+  while(ctx.measureText(nombre).width>nameSafeW&&nameFs>44)nameFs-=2;
+  ctx.font=`900 ${nameFs}px sans-serif`;
+  const nameLines=alWrapLines(ctx,nombre,nameSafeW);
+  const nameLH=nameFs*1.15;
+  const nameG=ctx.createLinearGradient(0,nameTop,0,nameTop+nameLines.length*nameLH);
+  nameG.addColorStop(0,'#ffffff');nameG.addColorStop(1,'rgba(255,210,215,1)');
+  ctx.fillStyle=nameG;
+  nameLines.forEach((ln,i)=>ctx.fillText(ln,cW/2,nameTop+i*nameLH+nameFs));
   ctx.restore();
+  const nameBottom=nameTop+nameLines.length*nameLH+(isSquare?8:10);
 
-  // ── Badge beneficio ──
-  const badgeY=nameY+(isSquare?60:70);
-  const badgeTxt=beneficio.toUpperCase();
-  ctx.font=`900 ${isSquare?46:52}px sans-serif`;ctx.textAlign='center';ctx.letterSpacing='1px';
-  const bw=Math.min(ctx.measureText(badgeTxt).width+90,cW-80);
-  const bh=isSquare?80:92;
-  const bx=cW/2-bw/2,by=badgeY;
-  const bg=ctx.createLinearGradient(bx,by,bx+bw,by);
-  bg.addColorStop(0,'#a30018');bg.addColorStop(.5,'#e8102e');bg.addColorStop(1,'#a30018');
-  ctx.save();ctx.shadowColor='rgba(200,16,46,.7)';ctx.shadowBlur=30;
-  ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(bx,by,bw,bh,bh/2);ctx.fill();
-  ctx.restore();
-  ctx.fillStyle='#fff';ctx.fillText(badgeTxt,cW/2,by+bh*.68);
+  // ════ 6. BADGE BENEFICIO (con wrap y margen seguro) ════
+  const badgeTop=nameBottom+(isSquare?24:30);
+  const badgeSafeW=cW-SAFE*2;
+  const badgeFs=isSquare?44:50;
+  ctx.font=`900 ${badgeFs}px sans-serif`;ctx.letterSpacing='1px';
+  const badgeLines=alWrapLines(ctx,beneficio.toUpperCase(),badgeSafeW-80);
+  const badgePillH=isSquare?76:86;
+  const badgeH=alFillBadge(ctx,badgeLines,cW/2,badgeTop,badgePillH,badgeFs,badgeSafeW,true);
+  const badgeBottom=badgeTop+badgeH+(isSquare?24:30);
 
-  // ── Reseña / descripción ──
+  // ════ 7. RESEÑA ════
   if(resena){
-    const ry=badgeY+bh+(isSquare?46:60);
+    const rPad=isSquare?56:70;const rSafeW=cW-rPad*2;
+    const rFs=isSquare?34:38;const rLH=rFs*1.55;
+    ctx.font=`400 ${rFs}px sans-serif`;ctx.letterSpacing='0px';
+    const rLines=alWrapLines(ctx,resena,rSafeW-40).slice(0,isSquare?4:5);
+    const rBoxH=rLines.length*rLH+(isSquare?32:38);
+    const rBoxY=badgeBottom;
+    // Caja vidrio
     ctx.save();
-    // Caja semitransparente
-    ctx.fillStyle='rgba(255,255,255,.05)';
-    ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1.5;
-    const boxPad=isSquare?50:70,boxH=isSquare?200:240;
-    ctx.beginPath();ctx.roundRect(boxPad,ry,cW-boxPad*2,boxH,20);ctx.fill();ctx.stroke();
-    // Texto wrapping
-    ctx.font=`400 ${isSquare?36:40}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.82)';ctx.textAlign='center';ctx.letterSpacing='0px';
-    const lineH=isSquare?46:52;
-    const maxTW=cW-boxPad*2-40;
-    const words=resena.split(' ');let line='';let ly2=ry+lineH+10;
-    for(let i=0;i<words.length;i++){
-      const test=line+words[i]+' ';
-      if(ctx.measureText(test).width>maxTW&&line){ctx.fillText(line.trim(),cW/2,ly2);line=words[i]+' ';ly2+=lineH;if(ly2>ry+boxH-10)break;}
-      else line=test;
-    }
-    if(line)ctx.fillText(line.trim(),cW/2,ly2);
+    ctx.fillStyle='rgba(255,255,255,.04)';
+    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(rPad,rBoxY,rSafeW,rBoxH,isSquare?18:22);ctx.fill();ctx.stroke();
+    // Acento izquierdo
+    const acG=ctx.createLinearGradient(0,rBoxY,0,rBoxY+rBoxH);
+    acG.addColorStop(0,'rgba(200,16,46,.0)');acG.addColorStop(.3,'rgba(200,16,46,.9)');acG.addColorStop(.7,'rgba(200,16,46,.9)');acG.addColorStop(1,'rgba(200,16,46,.0)');
+    ctx.fillStyle=acG;ctx.fillRect(rPad,rBoxY,isSquare?5:6,rBoxH);
+    // Texto
+    ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='left';ctx.textBaseline='top';
+    ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;
+    rLines.forEach((ln,i)=>ctx.fillText(ln,rPad+isSquare?26:30,rBoxY+(isSquare?18:20)+i*rLH));
     ctx.restore();
   }
 
-  // ── CTA button ──
-  const ctaY2=isSquare?cH*.82:cH*.82;
-  const ctaW2=isSquare?680:760,ctaH2=isSquare?100:116;
-  const ctaX=cW/2-ctaW2/2;
-  ctx.save();ctx.shadowColor='rgba(200,16,46,.6)';ctx.shadowBlur=40;
-  const ctaG=ctx.createLinearGradient(ctaX,ctaY2,ctaX+ctaW2,ctaY2);
-  ctaG.addColorStop(0,'#c8102e');ctaG.addColorStop(.5,'#ff2244');ctaG.addColorStop(1,'#c8102e');
-  ctx.fillStyle=ctaG;ctx.beginPath();ctx.roundRect(ctaX,ctaY2,ctaW2,ctaH2,ctaH2/2);ctx.fill();
-  ctx.restore();
-  ctx.font=`900 ${isSquare?42:48}px sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='center';ctx.letterSpacing='.5px';
-  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=8;
-  ctx.fillText(cta,cW/2,ctaY2+ctaH2*.66);
-  ctx.shadowBlur=0;
+  // ════ 8. CTA ════
+  const ctaBtnW=isSquare?cW-SAFE*2:cW-SAFE*2;
+  const ctaBtnH=isSquare?96:112;
+  const ctaY=isSquare?cH-SAFE-ctaBtnH-20:cH-SAFE-ctaBtnH-24;
+  const ctaX2=cW/2-ctaBtnW/2;
 
-  // ── Footer ──
+  // Sombra
+  ctx.save();ctx.shadowColor='rgba(200,16,46,.65)';ctx.shadowBlur=isSquare?50:60;ctx.shadowOffsetY=10;
+  const ctaG2=ctx.createLinearGradient(ctaX2,ctaY,ctaX2+ctaBtnW,ctaY);
+  ctaG2.addColorStop(0,'#9a0018');ctaG2.addColorStop(.35,'#c8102e');ctaG2.addColorStop(.65,'#e8102e');ctaG2.addColorStop(1,'#9a0018');
+  ctx.fillStyle=ctaG2;ctx.beginPath();ctx.roundRect(ctaX2,ctaY,ctaBtnW,ctaBtnH,ctaBtnH/2);ctx.fill();
+  ctx.restore();
+
+  // Brillo interior top
+  ctx.save();ctx.globalAlpha=.25;
+  const shineG=ctx.createLinearGradient(0,ctaY,0,ctaY+ctaBtnH*.5);
+  shineG.addColorStop(0,'#fff');shineG.addColorStop(1,'transparent');
+  ctx.fillStyle=shineG;ctx.beginPath();ctx.roundRect(ctaX2+4,ctaY+4,ctaBtnW-8,ctaBtnH*.45,ctaBtnH/2);ctx.fill();
+  ctx.restore();
+
+  // Texto CTA — auto-fit
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='.5px';
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=10;
+  let ctaFs=isSquare?44:50;
+  ctx.font=`900 ${ctaFs}px sans-serif`;
+  while(ctx.measureText(cta).width>ctaBtnW-80&&ctaFs>28)ctaFs-=2;
+  ctx.font=`900 ${ctaFs}px sans-serif`;ctx.fillStyle='#fff';
+  ctx.fillText(cta,cW/2,ctaY+ctaBtnH/2);
+  ctx.restore();
+
+  // ════ 9. FOOTER ════
+  const footerY=cH-SAFE*.55;
   if(showClub){
-    const fy=isSquare?cH*.95:cH*.95;
-    ctx.font=`700 ${isSquare?28:32}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.3)';ctx.textAlign='center';ctx.letterSpacing='3px';
-    ctx.fillText('BENEFICIO EXCLUSIVO PARA SOCIOS · ATLÉTICO NORTE F.C.',cW/2,fy);
+    ctx.save();ctx.textAlign='center';ctx.letterSpacing='2.5px';
+    ctx.font=`700 ${isSquare?22:26}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.22)';
+    ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;
+    ctx.fillText('BENEFICIO EXCLUSIVO PARA SOCIOS DE ATLÉTICO NORTE F.C.',cW/2,footerY);
+    ctx.restore();
   }
 
-  // ── Stripe bottom ──
-  ctx.fillStyle=stripe;ctx.fillRect(0,cH-(isSquare?10:14),cW,isSquare?10:14);
+  // ════ 10. BORDES DE DISEÑO ════
+  // Franja top
+  const topSt=ctx.createLinearGradient(0,0,cW,0);
+  topSt.addColorStop(0,'transparent');topSt.addColorStop(.2,'#c8102e');topSt.addColorStop(.8,'#c8102e');topSt.addColorStop(1,'transparent');
+  ctx.fillStyle=topSt;ctx.fillRect(0,0,cW,isSquare?8:10);
+  // Franja bottom
+  ctx.fillStyle=topSt;ctx.fillRect(0,cH-(isSquare?8:10),cW,isSquare?8:10);
+  // Esquinas decorativas
+  function corner(x,y,dx,dy){
+    const sz=isSquare?48:60,th=isSquare?5:6;
+    ctx.fillStyle='rgba(200,16,46,.7)';
+    ctx.fillRect(x,y,dx*sz,th);
+    ctx.fillRect(x,y,th,dy*sz);
+  }
+  corner(SAFE*.6,SAFE*.6,1,1);corner(cW-SAFE*.6-60,SAFE*.6,-1,1);
+  corner(SAFE*.6,cH-SAFE*.6,-SAFE*.6,1);corner(cW-SAFE*.6-60,cH-SAFE*.6,-1,-1);
 }
 
 function cpCaption(){
