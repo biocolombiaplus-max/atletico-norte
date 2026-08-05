@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.85';
+var APP_VER='8.86';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -747,9 +747,15 @@ tbody td:nth-child(2){text-align:left}
 
 /* ═══ PATROCINADORES / ALIADOS ═══ */
 .sp-section{padding:0 14px}
-.sp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sp-header{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
 .sp-title{font-size:9px;font-weight:900;color:var(--dm);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:6px}
 .sp-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.sp-header-sub{font-size:9px;color:var(--m);margin-left:0;margin-top:1px}
+/* Hero socios — visible cuando hay login */
+.sp-hero-socio{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(200,16,46,.13) 0%,rgba(200,16,46,.05) 100%);border:1px solid rgba(200,16,46,.22);border-radius:16px;padding:14px 15px;margin-bottom:14px}
+.sp-hero-badge{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8102e,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(200,16,46,.45)}
+.sp-hero-title{font-size:14px;font-weight:900;color:var(--t);letter-spacing:-.3px;line-height:1.2}
+.sp-hero-sub{font-size:10px;color:var(--m);margin-top:3px;line-height:1.4}
 .sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .sp-card{background:var(--b2);border:1px solid var(--bd);border-radius:14px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
 .sp-card:active{transform:scale(.96);opacity:.85}
@@ -2174,8 +2180,20 @@ function spRender(){
   var sec=document.getElementById('spSection');
   if(!sec)return;
   var keys=Object.keys(_spData);
+  var loggedIn=!!cu;
   var h='<div class="sp-section">';
-  h+='<div class="sp-header"><div class="sp-title">⭐ Aliados &amp; Patrocinadores</div></div>';
+  // Header — diferenciado según login
+  if(loggedIn){
+    h+='<div class="sp-hero-socio">'
+      +'<div class="sp-hero-badge">⭐</div>'
+      +'<div class="sp-hero-txt">'
+      +'<div class="sp-hero-title">Beneficios para nuestros socios</div>'
+      +'<div class="sp-hero-sub">Descuentos y ventajas exclusivos de la familia Atlético Norte</div>'
+      +'</div>'
+      +'</div>';
+  } else {
+    h+='<div class="sp-header"><div class="sp-title">⭐ Aliados &amp; Patrocinadores</div><div class="sp-header-sub">Descuentos para la comunidad</div></div>';
+  }
   if(keys.length){
     h+='<div class="sp-grid">';
     keys.forEach(function(uid){
@@ -2194,10 +2212,10 @@ function spRender(){
   } else {
     h+='<div class="sp-empty">🤝 Pronto habrá aliados y descuentos exclusivos para socios.<br><br>¿Tienes un negocio? Pauta gratis abajo.</div>';
   }
-  // Paute CTA — siempre visible
+  // Paute CTA — siempre visible para todos
   h+='<button class="sp-paute-btn" onclick="openPauta()">'
     +'<div class="sp-paute-ico">🚀</div>'
-    +'<div class="sp-paute-txt"><strong>¡Pauta aquí GRATIS!</strong><span>¿Tienes empresa, emprendimiento o servicio?<br>Ofrece un beneficio · Llegamos a toda la comunidad</span></div>'
+    +'<div class="sp-paute-txt"><strong>¡Pauta aquí GRATIS!</strong><span>¿Tienes empresa, emprendimiento o servicio?<br>Ofrece un beneficio exclusivo &middot; Llegamos a cientos de socios</span></div>'
     +'<div class="sp-paute-arr">›</div>'
     +'</button>';
   h+='</div>';
@@ -5548,6 +5566,8 @@ async function execResetApp(btn){
 // ── INIT ──
 initFltEq();rFx();rCards();rTb();rEqd();rDisc();rDlg(DLG_DEF);updHdr();
 setTimeout(function(){rSortGrd();},100);
+// Load sponsors immediately on page init — visible to everyone, no login required
+spLoad();
 
 // ═══════════════════════════════════════════════
 // ── TOAST NOTIFICATION SYSTEM ──
