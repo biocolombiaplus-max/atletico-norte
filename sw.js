@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v9.15-2026-08-06';
+const SW_VER = 'v9.16-2026-08-06';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER;
 
@@ -108,8 +108,9 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (e.request.mode === 'navigate') {
-    // Always serve the root HTML for any navigate request (including ?_v= cache-bust URLs)
-    const freshReq = new Request(url.pathname, {
+    // Use FULL URL (preserves ?_v=timestamp) so Cloudflare CDN sees a unique URL
+    // and is forced to fetch from origin — url.pathname alone strips the cache-buster.
+    const freshReq = new Request(e.request.url, {
       cache: 'no-store',
       headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache, no-store' }
     });

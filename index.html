@@ -20,25 +20,55 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.15';
+var APP_VER='9.16';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
 (function(){
   var VER=APP_VER;
+  var _updating=false;
+  function _showUpdateScreen(newVer){
+    if(_updating)return;
+    _updating=true;
+    function _mount(){
+      var ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;z-index:999999;background:#060d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:-apple-system,system-ui,sans-serif';
+      ov.innerHTML='<div style="font-size:48px">🔄</div>'
+        +'<div style="color:#fff;font-size:20px;font-weight:900;letter-spacing:-.3px">Actualizando app</div>'
+        +'<div style="color:rgba(255,255,255,.5);font-size:13px">Versión '+newVer+' disponible — un momento...</div>'
+        +'<div style="width:48px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:8px;overflow:hidden">'
+          +'<div style="height:100%;background:#c8102e;border-radius:2px;animation:_upd-bar 1s ease-in-out infinite alternate"></div>'
+        +'</div>'
+        +'<style>@keyframes _upd-bar{from{width:10%}to{width:100%}}</style>';
+      if(document.body)document.body.appendChild(ov);
+      else document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(ov);});
+    }
+    _mount();
+    // Clear all caches before redirecting
+    if('caches' in window){
+      caches.keys().then(function(ks){
+        Promise.all(ks.map(function(k){return caches.delete(k);})).then(function(){
+          location.replace(location.pathname+'?_v='+Date.now());
+        });
+      }).catch(function(){location.replace(location.pathname+'?_v='+Date.now());});
+    } else {
+      location.replace(location.pathname+'?_v='+Date.now());
+    }
+  }
   function _chkVer(){
     fetch('/version.json?_t='+Date.now(),{cache:'no-store'})
       .then(function(r){return r.json();})
       .then(function(d){
-        if(d.v && d.v!==VER){
-          location.replace(location.pathname+'?_v='+Date.now());
-        }
+        if(d.v && d.v!==VER) _showUpdateScreen(d.v);
       }).catch(function(){});
   }
   _chkVer();
+  // Check on focus (tab switch, phone unlock)
   document.addEventListener('visibilitychange',function(){
     if(document.visibilityState==='visible') _chkVer();
   });
+  // Belt-and-suspenders: check every 90 seconds while app is open
+  setInterval(_chkVer, 90000);
 }());
 // ── SW update mechanism ────────────────────────────────────────────────────
 (function(){
