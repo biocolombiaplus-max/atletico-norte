@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.96';
+var APP_VER='8.97';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -2406,7 +2406,10 @@ function adShowSp(){
     var h='<div style="padding:14px 16px 24px">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
       +'<h3 style="font-size:15px;font-weight:900">⭐ Patrocinadores</h3>'
+      +'<div style="display:flex;gap:7px">'
+      +'<button style="background:var(--b3);color:var(--t);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800;cursor:pointer" onclick="adSpStats()">📊 Estadísticas</button>'
       +'<button style="background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer" onclick="adSpForm(null)">+ Agregar</button>'
+      +'</div>'
       +'</div>';
     if(!keys.length){
       h+='<div style="text-align:center;padding:30px 0;color:var(--m);font-size:12px">Sin patrocinadores aún.<br>Agrega el primero con el botón de arriba.</div>';
@@ -2419,35 +2422,194 @@ function adShowSp(){
           +logoEl
           +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(s.nombre||'')+'</div>'
           +'<div style="font-size:10px;color:var(--m);margin-top:1px">'+escHtml(s.beneficio||'')+'</div></div>'
-          +'<div style="font-size:10px;font-weight:800;color:var(--m);text-align:right;flex-shrink:0"><div style="color:#fbbf24">'+((s.clicks||0)+' clics')+'</div><div style="font-size:9px;margin-top:2px">'+((s.wa||'').slice(-7)||'—')+'</div></div>'
+          +'<div style="font-size:10px;font-weight:800;color:var(--m);text-align:right;flex-shrink:0">'
+          +'<div style="color:#fbbf24">'+((s.clicks||0))+' clics</div>'
+          +'<div style="color:var(--m);font-size:9px;margin-top:1px">'+((s.views||0))+' vistas</div>'
+          +'</div>'
           +'</div>';
       });
       h+='</div>';
-      // Stats
-      h+='<div style="margin-top:16px;background:rgba(200,16,46,.07);border:1px solid rgba(200,16,46,.18);border-radius:12px;padding:12px 14px">'
-        +'<div style="font-size:9px;font-weight:800;color:#d05070;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Estadísticas de clics este mes</div>';
-      var mes=new Date().toISOString().slice(0,7);
-      if(db){
-        db.ref('/sp_clics').orderByChild('fecha').startAt(mes+'-01').once('value').then(function(sn){
-          var clics=sn.val()||{};
-          var byNeg={};
-          Object.values(clics).forEach(function(c){byNeg[c.nombre]=(byNeg[c.nombre]||0)+1;});
-          var el=document.getElementById('spStatsArea');
-          if(!el)return;
-          var sh='';
-          Object.keys(byNeg).sort(function(a,b){return byNeg[b]-byNeg[a];}).forEach(function(n){
-            sh+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px"><span>'+escHtml(n)+'</span><span style="font-weight:900;color:#fbbf24">'+byNeg[n]+' clics</span></div>';
-          });
-          el.innerHTML=sh||'<div style="color:var(--m);font-size:11px">Sin clics este mes aún</div>';
-        });
-      }
-      h+='<div id="spStatsArea" style="min-height:20px"><span style="color:var(--m);font-size:11px">Calculando…</span></div></div>';
     }
     h+='</div>';
     adCnt(h);
   };
   if(ref) ref.once('value').then(function(sn){go(sn.val());}).catch(function(){go({});});
   else go({});
+}
+
+// ── Panel de estadísticas de aliados ──
+function adSpStats(){
+  var now=new Date();
+  var curMes=now.toISOString().slice(0,7);
+  _spStatsRender(curMes);
+}
+
+function _spStatsRender(mes){
+  adCnt('<div style="padding:16px;text-align:center;color:var(--m);font-size:12px">⏳ Calculando estadísticas…</div>');
+  // Build month options: current + 5 previous
+  var monthOpts='';
+  for(var i=0;i<6;i++){
+    var d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);
+    var val=d.toISOString().slice(0,7);
+    var lbl=d.toLocaleString('es-CO',{month:'long',year:'numeric'});
+    monthOpts+='<option value="'+val+'"'+(val===mes?' selected':'')+'>'+lbl+'</option>';
+  }
+  // Date range for query
+  var y=parseInt(mes.slice(0,4)),m=parseInt(mes.slice(5,7));
+  var nextM=m===12?'01':(m+1<10?'0'+(m+1):''+(m+1));
+  var nextY=m===12?y+1:y;
+  var startD=mes+'-01';
+  var endD=nextY+'-'+nextM+'-01';
+
+  if(!db){
+    adCnt('<div style="padding:20px;text-align:center;color:var(--m);font-size:12px">Sin conexión a base de datos</div>');
+    return;
+  }
+
+  // Load sponsors data + clicks in parallel
+  Promise.all([
+    db.ref('/patrocinadores').once('value'),
+    db.ref('/sp_clics').orderByChild('fecha').startAt(startD).endAt(endD.slice(0,7)+'-31').once('value')
+  ]).then(function(results){
+    var spData=results[0].val()||{};
+    var clicsRaw=results[1].val()||{};
+
+    // Build per-uid stats map
+    var stats={};
+    Object.keys(spData).forEach(function(uid){
+      stats[uid]={nombre:spData[uid].nombre||'Aliado',logo:spData[uid].logo||'',emoji:spData[uid].emoji||'🏪',vistas:spData[uid].views||0,wa:0,ig:0,url:0,total:0};
+    });
+
+    // Aggregate clicks for this month
+    Object.values(clicsRaw).forEach(function(c){
+      // Filter exact month
+      if(!c.fecha||c.fecha.slice(0,7)!==mes)return;
+      if(!c.uid||!stats[c.uid])return;
+      var t=c.tipo||'url';
+      if(t==='wa')stats[c.uid].wa++;
+      else if(t==='ig')stats[c.uid].ig++;
+      else stats[c.uid].url++;
+      stats[c.uid].total++;
+    });
+
+    var rows=Object.keys(stats).sort(function(a,b){return stats[b].total-stats[a].total;});
+    var grandTotal=rows.reduce(function(s,k){return s+stats[k].total;},0);
+    var grandWa=rows.reduce(function(s,k){return s+stats[k].wa;},0);
+    var grandIg=rows.reduce(function(s,k){return s+stats[k].ig;},0);
+    var grandUrl=rows.reduce(function(s,k){return s+stats[k].url;},0);
+
+    var h='<div style="padding:14px 16px 28px">';
+    // Header
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+      +'<button onclick="adShowSp()" style="background:var(--b3);border:1px solid var(--bd);color:var(--t);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer">← Volver</button>'
+      +'<h3 style="font-size:15px;font-weight:900;flex:1">📊 Estadísticas de aliados</h3>'
+      +'</div>';
+
+    // Month selector
+    h+='<select onchange="_spStatsRender(this.value)" style="width:100%;background:var(--b2);color:var(--t);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;margin-bottom:14px">'
+      +monthOpts+'</select>';
+
+    // Summary cards row
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">';
+    var cards=[
+      {lbl:'Total clics',val:grandTotal,col:'#fbbf24'},
+      {lbl:'WhatsApp',val:grandWa,col:'#22c55e'},
+      {lbl:'Instagram',val:grandIg,col:'#e1306c'},
+      {lbl:'Web / Link',val:grandUrl,col:'#60a5fa'}
+    ];
+    cards.forEach(function(c){
+      h+='<div style="background:var(--b2);border:1px solid var(--bd);border-radius:10px;padding:9px 6px;text-align:center">'
+        +'<div style="font-size:18px;font-weight:900;color:'+c.col+';font-variant-numeric:tabular-nums">'+c.val+'</div>'
+        +'<div style="font-size:8px;color:var(--m);margin-top:2px;font-weight:700;line-height:1.2">'+c.lbl+'</div>'
+        +'</div>';
+    });
+    h+='</div>';
+
+    // Per-sponsor table
+    if(!rows.length||grandTotal===0){
+      h+='<div style="text-align:center;padding:24px 0;color:var(--m);font-size:12px">Sin interacciones registradas este mes.<br>Los clics aparecerán aquí en tiempo real.</div>';
+    } else {
+      h+='<div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Detalle por aliado</div>';
+      rows.forEach(function(uid){
+        var s=stats[uid];
+        if(!s.total&&!s.vistas)return;
+        var logoEl=s.logo?'<img src="'+s.logo+'" style="width:34px;height:34px;border-radius:7px;object-fit:cover;border:1px solid var(--bd)" alt="">'
+          :'<div style="width:34px;height:34px;border-radius:7px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid var(--bd)">'+s.emoji+'</div>';
+        var pct=grandTotal>0?Math.round(s.total/grandTotal*100):0;
+        h+='<div style="background:var(--b2);border:1px solid var(--bd);border-radius:11px;padding:11px 12px;margin-bottom:7px">'
+          +'<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">'
+          +logoEl
+          +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(s.nombre)+'</div>'
+          +'<div style="font-size:9px;color:var(--m);margin-top:1px">'+s.vistas+' vistas · '+pct+'% del total</div></div>'
+          +'<div style="font-size:16px;font-weight:900;color:#fbbf24;font-variant-numeric:tabular-nums">'+s.total+'</div>'
+          +'</div>'
+          // Progress bar
+          +'<div style="height:3px;background:var(--b3);border-radius:2px;margin-bottom:8px"><div style="height:3px;background:linear-gradient(90deg,#c8102e,#ff4d6d);border-radius:2px;width:'+pct+'%"></div></div>'
+          // Breakdown chips
+          +'<div style="display:flex;gap:5px;flex-wrap:wrap">'
+          +(s.wa?'<span style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800">📱 WA: '+s.wa+'</span>':'')
+          +(s.ig?'<span style="background:rgba(225,48,108,.12);color:#e1306c;border:1px solid rgba(225,48,108,.25);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800">📸 IG: '+s.ig+'</span>':'')
+          +(s.url?'<span style="background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800">🌐 Web: '+s.url+'</span>':'')
+          +'</div>'
+          +'</div>';
+      });
+    }
+
+    // Export button
+    h+='<button onclick="_spStatsExport(\''+mes+'\')" style="width:100%;margin-top:10px;background:var(--b2);color:var(--t);border:1.5px solid var(--bd);border-radius:11px;padding:12px;font-size:12px;font-weight:800;cursor:pointer">📋 Copiar reporte para WhatsApp</button>';
+
+    h+='<div style="margin-top:10px;background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.15);border-radius:10px;padding:10px 12px;font-size:9px;color:var(--m);line-height:1.5">'
+      +'ℹ️ <strong>¿Por qué no veo los números de WhatsApp?</strong><br>'
+      +'Cuando un socio toca "Contactar por WhatsApp" la app registra ese clic, pero el número y el mensaje quedan dentro de WhatsApp. Solo WhatsApp Business con API permite ver eso.'
+      +'</div>';
+
+    h+='</div>';
+    adCnt(h);
+  }).catch(function(e){
+    adCnt('<div style="padding:20px;text-align:center;color:#f87171;font-size:12px">Error cargando estadísticas: '+e.message+'</div>');
+  });
+}
+
+function _spStatsExport(mes){
+  if(!db){showToast('warn','Sin conexión','',2500,'#f59e0b');return;}
+  var y=parseInt(mes.slice(0,4)),m=parseInt(mes.slice(5,7));
+  var nextM=m===12?'01':(m+1<10?'0'+(m+1):''+(m+1));
+  var nextY=m===12?y+1:y;
+  Promise.all([
+    db.ref('/patrocinadores').once('value'),
+    db.ref('/sp_clics').orderByChild('fecha').startAt(mes+'-01').endAt(nextY+'-'+nextM+'-01').once('value')
+  ]).then(function(results){
+    var spData=results[0].val()||{};
+    var clicsRaw=results[1].val()||{};
+    var stats={};
+    Object.keys(spData).forEach(function(uid){stats[uid]={nombre:spData[uid].nombre||'Aliado',wa:0,ig:0,url:0,total:0};});
+    Object.values(clicsRaw).forEach(function(c){
+      if(!c.fecha||c.fecha.slice(0,7)!==mes)return;
+      if(!c.uid||!stats[c.uid])return;
+      var t=c.tipo||'url';
+      if(t==='wa')stats[c.uid].wa++;else if(t==='ig')stats[c.uid].ig++;else stats[c.uid].url++;
+      stats[c.uid].total++;
+    });
+    var mesLbl=new Date(mes+'-15').toLocaleString('es-CO',{month:'long',year:'numeric'});
+    var lines=['📊 *Reporte de aliados — '+mesLbl+'*',''];
+    Object.keys(stats).sort(function(a,b){return stats[b].total-stats[a].total;}).forEach(function(uid){
+      var s=stats[uid];
+      lines.push('🏪 *'+s.nombre+'*');
+      lines.push('   Clics totales: '+s.total);
+      if(s.wa)lines.push('   📱 WhatsApp: '+s.wa);
+      if(s.ig)lines.push('   📸 Instagram: '+s.ig);
+      if(s.url)lines.push('   🌐 Web/Landing: '+s.url);
+      lines.push('');
+    });
+    lines.push('_Generado desde Atlético Norte F.C. App_');
+    var txt=lines.join('\n');
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){showToast('ok','Copiado','Reporte listo para pegar en WhatsApp',3000,'#22c55e');});
+    } else {
+      var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      showToast('ok','Copiado','Reporte listo para pegar en WhatsApp',3000,'#22c55e');
+    }
+  });
 }
 
 function adSpForm(uid){
