@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.09';
+var APP_VER='9.10';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1059,6 +1059,28 @@ tbody td:nth-child(2){text-align:left}
 .cc-sum-row.total{font-size:19px;font-weight:900;color:#fff;border-top:1px solid rgba(255,255,255,.09);padding-top:10px;margin-top:7px}
 .cc-wa-btn{width:100%;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:16px;padding:17px;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 22px rgba(34,197,94,.35);transition:opacity .12s,transform .1s}
 .cc-wa-btn:active{opacity:.88;transform:scale(.98)}
+
+/* ─── Item numbers & tag badges ─── */
+.cc-item-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.cc-num{font-size:10px;font-weight:900;color:rgba(200,16,46,.7);background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.25);width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:0}
+.cc-tag{font-size:9.5px;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:.3px;white-space:nowrap}
+.cc-tag-hot{background:linear-gradient(135deg,#c8102e,#ff4a1a);color:#fff}
+.cc-tag-star{background:linear-gradient(135deg,#b8860b,#f5c518);color:#111}
+.cc-tag-sig{background:linear-gradient(135deg,#4f21a1,#7c3aed);color:#fff}
+.cc-tag-fresh{background:linear-gradient(135deg,#166534,#22c55e);color:#fff}
+.cc-tag-kids{background:linear-gradient(135deg,#0369a1,#38bdf8);color:#fff}
+
+/* ─── Savings motivator in footer ─── */
+.cc-savings-pill{display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.08));border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.cc-savings-pill-ico{font-size:20px;line-height:1}
+.cc-savings-pill-txt{font-size:12px;color:rgba(255,255,255,.6);line-height:1.4}
+.cc-savings-pill-amt{font-size:20px;font-weight:900;color:#4ade80;line-height:1}
+
+/* ─── Hero banner inside ordering sheet ─── */
+.cc-hero-strip{background:linear-gradient(90deg,rgba(200,16,46,.18),rgba(200,16,46,.06));border-radius:12px;padding:10px 14px;margin:0 18px 14px;display:flex;align-items:center;gap:10px}
+.cc-hero-strip-ico{font-size:24px;line-height:1;flex-shrink:0}
+.cc-hero-strip-copy{flex:1;font-size:11.5px;color:rgba(255,255,255,.75);line-height:1.5}
+.cc-hero-strip-copy strong{color:#fff;font-size:13px;display:block;margin-bottom:1px}
 </style>
 </head>
 <body>
@@ -2517,8 +2539,8 @@ function spClick(uid){
       +'</div>'
       +'<div class="sp-modal-body">'
         +'<div class="sp-modal-resena"><div class="sp-modal-resena-lbl">🎁 Tu beneficio exclusivo</div>'
-        +'Presenta tu membresía Atlético Norte y obtén <strong>15% de descuento en toda la carta</strong>. '
-        +'Creps, patacones, jugos, bebidas y más. ¡Ve el ahorro en tiempo real antes de pedir!</div>'
+        +'Presenta tu membresía <strong>Atlético Norte</strong> y obtén <strong>15% de descuento en toda la carta</strong>. '
+        +'Solo en un crep Marinero Súper ahorras <strong>$12.450</strong> — ¡y el ahorro se acumula en cada producto!</div>'
         +'<button class="cc-pedido-btn" onclick="spCloseModal();ccOpenMenu(_ccPendingUid,_ccPendingData)">🍽️&nbsp;&nbsp;Hacer pedido con descuento</button>'
         +'<div class="sp-modal-nota">⭐ Beneficio exclusivo para la comunidad Atlético Norte F.C.</div>'
       +'</div>';
@@ -2593,81 +2615,81 @@ var _ccPendingData=null;
 
 var _CC_MENU=[
   {id:'creps',nom:'Creps 🫔',items:[
-    {n:'Marinero',d:'Pulpo, Calamar, Camarón',s:{P:35500,M:61000,S:83000}},
-    {n:'Camarones',s:{P:35500,M:61000,S:83000}},
-    {n:'Marco Polo',s:{P:35500,M:61000,S:83000}},
+    {n:'Marinero',d:'Pulpo, Calamar, Camarón',s:{P:35500,M:61000,S:83000},tag:'hot'},
+    {n:'Camarones',d:'Mar de sabor en cada mordida',s:{P:35500,M:61000,S:83000},tag:'hot'},
+    {n:'Marco Polo',d:'El clásico que nunca falla',s:{P:35500,M:61000,S:83000},tag:'star'},
     {n:'Camarón y Pollo',d:'Camarón, Pollo, Champiñón',s:{P:35500,M:61000,S:83000}},
     {n:'Camarón y Champiñón',s:{P:35500,M:61000,S:83000}},
-    {n:'Pollo con Champiñón',s:{P:26500,M:41000,S:56000}},
+    {n:'Pollo con Champiñón',s:{P:26500,M:41000,S:56000},tag:'star'},
     {n:'Pollo con Espárragos',s:{P:26500,M:41000,S:56000}},
     {n:'Pollo con Jamón',s:{P:22500,M:36500,S:56000}},
     {n:'Pollo con Queso',s:{P:22500,M:36500,S:56000}},
-    {n:'Pollo con Piña',s:{P:24500,M:40000,S:61000}},
-    {n:'Especial de Pollo',d:'Pollo, Jamón, Queso, Champiñón',s:{P:24500,M:40000,S:61000}},
-    {n:'Pollo con Verduras',s:{P:24500,M:40000,S:61000}},
+    {n:'Pollo con Piña',d:'Dulce y salado en equilibrio perfecto',s:{P:24500,M:40000,S:61000}},
+    {n:'Especial de Pollo',d:'Pollo, Jamón, Queso, Champiñón',s:{P:24500,M:40000,S:61000},tag:'star'},
+    {n:'Pollo con Verduras',s:{P:24500,M:40000,S:61000},tag:'fresh'},
     {n:'Champiñón con Queso',s:{P:24500,M:40000,S:61000}},
-    {n:'Vegetariano',d:'Verduras, Queso, Champiñón, Espárragos',s:{P:24500,M:40000,S:56000}},
-    {n:'Jamón y Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Vegetariano',d:'Verduras, Queso, Champiñón, Espárragos',s:{P:24500,M:40000,S:56000},tag:'fresh'},
+    {n:'Jamón y Queso',d:'El duo perfecto, simple y delicioso',s:{P:22500,M:36500,S:56000}},
     {n:'Carne Molida y Queso',s:{P:24500,M:40000,S:61000}},
     {n:'Carne Molida, Champiñón y Queso',s:{P:26500,M:41000,S:56000}},
     {n:'Carne Molida, Pollo y Queso',s:{P:24500,M:40000,S:61000}},
-    {n:'Strogonoff',d:'Carne Molida, Pollo, Queso, Champiñón',s:{P:24500,M:40000,S:61000}},
+    {n:'Strogonoff',d:'Carne Molida, Pollo, Queso, Champiñón',s:{P:24500,M:40000,S:61000},tag:'sig'},
     {n:'Atún, Pollo y Queso',s:{P:22500,M:36500,S:56000}},
     {n:'Atún Especial',d:'Atún, Champiñón, Queso',s:{P:26500,M:41000,S:56000}},
-    {n:'Bocadillo con Queso',s:{P:17000,M:22000,S:33000}},
-    {n:'Arequipe con Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Bocadillo con Queso',d:'Dulce colombiano inigualable',s:{P:17000,M:22000,S:33000}},
+    {n:'Arequipe con Queso',d:'¡El postre que se hace crep!',s:{P:22500,M:36500,S:56000},tag:'star'},
     {n:'Hawaiano',d:'Jamón, Queso y Piña',s:{P:22500,M:36500,S:56000}},
     {n:'Pollo, Jamón y Queso',s:{P:22500,M:36500,S:56000}},
-    {n:'Ranchero Chicken',d:'Pollo, Salchicha Ranchera, Tocineta, Queso',s:{P:24500,M:40000,S:61000}},
-    {n:'Ranchero',d:'Carne Molida, Salchicha Ranchera, Tocineta, Queso',s:{P:24500,M:40000,S:61000}},
-    {n:'Corn',s:{P:24500,M:40000,S:61000}},
-    {n:'César Creps',d:'Carne Molida, Pollo, Queso, Maíz, Tocineta',s:{P:24500,M:40000,S:61000}},
-    {n:'Nutella con Queso',s:{P:17000,M:22000,S:33000}},
+    {n:'Ranchero Chicken',d:'Pollo, Salchicha Ranchera, Tocineta, Queso',s:{P:24500,M:40000,S:61000},tag:'hot'},
+    {n:'Ranchero',d:'Carne Molida, Salchicha Ranchera, Tocineta, Queso',s:{P:24500,M:40000,S:61000},tag:'hot'},
+    {n:'Corn',d:'Maíz tierno, queso y tocineta',s:{P:24500,M:40000,S:61000}},
+    {n:'César Creps',d:'Carne Molida, Pollo, Queso, Maíz, Tocineta',s:{P:24500,M:40000,S:61000},tag:'sig'},
+    {n:'Nutella con Queso',d:'El placer más dulce del menú',s:{P:17000,M:22000,S:33000},tag:'star'},
   ]},
   {id:'patacones',nom:'Patacones 🍟',items:[
     {n:'Pollo, Jamón y Queso',p:23000},
-    {n:'Pollo, Maíz, Tocineta, Queso',p:26000},
-    {n:'Especial',d:'Pollo, Jamón, Queso y Champiñón',p:26000},
-    {n:'Super Especial',d:'Pollo, Carne Desmechada, Champiñón, Tocineta y Queso',p:30000},
-    {n:'Ranchero',d:'Carne Desmechada, Tocineta, Salchicha Ranchera, Maíz, Queso',p:30000},
+    {n:'Pollo, Maíz, Tocineta y Queso',p:26000},
+    {n:'Especial',d:'Pollo, Jamón, Queso y Champiñón',p:26000,tag:'star'},
+    {n:'Super Especial',d:'Pollo, Carne Desmechada, Champiñón, Tocineta y Queso',p:30000,tag:'hot'},
+    {n:'Ranchero',d:'Carne Desmechada, Tocineta, Salchicha Ranchera, Maíz, Queso',p:30000,tag:'hot'},
   ]},
   {id:'infantil',nom:'Menú Infantil 👶',items:[
-    {n:'Nuggets de Pollo',p:20000},
-    {n:'Porción de Papas',p:10000},
-    {n:'Salchipapas',p:15000},
+    {n:'Nuggets de Pollo',d:'¡Los niños enloquecen con esto!',p:20000,tag:'kids'},
+    {n:'Porción de Papas',p:10000,tag:'kids'},
+    {n:'Salchipapas',d:'El combo favorito de los más pequeños',p:15000,tag:'kids'},
   ]},
   {id:'jugos',nom:'Jugos 🍊',items:[
-    {n:'Champú de Fresa',p:9000},
-    {n:'Guanábana en Leche',p:9000},
-    {n:'Naranja',p:10000},
-    {n:'Mandarina',p:10000},
+    {n:'Champú de Fresa',d:'Con fruta natural — receta de la casa',p:9000,tag:'sig'},
+    {n:'Guanábana en Leche',d:'Con fruta natural fresca',p:9000,tag:'fresh'},
+    {n:'Naranja',d:'Exprimida al momento',p:10000,tag:'fresh'},
+    {n:'Mandarina',d:'Con fruta natural de temporada',p:10000,tag:'fresh'},
   ]},
   {id:'frappes',nom:'Frappes 🧊',items:[
-    {n:'Naranja Frappe',p:8000},
-    {n:'Mandarina Frappe',p:7000},
-    {n:'Maracuyá Frappe',p:8000},
-    {n:'Limón Frappe',p:7000},
+    {n:'Naranja Frappe',d:'Cítrico y refrescante — el más pedido',p:8000,tag:'hot'},
+    {n:'Mandarina Frappe',d:'Suave y tropical',p:7000},
+    {n:'Maracuyá Frappe',d:'Tropical con toque ácido perfecto',p:8000,tag:'star'},
+    {n:'Limón Frappe',d:'Fresco e intenso',p:7000},
   ]},
   {id:'bebidas',nom:'Bebidas 🥤',items:[
     {n:'Coca-Cola 400ml',p:4000},
-    {n:'Agua Botella',p:4000},
+    {n:'Agua Botella 400ml',p:4000},
     {n:'Jugos Hit',p:4000},
-    {n:'Mr Tea',p:9000},
-    {n:'Coca-Cola 1.5L',p:11000},
-    {n:'Coca-Cola 2.0L',p:12000},
+    {n:'Mr Tea',d:'Té helado premium',p:9000},
+    {n:'Coca-Cola 1.5L',d:'Ideal para compartir',p:11000},
+    {n:'Coca-Cola 2.0L',d:'Para toda la mesa',p:12000},
   ]},
   {id:'cervezas',nom:'Cervezas 🍺',items:[
-    {n:'Club Colombia',p:6000},
-    {n:'Coronita',p:6000},
+    {n:'Club Colombia',d:'La reina de las cervezas colombianas',p:6000,tag:'star'},
+    {n:'Coronita',d:'Importada, refrescante y fría',p:6000},
     {n:'Poker',p:5000},
-    {n:'Águila',p:5000},
-    {n:'Águila Light',p:5000},
+    {n:'Águila',d:'La clásica colombiana',p:5000},
+    {n:'Águila Light',d:'Suave y ligera',p:5000},
   ]},
   {id:'adicionales',nom:'Adicionales ➕',items:[
-    {n:'Maíz',p:2000},
-    {n:'Tocineta',p:3000},
-    {n:'Champiñón',p:3000},
-    {n:'Salchicha Ranchera',p:3000},
+    {n:'Maíz',d:'Tierno y dorado',p:2000},
+    {n:'Tocineta',d:'Crujiente y ahumada',p:3000},
+    {n:'Champiñón',d:'Salteado al momento',p:3000},
+    {n:'Salchicha Ranchera',d:'Sabor ahumado intenso',p:3000},
   ]},
 ];
 
@@ -2705,15 +2727,30 @@ function _ccKey(catId,itemName,size){
 
 function _ccBuildItems(cat){
   var sNom={P:'Personal',M:'Mediano',S:'Súper'};
+  var tagMap={
+    hot:['cc-tag-hot','🔥 El más pedido'],
+    star:['cc-tag-star','⭐ Favorito del local'],
+    sig:['cc-tag-sig','💯 Firma de la casa'],
+    fresh:['cc-tag-fresh','🌿 Con fruta natural'],
+    kids:['cc-tag-kids','👶 Para los peques']
+  };
   var html='<div class="cc-cat-lbl">'+cat.nom+'</div>';
-  cat.items.forEach(function(item){
+  cat.items.forEach(function(item,idx){
     var hasSizes=!!item.s;
+    var numStr=(idx+1)<10?'0'+(idx+1):''+(idx+1);
+    var tagHtml='';
+    if(item.tag&&tagMap[item.tag]){
+      tagHtml='<span class="cc-tag '+tagMap[item.tag][0]+'">'+tagMap[item.tag][1]+'</span>';
+    }
     html+='<div class="cc-item">';
-    html+='<div class="cc-item-name">'+escHtml(item.n)+'</div>';
+    html+='<div class="cc-item-head">'
+      +'<span class="cc-num">'+numStr+'</span>'
+      +'<span class="cc-item-name">'+escHtml(item.n)+'</span>'
+      +tagHtml
+    +'</div>';
     if(item.d) html+='<div class="cc-item-sub">'+escHtml(item.d)+'</div>';
     if(hasSizes){
-      if(!item.d) html+='<div style="height:8px"></div>';
-      html+='<div class="cc-sizes">';
+      html+='<div class="cc-sizes" style="margin-top:9px">';
       ['P','M','S'].forEach(function(sz){
         if(!item.s[sz])return;
         var price=item.s[sz];
@@ -2741,7 +2778,7 @@ function _ccBuildItems(cat){
       html+='<div class="cc-item-row">'
         +'<div class="cc-item-prices">'
           +'<span class="cc-item-price">'+_ccFmt(price)+'</span>'
-          +'<span class="cc-item-pdesc">'+_ccFmt(discP)+' socio</span>'
+          +'<span class="cc-item-pdesc">'+_ccFmt(discP)+' con tu 15%</span>'
         +'</div>'
         +'<div class="cc-qty">'
           +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\',\'\','+price+',-1)">−</button>'
@@ -2782,6 +2819,11 @@ function _ccRender(spData){
       +'</div>'
       +tabs
     +'</div>'
+    +'<div class="cc-hero-strip">'
+      +'<span class="cc-hero-strip-ico">💰</span>'
+      +'<div class="cc-hero-strip-copy"><strong>¡Estás ahorrando con tu membresía!</strong>'
+      +'Agrega productos y ve tu ahorro real en tiempo real antes de pedir.</div>'
+    +'</div>'
     +'<div class="cc-body" id="ccBody">'+_ccBuildItems(cat)+'</div>'
     +_ccBuildFooter();
 }
@@ -2809,22 +2851,34 @@ function ccAdj(key,nom,cat,size,price,delta){
 function _ccBuildFooter(){
   var keys=Object.keys(_ccOrder);
   var total=0;
-  keys.forEach(function(k){var e=_ccOrder[k];total+=e.price*e.qty;});
+  var totalItems=0;
+  keys.forEach(function(k){var e=_ccOrder[k];total+=e.price*e.qty;totalItems+=e.qty;});
   var discAmt=Math.round(total*_CC_DESC/100);
   var finalTotal=total-discAmt;
   var hasItems=keys.length>0;
   var inner='';
   if(hasItems){
+    inner+='<div class="cc-savings-pill">'
+      +'<span class="cc-savings-pill-ico">🎉</span>'
+      +'<div style="flex:1">'
+        +'<div class="cc-savings-pill-txt">Tu ahorro como socio hoy</div>'
+        +'<div class="cc-savings-pill-amt">− '+_ccFmt(discAmt)+'</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+        +'<div class="cc-savings-pill-txt">'+totalItems+' producto'+(totalItems>1?'s':'')+'</div>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:1px">¡Vale la pena!</div>'
+      +'</div>'
+    +'</div>';
     inner+='<div class="cc-summary">'
-      +'<div class="cc-sum-row"><span>Subtotal normal</span><span>'+_ccFmt(total)+'</span></div>'
-      +'<div class="cc-sum-row save"><span>🎉 Descuento socio ('+_CC_DESC+'%)</span><span>− '+_ccFmt(discAmt)+'</span></div>'
-      +'<div class="cc-sum-row total"><span>Total a pagar</span><span>'+_ccFmt(finalTotal)+'</span></div>'
+      +'<div class="cc-sum-row"><span>Precio sin descuento</span><span>'+_ccFmt(total)+'</span></div>'
+      +'<div class="cc-sum-row save"><span>Descuento socio 15%</span><span>− '+_ccFmt(discAmt)+'</span></div>'
+      +'<div class="cc-sum-row total"><span>✅ Pagas solo</span><span>'+_ccFmt(finalTotal)+'</span></div>'
       +'</div>';
     inner+='<button class="cc-wa-btn" onclick="ccEnviarWa()">'
-      +'<span>📲 Enviar pedido por WhatsApp</span>'
+      +'📲&nbsp; Enviar pedido por WhatsApp'
     +'</button>';
   } else {
-    inner='<div class="cc-footer-empty">Agrega productos para armar tu pedido</div>';
+    inner='<div class="cc-footer-empty">👆 Agrega productos y ve cuánto ahorras</div>';
   }
   return '<div class="cc-footer" id="ccFooter">'+inner+'</div>';
 }
