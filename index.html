@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.11';
+var APP_VER='9.12';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1039,11 +1039,12 @@ tbody td:nth-child(2){text-align:left}
 
 /* Size rows */
 .cc-sizes{display:flex;flex-direction:column;gap:7px}
-.cc-size-row{display:flex;align-items:center;background:rgba(255,255,255,.045);border-radius:12px;padding:9px 12px;gap:10px}
+.cc-size-row{display:flex;align-items:center;background:rgba(255,255,255,.045);border-radius:12px;padding:9px 10px;gap:7px}
 .cc-size-badge{font-size:10px;font-weight:900;color:#fff;background:rgba(200,16,46,.8);width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cc-size-nom{font-size:12px;font-weight:700;color:rgba(255,255,255,.55);flex:1;min-width:0}
-.cc-size-old{font-size:11px;color:rgba(255,255,255,.28);text-decoration:line-through;flex-shrink:0}
-.cc-size-disc{font-size:14px;color:#4ade80;font-weight:900;width:66px;text-align:right;flex-shrink:0}
+.cc-size-old{font-size:11.5px;color:rgba(255,100,80,.55);text-decoration:line-through;text-decoration-color:rgba(255,80,60,.7);text-decoration-thickness:1.5px;flex-shrink:0;font-weight:600}
+.cc-size-disc{font-size:15px;color:#4ade80;font-weight:900;flex-shrink:0}
+.cc-save-chip{font-size:9px;font-weight:900;background:rgba(34,197,94,.14);color:#4ade80;border:1px solid rgba(34,197,94,.28);border-radius:8px;padding:2px 6px;white-space:nowrap;flex-shrink:0;letter-spacing:.1px}
 .cc-qty{display:flex;align-items:center;gap:9px;flex-shrink:0;margin-left:2px}
 .cc-qty-btn{width:34px;height:34px;border-radius:50%;border:none;background:rgba(200,16,46,.14);color:#e8394f;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .12s,transform .1s;flex-shrink:0}
 .cc-qty-btn:active{background:rgba(200,16,46,.32);transform:scale(.9)}
@@ -1068,7 +1069,7 @@ tbody td:nth-child(2){text-align:left}
 
 /* ─── Item numbers & tag badges ─── */
 .cc-item-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
-.cc-num{font-size:10px;font-weight:900;color:rgba(200,16,46,.7);background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.25);width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:0}
+.cc-num{font-size:10px;font-weight:900;color:#111;background:#f5c518;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:0;box-shadow:0 2px 6px rgba(245,197,24,.35)}
 .cc-tag{font-size:9.5px;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:.3px;white-space:nowrap}
 .cc-tag-hot{background:linear-gradient(135deg,#c8102e,#ff4a1a);color:#fff}
 .cc-tag-star{background:linear-gradient(135deg,#b8860b,#f5c518);color:#111}
@@ -2630,11 +2631,11 @@ var _CC_MENU=[
     {n:'Pollo con Espárragos',s:{P:26500,M:41000,S:56000}},
     {n:'Pollo con Jamón',s:{P:22500,M:36500,S:56000}},
     {n:'Pollo con Queso',s:{P:22500,M:36500,S:56000}},
-    {n:'Pollo con Piña',d:'Dulce y salado en equilibrio perfecto',s:{P:24500,M:40000,S:61000}},
+    {n:'Pollo con Piña',d:'Dulce y salado en equilibrio perfecto',s:{P:22500,M:36500,S:56000}},
     {n:'Especial de Pollo',d:'Pollo, Jamón, Queso, Champiñón',s:{P:24500,M:40000,S:61000},tag:'star'},
-    {n:'Pollo con Verduras',s:{P:24500,M:40000,S:61000},tag:'fresh'},
+    {n:'Pollo con Verduras',d:'Con verduras frescas del día',s:{P:24500,M:40000,S:61000}},
     {n:'Champiñón con Queso',s:{P:24500,M:40000,S:61000}},
-    {n:'Vegetariano',d:'Verduras, Queso, Champiñón, Espárragos',s:{P:24500,M:40000,S:56000},tag:'fresh'},
+    {n:'Vegetariano',d:'Verduras, Queso, Champiñón, Espárragos',s:{P:24500,M:40000,S:61000},tag:'fresh'},
     {n:'Jamón y Queso',d:'El duo perfecto, simple y delicioso',s:{P:22500,M:36500,S:56000}},
     {n:'Carne Molida y Queso',s:{P:24500,M:40000,S:61000}},
     {n:'Carne Molida, Champiñón y Queso',s:{P:26500,M:41000,S:56000}},
@@ -2765,11 +2766,13 @@ function _ccItemsHtml(cat){
         var discP=_ccDisc(price);
         var k=_ccKey(cat.id,item.n,sz);
         var qty=(_ccOrder[k]||{}).qty||0;
+        var saving=price-discP;
         html+='<div class="cc-size-row">'
           +'<span class="cc-size-badge">'+sz+'</span>'
           +'<span class="cc-size-nom">'+_CC_S_NOM[sz]+'</span>'
           +'<span class="cc-size-old">'+_ccFmt(price)+'</span>'
           +'<span class="cc-size-disc">'+_ccFmt(discP)+'</span>'
+          +'<span class="cc-save-chip">−'+_ccFmt(saving)+'</span>'
           +'<div class="cc-qty">'
             +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\',\''+sz+'\','+price+',-1)">−</button>'
             +'<span class="cc-qty-n" id="ccq_'+k.replace(/[^a-z0-9]/gi,'_')+'">'+qty+'</span>'
