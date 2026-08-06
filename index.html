@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.06';
+var APP_VER='9.07';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -994,6 +994,56 @@ tbody td:nth-child(2){text-align:left}
 .cdn-verif-err{background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.28);border-radius:14px;padding:16px;text-align:center;margin-bottom:16px}
 .cdn-verif-select{width:100%;background:var(--b3);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:14px;padding:11px 14px;outline:none;font-family:inherit;margin-bottom:12px;-webkit-appearance:none}
 .cdn-verif-log-btn{width:100%;background:linear-gradient(135deg,#c8102e,#950c22);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:900;cursor:pointer}
+
+/* ═══ CESAR CREPS ORDERING MODAL ═══ */
+#ccMenuOv{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#ccMenuOv.op{display:flex}
+#ccMenuSheet{width:100%;max-width:540px;max-height:93vh;background:var(--b1);border-radius:26px 26px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 48px rgba(0,0,0,.55)}
+.cc-sheet-head{background:linear-gradient(135deg,#0d0003,#1a0005);padding:16px 16px 0;flex-shrink:0}
+.cc-sheet-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cc-sheet-logo{width:54px;height:54px;border-radius:14px;object-fit:cover;border:2px solid rgba(200,16,46,.6);flex-shrink:0}
+.cc-sheet-logo-em{width:54px;height:54px;border-radius:14px;background:rgba(200,16,46,.12);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.cc-sheet-info{flex:1;min-width:0}
+.cc-sheet-name{font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1.2}
+.cc-sheet-disc{display:inline-flex;align-items:center;gap:5px;background:rgba(200,16,46,.88);color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:20px;margin-top:4px;letter-spacing:.2px}
+.cc-close{margin-left:auto;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Category tabs */
+.cc-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
+.cc-tabs::-webkit-scrollbar{display:none}
+.cc-tab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;border:1.5px solid rgba(200,16,46,.3);background:transparent;color:rgba(255,255,255,.55);cursor:pointer;transition:all .18s;white-space:nowrap}
+.cc-tab.act{background:rgba(200,16,46,.88);color:#fff;border-color:transparent}
+/* Items list */
+.cc-body{flex:1;overflow-y:auto;padding:4px 0 0;-webkit-overflow-scrolling:touch}
+.cc-cat-lbl{font-size:10px;font-weight:900;color:rgba(200,16,46,.7);letter-spacing:1.5px;text-transform:uppercase;padding:14px 16px 6px}
+.cc-item{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd)}
+.cc-item:last-child{border-bottom:none}
+.cc-item-info{flex:1;min-width:0}
+.cc-item-name{font-size:13.5px;font-weight:800;color:var(--t);line-height:1.25}
+.cc-item-sub{font-size:10px;color:var(--m);margin-top:2px;line-height:1.4}
+/* Size rows for items with P/M/S */
+.cc-sizes{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.cc-size-row{display:flex;align-items:center;gap:8px}
+.cc-size-lbl{font-size:10px;font-weight:800;color:rgba(200,16,46,.8);width:18px;text-align:right;flex-shrink:0}
+.cc-size-price{font-size:11.5px;font-weight:700;color:var(--m);width:58px;text-align:right;flex-shrink:0}
+.cc-size-disc{font-size:10px;color:rgba(76,200,76,.8);font-weight:700;width:54px;flex-shrink:0}
+.cc-qty{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.cc-qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(200,16,46,.45);background:transparent;color:rgba(200,16,46,.9);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s}
+.cc-qty-btn:active{background:rgba(200,16,46,.15)}
+.cc-qty-n{font-size:14px;font-weight:900;color:var(--t);min-width:16px;text-align:center}
+/* Simple price+qty for items without size */
+.cc-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.cc-item-price{font-size:12.5px;font-weight:800;color:var(--t)}
+.cc-item-pdesc{font-size:10px;color:rgba(76,200,76,.8);font-weight:700}
+/* Sticky footer */
+.cc-footer{flex-shrink:0;background:var(--b2);border-top:1px solid var(--bd);padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.cc-footer-empty{text-align:center;color:var(--m);font-size:12px;padding:4px 0}
+.cc-summary{margin-bottom:10px}
+.cc-sum-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--m);margin-bottom:3px}
+.cc-sum-row.total{font-size:16px;font-weight:900;color:var(--t);border-top:1px solid var(--bd);padding-top:7px;margin-top:4px}
+.cc-sum-row.save{color:rgba(76,200,76,.9);font-weight:800;font-size:12px}
+.cc-wa-btn{width:100%;background:linear-gradient(135deg,#1a7a32,#22a040);color:#fff;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-.2px}
+.cc-wa-btn:active{opacity:.88}
+.cc-wa-sub{font-size:10px;font-weight:600;opacity:.82;display:block;margin-top:2px}
 </style>
 </head>
 <body>
@@ -2436,6 +2486,12 @@ function spClick(uid){
   var s=_spData[uid];
   if(!s)return;
   if(db) db.ref('/patrocinadores/'+uid+'/views').transaction(function(v){return(v||0)+1;});
+  // César Creps — abrir menú interactivo en vez del modal genérico
+  var waClean=(s.wa||'').replace(/\D/g,'');
+  if(s.menuId==='cesar_creps'||waClean.endsWith('3202940536')||waClean==='3202940536'){
+    ccOpenMenu(uid,s);
+    return;
+  }
   var logoHtml=s.logo
     ?'<div class="sp-modal-logo"><img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'"></div>'
     :'<div class="sp-modal-logo">'+escHtml(s.emoji||'🏪')+'</div>';
@@ -2489,6 +2545,334 @@ function spClick(uid){
 
 function openPauta(){var m=document.getElementById('mPauta');if(m)m.classList.add('op');}
 function closePauta(){var m=document.getElementById('mPauta');if(m)m.classList.remove('op');}
+
+// ═══════════════════════════════════════════════════════════════
+// CÉSAR CREPS — MINI PEDIDOR INTERACTIVO
+// ═══════════════════════════════════════════════════════════════
+var _CC_DESC=15; // % descuento socio
+var _CC_WA='573202940536';
+var _ccOrder={}; // {key: {nom,cat,size,price,qty}}
+var _ccActiveCat=0;
+
+var _CC_MENU=[
+  {id:'creps',nom:'Creps 🫔',items:[
+    {n:'Marinero',d:'Pulpo, Calamar, Camarón',s:{P:35500,M:61000,S:83000}},
+    {n:'Camarones',s:{P:35500,M:61000,S:83000}},
+    {n:'Marco Polo',s:{P:35500,M:61000,S:83000}},
+    {n:'Camarón y Pollo',d:'Camarón, Pollo, Champiñón',s:{P:35500,M:61000,S:83000}},
+    {n:'Camarón y Champiñón',s:{P:35500,M:61000,S:83000}},
+    {n:'Pollo con Champiñón',s:{P:26500,M:41000,S:56000}},
+    {n:'Pollo con Espárragos',s:{P:26500,M:41000,S:56000}},
+    {n:'Pollo con Jamón',s:{P:22500,M:36500,S:56000}},
+    {n:'Pollo con Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Pollo con Piña',s:{P:24500,M:40000,S:61000}},
+    {n:'Especial de Pollo',d:'Pollo, Jamón, Queso, Champiñón',s:{P:24500,M:40000,S:61000}},
+    {n:'Pollo con Verduras',s:{P:24500,M:40000,S:61000}},
+    {n:'Champiñón con Queso',s:{P:24500,M:40000,S:61000}},
+    {n:'Vegetariano',d:'Verduras, Queso, Champiñón, Espárragos',s:{P:24500,M:40000,S:56000}},
+    {n:'Jamón y Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Carne Molida y Queso',s:{P:24500,M:40000,S:61000}},
+    {n:'Carne Molida, Champiñón y Queso',s:{P:26500,M:41000,S:56000}},
+    {n:'Carne Molida, Pollo y Queso',s:{P:24500,M:40000,S:61000}},
+    {n:'Strogonoff',d:'Carne Molida, Pollo, Queso, Champiñón',s:{P:24500,M:40000,S:61000}},
+    {n:'Atún, Pollo y Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Atún Especial',d:'Atún, Champiñón, Queso',s:{P:26500,M:41000,S:56000}},
+    {n:'Bocadillo con Queso',s:{P:17000,M:22000,S:33000}},
+    {n:'Arequipe con Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Hawaiano',d:'Jamón, Queso y Piña',s:{P:22500,M:36500,S:56000}},
+    {n:'Pollo, Jamón y Queso',s:{P:22500,M:36500,S:56000}},
+    {n:'Ranchero Chicken',d:'Pollo, Salchicha Ranchera, Tocineta, Queso',s:{P:24500,M:40000,S:61000}},
+    {n:'Ranchero',d:'Carne Molida, Salchicha Ranchera, Tocineta, Queso',s:{P:24500,M:40000,S:61000}},
+    {n:'Corn',s:{P:24500,M:40000,S:61000}},
+    {n:'César Creps',d:'Carne Molida, Pollo, Queso, Maíz, Tocineta',s:{P:24500,M:40000,S:61000}},
+    {n:'Nutella con Queso',s:{P:17000,M:22000,S:33000}},
+  ]},
+  {id:'patacones',nom:'Patacones 🍟',items:[
+    {n:'Pollo, Jamón y Queso',p:23000},
+    {n:'Pollo, Maíz, Tocineta, Queso',p:26000},
+    {n:'Especial',d:'Pollo, Jamón, Queso y Champiñón',p:26000},
+    {n:'Super Especial',d:'Pollo, Carne Desmechada, Champiñón, Tocineta y Queso',p:30000},
+    {n:'Ranchero',d:'Carne Desmechada, Tocineta, Salchicha Ranchera, Maíz, Queso',p:30000},
+  ]},
+  {id:'infantil',nom:'Menú Infantil 👶',items:[
+    {n:'Nuggets de Pollo',p:20000},
+    {n:'Porción de Papas',p:10000},
+    {n:'Salchipapas',p:15000},
+  ]},
+  {id:'jugos',nom:'Jugos 🍊',items:[
+    {n:'Champú de Fresa',p:9000},
+    {n:'Guanábana en Leche',p:9000},
+    {n:'Naranja',p:10000},
+    {n:'Mandarina',p:10000},
+  ]},
+  {id:'frappes',nom:'Frappes 🧊',items:[
+    {n:'Naranja Frappe',p:8000},
+    {n:'Mandarina Frappe',p:7000},
+    {n:'Maracuyá Frappe',p:8000},
+    {n:'Limón Frappe',p:7000},
+  ]},
+  {id:'bebidas',nom:'Bebidas 🥤',items:[
+    {n:'Coca-Cola 400ml',p:4000},
+    {n:'Agua Botella',p:4000},
+    {n:'Jugos Hit',p:4000},
+    {n:'Mr Tea',p:9000},
+    {n:'Coca-Cola 1.5L',p:11000},
+    {n:'Coca-Cola 2.0L',p:12000},
+  ]},
+  {id:'cervezas',nom:'Cervezas 🍺',items:[
+    {n:'Club Colombia',p:6000},
+    {n:'Coronita',p:6000},
+    {n:'Poker',p:5000},
+    {n:'Águila',p:5000},
+    {n:'Águila Light',p:5000},
+  ]},
+  {id:'adicionales',nom:'Adicionales ➕',items:[
+    {n:'Maíz',p:2000},
+    {n:'Tocineta',p:3000},
+    {n:'Champiñón',p:3000},
+    {n:'Salchicha Ranchera',p:3000},
+  ]},
+];
+
+function _ccEnsureModal(){
+  if(document.getElementById('ccMenuOv'))return;
+  var d=document.createElement('div');
+  d.id='ccMenuOv';
+  d.innerHTML='<div id="ccMenuSheet"></div>';
+  d.addEventListener('click',function(e){if(e.target===d)ccCloseMenu();});
+  document.body.appendChild(d);
+}
+
+function ccOpenMenu(uid,spData){
+  _ccOrder={};_ccActiveCat=0;
+  _ccEnsureModal();
+  var ov=document.getElementById('ccMenuOv');
+  ov.classList.add('op');
+  _ccRender(spData);
+}
+
+function ccCloseMenu(){
+  var ov=document.getElementById('ccMenuOv');
+  if(ov)ov.classList.remove('op');
+}
+
+function _ccFmt(n){
+  return '$'+n.toLocaleString('es-CO');
+}
+function _ccDisc(p){
+  return Math.round(p*(1-_CC_DESC/100));
+}
+function _ccKey(catId,itemName,size){
+  return catId+'|'+itemName+(size?'|'+size:'');
+}
+
+function _ccRender(spData){
+  var sheet=document.getElementById('ccMenuSheet');
+  if(!sheet)return;
+  var logoEl=spData&&spData.logo
+    ?'<img class="cc-sheet-logo" src="'+escHtml(spData.logo)+'" alt="César Creps">'
+    :'<div class="cc-sheet-logo-em">🫔</div>';
+
+  // Tabs
+  var tabs='<div class="cc-tabs" id="ccTabs">';
+  _CC_MENU.forEach(function(cat,i){
+    tabs+='<button class="cc-tab'+(i===_ccActiveCat?' act':'')+'" onclick="ccSetCat('+i+')">'+cat.nom+'</button>';
+  });
+  tabs+='</div>';
+
+  // Items for active category
+  var cat=_CC_MENU[_ccActiveCat];
+  var items='<div class="cc-body" id="ccBody">';
+  items+='<div class="cc-cat-lbl">'+cat.nom+'</div>';
+  cat.items.forEach(function(item){
+    var hasSizes=!!item.s;
+    items+='<div class="cc-item">';
+    items+='<div class="cc-item-info">';
+    items+='<div class="cc-item-name">'+escHtml(item.n)+'</div>';
+    if(item.d)items+='<div class="cc-item-sub">'+escHtml(item.d)+'</div>';
+    if(hasSizes){
+      items+='<div class="cc-sizes">';
+      var sizeNames={P:'Personal',M:'Mediano',S:'Super'};
+      ['P','M','S'].forEach(function(sz){
+        if(!item.s[sz])return;
+        var price=item.s[sz];
+        var discP=_ccDisc(price);
+        var k=_ccKey(cat.id,item.n,sz);
+        var qty=(_ccOrder[k]||{}).qty||0;
+        items+='<div class="cc-size-row">'
+          +'<span class="cc-size-lbl">'+sz+'</span>'
+          +'<span class="cc-size-price">'+_ccFmt(price)+'</span>'
+          +'<span class="cc-size-disc">→ '+_ccFmt(discP)+'</span>'
+          +'<div class="cc-qty">'
+            +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\',\''+sz+'\','+price+',-1)">−</button>'
+            +'<span class="cc-qty-n" id="ccq_'+k.replace(/[^a-z0-9]/gi,'_')+'">'+qty+'</span>'
+            +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\',\''+sz+'\','+price+',1)">+</button>'
+          +'</div>'
+        +'</div>';
+      });
+      items+='</div>';
+    } else {
+      var price=item.p;
+      var discP=_ccDisc(price);
+      var k=_ccKey(cat.id,item.n,'');
+      var qty=(_ccOrder[k]||{}).qty||0;
+      items+='</div>'; // close item-info
+      items+='<div class="cc-item-right">'
+        +'<span class="cc-item-price">'+_ccFmt(price)+'</span>'
+        +'<span class="cc-item-pdesc">Socio: '+_ccFmt(discP)+'</span>'
+        +'<div class="cc-qty">'
+          +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\','+'\'\''+','+price+',-1)">−</button>'
+          +'<span class="cc-qty-n" id="ccq_'+k.replace(/[^a-z0-9]/gi,'_')+'">'+qty+'</span>'
+          +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\','+'\'\''+','+price+',1)">+</button>'
+        +'</div>'
+      +'</div>';
+      // skip the closing div since we closed early
+      items+='</div>'; // close cc-item
+      return;
+    }
+    items+='</div>'; // close cc-item-info (size case)
+    items+='</div>'; // close cc-item
+  });
+  items+='</div>';
+
+  // Footer
+  var footer=_ccBuildFooter();
+
+  sheet.innerHTML=''
+    +'<div class="cc-sheet-head">'
+      +'<div class="cc-sheet-top">'
+        +logoEl
+        +'<div class="cc-sheet-info">'
+          +'<div class="cc-sheet-name">César Creps</div>'
+          +'<div class="cc-sheet-disc">🎉 '+_CC_DESC+'% OFF para socios</div>'
+        +'</div>'
+        +'<button class="cc-close" onclick="ccCloseMenu()">✕</button>'
+      +'</div>'
+      +tabs
+    +'</div>'
+    +items
+    +footer;
+}
+
+function ccSetCat(idx){
+  _ccActiveCat=idx;
+  // Update tabs UI without full re-render
+  var tabs=document.querySelectorAll('.cc-tab');
+  tabs.forEach(function(t,i){t.classList.toggle('act',i===idx);});
+  // Re-render body
+  var spData=null; // we just need the body
+  var cat=_CC_MENU[idx];
+  var items='<div class="cc-cat-lbl">'+cat.nom+'</div>';
+  cat.items.forEach(function(item){
+    var hasSizes=!!item.s;
+    items+='<div class="cc-item">';
+    items+='<div class="cc-item-info">';
+    items+='<div class="cc-item-name">'+escHtml(item.n)+'</div>';
+    if(item.d)items+='<div class="cc-item-sub">'+escHtml(item.d)+'</div>';
+    if(hasSizes){
+      items+='<div class="cc-sizes">';
+      ['P','M','S'].forEach(function(sz){
+        if(!item.s[sz])return;
+        var price=item.s[sz];
+        var discP=_ccDisc(price);
+        var k=_ccKey(cat.id,item.n,sz);
+        var qty=(_ccOrder[k]||{}).qty||0;
+        items+='<div class="cc-size-row">'
+          +'<span class="cc-size-lbl">'+sz+'</span>'
+          +'<span class="cc-size-price">'+_ccFmt(price)+'</span>'
+          +'<span class="cc-size-disc">→ '+_ccFmt(discP)+'</span>'
+          +'<div class="cc-qty">'
+            +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\',\''+sz+'\','+price+',-1)">−</button>'
+            +'<span class="cc-qty-n" id="ccq_'+k.replace(/[^a-z0-9]/gi,'_')+'">'+qty+'</span>'
+            +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\',\''+sz+'\','+price+',1)">+</button>'
+          +'</div>'
+        +'</div>';
+      });
+      items+='</div></div></div>';
+    } else {
+      var price=item.p;
+      var discP=_ccDisc(price);
+      var k=_ccKey(cat.id,item.n,'');
+      var qty=(_ccOrder[k]||{}).qty||0;
+      items+='</div>'
+        +'<div class="cc-item-right">'
+          +'<span class="cc-item-price">'+_ccFmt(price)+'</span>'
+          +'<span class="cc-item-pdesc">Socio: '+_ccFmt(discP)+'</span>'
+          +'<div class="cc-qty">'
+            +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\','+'\'\''+','+price+',-1)">−</button>'
+            +'<span class="cc-qty-n" id="ccq_'+k.replace(/[^a-z0-9]/gi,'_')+'">'+qty+'</span>'
+            +'<button class="cc-qty-btn" onclick="ccAdj(\''+escHtml(k)+'\',\''+escHtml(item.n)+'\',\''+cat.id+'\','+'\'\''+','+price+',1)">+</button>'
+          +'</div>'
+        +'</div></div>';
+    }
+  });
+  var body=document.getElementById('ccBody');
+  if(body){body.innerHTML=items;body.scrollTop=0;}
+}
+
+function ccAdj(key,nom,cat,size,price,delta){
+  var entry=_ccOrder[key]||{nom:nom,cat:cat,size:size,price:price,qty:0};
+  entry.qty=Math.max(0,entry.qty+delta);
+  if(entry.qty===0)delete _ccOrder[key];
+  else _ccOrder[key]=entry;
+  // Update qty display
+  var el=document.getElementById('ccq_'+key.replace(/[^a-z0-9]/gi,'_'));
+  if(el)el.textContent=entry.qty||0;
+  // Update footer
+  var ft=document.getElementById('ccFooter');
+  if(ft)ft.innerHTML=_ccBuildFooter();
+}
+
+function _ccBuildFooter(){
+  var keys=Object.keys(_ccOrder);
+  var total=0;
+  keys.forEach(function(k){var e=_ccOrder[k];total+=e.price*e.qty;});
+  var discAmt=Math.round(total*_CC_DESC/100);
+  var finalTotal=total-discAmt;
+  var hasItems=keys.length>0;
+  var inner='';
+  if(hasItems){
+    inner+='<div class="cc-summary">'
+      +'<div class="cc-sum-row"><span>Subtotal normal</span><span>'+_ccFmt(total)+'</span></div>'
+      +'<div class="cc-sum-row save"><span>🎉 Descuento socio ('+_CC_DESC+'%)</span><span>− '+_ccFmt(discAmt)+'</span></div>'
+      +'<div class="cc-sum-row total"><span>Total a pagar</span><span>'+_ccFmt(finalTotal)+'</span></div>'
+      +'</div>';
+    inner+='<button class="cc-wa-btn" onclick="ccEnviarWa()">'
+      +'<span>📲 Enviar pedido por WhatsApp</span>'
+    +'</button>';
+  } else {
+    inner='<div class="cc-footer-empty">Agrega productos para armar tu pedido</div>';
+  }
+  return '<div class="cc-footer" id="ccFooter">'+inner+'</div>';
+}
+
+function ccEnviarWa(){
+  var keys=Object.keys(_ccOrder);
+  if(!keys.length)return;
+  var total=0;
+  var lineas='';
+  var sizeNom={P:'Personal',M:'Mediano',S:'Super'};
+  keys.forEach(function(k){
+    var e=_ccOrder[k];
+    var subtotal=e.price*e.qty;
+    total+=subtotal;
+    var descLine=sizeNom[e.size]?(' ('+sizeNom[e.size]+')'):'';
+    var discUnit=_ccDisc(e.price);
+    lineas+='• '+e.qty+'x '+e.nom+descLine+'\n'
+      +'  Precio normal: '+_ccFmt(e.price)+' × '+e.qty+' = '+_ccFmt(subtotal)+'\n'
+      +'  Con 15% descuento: '+_ccFmt(discUnit)+' × '+e.qty+' = '+_ccFmt(discUnit*e.qty)+'\n';
+  });
+  var discAmt=Math.round(total*_CC_DESC/100);
+  var finalTotal=total-discAmt;
+  var msg='¡Hola César Creps! 👋 Soy socio de *Atlético Norte F.C.* y quiero hacer un pedido con mi beneficio del *15% de descuento*:\n\n'
+    +'🫔 *MI PEDIDO:*\n'+lineas+'\n'
+    +'💰 Subtotal normal: '+_ccFmt(total)+'\n'
+    +'🎉 Descuento socio 15%: − '+_ccFmt(discAmt)+'\n'
+    +'✅ *Total a pagar: '+_ccFmt(finalTotal)+'*\n\n'
+    +'Ahorro real: '+_ccFmt(discAmt)+' 🙌\n\n'
+    +'¡Gracias!';
+  window.open('https://wa.me/'+_CC_WA+'?text='+encodeURIComponent(msg),'_blank');
+}
 
 function spEnviarSolicitud(){
   var nombre=(document.getElementById('spfNombre')||{}).value||'';
