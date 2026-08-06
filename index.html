@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.13';
+var APP_VER='9.14';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1016,10 +1016,12 @@ tbody td:nth-child(2){text-align:left}
 .cc-close:active{background:rgba(255,255,255,.18)}
 
 /* Quick-nav jump bar */
-.cc-quicknav{display:flex;gap:7px;overflow-x:auto;padding:0 0 16px;scrollbar-width:none}
+.cc-quicknav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;scrollbar-width:none}
 .cc-quicknav::-webkit-scrollbar{display:none}
-.cc-qn-pill{flex-shrink:0;padding:7px 14px;border-radius:24px;font-size:12px;font-weight:800;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);cursor:pointer;transition:all .18s;white-space:nowrap;user-select:none}
-.cc-qn-pill:active{background:rgba(200,16,46,.25);color:#fff}
+.cc-qn-pill{flex-shrink:0;padding:10px 16px;border-radius:28px;font-size:13.5px;font-weight:900;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;white-space:nowrap;user-select:none;letter-spacing:.1px}
+.cc-qn-pill:active{transform:scale(.95)}
+@keyframes cc-glow{0%,100%{box-shadow:0 0 10px rgba(200,16,46,.5),0 4px 16px rgba(200,16,46,.4)}50%{box-shadow:0 0 22px rgba(200,16,46,.8),0 4px 24px rgba(200,16,46,.6)}}
+.cc-qn-pill.act{background:linear-gradient(135deg,#c8102e,#ff2247);color:#fff;border-color:transparent;animation:cc-glow 2s ease-in-out infinite;transform:scale(1.05)}
 
 /* Section dividers in continuous scroll */
 .cc-section-hd{display:flex;align-items:center;gap:10px;padding:20px 18px 10px;position:sticky;top:0;z-index:5;background:#111}
@@ -2673,15 +2675,15 @@ var _CC_MENU=[
   ]},
   {id:'frappes',nom:'Frappes 🧊',items:[
     {n:'Naranja Frappe',d:'Cítrico y refrescante — el más pedido',p:8000,tag:'hot'},
-    {n:'Mandarina Frappe',d:'Suave y tropical',p:7000},
+    {n:'Mandarina Frappe',d:'Suave y tropical',p:8000},
     {n:'Maracuyá Frappe',d:'Tropical con toque ácido perfecto',p:8000,tag:'star'},
     {n:'Limón Frappe',d:'Fresco e intenso',p:7000},
   ]},
   {id:'bebidas',nom:'Bebidas 🥤',items:[
-    {n:'Coca-Cola 400ml',p:4000},
-    {n:'Agua Botella 400ml',d:'Perfecta para hidratarte',p:5000},
+    {n:'Coca-Cola 400ml',p:5000},
+    {n:'Agua Botella 400ml',d:'Perfecta para hidratarte',p:4000},
     {n:'Jugos Hit',p:4000},
-    {n:'Mr Tea',d:'Té helado premium',p:9000},
+    {n:'Mr Tea',d:'Té helado premium',p:4000},
     {n:'Coca-Cola 1.5L',d:'Ideal para compartir',p:11000},
     {n:'Coca-Cola 1.5L Zero',d:'Sin azúcar, mismo sabor',p:11000},
     {n:'Coca-Cola 2.0L',d:'Para toda la mesa',p:12000},
@@ -2819,10 +2821,37 @@ function _ccBuildAllItems(){
 function ccScrollTo(catId){
   var el=document.getElementById('ccsec_'+catId);
   var body=document.getElementById('ccBody');
-  if(el&&body) body.scrollTop=el.offsetTop-2;
+  if(!el||!body) return;
+  // Accurate position relative to the scrollable container
+  var top=el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
+  body.scrollTo({top:Math.max(0,top-1),behavior:'smooth'});
+  // Snap the pill into view in the quick-nav
+  var pills=document.querySelectorAll('.cc-qn-pill');
+  _CC_MENU.forEach(function(cat,i){
+    var isAct=cat.id===catId;
+    if(pills[i]) pills[i].classList.toggle('act',isAct);
+    if(isAct&&pills[i]) pills[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  });
 }
 
-// legacy compat
+function _ccInitScrollSpy(){
+  var body=document.getElementById('ccBody');
+  if(!body) return;
+  body.addEventListener('scroll',function(){
+    var bodyTop=body.getBoundingClientRect().top;
+    var pills=document.querySelectorAll('.cc-qn-pill');
+    var activeId=_CC_MENU[0].id;
+    _CC_MENU.forEach(function(cat){
+      var sec=document.getElementById('ccsec_'+cat.id);
+      if(sec&&sec.getBoundingClientRect().top<=bodyTop+80) activeId=cat.id;
+    });
+    _CC_MENU.forEach(function(cat,i){
+      var isAct=cat.id===activeId;
+      if(pills[i]) pills[i].classList.toggle('act',isAct);
+    });
+  },{passive:true});
+}
+
 function _ccBuildItems(cat){return _ccItemsHtml(cat);}
 function ccSetCat(idx){ccScrollTo(_CC_MENU[idx]&&_CC_MENU[idx].id);}
 
@@ -2858,6 +2887,12 @@ function _ccRender(spData){
     +'</div>'
     +'<div class="cc-body" id="ccBody">'+_ccBuildAllItems()+'</div>'
     +_ccBuildFooter();
+  // Activate first pill and start scroll spy
+  setTimeout(function(){
+    var first=document.querySelector('.cc-qn-pill');
+    if(first) first.classList.add('act');
+    _ccInitScrollSpy();
+  },50);
 }
 
 function ccSetCat(idx){
