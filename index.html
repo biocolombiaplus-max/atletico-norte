@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.03';
+var APP_VER='9.04';
 // ── Update mechanism ──────────────────────────────────────────────────────
 // Rule: the SW navigate() call always wins — it goes to /?_sw=VER&_t=TS
 // The URL param _sw acts as the loop guard (no sessionStorage needed).
@@ -2179,14 +2179,23 @@ async function doCp(){
 }
 async function doLt(){if(fbR)await au.signOut();window.location.reload();}
 async function clearCacheReload(){
-  // IMPORTANT: do NOT unregister the SW — we need it active so it can
-  // intercept the navigate request and serve fresh HTML (no-store) from
-  // the server, bypassing the GitHub CDN cache. Unregistering removes
-  // that protection and lets the CDN serve stale content.
   sessionStorage.clear();
   localStorage.removeItem('_spw');
   if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(k){return caches.delete(k);}));}
-  // Timestamped URL: SW intercepts, fetches fresh HTML with no-store headers
+  // Re-register SW in case it was unregistered by an older version, then navigate
+  if('serviceWorker' in navigator){
+    try{
+      var regs=await navigator.serviceWorker.getRegistrations();
+      // Re-register if no active registration for scope /
+      if(!regs.length){
+        await navigator.serviceWorker.register('/sw.js?v='+APP_VER,{updateViaCache:'none'});
+      } else {
+        // Force update of existing registrations
+        await Promise.all(regs.map(function(r){return r.update();}));
+      }
+    }catch(e){}
+  }
+  // Timestamped URL: SW intercepts and fetches fresh HTML with no-store headers
   location.replace(location.pathname+'?_v='+Date.now());
 }
 function onIn(){
@@ -2345,29 +2354,37 @@ function spRender(){
   }
   sec.innerHTML=h;
   // Start JS-driven banner after DOM update
-  if(keys.length) setTimeout(spBannerStart,50);
+  if(keys.length) spBannerStart();
 }
 
 var _spBannerRaf=null;
+var _spBannerRetries=0;
 function spBannerStart(){
   if(_spBannerRaf){cancelAnimationFrame(_spBannerRaf);_spBannerRaf=null;}
+  _spBannerRetries=0;
+  _spBannerTryRun();
+}
+function _spBannerTryRun(){
   var track=document.getElementById('spBannerTrack');
   if(!track)return;
-  var pos=0;
-  var loopW=0;
-  // Wait one frame for layout, then measure half-width (one set of items)
-  requestAnimationFrame(function(){
-    loopW=track.scrollWidth/2; // half = one full set of items
-    if(loopW<=0)return;
-    var speed=0.6; // px per frame ~36px/s at 60fps
-    function tick(){
-      pos+=speed;
-      if(pos>=loopW)pos=0;
-      track.style.transform='translateX(-'+pos.toFixed(2)+'px)';
-      _spBannerRaf=requestAnimationFrame(tick);
+  var loopW=track.scrollWidth/2;
+  if(loopW<=0){
+    // Images may not be loaded yet — retry up to 20 times every 150ms
+    if(_spBannerRetries<20){
+      _spBannerRetries++;
+      setTimeout(_spBannerTryRun,150);
     }
+    return;
+  }
+  var pos=0;
+  var speed=0.6;
+  function tick(){
+    pos+=speed;
+    if(pos>=loopW)pos=0;
+    track.style.transform='translateX(-'+pos.toFixed(2)+'px)';
     _spBannerRaf=requestAnimationFrame(tick);
-  });
+  }
+  _spBannerRaf=requestAnimationFrame(tick);
 }
 
 function spCloseModal(){
