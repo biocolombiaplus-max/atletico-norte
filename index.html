@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.97';
+var APP_VER='8.98';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -776,6 +776,24 @@ tbody td:nth-child(2){text-align:left}
 .sp-benefit{font-size:9px;font-weight:900;color:#fff;text-align:center;background:linear-gradient(135deg,#c8102e,#950c22);border-radius:20px;padding:4px 10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 3px 10px rgba(200,16,46,.5);letter-spacing:.1px}
 .sp-tap-cta{font-size:8px;font-weight:800;color:rgba(200,16,46,.8);text-align:center;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:3px}
 .sp-clicks{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border-radius:8px;padding:2px 6px;font-size:7.5px;font-weight:800;color:rgba(255,255,255,.55)}
+/* ── Sponsor banner carousel ── */
+@keyframes sp-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.sp-banner-wrap{position:relative;margin:0 -14px 18px;overflow:hidden;background:linear-gradient(135deg,rgba(200,16,46,.08),rgba(0,0,0,0));border-top:1px solid rgba(200,16,46,.15);border-bottom:1px solid rgba(200,16,46,.15);padding:14px 0}
+.sp-banner-wrap::before,.sp-banner-wrap::after{content:'';position:absolute;top:0;bottom:0;width:36px;z-index:2;pointer-events:none}
+.sp-banner-wrap::before{left:0;background:linear-gradient(90deg,var(--b1),transparent)}
+.sp-banner-wrap::after{right:0;background:linear-gradient(-90deg,var(--b1),transparent)}
+.sp-banner-track{display:flex;gap:0;width:max-content;animation:sp-scroll 18s linear infinite}
+.sp-banner-track:hover{animation-play-state:paused}
+.sp-banner-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0 18px;cursor:pointer;flex-shrink:0}
+.sp-banner-logo{width:54px;height:54px;border-radius:14px;background:var(--b2);border:1.5px solid rgba(200,16,46,.2);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.35);transition:transform .2s,box-shadow .2s}
+.sp-banner-logo img{width:100%;height:100%;object-fit:cover}
+.sp-banner-item:active .sp-banner-logo{transform:scale(.92);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.sp-banner-name{font-size:8px;font-weight:800;color:var(--m);letter-spacing:.2px;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.sp-banner-lbl{font-size:8px;font-weight:800;color:var(--dm);letter-spacing:1.2px;text-transform:uppercase;text-align:center;padding:0 14px 4px;display:flex;align-items:center;gap:8px}
+.sp-banner-lbl::before,.sp-banner-lbl::after{content:'';flex:1;height:1px;background:rgba(200,16,46,.2)}
+.sp-grid-lbl{font-size:8px;font-weight:800;color:var(--dm);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sp-grid-lbl::before{content:'';width:3px;height:12px;background:#c8102e;border-radius:2px;flex-shrink:0}
+.sp-grid-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
 /* Modal aliado premium */
 .sp-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9800;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(6px)}
 .sp-modal-ov.op{opacity:1;pointer-events:all}
@@ -2250,6 +2268,30 @@ function spRender(){
     +'<div class="sp-header-sub">&#128293; Beneficios exclusivos para la comunidad Atl&#233;tico Norte &#8212; &#161;toca una tarjeta!</div>'
     +'</div>';
   if(keys.length){
+    // ── Banner giratorio ──
+    // Duplicate items so the loop is seamless (need >1 screen width)
+    var bannerItems='';
+    var buildBannerItem=function(uid){
+      var s=_spData[uid];
+      var logoEl=s.logo
+        ?'<img src="'+s.logo+'" alt="'+escHtml(s.nombre)+'">'
+        :escHtml(s.emoji||'🏪');
+      return '<div class="sp-banner-item" onclick="spClick(\''+uid+'\')">'
+        +'<div class="sp-banner-logo">'+logoEl+'</div>'
+        +'<div class="sp-banner-name">'+escHtml(s.nombre||'Aliado')+'</div>'
+        +'</div>';
+    };
+    // Build single set then duplicate for infinite scroll illusion
+    keys.forEach(function(uid){bannerItems+=buildBannerItem(uid);});
+    var doubled=bannerItems+bannerItems; // seamless loop requires 2x
+    h+='<div class="sp-banner-lbl">Nuestros aliados</div>';
+    h+='<div class="sp-banner-wrap"><div class="sp-banner-track">'+doubled+'</div></div>';
+    // Adjust animation speed based on count (more sponsors = slower to be readable)
+    var spd=Math.max(12,keys.length*4);
+    h+='<style>.sp-banner-track{animation-duration:'+spd+'s}</style>';
+
+    // ── Grid estático ──
+    h+='<div class="sp-grid-lbl">Toca para ver tu beneficio</div>';
     h+='<div class="sp-grid">';
     keys.forEach(function(uid){
       var s=_spData[uid];
