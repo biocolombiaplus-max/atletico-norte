@@ -2897,294 +2897,274 @@ function alWrapLines(ctx,text,maxW){
 let _aliadoBgImg=null;
 
 async function tAliado(ctx,cW,cH){
-  const isSquare=cH===cW;
-  const SAFE=isSquare?68:80;
-  const VSAFE=isSquare?60:80;
+  const isStory=cH>cW;
+  const SAFE=isStory?72:64;
+  const VSAFE=isStory?68:56;
   const INNER=cW-SAFE*2;
 
   const gv=id=>(document.getElementById(id)||{}).value||'';
   const nombre=gv('alNombre')||'Aliado Atlético Norte';
   const beneficio=gv('alBeneficio')||'Beneficio exclusivo para socios';
   const resena=gv('alResena')||'';
-  const cta=gv('alCta')||'Descarga la app del club y activa tu beneficio';
   const showClub=document.getElementById('alShowClub')?.checked!==false;
   const uid=(document.getElementById('aliadoSel')||{}).value||'';
   const sp=_aliadoSponsors[uid]||{};
   const emoji=sp.emoji||window._aliadoEmoji||'🏪';
 
-  // ══════ FONDO ══════
-  ctx.fillStyle='#04000a';ctx.fillRect(0,0,cW,cH);
-
+  // ── FONDO ──────────────────────────────────────────────────────────────
+  ctx.fillStyle='#050008';ctx.fillRect(0,0,cW,cH);
   if(_aliadoBgImg){
     const ir=_aliadoBgImg.width/_aliadoBgImg.height,cr=cW/cH;
     let sw,sh,sx,sy;
     if(ir>cr){sh=cH;sw=cH*ir;sx=(cW-sw)/2;sy=0;}else{sw=cW;sh=cW/ir;sx=0;sy=(cH-sh)/2;}
-    ctx.save();ctx.globalAlpha=.22;ctx.drawImage(_aliadoBgImg,sx,sy,sw,sh);ctx.restore();
-    const ov=ctx.createRadialGradient(cW/2,cH/2,cH*.08,cW/2,cH/2,cH*.9);
-    ov.addColorStop(0,'rgba(4,0,10,.6)');ov.addColorStop(1,'rgba(2,0,6,.98)');
+    ctx.save();ctx.globalAlpha=.18;ctx.drawImage(_aliadoBgImg,sx,sy,sw,sh);ctx.restore();
+    const ov=ctx.createRadialGradient(cW/2,cH/2,cH*.05,cW/2,cH/2,cH*.88);
+    ov.addColorStop(0,'rgba(5,0,8,.65)');ov.addColorStop(1,'rgba(3,0,5,.97)');
     ctx.fillStyle=ov;ctx.fillRect(0,0,cW,cH);
-    const ov2=ctx.createLinearGradient(0,0,0,cH);
-    ov2.addColorStop(0,'rgba(2,0,6,.98)');ov2.addColorStop(.15,'rgba(2,0,6,.3)');
-    ov2.addColorStop(.85,'rgba(2,0,6,.3)');ov2.addColorStop(1,'rgba(2,0,6,.98)');
-    ctx.fillStyle=ov2;ctx.fillRect(0,0,cW,cH);
-  }else{
-    const bg=ctx.createLinearGradient(0,0,cW,cH);
-    bg.addColorStop(0,'#080010');bg.addColorStop(.5,'#0a000c');bg.addColorStop(1,'#050010');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,cW,cH);
-    // Glow radial izquierda
-    const glL=ctx.createRadialGradient(0,cH*.4,0,0,cH*.4,cW*.7);
-    glL.addColorStop(0,'rgba(200,16,46,.12)');glL.addColorStop(1,'transparent');
-    ctx.fillStyle=glL;ctx.fillRect(0,0,cW,cH);
-    // Glow radial derecha
-    const glR=ctx.createRadialGradient(cW,cH*.7,0,cW,cH*.7,cW*.7);
-    glR.addColorStop(0,'rgba(180,0,60,.1)');glR.addColorStop(1,'transparent');
-    ctx.fillStyle=glR;ctx.fillRect(0,0,cW,cH);
   }
-
-  // Puntos de luz decorativos
-  ctx.save();
-  [[cW*.18,cH*.12,1.8],[cW*.82,cH*.08,1.4],[cW*.06,cH*.55,1.2],[cW*.94,cH*.45,1.6],[cW*.25,cH*.88,1.3],[cW*.75,cH*.92,1.5]].forEach(([px,py,r])=>{
-    ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fill();
-  });
+  // Atmospheres — soft, edge-only glows (no center blob)
+  const _atL=ctx.createRadialGradient(0,cH*.3,0,0,cH*.3,cW*.7);
+  _atL.addColorStop(0,'rgba(180,14,40,.13)');_atL.addColorStop(1,'transparent');
+  ctx.fillStyle=_atL;ctx.fillRect(0,0,cW,cH);
+  const _atR=ctx.createRadialGradient(cW,cH*.75,0,cW,cH*.75,cW*.65);
+  _atR.addColorStop(0,'rgba(160,0,50,.09)');_atR.addColorStop(1,'transparent');
+  ctx.fillStyle=_atR;ctx.fillRect(0,0,cW,cH);
+  // Texture diagonals
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.016)';ctx.lineWidth=1;
+  for(let i=-cH;i<cW+cH;i+=56){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+cH*.48,cH);ctx.stroke();}
   ctx.restore();
+  // Accent bars top + bottom
+  const _bH=isStory?11:10;
+  const _bG=ctx.createLinearGradient(0,0,cW,0);
+  _bG.addColorStop(0,'#5a000c');_bG.addColorStop(.25,'#c8102e');_bG.addColorStop(.5,'#ff1a3c');_bG.addColorStop(.75,'#c8102e');_bG.addColorStop(1,'#5a000c');
+  ctx.fillStyle=_bG;ctx.fillRect(0,0,cW,_bH);ctx.fillRect(0,cH-_bH,cW,_bH);
+  // Corner brackets
+  const _cSz=isStory?56:48,_cTh=isStory?6:5,_cOff=isStory?34:28;
+  ctx.fillStyle='rgba(200,16,46,.6)';
+  const _corner=(x,y,dx,dy)=>{ctx.fillRect(x,y,dx*_cSz,_cTh);ctx.fillRect(x,y,_cTh,dy*_cSz);};
+  _corner(_cOff,_cOff,1,1);_corner(cW-_cOff-_cSz,_cOff,-1,1);
+  _corner(_cOff,cH-_cOff,1,-1);_corner(cW-_cOff-_cSz,cH-_cOff,-1,-1);
 
-  // Líneas diagonales finas
-  ctx.save();ctx.strokeStyle='rgba(255,255,255,.012)';ctx.lineWidth=1;
-  for(let i=-cH;i<cW+cH;i+=isSquare?52:60){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+cH*.55,cH);ctx.stroke();}
-  ctx.restore();
+  // ── MEDIDAS DE BLOQUES ──────────────────────────────────────────────────
+  // Club header
+  const _clSz=showClub?(isStory?118:106):0;
+  const _clNameFs=isStory?28:26;
+  const _clPillFs=isStory?17:16;
+  const _clPillH=isStory?(_clPillFs+18):(_clPillFs+16);
+  const _clH=showClub?(_clSz+(_clNameFs+10)+(_clPillH+10)+8):0;
 
-  // ══════ BARRAS Y ESQUINAS ══════
-  const barH=isSquare?10:12;
-  const barG=ctx.createLinearGradient(0,0,cW,0);
-  barG.addColorStop(0,'#6b000f');barG.addColorStop(.3,'#c8102e');barG.addColorStop(.5,'#ff1a3a');barG.addColorStop(.7,'#c8102e');barG.addColorStop(1,'#6b000f');
-  ctx.fillStyle=barG;ctx.fillRect(0,0,cW,barH);ctx.fillRect(0,cH-barH,cW,barH);
-  const cSz=isSquare?52:64,cTh=isSquare?5:6,cOff=isSquare?30:38;
-  const drawCorner=(x,y,dx,dy)=>{ctx.fillStyle='rgba(200,16,46,.7)';ctx.fillRect(x,y,dx*cSz,cTh);ctx.fillRect(x,y,cTh,dy*cSz);};
-  drawCorner(cOff,cOff,1,1);drawCorner(cW-cOff-cSz,cOff,-1,1);
-  drawCorner(cOff,cH-cOff,1,-1);drawCorner(cW-cOff-cSz,cH-cOff,-1,-1);
+  // Aliado logo
+  const _lSz=isStory?296:264;
 
-  // ══════ LAYOUT: medir bloques, distribuir espacio ══════
-  // 1) CLUB HEADER (centrado, logo grande)
-  const clubLogoSz=showClub?(isSquare?120:148):0;
-  const clubTxtH=showClub?(isSquare?70:86):0;
-  const clubH=clubLogoSz+clubTxtH;
+  // Nombre aliado — ajuste de fuente automático
+  let _nFs=isStory?84:78;
+  ctx.font=`900 ${_nFs}px sans-serif`;
+  while(ctx.measureText(nombre).width>INNER-16&&_nFs>36){_nFs-=2;ctx.font=`900 ${_nFs}px sans-serif`;}
+  const _nLines=alWrapLines(ctx,nombre,INNER-16);
+  const _nLH=_nFs*1.18;
+  const _nH=_nLines.length*_nLH;
 
-  // 2) Logo aliado
-  const logoSz=isSquare?280:320;
+  // Eyebrow label
+  const _eyeFs=isStory?21:19;
+  const _eyeH=_eyeFs*2;
 
-  // 3) Nombre aliado
-  const nameFs0=isSquare?82:90;
-  ctx.font=`900 ${nameFs0}px sans-serif`;ctx.letterSpacing='-2px';
-  let nameFs=nameFs0;
-  while(ctx.measureText(nombre).width>INNER-20&&nameFs>38)nameFs-=2;
-  ctx.font=`900 ${nameFs}px sans-serif`;
-  const nameLines=alWrapLines(ctx,nombre,INNER-20);
-  const nameLH=nameFs*1.2;
-  const nameBlockH=nameLines.length*nameLH;
+  // Beneficio badge — ANCHO REAL (no bug de precedencia)
+  const _bdFs=isStory?46:42;
+  const _bdRowH=isStory?80:72;
+  const _bdGap=8;
+  ctx.font=`900 ${_bdFs}px sans-serif`;
+  const _bdLines=alWrapLines(ctx,beneficio.toUpperCase(),INNER-56);
+  const _bdTotalH=_bdLines.length*_bdRowH+(_bdLines.length-1)*_bdGap;
 
-  // 4) Eyebrow "PARA SOCIOS DEL CLUB" + badge beneficio
-  const eyeFs=isSquare?22:26;const eyeH=eyeFs*1.6;
-  const badgeFs=isSquare?44:50;
-  ctx.font=`900 ${badgeFs}px sans-serif`;ctx.letterSpacing='.5px';
-  const badgeLines=alWrapLines(ctx,beneficio.toUpperCase(),INNER-40);
-  const badgePH=isSquare?76:86;const badgeGap=isSquare?8:10;
-  const badgeBlockH=eyeH+12+badgeLines.length*badgePH+(badgeLines.length-1)*badgeGap;
+  // Reseña
+  const _rFs=isStory?33:30;const _rLH=_rFs*1.55;
+  const _rPadV=isStory?36:30;const _rPadH=isStory?44:36;
+  ctx.font=`400 ${_rFs}px sans-serif`;
+  const _rLines=resena?alWrapLines(ctx,resena,INNER-_rPadH*2).slice(0,isStory?4:3):[];
+  const _rBH=_rLines.length>0?(_rLines.length*_rLH+_rPadV*2):0;
 
-  // 5) Reseña
-  const rFs=isSquare?33:37;const rLH=rFs*1.6;
-  ctx.font=`400 ${rFs}px sans-serif`;ctx.letterSpacing='0px';
-  const rLines=resena?alWrapLines(ctx,resena,INNER-50).slice(0,isSquare?4:5):[];
-  const rBoxH=rLines.length>0?rLines.length*rLH+(isSquare?52:60):0;
+  // CTA button
+  const _ctaH=isStory?128:116;
 
-  // 6) CTA (2 líneas)
-  const ctaLine1Fs=isSquare?36:40;const ctaLine2Fs=isSquare?28:32;
-  const ctaBtnH=isSquare?130:148;
+  // Footer
+  const _ftH=showClub?(isStory?64:56):0;
 
-  // 7) Footer dual-logo
-  const footerH=showClub?(isSquare?80:96):0;
-
-  const contentH=VSAFE+clubH+(showClub?28:0)+20+logoSz+24+nameBlockH+20+badgeBlockH+(rLines.length?20+rBoxH:0)+24+ctaBtnH+16+footerH+VSAFE;
-  const gaps=6+(rLines.length?1:0)+(showClub?1:0);
-  const spare=Math.max(0,cH-contentH);
-  const gap=Math.min(spare/gaps,isSquare?40:56);
+  // Gap distribution
+  const _fixed=VSAFE+_clH+(showClub?28:0)+14+_lSz+18+_nH+14+_eyeH+10+_bdTotalH+(_rBH?18+_rBH:0)+20+_ctaH+12+_ftH+VSAFE;
+  const _gSlots=4+(_rBH?1:0)+(showClub?1:0);
+  const _spare=Math.max(0,cH-_fixed);
+  const _gap=Math.min(_spare/_gSlots,isStory?46:38);
 
   let y=VSAFE;
 
-  // ══════ CLUB HEADER (centrado, grande) ══════
+  // ── CLUB HEADER ─────────────────────────────────────────────────────────
   if(showClub){
-    const clubImg=getImg('club');
-    const cLX=cW/2-clubLogoSz/2;const cLY=y;
-    // Halo del club
+    const _cx=cW/2,_cy=y+_clSz/2;
+    // Soft contained halo (no full-canvas bleed)
+    const _ch=ctx.createRadialGradient(_cx,_cy,_clSz*.1,_cx,_cy,_clSz*.8);
+    _ch.addColorStop(0,'rgba(200,16,46,.22)');_ch.addColorStop(1,'transparent');
+    ctx.save();ctx.fillStyle=_ch;ctx.beginPath();ctx.arc(_cx,_cy,_clSz*.8,0,Math.PI*2);ctx.fill();ctx.restore();
+    // Rings
     ctx.save();
-    const clubHalo=ctx.createRadialGradient(cW/2,cLY+clubLogoSz/2,clubLogoSz*.2,cW/2,cLY+clubLogoSz/2,clubLogoSz*1.1);
-    clubHalo.addColorStop(0,'rgba(200,16,46,.3)');clubHalo.addColorStop(1,'transparent');
-    ctx.fillStyle=clubHalo;ctx.fillRect(0,cLY-clubLogoSz*.3,cW,clubLogoSz*1.8);ctx.restore();
-    // Ring doble
-    ctx.save();ctx.strokeStyle='rgba(200,16,46,.35)';ctx.lineWidth=isSquare?3:4;
-    ctx.beginPath();ctx.arc(cW/2,cLY+clubLogoSz/2,clubLogoSz/2+12,0,Math.PI*2);ctx.stroke();
-    ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.arc(cW/2,cLY+clubLogoSz/2,clubLogoSz/2+20,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(200,16,46,.42)';ctx.lineWidth=isStory?3:2.5;
+    ctx.beginPath();ctx.arc(_cx,_cy,_clSz/2+10,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(_cx,_cy,_clSz/2+18,0,Math.PI*2);ctx.stroke();
     ctx.restore();
-    if(clubImg){
-      ctx.save();ctx.beginPath();ctx.arc(cW/2,cLY+clubLogoSz/2,clubLogoSz/2,0,Math.PI*2);ctx.clip();
-      ctx.drawImage(clubImg,cLX,cLY,clubLogoSz,clubLogoSz);ctx.restore();
-      ctx.strokeStyle='rgba(200,16,46,.9)';ctx.lineWidth=isSquare?4:5;
-      ctx.beginPath();ctx.arc(cW/2,cLY+clubLogoSz/2,clubLogoSz/2+2,0,Math.PI*2);ctx.stroke();
+    const _ci=getImg('club');
+    if(_ci){
+      ctx.save();ctx.beginPath();ctx.arc(_cx,_cy,_clSz/2,0,Math.PI*2);ctx.clip();
+      ctx.drawImage(_ci,_cx-_clSz/2,y,_clSz,_clSz);ctx.restore();
+      ctx.strokeStyle='rgba(200,16,46,.88)';ctx.lineWidth=isStory?4:3.5;
+      ctx.beginPath();ctx.arc(_cx,_cy,_clSz/2+2,0,Math.PI*2);ctx.stroke();
     }else{
-      ctx.save();ctx.fillStyle='rgba(200,16,46,.15)';ctx.beginPath();ctx.arc(cW/2,cLY+clubLogoSz/2,clubLogoSz/2,0,Math.PI*2);ctx.fill();ctx.restore();
-      ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`${Math.round(clubLogoSz*.5)}px sans-serif`;ctx.fillText('⚽',cW/2,cLY+clubLogoSz/2);ctx.textBaseline='alphabetic';
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`${Math.round(_clSz*.48)}px sans-serif`;
+      ctx.fillText('⚽',_cx,_cy);ctx.textBaseline='alphabetic';
     }
-    // Nombre club
-    const txtY=cLY+clubLogoSz+(isSquare?16:20);
-    ctx.save();ctx.textAlign='center';ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=16;
-    ctx.font=`900 ${isSquare?28:34}px sans-serif`;ctx.fillStyle='#ffffff';ctx.letterSpacing='2px';
-    ctx.fillText('ATLÉTICO NORTE F.C.',cW/2,txtY);
-    // "ALIADO OFICIAL" con decoradores ★
-    const aoY=txtY+(isSquare?38:46);
-    const aoFs=isSquare?18:22;
-    ctx.font=`700 ${aoFs}px sans-serif`;ctx.letterSpacing='3px';
-    // Fondo pill rojo para "ALIADO OFICIAL"
-    const aoTxt='★  ALIADO OFICIAL  ★';
-    ctx.font=`700 ${aoFs}px sans-serif`;
-    const aoW=ctx.measureText(aoTxt).width+isSquare?44:56;
-    const aoPad=isSquare?22:28;const aoPH=isSquare?36:44;
-    ctx.fillStyle='rgba(200,16,46,.85)';ctx.beginPath();
-    ctx.roundRect(cW/2-aoW/2-aoPad,aoY-aoPH*.75,aoW+aoPad*2,aoPH,aoPH/2);ctx.fill();
-    ctx.fillStyle='#fff';ctx.fillText(aoTxt,cW/2,aoY);
+    // Club name
+    const _cnY=y+_clSz+_clNameFs+8;
+    ctx.save();ctx.textAlign='center';ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=14;
+    ctx.font=`900 ${_clNameFs}px sans-serif`;ctx.fillStyle='#ffffff';ctx.letterSpacing='2.5px';
+    ctx.fillText('ATLÉTICO NORTE F.C.',_cx,_cnY);
+    // "ALIADO OFICIAL" pill — width computed correctly
+    const _pTxt='★  ALIADO OFICIAL  ★';
+    ctx.font=`700 ${_clPillFs}px sans-serif`;ctx.letterSpacing='2px';
+    const _pTW=ctx.measureText(_pTxt).width;
+    const _pPadX=(isStory?20:18);const _pPadY=(isStory?9:8);
+    const _pW=_pTW+_pPadX*2;const _pH=_clPillFs+_pPadY*2;
+    const _pX=_cx-_pW/2;const _pY=_cnY+(isStory?16:14);
+    ctx.shadowColor='transparent';
+    ctx.fillStyle='rgba(200,16,46,.88)';ctx.beginPath();ctx.roundRect(_pX,_pY,_pW,_pH,_pH/2);ctx.fill();
+    // Pill shine
+    ctx.save();ctx.globalAlpha=.18;
+    const _pSh=ctx.createLinearGradient(0,_pY,0,_pY+_pH*.5);
+    _pSh.addColorStop(0,'#fff');_pSh.addColorStop(1,'transparent');
+    ctx.fillStyle=_pSh;ctx.beginPath();ctx.roundRect(_pX+3,_pY+3,_pW-6,_pH*.44,_pH/2);ctx.fill();ctx.restore();
+    ctx.fillStyle='#fff';ctx.fillText(_pTxt,_cx,_pY+_pPadY+_clPillFs*.88);
     ctx.restore();
-    y+=clubH+28+gap;
+    y+=_clH+28+_gap;
   }
 
-  // Separador
-  const hrGr=ctx.createLinearGradient(SAFE,0,cW-SAFE,0);
-  hrGr.addColorStop(0,'transparent');hrGr.addColorStop(.2,'rgba(200,16,46,.5)');hrGr.addColorStop(.8,'rgba(200,16,46,.5)');hrGr.addColorStop(1,'transparent');
-  ctx.fillStyle=hrGr;ctx.fillRect(SAFE,y,INNER,2);
-  y+=20+gap*.5;
+  // Separator
+  const _hr=ctx.createLinearGradient(SAFE,0,cW-SAFE,0);
+  _hr.addColorStop(0,'transparent');_hr.addColorStop(.2,'rgba(200,16,46,.42)');_hr.addColorStop(.8,'rgba(200,16,46,.42)');_hr.addColorStop(1,'transparent');
+  ctx.fillStyle=_hr;ctx.fillRect(SAFE,y,INNER,1.5);
+  y+=14+_gap*.3;
 
-  // ══════ LOGO ALIADO ══════
-  const logoX=cW/2-logoSz/2;const logoY=y;const logoR=logoSz*.2;
-  // Halo
-  ctx.save();
-  const halo=ctx.createRadialGradient(cW/2,logoY+logoSz/2,logoSz*.25,cW/2,logoY+logoSz/2,logoSz*.9);
-  halo.addColorStop(0,'rgba(200,16,46,.28)');halo.addColorStop(1,'transparent');
-  ctx.fillStyle=halo;ctx.fillRect(0,logoY-logoSz*.25,cW,logoSz*1.5);ctx.restore();
-  // Sombra
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=50;ctx.shadowOffsetY=16;
-  ctx.fillStyle='rgba(255,255,255,.04)';
-  ctx.beginPath();ctx.roundRect(logoX,logoY,logoSz,logoSz,logoR);ctx.fill();ctx.restore();
-  // Borde gradiente
-  const brd=ctx.createLinearGradient(logoX,logoY,logoX+logoSz,logoY+logoSz);
-  brd.addColorStop(0,'rgba(255,255,255,.45)');brd.addColorStop(.35,'rgba(200,16,46,.95)');brd.addColorStop(.65,'rgba(255,60,80,.85)');brd.addColorStop(1,'rgba(255,255,255,.35)');
-  ctx.save();ctx.strokeStyle=brd;ctx.lineWidth=isSquare?5:7;
-  ctx.beginPath();ctx.roundRect(logoX,logoY,logoSz,logoSz,logoR);ctx.stroke();ctx.restore();
+  // ── ALIADO LOGO ─────────────────────────────────────────────────────────
+  const _lX=cW/2-_lSz/2,_lY=y,_lR=_lSz*.22;
+  // Drop shadow only (no red halo glow that would look like a blob)
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=40;ctx.shadowOffsetY=14;
+  ctx.fillStyle='rgba(0,0,0,.01)';ctx.beginPath();ctx.roundRect(_lX,_lY,_lSz,_lSz,_lR);ctx.fill();ctx.restore();
+  // Gradient border
+  const _brd=ctx.createLinearGradient(_lX,_lY,_lX+_lSz,_lY+_lSz);
+  _brd.addColorStop(0,'rgba(255,255,255,.4)');_brd.addColorStop(.38,'rgba(200,16,46,.92)');_brd.addColorStop(.62,'rgba(255,50,70,.82)');_brd.addColorStop(1,'rgba(255,255,255,.3)');
+  ctx.save();ctx.strokeStyle=_brd;ctx.lineWidth=isStory?6:5;
+  ctx.beginPath();ctx.roundRect(_lX,_lY,_lSz,_lSz,_lR);ctx.stroke();ctx.restore();
   if(_aliadoLogoImg){
-    const ins=isSquare?14:18;
-    ctx.save();ctx.beginPath();ctx.roundRect(logoX+ins,logoY+ins,logoSz-ins*2,logoSz-ins*2,logoR-4);ctx.clip();
-    ctx.drawImage(_aliadoLogoImg,logoX+ins,logoY+ins,logoSz-ins*2,logoSz-ins*2);ctx.restore();
+    const _ins=isStory?13:11;
+    ctx.save();ctx.beginPath();ctx.roundRect(_lX+_ins,_lY+_ins,_lSz-_ins*2,_lSz-_ins*2,_lR-2);ctx.clip();
+    ctx.drawImage(_aliadoLogoImg,_lX+_ins,_lY+_ins,_lSz-_ins*2,_lSz-_ins*2);ctx.restore();
   }else{
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.font=`${Math.round(logoSz*.48)}px sans-serif`;
-    ctx.fillText(emoji,cW/2,logoY+logoSz/2);ctx.textBaseline='alphabetic';
+    ctx.font=`${Math.round(_lSz*.46)}px sans-serif`;ctx.fillText(emoji,cW/2,_lY+_lSz/2);ctx.textBaseline='alphabetic';
   }
-  y+=logoSz+24+gap;
+  y+=_lSz+18+_gap*.5;
 
-  // ══════ NOMBRE ALIADO ══════
-  ctx.save();ctx.textAlign='center';ctx.letterSpacing='-2px';
-  ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=24;
-  const nGr=ctx.createLinearGradient(0,y,0,y+nameBlockH);
-  nGr.addColorStop(0,'#ffffff');nGr.addColorStop(1,'rgba(255,200,210,1)');
-  ctx.fillStyle=nGr;ctx.font=`900 ${nameFs}px sans-serif`;
-  nameLines.forEach((ln,i)=>ctx.fillText(ln,cW/2,y+i*nameLH+nameFs*.88));
+  // ── NOMBRE ALIADO ────────────────────────────────────────────────────────
+  ctx.save();ctx.textAlign='center';ctx.letterSpacing='-1.5px';
+  ctx.font=`900 ${_nFs}px sans-serif`;
+  const _nGr=ctx.createLinearGradient(0,y,0,y+_nH);
+  _nGr.addColorStop(0,'#ffffff');_nGr.addColorStop(1,'rgba(255,195,210,.95)');
+  ctx.fillStyle=_nGr;ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=22;
+  _nLines.forEach((ln,i)=>ctx.fillText(ln,cW/2,y+i*_nLH+_nFs*.88));
   ctx.restore();
-  y+=nameBlockH+20+gap*.6;
+  y+=_nH+14+_gap*.4;
 
-  // ══════ EYEBROW + BADGE BENEFICIO ══════
-  // Eyebrow: "⭐ BENEFICIO EXCLUSIVO PARA SOCIOS"
-  ctx.save();ctx.textAlign='center';ctx.letterSpacing='2.5px';
-  ctx.font=`700 ${eyeFs}px sans-serif`;ctx.fillStyle='rgba(255,210,80,.9)';
-  ctx.shadowColor='rgba(180,120,0,.6)';ctx.shadowBlur=14;
-  ctx.fillText('⭐  BENEFICIO EXCLUSIVO PARA SOCIOS  ⭐',cW/2,y+eyeFs);
+  // ── EYEBROW ──────────────────────────────────────────────────────────────
+  ctx.save();ctx.textAlign='center';ctx.letterSpacing='2px';
+  ctx.font=`700 ${_eyeFs}px sans-serif`;ctx.fillStyle='rgba(255,205,68,.88)';
+  ctx.shadowColor='rgba(150,90,0,.45)';ctx.shadowBlur=10;
+  ctx.fillText('⭐  BENEFICIO EXCLUSIVO PARA SOCIOS  ⭐',cW/2,y+_eyeFs*.9);
   ctx.restore();
-  y+=eyeH+12;
+  y+=_eyeH+10;
 
-  // Badge pills
-  const bdBg=ctx.createLinearGradient(SAFE,y,cW-SAFE,y);
-  bdBg.addColorStop(0,'#7a0012');bdBg.addColorStop(.3,'#c8102e');bdBg.addColorStop(.5,'#e8142e');bdBg.addColorStop(.7,'#c8102e');bdBg.addColorStop(1,'#7a0012');
-  ctx.save();ctx.font=`900 ${badgeFs}px sans-serif`;ctx.letterSpacing='.5px';ctx.textAlign='center';ctx.textBaseline='middle';
-  badgeLines.forEach((ln,i)=>{
-    const lw=Math.min(ctx.measureText(ln).width+isSquare?100:120,INNER-8);
-    const lx=cW/2-lw/2,ly=y+i*(badgePH+badgeGap);
-    // Sombra
-    ctx.shadowColor='rgba(200,16,46,.8)';ctx.shadowBlur=isSquare?40:50;ctx.shadowOffsetY=8;
-    ctx.fillStyle=bdBg;ctx.beginPath();ctx.roundRect(lx,ly,lw,badgePH,badgePH/2);ctx.fill();
-    // Shine
-    ctx.save();ctx.globalAlpha=.2;
-    const sh=ctx.createLinearGradient(0,ly,0,ly+badgePH*.5);
-    sh.addColorStop(0,'#fff');sh.addColorStop(1,'transparent');
-    ctx.fillStyle=sh;ctx.beginPath();ctx.roundRect(lx+4,ly+4,lw-8,badgePH*.42,badgePH/2);ctx.fill();
+  // ── BENEFICIO BADGE(S) — sin shadow blob ─────────────────────────────────
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`900 ${_bdFs}px sans-serif`;ctx.letterSpacing='.5px';
+  _bdLines.forEach((ln,i)=>{
+    // Ancho real del texto (operadores con paréntesis explícitos)
+    const _lw=Math.min(ctx.measureText(ln).width+(isStory?96:84),INNER-8);
+    const _lx=cW/2-_lw/2,_ly=y+i*(_bdRowH+_bdGap);
+    // Fill — NO shadowColor (eso creaba el blob rojo)
+    const _bFill=ctx.createLinearGradient(_lx,_ly,_lx+_lw,_ly);
+    _bFill.addColorStop(0,'#7a0014');_bFill.addColorStop(.3,'#c8102e');_bFill.addColorStop(.5,'#df1230');_bFill.addColorStop(.7,'#c8102e');_bFill.addColorStop(1,'#7a0014');
+    ctx.shadowColor='transparent';ctx.fillStyle=_bFill;
+    ctx.beginPath();ctx.roundRect(_lx,_ly,_lw,_bdRowH,_bdRowH/2);ctx.fill();
+    // Shine superior sutil
+    ctx.save();ctx.globalAlpha=.17;
+    const _sh=ctx.createLinearGradient(0,_ly,0,_ly+_bdRowH*.5);
+    _sh.addColorStop(0,'#fff');_sh.addColorStop(1,'transparent');
+    ctx.fillStyle=_sh;ctx.beginPath();ctx.roundRect(_lx+4,_ly+4,_lw-8,_bdRowH*.43,_bdRowH/2);ctx.fill();
     ctx.restore();
-    ctx.shadowColor='transparent';ctx.fillStyle='#fff';ctx.fillText(ln,cW/2,ly+badgePH/2);
+    // Texto
+    ctx.fillStyle='#ffffff';ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=6;
+    ctx.fillText(ln,cW/2,_ly+_bdRowH/2);
+    ctx.shadowColor='transparent';
   });
   ctx.restore();ctx.textBaseline='alphabetic';
-  y+=badgeBlockH+gap;
+  y+=_bdTotalH+_gap;
 
-  // ══════ RESEÑA ══════
-  if(rLines.length){
-    y+=4;
-    const rPad=SAFE+2;const rSafeW=cW-rPad*2;
+  // ── RESEÑA ───────────────────────────────────────────────────────────────
+  if(_rLines.length){
+    const _rX=SAFE,_rW=INNER;
     ctx.save();
-    ctx.fillStyle='rgba(255,255,255,.04)';ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.roundRect(rPad,y,rSafeW,rBoxH,isSquare?18:22);ctx.fill();ctx.stroke();
-    const acTop=ctx.createLinearGradient(rPad,y,cW-rPad,y);
-    acTop.addColorStop(0,'transparent');acTop.addColorStop(.25,'rgba(200,16,46,.65)');acTop.addColorStop(.75,'rgba(200,16,46,.65)');acTop.addColorStop(1,'transparent');
-    ctx.fillStyle=acTop;ctx.fillRect(rPad,y,rSafeW,2.5);
-    ctx.fillStyle='rgba(255,255,255,.8)';ctx.textAlign='center';ctx.textBaseline='top';
-    ctx.font=`400 ${rFs}px sans-serif`;ctx.letterSpacing='0px';
-    ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=8;
-    rLines.forEach((ln,i)=>ctx.fillText(ln,cW/2,y+(isSquare?26:32)+i*rLH));
+    ctx.fillStyle='rgba(255,255,255,.04)';ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(_rX,y,_rW,_rBH,isStory?20:16);ctx.fill();ctx.stroke();
+    // Accent bar top
+    const _acG=ctx.createLinearGradient(_rX,y,_rX+_rW,y);
+    _acG.addColorStop(0,'transparent');_acG.addColorStop(.2,'rgba(200,16,46,.58)');_acG.addColorStop(.8,'rgba(200,16,46,.58)');_acG.addColorStop(1,'transparent');
+    ctx.fillStyle=_acG;ctx.fillRect(_rX,y,_rW,2);
+    ctx.fillStyle='rgba(255,255,255,.82)';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.font=`400 ${_rFs}px sans-serif`;ctx.letterSpacing='0px';
+    ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;
+    _rLines.forEach((ln,i)=>ctx.fillText(ln,cW/2,y+_rPadV+i*_rLH));
     ctx.restore();
-    y+=rBoxH+gap;
+    y+=_rBH+_gap*.8;
   }
 
-  // ══════ CTA BOTÓN ══════
-  y+=8;
-  const ctaX=SAFE;const ctaW=INNER;
-  // Glow exterior
-  ctx.save();ctx.shadowColor='rgba(200,16,46,.65)';ctx.shadowBlur=isSquare?55:70;ctx.shadowOffsetY=14;
-  const ctaGr=ctx.createLinearGradient(ctaX,y,ctaX+ctaW,y+ctaBtnH);
-  ctaGr.addColorStop(0,'#900016');ctaGr.addColorStop(.3,'#c8102e');ctaGr.addColorStop(.5,'#e8142e');ctaGr.addColorStop(.7,'#c8102e');ctaGr.addColorStop(1,'#900016');
-  ctx.fillStyle=ctaGr;ctx.beginPath();ctx.roundRect(ctaX,y,ctaW,ctaBtnH,isSquare?28:32);ctx.fill();ctx.restore();
-  // Shine top
-  ctx.save();ctx.globalAlpha=.18;
-  const cSh=ctx.createLinearGradient(0,y,0,y+ctaBtnH*.5);
-  cSh.addColorStop(0,'#fff');cSh.addColorStop(1,'transparent');
-  ctx.fillStyle=cSh;ctx.beginPath();ctx.roundRect(ctaX+6,y+6,ctaW-12,ctaBtnH*.42,isSquare?24:28);ctx.fill();ctx.restore();
-  // Border sutil
-  ctx.save();ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.roundRect(ctaX,y,ctaW,ctaBtnH,isSquare?28:32);ctx.stroke();ctx.restore();
-  // Texto 2 líneas
-  ctx.save();ctx.textAlign='center';ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=10;
-  // Línea 1: icono + texto principal
-  const ctaL1='📲 Descarga la app del club';
-  ctx.font=`900 ${ctaLine1Fs}px sans-serif`;ctx.fillStyle='#ffffff';ctx.letterSpacing='.5px';
-  ctx.fillText(ctaL1,cW/2,y+ctaBtnH*.38);
-  // Línea 2: instrucción
-  const ctaL2='y activa tu beneficio exclusivo';
-  ctx.font=`600 ${ctaLine2Fs}px sans-serif`;ctx.fillStyle='rgba(255,220,220,.9)';ctx.letterSpacing='.2px';
-  ctx.fillText(ctaL2,cW/2,y+ctaBtnH*.72);
+  // ── CTA BOTÓN ────────────────────────────────────────────────────────────
+  y+=12;
+  const _cX=SAFE,_cW=INNER;
+  // Outer glow — moderate, not over-extended
+  ctx.save();ctx.shadowColor='rgba(200,16,46,.48)';ctx.shadowBlur=isStory?44:36;ctx.shadowOffsetY=10;
+  const _ctaFill=ctx.createLinearGradient(_cX,y,_cX+_cW,y+_ctaH);
+  _ctaFill.addColorStop(0,'#880014');_ctaFill.addColorStop(.3,'#c8102e');_ctaFill.addColorStop(.5,'#de1130');_ctaFill.addColorStop(.7,'#c8102e');_ctaFill.addColorStop(1,'#880014');
+  ctx.fillStyle=_ctaFill;ctx.beginPath();ctx.roundRect(_cX,y,_cW,_ctaH,isStory?26:22);ctx.fill();ctx.restore();
+  // Top shine
+  ctx.save();ctx.globalAlpha=.15;
+  const _ctaSh=ctx.createLinearGradient(0,y,0,y+_ctaH*.5);
+  _ctaSh.addColorStop(0,'#fff');_ctaSh.addColorStop(1,'transparent');
+  ctx.fillStyle=_ctaSh;ctx.beginPath();ctx.roundRect(_cX+6,y+6,_cW-12,_ctaH*.42,isStory?22:18);ctx.fill();ctx.restore();
+  // Border
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(_cX,y,_cW,_ctaH,isStory?26:22);ctx.stroke();ctx.restore();
+  // Text
+  ctx.save();ctx.textAlign='center';ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=8;
+  ctx.font=`900 ${isStory?38:34}px sans-serif`;ctx.fillStyle='#ffffff';ctx.letterSpacing='.5px';
+  ctx.fillText('📲 Descarga la app del club',cW/2,y+_ctaH*.4);
+  ctx.font=`600 ${isStory?27:25}px sans-serif`;ctx.fillStyle='rgba(255,215,215,.88)';ctx.letterSpacing='.2px';
+  ctx.fillText('y activa tu beneficio exclusivo',cW/2,y+_ctaH*.75);
   ctx.restore();
-  y+=ctaBtnH+16+gap*.4;
+  y+=_ctaH+14;
 
-  // ══════ FOOTER DUAL ══════
-  if(showClub&&footerH){
-    // URL de la app
-    const urlY=y+footerH*.25;
-    ctx.save();ctx.textAlign='center';ctx.letterSpacing='1px';
-    ctx.font=`700 ${isSquare?19:22}px sans-serif`;ctx.fillStyle='rgba(200,16,46,.7)';
-    ctx.fillText('fixture.cesarcreps.com',cW/2,urlY);
-    ctx.font=`500 ${isSquare?16:19}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.18)';
-    ctx.letterSpacing='2px';
-    ctx.fillText('BENEFICIO EXCLUSIVO PARA SOCIOS · ATLÉTICO NORTE F.C.',cW/2,urlY+(isSquare?28:34));
+  // ── FOOTER ───────────────────────────────────────────────────────────────
+  if(showClub&&_ftH){
+    const _ftY=y+(isStory?18:15);
+    ctx.save();ctx.textAlign='center';
+    ctx.font=`700 ${isStory?20:18}px sans-serif`;ctx.fillStyle='rgba(200,16,46,.62)';ctx.letterSpacing='1px';
+    ctx.fillText('fixture.cesarcreps.com',cW/2,_ftY);
+    ctx.font=`500 ${isStory?14:13}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.16)';ctx.letterSpacing='1.8px';
+    ctx.fillText('BENEFICIO EXCLUSIVO PARA SOCIOS · ATLÉTICO NORTE F.C.',cW/2,_ftY+(isStory?30:26));
     ctx.restore();
   }
 }
