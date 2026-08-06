@@ -20,14 +20,20 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.00';
+var APP_VER='9.01';
 // Auto-reload when new SW takes control — guard prevents infinite loops
+// Force-reload bypassing every cache layer (SW, CDN, browser)
+function _hardReload(){
+  sessionStorage.clear();
+  var base=window.location.pathname;
+  window.location.replace(base+'?_v='+Date.now());
+}
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
   var key='_swr_'+APP_VER;
   if(sessionStorage.getItem(key)==='1')return;
   sessionStorage.setItem(key,'1');
-  window.location.reload(true);
+  _hardReload();
 }
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').then(function(reg){
@@ -2167,9 +2173,12 @@ async function doCp(){
 async function doLt(){if(fbR)await au.signOut();window.location.reload();}
 async function clearCacheReload(){
   sessionStorage.clear();
+  localStorage.removeItem('_spw');
   if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(k){return caches.delete(k);}));}
   if('serviceWorker' in navigator){var regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(function(r){return r.unregister();}));}
-  window.location.reload(true);
+  // Use timestamped URL — bypasses iOS Safari cache, GitHub CDN, and any SW cache
+  var base=window.location.pathname;
+  window.location.replace(base+'?_v='+Date.now());
 }
 function onIn(){
   document.getElementById("btnIn").style.display="none";

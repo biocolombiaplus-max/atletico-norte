@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v9.00-2026-08-06';
+const SW_VER = 'v9.01-2026-08-06';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER;
 
@@ -107,7 +107,12 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request, { cache: 'no-store' }).catch(() => caches.match(e.request)));
+    // Always serve the root HTML for any navigate request (including ?_v= cache-bust URLs)
+    const freshReq = new Request(url.pathname, {
+      cache: 'no-store',
+      headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache, no-store' }
+    });
+    e.respondWith(fetch(freshReq).catch(() => fetch(e.request, { cache: 'no-store' })));
     return;
   }
   if (url.hostname === 'www.gstatic.com') {
