@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v9.04-2026-08-06';
+const SW_VER = 'v9.05-2026-08-06';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER;
 
@@ -90,7 +90,7 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  if (url.pathname === '/manifest.json') {
+  if (url.pathname === '/manifest.json' || url.pathname === '/version.json') {
     e.respondWith(fetch(new Request(e.request.url, {cache:'no-store'})));
     return;
   }

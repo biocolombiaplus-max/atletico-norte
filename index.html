@@ -20,12 +20,27 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.04';
-// ── Update mechanism ──────────────────────────────────────────────────────
-// Rule: the SW navigate() call always wins — it goes to /?_sw=VER&_t=TS
-// The URL param _sw acts as the loop guard (no sessionStorage needed).
-// clearCacheReload KEEPS the SW registered so it can intercept and serve
-// fresh HTML — unregistering would let the CDN serve stale content.
+var APP_VER='9.05';
+// ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
+// Works even when the SW is unregistered (e.g. users stuck on v8.98).
+// /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
+(function(){
+  var VER=APP_VER;
+  function _chkVer(){
+    fetch('/version.json?_t='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.v && d.v!==VER){
+          location.replace(location.pathname+'?_v='+Date.now());
+        }
+      }).catch(function(){});
+  }
+  _chkVer();
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible') _chkVer();
+  });
+}());
+// ── SW update mechanism ────────────────────────────────────────────────────
 (function(){
   // If this page was loaded by a SW navigate, we have ?_sw=VER in the URL.
   // Strip it silently so the address bar stays clean.
