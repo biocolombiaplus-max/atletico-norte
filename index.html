@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='8.99';
+var APP_VER='9.00';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Guard is keyed to APP_VER so a new version always triggers exactly one reload
 function _swReload(){
@@ -777,12 +777,11 @@ tbody td:nth-child(2){text-align:left}
 .sp-tap-cta{font-size:8px;font-weight:800;color:rgba(200,16,46,.8);text-align:center;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:3px}
 .sp-clicks{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border-radius:8px;padding:2px 6px;font-size:7.5px;font-weight:800;color:rgba(255,255,255,.55)}
 /* ── Sponsor banner carousel ── */
-@keyframes sp-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .sp-banner-wrap{position:relative;margin:0 -14px 20px;overflow:hidden;background:rgba(200,16,46,.06);border-top:1px solid rgba(200,16,46,.18);border-bottom:1px solid rgba(200,16,46,.18);padding:16px 0}
 .sp-banner-wrap::before,.sp-banner-wrap::after{content:'';position:absolute;top:0;bottom:0;width:44px;z-index:2;pointer-events:none}
-.sp-banner-wrap::before{left:0;background:linear-gradient(90deg,var(--b1) 30%,transparent)}
-.sp-banner-wrap::after{right:0;background:linear-gradient(-90deg,var(--b1) 30%,transparent)}
-.sp-banner-track{display:flex;align-items:center;gap:0;width:max-content;animation:sp-scroll 18s linear infinite;will-change:transform}
+.sp-banner-wrap::before{left:0;background:linear-gradient(90deg,var(--b1) 40%,transparent)}
+.sp-banner-wrap::after{right:0;background:linear-gradient(-90deg,var(--b1) 40%,transparent)}
+.sp-banner-track{display:flex;align-items:center;width:max-content;will-change:transform}
 .sp-banner-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 20px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .sp-banner-logo{width:58px;height:58px;border-radius:15px;background:var(--b2);border:1.5px solid rgba(200,16,46,.25);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .15s}
 .sp-banner-logo img{width:100%;height:100%;object-fit:cover}
@@ -2267,9 +2266,7 @@ function spRender(){
     +'<div class="sp-header-sub">&#128293; Beneficios exclusivos para la comunidad Atl&#233;tico Norte &#8212; &#161;toca una tarjeta!</div>'
     +'</div>';
   if(keys.length){
-    // ── Banner giratorio ──
-    // Duplicate items so the loop is seamless (need >1 screen width)
-    var bannerItems='';
+    // ── Banner giratorio (JS-driven, máxima compatibilidad iOS) ──
     var buildBannerItem=function(uid){
       var s=_spData[uid];
       var logoEl=s.logo
@@ -2280,13 +2277,14 @@ function spRender(){
         +'<div class="sp-banner-name">'+escHtml(s.nombre||'Aliado')+'</div>'
         +'</div>';
     };
-    // Build single set then duplicate for infinite scroll illusion
-    keys.forEach(function(uid){bannerItems+=buildBannerItem(uid);});
-    var doubled=bannerItems+bannerItems; // seamless loop requires 2x
+    // Repeat enough times: at least 8 items so banner always overflows screen
+    var reps=Math.max(2,Math.ceil(8/keys.length));
+    var items='';
+    for(var ri=0;ri<reps;ri++)keys.forEach(function(uid){items+=buildBannerItem(uid);});
+    // Double the whole set for seamless loop (animation resets at -50%)
+    var trackHtml=items+items;
     h+='<div class="sp-banner-lbl">Nuestros aliados</div>';
-    // Adjust animation speed based on count (more sponsors = slower to be readable)
-    var spd=Math.max(12,keys.length*4);
-    h+='<div class="sp-banner-wrap"><div class="sp-banner-track" style="animation-duration:'+spd+'s">'+doubled+'</div></div>';
+    h+='<div class="sp-banner-wrap"><div class="sp-banner-track" id="spBannerTrack">'+trackHtml+'</div></div>';
 
     // ── Grid estático ──
     h+='<div class="sp-grid-lbl">Toca para ver tu beneficio</div>';
@@ -2328,6 +2326,30 @@ function spRender(){
     document.body.appendChild(mo);
   }
   sec.innerHTML=h;
+  // Start JS-driven banner after DOM update
+  if(keys.length) setTimeout(spBannerStart,50);
+}
+
+var _spBannerRaf=null;
+function spBannerStart(){
+  if(_spBannerRaf){cancelAnimationFrame(_spBannerRaf);_spBannerRaf=null;}
+  var track=document.getElementById('spBannerTrack');
+  if(!track)return;
+  var pos=0;
+  var loopW=0;
+  // Wait one frame for layout, then measure half-width (one set of items)
+  requestAnimationFrame(function(){
+    loopW=track.scrollWidth/2; // half = one full set of items
+    if(loopW<=0)return;
+    var speed=0.6; // px per frame ~36px/s at 60fps
+    function tick(){
+      pos+=speed;
+      if(pos>=loopW)pos=0;
+      track.style.transform='translateX(-'+pos.toFixed(2)+'px)';
+      _spBannerRaf=requestAnimationFrame(tick);
+    }
+    _spBannerRaf=requestAnimationFrame(tick);
+  });
 }
 
 function spCloseModal(){
