@@ -1,5 +1,5 @@
 // Atlético Norte FC — Service Worker
-const SW_VER = 'v9.02-2026-08-06';
+const SW_VER = 'v9.03-2026-08-06';
 const STATIC_CACHE = 'an-static-' + SW_VER;
 const ICON_CACHE   = 'an-club-icon-' + SW_VER;
 
@@ -27,11 +27,12 @@ self.addEventListener('activate', e => {
       .then(() => self.clients.claim())
       .then(() => self.clients.matchAll({type:'window', includeUncontrolled:true}))
       .then(cls => {
-        // Force a real navigation reload on every open tab.
-        // client.navigate() creates a fresh page load — bypasses any
-        // sessionStorage guard that blocks the postMessage path.
+        // Navigate every open tab to a fresh timestamped URL.
+        // The SW fetch handler intercepts this with no-store headers so
+        // GitHub CDN and iOS disk cache are both bypassed.
         cls.forEach(c => {
-          try { c.navigate(c.url); } catch(err) {
+          const freshUrl = c.url.split('?')[0] + '?_sw=' + SW_VER + '&_t=' + Date.now();
+          try { c.navigate(freshUrl); } catch(err) {
             c.postMessage({type:'SW_UPDATED', ver:SW_VER});
           }
         });

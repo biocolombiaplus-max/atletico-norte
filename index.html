@@ -20,49 +20,56 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.02';
-// Auto-reload when new SW takes control — guard prevents infinite loops
-// Force-reload bypassing every cache layer (SW, CDN, browser)
-function _hardReload(){
-  sessionStorage.clear();
-  var base=window.location.pathname;
-  window.location.replace(base+'?_v='+Date.now());
-}
-// Guard is keyed to APP_VER so a new version always triggers exactly one reload
-function _swReload(){
-  var key='_swr_'+APP_VER;
-  if(sessionStorage.getItem(key)==='1')return;
-  sessionStorage.setItem(key,'1');
-  _hardReload();
-}
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js?v='+APP_VER).then(function(reg){
-    reg.update();
+var APP_VER='9.03';
+// ── Update mechanism ──────────────────────────────────────────────────────
+// Rule: the SW navigate() call always wins — it goes to /?_sw=VER&_t=TS
+// The URL param _sw acts as the loop guard (no sessionStorage needed).
+// clearCacheReload KEEPS the SW registered so it can intercept and serve
+// fresh HTML — unregistering would let the CDN serve stale content.
+(function(){
+  // If this page was loaded by a SW navigate, we have ?_sw=VER in the URL.
+  // Strip it silently so the address bar stays clean.
+  var params=new URLSearchParams(location.search);
+  var swVer=params.get('_sw');
+  if(swVer||params.get('_v')){
+    history.replaceState(null,'',location.pathname);
+  }
+
+  if(!('serviceWorker' in navigator))return;
+
+  // Register SW — versioned URL guarantees browser always fetches fresh SW
+  navigator.serviceWorker.register('/sw.js?v='+APP_VER,{updateViaCache:'none'}).then(function(reg){
+    // Check for already-waiting SW (e.g. page was loaded while SW was waiting)
     if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
+    // Watch for new SW installing
     reg.addEventListener('updatefound',function(){
       var nw=reg.installing;
       nw.addEventListener('statechange',function(){
-        if(nw.state==='installed'){
+        if(nw.state==='installed'&&navigator.serviceWorker.controller){
+          // Activate immediately — SW navigate() will reload us with fresh HTML
           nw.postMessage({type:'SKIP_WAITING'});
-          // Show update banner instead of silent reload — user must tap
-          setTimeout(function(){
-            var b=document.getElementById('_updBanner');
-            if(b)b.style.display='flex';
-          },500);
         }
       });
     });
-    navigator.serviceWorker.addEventListener('controllerchange',_swReload);
-    // iOS foreground: check for new SW every time app becomes visible
+    // Kick an update check now and every 20s, and on foreground
+    reg.update();
+    setInterval(function(){reg.update();},20000);
     document.addEventListener('visibilitychange',function(){
       if(document.visibilityState==='visible')reg.update();
     });
-    setInterval(function(){reg.update();},30000);
   }).catch(function(){});
+
+  // When SW_UPDATED arrives (fallback path if navigate() fails)
   navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED')_swReload();
+    if(e.data&&e.data.type==='SW_UPDATED'){
+      // Clear caches so fresh resources are fetched, then navigate with timestamp
+      if('caches' in window){
+        caches.keys().then(function(ks){Promise.all(ks.map(function(k){return caches.delete(k);}));});
+      }
+      location.replace(location.pathname+'?_sw='+e.data.ver+'&_t='+Date.now());
+    }
   });
-}
+}());
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -2172,13 +2179,15 @@ async function doCp(){
 }
 async function doLt(){if(fbR)await au.signOut();window.location.reload();}
 async function clearCacheReload(){
+  // IMPORTANT: do NOT unregister the SW — we need it active so it can
+  // intercept the navigate request and serve fresh HTML (no-store) from
+  // the server, bypassing the GitHub CDN cache. Unregistering removes
+  // that protection and lets the CDN serve stale content.
   sessionStorage.clear();
   localStorage.removeItem('_spw');
   if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(k){return caches.delete(k);}));}
-  if('serviceWorker' in navigator){var regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(function(r){return r.unregister();}));}
-  // Use timestamped URL — bypasses iOS Safari cache, GitHub CDN, and any SW cache
-  var base=window.location.pathname;
-  window.location.replace(base+'?_v='+Date.now());
+  // Timestamped URL: SW intercepts, fetches fresh HTML with no-store headers
+  location.replace(location.pathname+'?_v='+Date.now());
 }
 function onIn(){
   document.getElementById("btnIn").style.display="none";
