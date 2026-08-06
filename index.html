@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.10';
+var APP_VER='9.11';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1015,11 +1015,17 @@ tbody td:nth-child(2){text-align:left}
 .cc-close{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.75);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
 .cc-close:active{background:rgba(255,255,255,.18)}
 
-/* Category tabs */
-.cc-tabs{display:flex;gap:7px;overflow-x:auto;padding:0 0 16px;scrollbar-width:none}
-.cc-tabs::-webkit-scrollbar{display:none}
-.cc-tab{flex-shrink:0;padding:8px 16px;border-radius:24px;font-size:12.5px;font-weight:800;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);cursor:pointer;transition:all .18s;white-space:nowrap}
-.cc-tab.act{background:linear-gradient(135deg,#c8102e,#ff2247);color:#fff;border-color:transparent;box-shadow:0 3px 14px rgba(200,16,46,.4)}
+/* Quick-nav jump bar */
+.cc-quicknav{display:flex;gap:7px;overflow-x:auto;padding:0 0 16px;scrollbar-width:none}
+.cc-quicknav::-webkit-scrollbar{display:none}
+.cc-qn-pill{flex-shrink:0;padding:7px 14px;border-radius:24px;font-size:12px;font-weight:800;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);cursor:pointer;transition:all .18s;white-space:nowrap;user-select:none}
+.cc-qn-pill:active{background:rgba(200,16,46,.25);color:#fff}
+
+/* Section dividers in continuous scroll */
+.cc-section-hd{display:flex;align-items:center;gap:10px;padding:20px 18px 10px;position:sticky;top:0;z-index:5;background:#111}
+.cc-section-hd-bar{flex:1;height:1px;background:rgba(200,16,46,.2)}
+.cc-section-hd-lbl{font-size:13px;font-weight:900;color:#c8102e;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+.cc-section-hd-ct{font-size:10px;font-weight:700;color:rgba(255,255,255,.25);margin-left:2px}
 
 /* Items list */
 .cc-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#111}
@@ -2672,10 +2678,11 @@ var _CC_MENU=[
   ]},
   {id:'bebidas',nom:'Bebidas 🥤',items:[
     {n:'Coca-Cola 400ml',p:4000},
-    {n:'Agua Botella 400ml',p:4000},
+    {n:'Agua Botella 400ml',d:'Perfecta para hidratarte',p:5000},
     {n:'Jugos Hit',p:4000},
     {n:'Mr Tea',d:'Té helado premium',p:9000},
     {n:'Coca-Cola 1.5L',d:'Ideal para compartir',p:11000},
+    {n:'Coca-Cola 1.5L Zero',d:'Sin azúcar, mismo sabor',p:11000},
     {n:'Coca-Cola 2.0L',d:'Para toda la mesa',p:12000},
   ]},
   {id:'cervezas',nom:'Cervezas 🍺',items:[
@@ -2725,29 +2732,30 @@ function _ccKey(catId,itemName,size){
   return catId+'|'+itemName+(size?'|'+size:'');
 }
 
-function _ccBuildItems(cat){
-  var sNom={P:'Personal',M:'Mediano',S:'Súper'};
-  var tagMap={
-    hot:['cc-tag-hot','🔥 El más pedido'],
-    star:['cc-tag-star','⭐ Favorito del local'],
-    sig:['cc-tag-sig','💯 Firma de la casa'],
-    fresh:['cc-tag-fresh','🌿 Con fruta natural'],
-    kids:['cc-tag-kids','👶 Para los peques']
-  };
-  var html='<div class="cc-cat-lbl">'+cat.nom+'</div>';
+var _CC_TAG_MAP={
+  hot:['cc-tag-hot','🔥 El más pedido'],
+  star:['cc-tag-star','⭐ Favorito del local'],
+  sig:['cc-tag-sig','💯 Firma de la casa'],
+  fresh:['cc-tag-fresh','🌿 Con fruta natural'],
+  kids:['cc-tag-kids','👶 Para los peques']
+};
+var _CC_S_NOM={P:'Personal',M:'Mediano',S:'Súper'};
+
+function _ccItemsHtml(cat){
+  var html='';
   cat.items.forEach(function(item,idx){
     var hasSizes=!!item.s;
     var numStr=(idx+1)<10?'0'+(idx+1):''+(idx+1);
     var tagHtml='';
-    if(item.tag&&tagMap[item.tag]){
-      tagHtml='<span class="cc-tag '+tagMap[item.tag][0]+'">'+tagMap[item.tag][1]+'</span>';
+    if(item.tag&&_CC_TAG_MAP[item.tag]){
+      tagHtml='<span class="cc-tag '+_CC_TAG_MAP[item.tag][0]+'">'+_CC_TAG_MAP[item.tag][1]+'</span>';
     }
-    html+='<div class="cc-item">';
-    html+='<div class="cc-item-head">'
-      +'<span class="cc-num">'+numStr+'</span>'
-      +'<span class="cc-item-name">'+escHtml(item.n)+'</span>'
-      +tagHtml
-    +'</div>';
+    html+='<div class="cc-item">'
+      +'<div class="cc-item-head">'
+        +'<span class="cc-num">'+numStr+'</span>'
+        +'<span class="cc-item-name">'+escHtml(item.n)+'</span>'
+        +tagHtml
+      +'</div>';
     if(item.d) html+='<div class="cc-item-sub">'+escHtml(item.d)+'</div>';
     if(hasSizes){
       html+='<div class="cc-sizes" style="margin-top:9px">';
@@ -2759,7 +2767,7 @@ function _ccBuildItems(cat){
         var qty=(_ccOrder[k]||{}).qty||0;
         html+='<div class="cc-size-row">'
           +'<span class="cc-size-badge">'+sz+'</span>'
-          +'<span class="cc-size-nom">'+sNom[sz]+'</span>'
+          +'<span class="cc-size-nom">'+_CC_S_NOM[sz]+'</span>'
           +'<span class="cc-size-old">'+_ccFmt(price)+'</span>'
           +'<span class="cc-size-disc">'+_ccFmt(discP)+'</span>'
           +'<div class="cc-qty">'
@@ -2792,6 +2800,29 @@ function _ccBuildItems(cat){
   return html;
 }
 
+function _ccBuildAllItems(){
+  var html='';
+  _CC_MENU.forEach(function(cat){
+    html+='<div class="cc-section-hd" id="ccsec_'+cat.id+'">'
+      +'<span class="cc-section-hd-lbl">'+cat.nom+'</span>'
+      +'<span class="cc-section-hd-ct">'+cat.items.length+' productos</span>'
+      +'<span class="cc-section-hd-bar"></span>'
+    +'</div>';
+    html+=_ccItemsHtml(cat);
+  });
+  return html;
+}
+
+function ccScrollTo(catId){
+  var el=document.getElementById('ccsec_'+catId);
+  var body=document.getElementById('ccBody');
+  if(el&&body) body.scrollTop=el.offsetTop-2;
+}
+
+// legacy compat
+function _ccBuildItems(cat){return _ccItemsHtml(cat);}
+function ccSetCat(idx){ccScrollTo(_CC_MENU[idx]&&_CC_MENU[idx].id);}
+
 function _ccRender(spData){
   var sheet=document.getElementById('ccMenuSheet');
   if(!sheet)return;
@@ -2799,13 +2830,11 @@ function _ccRender(spData){
     ?'<img class="cc-sheet-logo" src="'+escHtml(spData.logo)+'" alt="César Creps">'
     :'<div class="cc-sheet-logo-em">🫔</div>';
 
-  var tabs='<div class="cc-tabs" id="ccTabs">';
-  _CC_MENU.forEach(function(cat,i){
-    tabs+='<button class="cc-tab'+(i===_ccActiveCat?' act':'')+'" onclick="ccSetCat('+i+')">'+cat.nom+'</button>';
+  var quicknav='<div class="cc-quicknav">';
+  _CC_MENU.forEach(function(cat){
+    quicknav+='<button class="cc-qn-pill" onclick="ccScrollTo(\''+cat.id+'\')">'+cat.nom+'</button>';
   });
-  tabs+='</div>';
-
-  var cat=_CC_MENU[_ccActiveCat];
+  quicknav+='</div>';
 
   sheet.innerHTML=''
     +'<div class="cc-sheet-head">'
@@ -2817,14 +2846,14 @@ function _ccRender(spData){
         +'</div>'
         +'<button class="cc-close" onclick="ccCloseMenu()">✕</button>'
       +'</div>'
-      +tabs
+      +quicknav
     +'</div>'
     +'<div class="cc-hero-strip">'
       +'<span class="cc-hero-strip-ico">💰</span>'
       +'<div class="cc-hero-strip-copy"><strong>¡Estás ahorrando con tu membresía!</strong>'
-      +'Agrega productos y ve tu ahorro real en tiempo real antes de pedir.</div>'
+      +' Agrega productos y ve tu ahorro real antes de pedir.</div>'
     +'</div>'
-    +'<div class="cc-body" id="ccBody">'+_ccBuildItems(cat)+'</div>'
+    +'<div class="cc-body" id="ccBody">'+_ccBuildAllItems()+'</div>'
     +_ccBuildFooter();
 }
 
