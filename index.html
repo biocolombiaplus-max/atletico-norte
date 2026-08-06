@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.01';
+var APP_VER='9.02';
 // Auto-reload when new SW takes control — guard prevents infinite loops
 // Force-reload bypassing every cache layer (SW, CDN, browser)
 function _hardReload(){
@@ -36,7 +36,7 @@ function _swReload(){
   _hardReload();
 }
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').then(function(reg){
+  navigator.serviceWorker.register('/sw.js?v='+APP_VER).then(function(reg){
     reg.update();
     if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
     reg.addEventListener('updatefound',function(){
