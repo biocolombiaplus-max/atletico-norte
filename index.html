@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.14';
+var APP_VER='9.15';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1016,12 +1016,25 @@ tbody td:nth-child(2){text-align:left}
 .cc-close:active{background:rgba(255,255,255,.18)}
 
 /* Quick-nav jump bar */
-.cc-quicknav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;scrollbar-width:none}
+.cc-quicknav{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 18px;scrollbar-width:none}
 .cc-quicknav::-webkit-scrollbar{display:none}
-.cc-qn-pill{flex-shrink:0;padding:10px 16px;border-radius:28px;font-size:13.5px;font-weight:900;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;white-space:nowrap;user-select:none;letter-spacing:.1px}
-.cc-qn-pill:active{transform:scale(.95)}
-@keyframes cc-glow{0%,100%{box-shadow:0 0 10px rgba(200,16,46,.5),0 4px 16px rgba(200,16,46,.4)}50%{box-shadow:0 0 22px rgba(200,16,46,.8),0 4px 24px rgba(200,16,46,.6)}}
-.cc-qn-pill.act{background:linear-gradient(135deg,#c8102e,#ff2247);color:#fff;border-color:transparent;animation:cc-glow 2s ease-in-out infinite;transform:scale(1.05)}
+.cc-qn-pill{
+  flex-shrink:0;padding:11px 18px;border-radius:30px;
+  font-size:13px;font-weight:900;letter-spacing:.15px;white-space:nowrap;user-select:none;
+  border:1.5px solid rgba(255,255,255,.11);
+  background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.04));
+  color:rgba(255,255,255,.55);
+  box-shadow:0 2px 10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
+  cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1)
+}
+.cc-qn-pill:active{transform:scale(.93);opacity:.85}
+@keyframes cc-glow{0%,100%{box-shadow:0 0 12px rgba(200,16,46,.55),0 4px 18px rgba(200,16,46,.45),inset 0 1px 0 rgba(255,255,255,.2)}50%{box-shadow:0 0 28px rgba(200,16,46,.85),0 6px 28px rgba(200,16,46,.65),inset 0 1px 0 rgba(255,255,255,.25)}}
+.cc-qn-pill.act{
+  background:linear-gradient(135deg,#c8102e 0%,#ff2247 100%);
+  color:#fff;border-color:rgba(255,120,120,.35);
+  box-shadow:0 4px 22px rgba(200,16,46,.55),inset 0 1px 0 rgba(255,255,255,.25);
+  animation:cc-glow 2.2s ease-in-out infinite;transform:scale(1.07)
+}
 
 /* Section dividers in continuous scroll */
 .cc-section-hd{display:flex;align-items:center;gap:10px;padding:20px 18px 10px;position:sticky;top:0;z-index:5;background:#111}
@@ -1030,7 +1043,7 @@ tbody td:nth-child(2){text-align:left}
 .cc-section-hd-ct{font-size:10px;font-weight:700;color:rgba(255,255,255,.25);margin-left:2px}
 
 /* Items list */
-.cc-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#111}
+.cc-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#111;position:relative}
 .cc-cat-lbl{font-size:10px;font-weight:900;color:rgba(200,16,46,.75);letter-spacing:2px;text-transform:uppercase;padding:18px 18px 8px}
 
 /* Item card */
@@ -2808,7 +2821,9 @@ function _ccItemsHtml(cat){
 function _ccBuildAllItems(){
   var html='';
   _CC_MENU.forEach(function(cat){
-    html+='<div class="cc-section-hd" id="ccsec_'+cat.id+'">'
+    // Non-sticky anchor — ccScrollTo targets this, not the sticky header
+    html+='<div id="ccsec_'+cat.id+'" style="height:0;overflow:hidden;margin:0;padding:0"></div>';
+    html+='<div class="cc-section-hd">'
       +'<span class="cc-section-hd-lbl">'+cat.nom+'</span>'
       +'<span class="cc-section-hd-ct">'+cat.items.length+' productos</span>'
       +'<span class="cc-section-hd-bar"></span>'
@@ -2819,18 +2834,30 @@ function _ccBuildAllItems(){
 }
 
 function ccScrollTo(catId){
-  var el=document.getElementById('ccsec_'+catId);
+  var anchor=document.getElementById('ccsec_'+catId);
   var body=document.getElementById('ccBody');
-  if(!el||!body) return;
-  // Accurate position relative to the scrollable container
-  var top=el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
-  body.scrollTo({top:Math.max(0,top-1),behavior:'smooth'});
-  // Snap the pill into view in the quick-nav
+  if(!anchor||!body) return;
+  // anchor.offsetTop is relative to ccBody because ccBody has position:relative
+  body.scrollTop=anchor.offsetTop;
+  _ccSetActivePill(catId);
+}
+
+function _ccSetActivePill(catId){
   var pills=document.querySelectorAll('.cc-qn-pill');
   _CC_MENU.forEach(function(cat,i){
     var isAct=cat.id===catId;
-    if(pills[i]) pills[i].classList.toggle('act',isAct);
-    if(isAct&&pills[i]) pills[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    if(!pills[i]) return;
+    pills[i].classList.toggle('act',isAct);
+    if(isAct){
+      // center active pill in the quick-nav bar
+      var nav=pills[i].closest('.cc-quicknav');
+      if(nav){
+        var pLeft=pills[i].offsetLeft;
+        var pW=pills[i].offsetWidth;
+        var nW=nav.offsetWidth;
+        nav.scrollLeft=pLeft - nW/2 + pW/2;
+      }
+    }
   });
 }
 
@@ -2838,16 +2865,15 @@ function _ccInitScrollSpy(){
   var body=document.getElementById('ccBody');
   if(!body) return;
   body.addEventListener('scroll',function(){
-    var bodyTop=body.getBoundingClientRect().top;
-    var pills=document.querySelectorAll('.cc-qn-pill');
+    var st=body.scrollTop;
     var activeId=_CC_MENU[0].id;
     _CC_MENU.forEach(function(cat){
-      var sec=document.getElementById('ccsec_'+cat.id);
-      if(sec&&sec.getBoundingClientRect().top<=bodyTop+80) activeId=cat.id;
+      var anchor=document.getElementById('ccsec_'+cat.id);
+      if(anchor && anchor.offsetTop <= st+10) activeId=cat.id;
     });
+    var pills=document.querySelectorAll('.cc-qn-pill');
     _CC_MENU.forEach(function(cat,i){
-      var isAct=cat.id===activeId;
-      if(pills[i]) pills[i].classList.toggle('act',isAct);
+      if(pills[i]) pills[i].classList.toggle('act',cat.id===activeId);
     });
   },{passive:true});
 }
