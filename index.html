@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.17';
+var APP_VER='9.18';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -813,11 +813,14 @@ tbody td:nth-child(2){text-align:left}
 /* ═══ PATROCINADORES / ALIADOS ═══ */
 /* ═══ ALIADOS / SPONSORS ═══ */
 .sp-section{padding:0 14px 4px}
-.sp-header{margin-bottom:14px}
-.sp-title{font-size:9px;font-weight:900;color:var(--dm);text-transform:uppercase;letter-spacing:1.6px;display:flex;align-items:center;gap:8px}
-.sp-title::before{content:'';width:3px;height:14px;background:#c8102e;border-radius:2px;flex-shrink:0}
-.sp-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
-.sp-header-sub{font-size:9.5px;color:var(--m);margin-top:5px;margin-left:11px}
+.sp-header{margin-bottom:16px}
+@keyframes sp-hd-glow{0%,100%{box-shadow:0 0 18px rgba(200,16,46,.28)}50%{box-shadow:0 0 32px rgba(200,16,46,.55)}}
+@keyframes sp-badge-shine{0%{background-position:200% center}100%{background-position:-200% center}}
+.sp-title{font-size:11px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:1.8px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sp-title-bar{width:4px;height:18px;background:linear-gradient(180deg,#ff2247,#c8102e);border-radius:2px;flex-shrink:0;box-shadow:0 0 10px rgba(200,16,46,.7)}
+.sp-title-after{flex:1;height:1px;background:linear-gradient(90deg,rgba(200,16,46,.35),transparent)}
+.sp-header-sub{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(200,16,46,.14),rgba(200,16,46,.06));border:1px solid rgba(200,16,46,.3);border-radius:30px;padding:7px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.88);animation:sp-hd-glow 3s ease-in-out infinite;margin-left:0}
+.sp-header-sub-dot{width:7px;height:7px;border-radius:50%;background:#c8102e;flex-shrink:0;box-shadow:0 0 8px rgba(200,16,46,.9)}
 /* Grid 2 columnas — logos grandes y llamativos */
 @keyframes sp-pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,16,46,.35)}70%{box-shadow:0 0 0 8px rgba(200,16,46,0)}}
 @keyframes sp-ripple{0%{transform:scale(.85);opacity:.7}100%{transform:scale(1.6);opacity:0}}
@@ -847,9 +850,10 @@ tbody td:nth-child(2){text-align:left}
 .sp-banner-name{font-size:8.5px;font-weight:800;color:var(--m);letter-spacing:.2px;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .sp-banner-lbl{font-size:8px;font-weight:800;color:var(--dm);letter-spacing:1.4px;text-transform:uppercase;text-align:center;padding:0 14px 6px;display:flex;align-items:center;gap:8px}
 .sp-banner-lbl::before,.sp-banner-lbl::after{content:'';flex:1;height:1px;background:rgba(200,16,46,.22)}
-.sp-grid-lbl{font-size:8px;font-weight:800;color:var(--dm);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.sp-grid-lbl::before{content:'';width:3px;height:12px;background:#c8102e;border-radius:2px;flex-shrink:0}
-.sp-grid-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
+@keyframes sp-hand-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.sp-grid-lbl{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 0 14px;background:linear-gradient(135deg,rgba(245,197,24,.12),rgba(245,197,24,.05));border:1px solid rgba(245,197,24,.3);border-radius:20px;padding:9px 14px;font-size:11px;font-weight:900;color:#f5c518;letter-spacing:.6px;text-transform:uppercase}
+.sp-grid-lbl-hand{display:inline-block;animation:sp-hand-bounce 1.2s ease-in-out infinite}
+.sp-grid-lbl-arrow{font-size:10px;opacity:.7}
 /* Modal aliado premium */
 .sp-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9800;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(6px)}
 .sp-modal-ov.op{opacity:1;pointer-events:all}
@@ -2443,8 +2447,8 @@ function spRender(){
   var isAdm=cr==='Administrador'||cr==='Coordinador Financiero';
   var h='<div class="sp-section">';
   h+='<div class="sp-header">'
-    +'<div class="sp-title">Aliados &amp; Patrocinadores</div>'
-    +'<div class="sp-header-sub">&#128293; Beneficios exclusivos para la comunidad Atl&#233;tico Norte &#8212; &#161;toca una tarjeta!</div>'
+    +'<div class="sp-title"><span class="sp-title-bar"></span>Aliados &amp; Patrocinadores<span class="sp-title-after"></span></div>'
+    +'<div class="sp-header-sub"><span class="sp-header-sub-dot"></span>Descuentos exclusivos para socios &mdash; &#161;toca y ahorra!</div>'
     +'</div>';
   if(keys.length){
     // ── Banner giratorio (JS-driven, máxima compatibilidad iOS) ──
@@ -2468,7 +2472,7 @@ function spRender(){
     h+='<div class="sp-banner-wrap"><div class="sp-banner-track" id="spBannerTrack">'+trackHtml+'</div></div>';
 
     // ── Grid estático ──
-    h+='<div class="sp-grid-lbl">Toca para ver tu beneficio</div>';
+    h+='<div class="sp-grid-lbl"><span class="sp-grid-lbl-hand">&#128070;</span> Toca para ver tu beneficio <span class="sp-grid-lbl-arrow">&#9660;</span></div>';
     h+='<div class="sp-grid">';
     keys.forEach(function(uid){
       var s=_spData[uid];
