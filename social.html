@@ -150,8 +150,8 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
         <button id="fmtStory" onclick="aliadoSetFmt('story',this)" style="padding:10px;border-radius:10px;border:2px solid #c8102e;background:rgba(200,16,46,.12);color:var(--t);font-size:11px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
           <span style="font-size:22px">📱</span>Story 9:16<span style="font-size:9px;color:var(--m);font-weight:600">Instagram / Estados</span>
         </button>
-        <button id="fmtSquare" onclick="aliadoSetFmt('square',this)" style="padding:10px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b3);color:var(--m);font-size:11px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
-          <span style="font-size:22px">⬜</span>Cuadrado 1:1<span style="font-size:9px;font-weight:600">WhatsApp / Feed</span>
+        <button id="fmtSquare" onclick="aliadoSetFmt('portrait',this)" style="padding:10px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b3);color:var(--m);font-size:11px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:22px">🖼️</span>Feed 4:5<span style="font-size:9px;font-weight:600">1080×1350 Instagram</span>
         </button>
       </div>
     </div>
@@ -661,10 +661,11 @@ function clearBg(){
 }
 
 // ═══════════════════════════════════════════════════════
-//  CANVAS — 1080 × 1920 (story) / 1080 × 1080 (square)
+//  CANVAS — 1080 × 1920 (story) / 1080 × 1350 (portrait feed)
 // ═══════════════════════════════════════════════════════
 const W=1080,H=1920;
-let _aliadoFmt='story'; // 'story' | 'square'
+const H_PORTRAIT=1350;
+let _aliadoFmt='story'; // 'story' | 'portrait'
 const DL=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const DS=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 const ML=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -676,7 +677,7 @@ async function gen(){
   // Resize canvas for aliado format
   const cv=document.getElementById('cv');
   if(isAliado){
-    const cH=_aliadoFmt==='square'?W:H;
+    const cH=_aliadoFmt==='portrait'?H_PORTRAIT:H;
     if(cv.width!==W||cv.height!==cH){cv.width=W;cv.height=cH;}
   } else {
     if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
@@ -2834,17 +2835,12 @@ function aliadoInit(){
 
 function aliadoSetFmt(fmt,btn){
   _aliadoFmt=fmt;
-  const s=document.getElementById('fmtStory');
-  const q=document.getElementById('fmtSquare');
-  const activeStyle='border:2px solid #c8102e;background:rgba(200,16,46,.12);color:var(--t)';
-  const idleStyle='border:1.5px solid var(--bd);background:var(--b3);color:var(--m)';
-  if(s)s.style.cssText=s.style.cssText+(fmt==='story'?activeStyle:idleStyle);
-  if(q)q.style.cssText=q.style.cssText+(fmt==='square'?activeStyle:idleStyle);
-  // Update border on clicked button
   document.querySelectorAll('#fmtStory,#fmtSquare').forEach(b=>{
-    b.style.borderColor=b.id===(fmt==='story'?'fmtStory':'fmtSquare')?'#c8102e':'var(--bd)';
-    b.style.background=b.id===(fmt==='story'?'fmtStory':'fmtSquare')?'rgba(200,16,46,.12)':'var(--b3)';
-    b.style.color=b.id===(fmt==='story'?'fmtStory':'fmtSquare')?'var(--t)':'var(--m)';
+    const active=(fmt==='story'&&b.id==='fmtStory')||(fmt==='portrait'&&b.id==='fmtSquare');
+    b.style.borderColor=active?'#c8102e':'var(--bd)';
+    b.style.borderWidth=active?'2px':'1.5px';
+    b.style.background=active?'rgba(200,16,46,.12)':'var(--b3)';
+    b.style.color=active?'var(--t)':'var(--m)';
   });
   aliadoPreview();
 }
