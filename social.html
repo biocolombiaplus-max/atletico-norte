@@ -2993,13 +2993,17 @@ async function tAliado(ctx,cW,cH){
   // Footer
   const ftH=showClub?(isStory?60:52):0;
 
-  // Distribución de espacio
-  const fixed=V+cLH+(showClub?24:0)+12+lSz+16+nH+12+eH+8+bdH+(rBH?16+rBH:0)+18+ctH+10+ftH+V;
-  const slots=4+(rBH?1:0)+(showClub?1:0);
-  const spare=Math.max(0,cH-fixed);
-  const gap=Math.min(spare/slots,isStory?44:36);
+  // Trust strip
+  const trustH=isStory?58:50;
+  const trustFs=isStory?22:20;
 
-  let y=V;
+  // Distribución de espacio — centrado vertical
+  const fixed=cLH+(showClub?24:0)+12+lSz+16+nH+12+eH+8+bdH+(rBH?16+rBH:0)+18+ctH+16+trustH+14+ftH;
+  const slots=4+(rBH?1:0)+(showClub?1:0);
+  const spare=Math.max(0,cH-fixed-V*2);
+  const gap=Math.min(spare/slots,isStory?52:44);
+  const totalH=fixed+gap*slots;
+  let y=Math.max(V,Math.floor((cH-totalH)/2));
 
   // ── CLUB HEADER ───────────────────────────────────────────────────────────
   if(showClub){
@@ -3150,12 +3154,33 @@ async function tAliado(ctx,cW,cH){
   ctx.fillText('📲 Descarga la app del club',W2,y+ctH*.4);
   ctx.font=`600 ${isStory?26:24}px sans-serif`;ctx.fillStyle='rgba(255,210,210,.88)';ctx.letterSpacing='.1px';
   ctx.fillText('y activa tu beneficio exclusivo',W2,y+ctH*.76);
-  y+=ctH+10;
+  y+=ctH+16;
 
-  // ── FOOTER ───────────────────────────────────────────────────────────────
+  // ── TRUST STRIP ───────────────────────────────────────────────────────────
+  _noShadow(ctx);
+  // Fondo sutil
+  ctx.fillStyle='rgba(255,255,255,.04)';ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.roundRect(S,y,INNER,trustH,isStory?16:12);ctx.fill();ctx.stroke();
+  // Tres checks centrados
+  const checks=['✓ Válido todos los días','✓ Sin mínimo de compra','✓ Solo para socios'];
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`600 ${trustFs}px sans-serif`;ctx.letterSpacing='0px';
+  const chunkW=INNER/3;
+  checks.forEach((txt,i)=>{
+    const cx2=S+chunkW*i+chunkW/2;
+    const mid=y+trustH/2;
+    // Check verde
+    ctx.fillStyle='rgba(74,222,128,.88)';
+    ctx.fillText('✓',cx2-ctx.measureText(txt.slice(1)).width/2-trustFs*.1,mid);
+    ctx.fillStyle='rgba(255,255,255,.78)';
+    ctx.fillText(txt.slice(1),cx2+trustFs*.4,mid);
+  });
+  ctx.textBaseline='alphabetic';
+  y+=trustH+14;
+
+  // ── FOOTER (pinned near bottom) ───────────────────────────────────────────
   if(showClub&&ftH){
     _noShadow(ctx);ctx.textAlign='center';
-    const ftY=y+(isStory?20:16);
+    const ftY=cH-V-(isStory?28:24);
     ctx.font=`700 ${isStory?19:17}px sans-serif`;ctx.fillStyle='rgba(200,16,46,.58)';ctx.letterSpacing='1px';
     ctx.fillText('fixture.cesarcreps.com',W2,ftY);
     ctx.font=`500 ${isStory?13:12}px sans-serif`;ctx.fillStyle='rgba(255,255,255,.14)';ctx.letterSpacing='1.8px';
