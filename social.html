@@ -1879,7 +1879,7 @@ async function tResultado(ctx,m){
   const hasCards=ylL.length||ylR.length||rdL.length||rdR.length;
 
   // Helper: draw a thin labeled separator between event sections
-  function evSep(rowY,rH,label,col){
+  function evSep(rowY,rH,label,col,lColX,rColX,colW){
     const sepY=rowY-rH*.45;
     ctx.save();ctx.globalAlpha=.35;
     ctx.strokeStyle=col;ctx.lineWidth=1;ctx.setLineDash([3,5]);
@@ -1917,11 +1917,11 @@ async function tResultado(ctx,m){
 
       // Section separator: before cards (yellow) block
       if(i===goalRows&&(ylL.length||ylR.length||rdL.length||rdR.length)&&i>0){
-        evSep(rowY,rowH,'TARJETAS','rgba(251,191,36,.8)');
+        evSep(rowY,rowH,'TARJETAS','rgba(251,191,36,.8)',lColX,rColX,colW);
       }
       // Section separator: before reds block (only if yellows also exist)
       if(i===cardRows&&(rdL.length||rdR.length)&&(ylL.length||ylR.length)&&i>0){
-        evSep(rowY,rowH,'ROJAS','rgba(239,68,68,.8)');
+        evSep(rowY,rowH,'ROJAS','rgba(239,68,68,.8)',lColX,rColX,colW);
       }
 
       const el=evL[i],er=evR[i];
