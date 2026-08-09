@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -168,19 +168,19 @@ select:focus,input:focus{outline:none;border-color:var(--rd);box-shadow:0 0 0 3p
     <div style="display:flex;flex-direction:column;gap:10px">
       <div>
         <div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Nombre / Marca</div>
-        <input id="alNombre" type="text" placeholder="Ej: César Creps" oninput="aliadoPreview()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none">
+        <input id="alNombre" type="text" placeholder="Ej: César Creps" oninput="aliadoPreviewDebounced()" onfocus="aliadoInputFocus()" onblur="aliadoInputBlur()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:16px;padding:9px 12px;outline:none;-webkit-appearance:none">
       </div>
       <div>
         <div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Titular de la oferta / Badge</div>
-        <input id="alBeneficio" type="text" placeholder="Ej: 15% OFF exclusivo socios" oninput="aliadoPreview()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none">
+        <input id="alBeneficio" type="text" placeholder="Ej: 15% OFF exclusivo socios" oninput="aliadoPreviewDebounced()" onfocus="aliadoInputFocus()" onblur="aliadoInputBlur()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:16px;padding:9px 12px;outline:none;-webkit-appearance:none">
       </div>
       <div>
         <div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Descripción / Reseña</div>
-        <textarea id="alResena" rows="3" placeholder="Texto que aparece en la imagen…" oninput="aliadoPreview()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:12px;padding:9px 12px;outline:none;resize:vertical;font-family:inherit;-webkit-appearance:none"></textarea>
+        <textarea id="alResena" rows="3" placeholder="Texto que aparece en la imagen…" oninput="aliadoPreviewDebounced()" onfocus="aliadoInputFocus()" onblur="aliadoInputBlur()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:16px;padding:9px 12px;outline:none;resize:none;font-family:inherit;-webkit-appearance:none"></textarea>
       </div>
       <div>
         <div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Botón CTA (llamado a la acción)</div>
-        <input id="alCta" type="text" placeholder="Ej: Escríbenos por WhatsApp · Ver más info" oninput="aliadoPreview()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none">
+        <input id="alCta" type="text" placeholder="Ej: Escríbenos por WhatsApp · Ver más info" oninput="aliadoPreviewDebounced()" onfocus="aliadoInputFocus()" onblur="aliadoInputBlur()" style="width:100%;box-sizing:border-box;background:var(--b3);border:1.5px solid var(--bd);border-radius:9px;color:var(--t);font-size:16px;padding:9px 12px;outline:none;-webkit-appearance:none">
       </div>
       <div>
         <div style="font-size:9px;font-weight:800;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Logo (opcional, reemplaza emoji)</div>
@@ -2914,6 +2914,20 @@ function aliadoLoadLogo(inp){
 
 function aliadoPreview(){
   if(curTpl==='aliado')gen();
+}
+let _alPrevTimer=null;
+function aliadoPreviewDebounced(){
+  clearTimeout(_alPrevTimer);
+  _alPrevTimer=setTimeout(function(){if(curTpl==='aliado')gen();},480);
+}
+function aliadoInputFocus(){
+  // Pause live preview while keyboard is up — prevents scroll jumping
+  clearTimeout(_alPrevTimer);
+}
+function aliadoInputBlur(){
+  // Redraw once after user finishes editing a field
+  clearTimeout(_alPrevTimer);
+  _alPrevTimer=setTimeout(function(){if(curTpl==='aliado')gen();},120);
 }
 
 // ── Helpers ──
