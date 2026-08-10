@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.18';
+var APP_VER='9.19';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -2118,7 +2118,7 @@ function updHdr(){
   document.getElementById("hPl").textContent=pl;
   document.getElementById("hRm").textContent=135-pl;
   // Semana: pr\u00f3xima jornada no jugada; si todo jugado, \u00faltima semana jugada
-  var todayStr=new Date().toISOString().slice(0,10);
+  var todayStr=new Date(Date.now()-5*3600000).toISOString().slice(0,10);
   var pendFut=MF.filter(function(m){return !(res[m.id]&&res[m.id].l!==undefined)&&m.fecha>=todayStr;});
   var curWk;
   if(pendFut.length){pendFut.sort(function(a,b){return a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora);});curWk=pendFut[0].week;}
@@ -3403,17 +3403,19 @@ function _matchStatus(m){
   // Returns: 'played'|'live'|'hoy'|'next'|'future'
   var r=res[m.id];
   if(r&&r.l!==undefined)return'played';
-  var now=new Date();
-  var todayStr=now.toISOString().slice(0,10);
+  // Siempre hora Colombia UTC-5 \u2014 evita que UTC cruce de d\u00eda antes que Colombia
+  var nowCol=new Date(Date.now()-5*3600000);
+  var todayStr=nowCol.toISOString().slice(0,10);
   if(m.fecha>todayStr)return'future';
-  if(m.fecha<todayStr)return'played'; // past unregistered \u2192 treat as future (won't badge)
-  // Today's match
+  if(m.fecha<todayStr)return'played';
+  // Partido de hoy \u2014 comparar minutos desde medianoche Colombia
   var hora=getHora(m).split(':');
-  var kickoff=new Date(now);kickoff.setHours(+hora[0],+hora[1],0,0);
-  var diff=(now-kickoff)/60000;
+  var nowMins=nowCol.getUTCHours()*60+nowCol.getUTCMinutes();
+  var kickMins=+hora[0]*60+(+hora[1]);
+  var diff=nowMins-kickMins;
   if(diff<0)return'hoy';
   if(diff<=80)return'live';
-  return'future'; // ended but not entered
+  return'future';
 }
 function rFx(){
   updHdr();
@@ -3423,7 +3425,7 @@ function rFx(){
     return vuOk&&eqOk;
   });
   // Find next upcoming unplayed match across all (ignoring filters for badge logic)
-  var todayStr=new Date().toISOString().slice(0,10);
+  var todayStr=new Date(Date.now()-5*3600000).toISOString().slice(0,10);
   var allPend=MF.filter(function(m){return !(res[m.id]&&res[m.id].l!==undefined)&&m.fecha>=todayStr;});
   allPend.sort(function(a,b){return a.fecha.localeCompare(b.fecha)||getHora(a).localeCompare(getHora(b));});
   var nextMid=allPend.length?allPend[0].id:-1;
