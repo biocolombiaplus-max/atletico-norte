@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.24';
+var APP_VER='9.25';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -147,11 +147,11 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 @keyframes adleftspark{0%,100%{opacity:.7}50%{opacity:1}}
 .adticker{display:flex;align-items:center;height:48px;background:linear-gradient(90deg,rgba(15,3,5,.98) 0%,rgba(40,10,5,.98) 40%,rgba(30,12,2,.98) 60%,rgba(15,3,5,.98) 100%);border-top:2px solid rgba(251,191,36,.55);border-bottom:1px solid rgba(251,191,36,.18);text-decoration:none;cursor:pointer;animation:adglow 3s ease-in-out infinite;position:relative;overflow:hidden}
 .adticker::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(251,191,36,.04) 30%,rgba(251,113,26,.05) 60%,transparent 100%);pointer-events:none}
-.adtk-left{flex-shrink:0;padding:0 14px;display:flex;align-items:center;gap:7px;height:100%;background:linear-gradient(135deg,#c8102e 0%,#e53935 45%,#b71c1c 100%);position:relative;animation:adleftglow 2.5s ease-in-out infinite;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,0 100%);padding-right:20px}
-.adtk-icon{font-size:20px;line-height:1;filter:drop-shadow(0 0 8px rgba(255,200,0,.9));animation:adleftspark 1.8s ease-in-out infinite}
-.adtk-lbl{display:flex;flex-direction:column;line-height:1.15}
-.adtk-lbl-top{font-size:6.5px;font-weight:900;color:rgba(255,255,255,.75);letter-spacing:2.5px;text-transform:uppercase}
-.adtk-lbl-bot{font-size:10px;font-weight:900;color:#fff;letter-spacing:.3px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.adtk-left{flex-shrink:0;padding:0 16px 0 13px;display:flex;align-items:center;gap:8px;height:100%;background:linear-gradient(135deg,#c8102e 0%,#e53935 45%,#b71c1c 100%);position:relative;animation:adleftglow 2.5s ease-in-out infinite;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%);padding-right:24px}
+.adtk-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 8px rgba(255,200,0,.9));animation:adleftspark 1.8s ease-in-out infinite;flex-shrink:0}
+.adtk-lbl{display:flex;flex-direction:column;line-height:1.2;gap:1px}
+.adtk-lbl-top{font-size:8px;font-weight:900;color:rgba(255,255,255,.82);letter-spacing:2px;text-transform:uppercase}
+.adtk-lbl-bot{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.3px;text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,.5),0 0 20px rgba(255,200,0,.3);line-height:1}
 .adtk-scroll{flex:1;overflow:hidden;position:relative;height:100%;mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 .adtrack{display:flex;gap:56px;white-space:nowrap;position:absolute;top:0;left:0;height:100%;align-items:center;animation:adscroll 36s linear infinite}
 .adtrack:hover{animation-play-state:paused}
