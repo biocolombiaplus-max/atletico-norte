@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.22';
+var APP_VER='9.23';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -415,6 +415,9 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .admfxpnd{color:var(--m);font-size:9px;font-style:italic}
 .admfxvu{font-size:8px;background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2);border-radius:5px;padding:2px 6px;font-weight:700}
 .mc-reprog-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:900;color:#f59e0b;background:rgba(245,159,11,.13);border:1px solid rgba(245,159,11,.3);border-radius:8px;padding:1px 7px;margin-left:4px;letter-spacing:.3px;white-space:nowrap}
+.mc-reprog-btn{cursor:pointer;background:rgba(245,159,11,.1);border:1px solid rgba(245,159,11,.3);color:#f59e0b;padding:4px 9px;border-radius:7px;font-size:12px;font-weight:700;transition:.12s;-webkit-appearance:none;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
+.mc-reprog-btn:active{transform:scale(.9);background:rgba(245,159,11,.22)}
+.mc-reprog-btn--active{background:rgba(245,159,11,.2);border-color:rgba(245,159,11,.6);color:#fbbf24;font-weight:900}
 .admfxteam{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800}
 .admfxteam .tb{width:18px;height:22px;flex-shrink:0}
 /* Stats */
@@ -3490,7 +3493,8 @@ function rFx(){
       h+='<div class="mm"><span class="mhora"'+((mhora!==m.hora||hasReprog)?' style="color:#f59e0b"':'')+'>'+mhora+'</span><span class="mcancha '+cc+'">'+effCancha+'</span><span class="mvu">V'+m.vu+'</span>'+(hasReprog?'<span class="mc-reprog-badge">&#128197; Reajuste</span>':'')+'</div>';
       if(cEd()){
         h+='<div class="mm-acts">';
-        h+='<span class="ec" data-mid="'+m.id+'" onclick="oRsEl(this)">&#9999;&#65039;</span>';
+        h+='<span class="ec" data-mid="'+m.id+'" onclick="oRsEl(this)" title="Ingresar resultado">&#9999;&#65039;</span>';
+        h+='<span class="mc-reprog-btn no-print'+(hasReprog?' mc-reprog-btn--active':'')+'" onclick="event.stopPropagation();openReprogModal('+m.id+')" title="Reajustar fecha/hora/cancha">&#128197;'+(hasReprog?' Reajustado':'')+'</span>';
         if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=resultado" onclick="event.stopPropagation()" title="Imagen resultado">&#128202;</a>';
         if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=mvp" onclick="event.stopPropagation()" title="Imagen MVP">&#11088;</a>';
         h+='<span class="mc-sh no-print" onclick="event.stopPropagation();genMatchCard('+m.id+')" title="Generar póster">&#128228;</span>';
