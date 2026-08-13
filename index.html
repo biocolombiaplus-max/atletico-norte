@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.26';
+var APP_VER='9.27';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1914,17 +1914,15 @@ function setupFirebaseListeners(){
   if(_listenersActive)return;
   _listenersActive=true;
   db.ref("/resultados").on("value",function(s){try{res=s.val()||{};rGl();rCards();rFx();rTb();rGo();rVl();rDisc();updHdr();}catch(e){}},function(){});
-  db.ref("/reprogramaciones").on("value",function(s){try{
-    var d=s.val()||{};
-    reprog={};
-    Object.keys(d).forEach(function(k){reprog[parseInt(k)]=d[k];});
-    rFx();updHdr();
-  }catch(e){}},function(){});
   db.ref("/horariosSwap").on("value",function(s){try{
     var d=s.val()||{};
-    horaOverrides={};
-    Object.keys(d).forEach(function(k){if(d[k]&&d[k].hora)horaOverrides[parseInt(k)]=d[k].hora;});
-    rFx();
+    horaOverrides={};reprog={};
+    Object.keys(d).forEach(function(k){
+      var id=parseInt(k);
+      if(d[k]&&d[k].hora)horaOverrides[id]=d[k].hora;
+      if(d[k]&&d[k].motivo)reprog[id]=d[k]; // full reprog data stored here
+    });
+    rFx();updHdr();
   }catch(e){}},function(){});
   db.ref("/sorteo").on("value",function(s){try{sortAssign=s.val()||{};rSortGrd();}catch(e){}},function(){});
   db.ref("/delegados").on("value",function(s){try{rDlg(s.val()?Object.values(s.val()):DLG_DEF);}catch(e){}},function(){try{rDlg(DLG_DEF);}catch(e){}});
@@ -4864,11 +4862,17 @@ async function saveReprog(mid){
   var auth=document.getElementById('rpAuth').value;
   var motivo=(document.getElementById('rpMotivo').value||'').trim();
   if(!motivo){showToast('warn','Motivo requerido','Explica el motivo del reajuste',3000);return;}
+  // Out-of-calendar dates require Presidente or Junta Directiva authorization
+  if(typeof DATES!=='undefined'&&DATES.indexOf(fecha)<0){
+    if(auth!=='Presidente'&&auth!=='Junta Directiva'){
+      showToast('warn','⚠️ Autorización requerida','Para fechas fuera del calendario debe seleccionar: Presidente o Junta Directiva',4500);
+      return;
+    }
+  }
   var data={fecha:fecha,hora:hora,cancha:cancha,motivo:motivo,autorizadoPor:auth,editadoPor:cu,editadoNombre:pf.nombre||cu,ts:Date.now()};
   try{
-    await db.ref('/reprogramaciones/'+mid).set(data);
-    // Also sync horariosSwap for backward compat
-    await db.ref('/horariosSwap/'+mid).set({hora:hora});
+    // Write everything to /horariosSwap (coordinator has permission here)
+    await db.ref('/horariosSwap/'+mid).set(data);
     // Audit log
     await db.ref('/auditHorarios').push({mid:mid,ts:Date.now(),por:cu,nombre:pf.nombre||cu,auth:auth,motivo:motivo,fecha:fecha,hora:hora,cancha:cancha});
     cM('mDlg');
@@ -4879,7 +4883,6 @@ async function saveReprog(mid){
 async function deleteReprog(mid){
   if(!confirm('¿Eliminar el reajuste y restaurar la fecha original?'))return;
   try{
-    await db.ref('/reprogramaciones/'+mid).remove();
     await db.ref('/horariosSwap/'+mid).remove();
     cM('mDlg');
     showToast('info','&#128197; Reajuste eliminado','Partido #'+mid+' restaurado al original',3000,'#10b981');
