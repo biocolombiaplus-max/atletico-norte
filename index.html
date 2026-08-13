@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.20';
+var APP_VER='9.21';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -137,44 +137,40 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 /* ── AD BANNER ── */
 .adb{background:linear-gradient(180deg,#03060f 0%,#050c1a 100%);border-bottom:1px solid rgba(124,58,237,.18);padding:0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
 .adb::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(124,58,237,.04) 0%,rgba(6,182,212,.03) 50%,rgba(244,63,94,.04) 100%);pointer-events:none}
-/* Sponsor bar */
-.adspbar{display:flex;align-items:center;gap:0;height:34px;border-bottom:1px solid rgba(124,58,237,.12);position:relative;overflow:hidden}
-.adspbar-label{font-size:7.5px;font-weight:900;letter-spacing:2.5px;color:rgba(124,58,237,.8);text-transform:uppercase;padding:0 10px;flex-shrink:0;border-right:1px solid rgba(124,58,237,.15);display:flex;align-items:center;gap:5px}
-.adspbar-label::before{content:'';width:4px;height:4px;border-radius:50%;background:#7c3aed;box-shadow:0 0 6px #7c3aed;animation:adpulse 2s ease-in-out infinite;flex-shrink:0}
+/* ── AD STRIP ── */
 @keyframes adpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-.adsp-slot{display:flex;align-items:center;gap:7px;padding:0 13px;border-right:1px solid rgba(255,255,255,.04);height:100%;flex-shrink:0;cursor:pointer;transition:background .2s;text-decoration:none}
-.adsp-slot:hover{background:rgba(124,58,237,.06)}
-.adsp-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2px 8px 2px 5px}
-.adsp-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.adsp-name{font-size:9.5px;font-weight:800;color:rgba(220,235,255,.85);letter-spacing:.1px}
-.adsp-tag{font-size:7.5px;color:rgba(150,175,210,.45);font-weight:600;margin-top:1px}
-.adsp-cta{margin-left:auto;flex-shrink:0;display:flex;align-items:center;height:100%;padding:0 10px}
-.adpromo{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#7c3aed,#0ea5e9,#f43f5e);background-size:200% 200%;animation:adgrad 4s ease infinite;border-radius:20px;padding:5px 13px;font-size:9.5px;font-weight:900;color:#fff;letter-spacing:.5px;text-shadow:0 1px 4px rgba(0,0,0,.5);box-shadow:0 0 16px rgba(124,58,237,.4),0 2px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2);white-space:nowrap;cursor:pointer;text-decoration:none;border:none;transition:transform .15s,box-shadow .15s}
-.adpromo:active{transform:scale(.95)}
-@keyframes adgrad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.adpromo .pip{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 1s ease-in-out infinite;flex-shrink:0;box-shadow:0 0 5px rgba(255,255,255,.9)}
-@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.5)}}
-/* Ticker — pauta ad */
-.adticker{overflow:hidden;position:relative;height:32px;background:linear-gradient(90deg,rgba(250,176,5,.07),rgba(251,113,26,.09),rgba(250,176,5,.07));border-top:1px solid rgba(250,176,5,.22);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);cursor:pointer}
-.adticker a{display:block;width:100%;height:100%;text-decoration:none}
-.adtrack{display:flex;gap:60px;white-space:nowrap;position:absolute;top:0;left:0;animation:adscroll 38s linear infinite}
-.adtrack:hover{animation-play-state:paused}
-.admsg{display:inline-flex;align-items:center;gap:8px;height:32px}
-.admsg .ic{font-size:14px}
-.admsg .tx{font-size:11px;font-weight:700;color:rgba(255,220,120,.82);letter-spacing:.1px}
-.admsg .hl{font-weight:900}
-.admsg .hl-fire{color:#fbbf24;text-shadow:0 0 8px rgba(251,191,36,.6)}
-.admsg .hl-free{color:#4ade80;font-weight:900;text-shadow:0 0 8px rgba(74,222,128,.45)}
-.admsg .hl-hot{color:#fb7185;font-weight:900}
-.admsg .hl-w{color:#fff;font-weight:900}
-.admsg-dot{display:inline-block;width:3px;height:3px;border-radius:50%;background:rgba(251,191,36,.5);margin:0 8px;vertical-align:middle}
+@keyframes adglow{0%,100%{box-shadow:0 0 14px rgba(251,191,36,.18),inset 0 0 40px rgba(251,191,36,.03)}50%{box-shadow:0 0 28px rgba(251,191,36,.38),inset 0 0 60px rgba(251,191,36,.07)}}
+@keyframes adctapulse{0%,100%{box-shadow:0 0 10px rgba(251,191,36,.4),0 2px 8px rgba(0,0,0,.5)}50%{box-shadow:0 0 22px rgba(251,191,36,.75),0 2px 12px rgba(0,0,0,.5)}}
 @keyframes adscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.5)}}
+.adticker{display:flex;align-items:center;height:46px;background:linear-gradient(90deg,rgba(15,3,5,.98) 0%,rgba(40,10,5,.98) 40%,rgba(30,12,2,.98) 60%,rgba(15,3,5,.98) 100%);border-top:2px solid rgba(251,191,36,.55);border-bottom:1px solid rgba(251,191,36,.18);text-decoration:none;cursor:pointer;animation:adglow 3s ease-in-out infinite;position:relative;overflow:hidden}
+.adticker::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(251,191,36,.04) 30%,rgba(251,113,26,.05) 60%,transparent 100%);pointer-events:none}
+.adtk-left{flex-shrink:0;padding:0 11px;border-right:1px solid rgba(251,191,36,.2);display:flex;align-items:center;gap:6px;height:100%}
+.adtk-icon{font-size:18px;line-height:1;filter:drop-shadow(0 0 6px rgba(251,191,36,.7))}
+.adtk-lbl{display:flex;flex-direction:column;line-height:1.1}
+.adtk-lbl-top{font-size:7px;font-weight:900;color:rgba(251,191,36,.6);letter-spacing:2px;text-transform:uppercase}
+.adtk-lbl-bot{font-size:9.5px;font-weight:900;color:#fbbf24;letter-spacing:.5px;text-transform:uppercase}
+.adtk-scroll{flex:1;overflow:hidden;position:relative;height:100%;mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.adtrack{display:flex;gap:56px;white-space:nowrap;position:absolute;top:0;left:0;height:100%;align-items:center;animation:adscroll 36s linear infinite}
+.adtrack:hover{animation-play-state:paused}
+.admsg{display:inline-flex;align-items:center;gap:8px;height:100%}
+.admsg .ic{font-size:15px}
+.admsg .tx{font-size:12px;font-weight:700;color:rgba(255,218,100,.85);letter-spacing:.05px}
+.admsg .hl{font-weight:900}
+.admsg .hl-fire{color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,.7)}
+.admsg .hl-free{color:#4ade80;font-weight:900;text-shadow:0 0 8px rgba(74,222,128,.5)}
+.admsg .hl-hot{color:#fb7185;font-weight:900;letter-spacing:.3px}
+.admsg .hl-w{color:#fff;font-weight:900}
+.admsg-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(251,191,36,.45);margin:0 10px;vertical-align:middle;flex-shrink:0}
+.adtk-right{flex-shrink:0;padding:0 10px;border-left:1px solid rgba(251,191,36,.2);display:flex;align-items:center;height:100%}
+.adtk-cta{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#fbbf24 0%,#f97316 100%);border-radius:22px;padding:7px 14px;font-size:10px;font-weight:900;color:#0a0300;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;animation:adctapulse 2s ease-in-out infinite;text-shadow:none}
+.adtk-cta-pip{width:5px;height:5px;border-radius:50%;background:rgba(0,0,0,.4);animation:blink 1s ease-in-out infinite;flex-shrink:0}
 
 /* ── DESKTOP OVERRIDES ── */
 @media(min-width:600px){
   .adb{flex-direction:column}
-  .adticker{height:30px}
-  .admsg .tx{font-size:11px}
+  .adticker{height:48px}
+  .admsg .tx{font-size:13px}
 }
 /* ── HEADER ── */
 .hdr{background:linear-gradient(160deg,#070f20 0%,#0c1d38 60%,#071228 100%);border-bottom:1px solid var(--bd);padding:10px 14px 10px;flex-shrink:0}
@@ -1145,37 +1141,37 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- AD BANNER -->
 <div class="adb">
-  <!-- Sponsor bar -->
-  <div class="adspbar">
-    <span class="adspbar-label">Aliados</span>
-    <a class="adsp-slot" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%20F.C.%20%F0%9F%91%8B%20Quiero%20averiguar%20sobre%20la%20pauta%20comercial%20GRATIS%20para%20socios%20del%20club.%20%C2%BFMe%20pueden%20dar%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer">
-      <span class="adsp-badge"><span class="adsp-dot" style="background:#22d3ee;box-shadow:0 0 5px #22d3ee"></span><span class="adsp-name">COVEADSE</span></span>
-      <span class="adsp-tag">Sede &middot; Cancha oficial</span>
-    </a>
-    <a class="adsp-slot" href="https://wa.me/573171030787?text=Hola%20Atl%C3%A9tico%20Norte%20F.C.%20%F0%9F%91%8B%20Quiero%20averiguar%20sobre%20la%20pauta%20comercial%20GRATIS%20para%20socios%20del%20club.%20%C2%BFMe%20pueden%20dar%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer">
-      <span class="adsp-badge"><span class="adsp-dot" style="background:#a78bfa;box-shadow:0 0 5px #a78bfa"></span><span class="adsp-name">Villa Silvania</span></span>
-      <span class="adsp-tag">Sede &middot; Cancha</span>
-    </a>
-    <div class="adsp-cta">
-      <a class="adpromo" href="https://wa.me/573505457420?text=%F0%9F%94%A5%20Hola%21%20Vi%20el%20anuncio%20en%20la%20app%20de%20Atl%C3%A9tico%20Norte%20FC.%20Quiero%20pautar%20GRATIS%20mi%20negocio%20para%20llegar%20a%20los%20socios%20y%20fanáticos%20del%20club.%20%C2%BFCuántos%20me%20pueden%20ver%20y%20cómo%20funciona%3F%20%F0%9F%9A%80" target="_blank" rel="noopener noreferrer"><span class="pip"></span>Pautar Gratis</a>
-    </div>
-  </div>
-  <!-- Ticker — pauta gratis ad -->
+  <!-- Ad strip — pauta gratis -->
   <a class="adticker" href="https://wa.me/573505457420?text=%F0%9F%94%A5%20Hola%21%20Vi%20el%20anuncio%20en%20la%20app%20de%20Atl%C3%A9tico%20Norte%20FC.%20Quiero%20pautar%20GRATIS%20mi%20negocio%20para%20llegar%20a%20los%20socios%20y%20fan%C3%A1ticos%20del%20club.%20%C2%BFCu%C3%A1ntos%20me%20pueden%20ver%20y%20c%C3%B3mo%20funciona%3F%20%F0%9F%9A%80" target="_blank" rel="noopener noreferrer">
-    <div class="adtrack" id="adTrack">
-      <span class="admsg"><span class="ic">&#128293;</span><span class="tx"><span class="hl hl-fire">&#161;PAUTA GRATIS!</span>&nbsp; &#8212; &nbsp;&#191;Tienes negocio o emprendimiento?&nbsp; Tu marca llega a <span class="hl hl-w">cientos de socios y familias</span></span></span>
-      <span class="admsg-dot"></span>
-      <span class="admsg"><span class="ic">&#128200;</span><span class="tx"><span class="hl hl-free">Aumenta tus ventas SIN pagar nada</span>&nbsp; &#8212; &nbsp;Espacio publicitario <span class="hl hl-w">100% GRATIS</span> en la app</span></span>
-      <span class="admsg-dot"></span>
-      <span class="admsg"><span class="ic">&#9889;</span><span class="tx">Espacios <span class="hl hl-hot">LIMITADOS</span>&nbsp; &#8212; &nbsp;&#161;No pierdas el tuyo! &nbsp;<span class="hl hl-fire">Toca AQUI &#8594;</span></span></span>
-      <span class="admsg-dot"></span>
-      <!-- seamless loop duplicate -->
-      <span class="admsg"><span class="ic">&#128293;</span><span class="tx"><span class="hl hl-fire">&#161;PAUTA GRATIS!</span>&nbsp; &#8212; &nbsp;&#191;Tienes negocio o emprendimiento?&nbsp; Tu marca llega a <span class="hl hl-w">cientos de socios y familias</span></span></span>
-      <span class="admsg-dot"></span>
-      <span class="admsg"><span class="ic">&#128200;</span><span class="tx"><span class="hl hl-free">Aumenta tus ventas SIN pagar nada</span>&nbsp; &#8212; &nbsp;Espacio publicitario <span class="hl hl-w">100% GRATIS</span> en la app</span></span>
-      <span class="admsg-dot"></span>
-      <span class="admsg"><span class="ic">&#9889;</span><span class="tx">Espacios <span class="hl hl-hot">LIMITADOS</span>&nbsp; &#8212; &nbsp;&#161;No pierdas el tuyo! &nbsp;<span class="hl hl-fire">Toca AQUI &#8594;</span></span></span>
-      <span class="admsg-dot"></span>
+    <!-- Fixed left: brand signal -->
+    <div class="adtk-left">
+      <span class="adtk-icon">&#128293;</span>
+      <div class="adtk-lbl">
+        <span class="adtk-lbl-top">Tu negocio</span>
+        <span class="adtk-lbl-bot">aquí gratis</span>
+      </div>
+    </div>
+    <!-- Scrolling messages -->
+    <div class="adtk-scroll">
+      <div class="adtrack" id="adTrack">
+        <span class="admsg"><span class="ic">&#127775;</span><span class="tx"><span class="hl hl-fire">&#161;ANUNCIA GRATIS</span>&nbsp;&#8212;&nbsp;&#191;Tienes negocio o emprendimiento? Tu marca llega a <span class="hl hl-w">cientos de socios y familias</span></span></span>
+        <span class="admsg-dot"></span>
+        <span class="admsg"><span class="ic">&#128200;</span><span class="tx"><span class="hl hl-free">Aumenta tus ventas SIN pagar nada</span>&nbsp;&#8212;&nbsp;Espacio publicitario <span class="hl hl-w">100% GRATIS</span> en la app de Atl&#233;tico Norte</span></span>
+        <span class="admsg-dot"></span>
+        <span class="admsg"><span class="ic">&#9889;</span><span class="tx">Espacios <span class="hl hl-hot">LIMITADOS</span>&nbsp;&#8212;&nbsp;&#161;No dejes pasar esta oportunidad! Cientos de fanáticos ver&#225;n tu marca cada semana</span></span>
+        <span class="admsg-dot"></span>
+        <!-- seamless loop -->
+        <span class="admsg"><span class="ic">&#127775;</span><span class="tx"><span class="hl hl-fire">&#161;ANUNCIA GRATIS</span>&nbsp;&#8212;&nbsp;&#191;Tienes negocio o emprendimiento? Tu marca llega a <span class="hl hl-w">cientos de socios y familias</span></span></span>
+        <span class="admsg-dot"></span>
+        <span class="admsg"><span class="ic">&#128200;</span><span class="tx"><span class="hl hl-free">Aumenta tus ventas SIN pagar nada</span>&nbsp;&#8212;&nbsp;Espacio publicitario <span class="hl hl-w">100% GRATIS</span> en la app de Atl&#233;tico Norte</span></span>
+        <span class="admsg-dot"></span>
+        <span class="admsg"><span class="ic">&#9889;</span><span class="tx">Espacios <span class="hl hl-hot">LIMITADOS</span>&nbsp;&#8212;&nbsp;&#161;No dejes pasar esta oportunidad! Cientos de fan&#225;ticos ver&#225;n tu marca cada semana</span></span>
+        <span class="admsg-dot"></span>
+      </div>
+    </div>
+    <!-- Fixed right: CTA -->
+    <div class="adtk-right">
+      <span class="adtk-cta"><span class="adtk-cta-pip"></span>&#161;LO QUIERO!</span>
     </div>
   </a>
 </div>
