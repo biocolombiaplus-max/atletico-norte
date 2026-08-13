@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.25';
+var APP_VER='9.26';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -4796,22 +4796,15 @@ function openReprogModal(mid){
   h+='<div style="font-size:10px;color:var(--m)">'+origDesc+' &nbsp;&middot;&nbsp; Vuelta '+m.vu+'</div>';
   if(rp&&rp.ts){h+='<div style="margin-top:6px;font-size:9px;color:#f59e0b;font-weight:700">&#128197; Ya tiene reajuste &mdash; se va a sobreescribir</div>';}
   h+='</div>';
-  // Nueva fecha
-  h+='<div class="ctrl-l" style="margin-bottom:5px">Nueva fecha</div>';
-  h+='<select id="rpFecha" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b2);color:var(--t);font-size:12px;margin-bottom:12px;box-sizing:border-box">';
+  // Nueva fecha — input libre, sin restricción
   var selFecha=rp.fecha||m.fecha;
-  DATES.forEach(function(dt){
-    var dd=new Date(dt+'T12:00:00');
-    var lbl=days[dd.getDay()]+' '+dd.getDate()+' '+months[dd.getMonth()]+' '+2026;
-    h+='<option value="'+dt+'"'+(dt===selFecha?' selected':'')+'>'+lbl+'</option>';
-  });
-  h+='</select>';
-  // Hora
-  h+='<div class="ctrl-l" style="margin-bottom:5px">Nueva hora</div>';
-  h+='<select id="rpHora" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b2);color:var(--t);font-size:12px;margin-bottom:12px;box-sizing:border-box">';
+  h+='<div class="ctrl-l" style="margin-bottom:5px">Nueva fecha <span style="font-size:9px;color:var(--m);font-weight:600">(cualquier fecha)</span></div>';
+  h+='<input id="rpFecha" type="date" value="'+selFecha+'" onchange="rpCheckFecha(this.value,\''+m.fecha+'\')" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b2);color:var(--t);font-size:15px;font-weight:700;box-sizing:border-box;-webkit-appearance:none;margin-bottom:8px">';
+  h+='<div id="rpFechaWarn" style="margin-bottom:12px"></div>';
+  // Hora — input libre
   var selHora=rp.hora||m.hora;
-  HOURS.forEach(function(hr){h+='<option value="'+hr+'"'+(hr===selHora?' selected':'')+'>'+hr+'</option>';});
-  h+='</select>';
+  h+='<div class="ctrl-l" style="margin-bottom:5px">Nueva hora <span style="font-size:9px;color:var(--m);font-weight:600">(cualquier hora)</span></div>';
+  h+='<input id="rpHora" type="time" value="'+selHora+'" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b2);color:var(--t);font-size:15px;font-weight:700;box-sizing:border-box;-webkit-appearance:none;margin-bottom:12px">';
   // Cancha
   h+='<div class="ctrl-l" style="margin-bottom:5px">Cancha</div>';
   h+='<select id="rpCancha" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--b2);color:var(--t);font-size:12px;margin-bottom:12px;box-sizing:border-box">';
@@ -4834,6 +4827,34 @@ function openReprogModal(mid){
   document.getElementById('mDlgT').textContent='Reajuste de Partido #'+mid;
   document.getElementById('mDlgB').innerHTML=h;
   openM('mDlg');
+  setTimeout(function(){rpCheckFecha(selFecha,m.fecha);},80);
+}
+function rpCheckFecha(newFecha,origFecha){
+  var warn=document.getElementById('rpFechaWarn');if(!warn)return;
+  if(!newFecha){warn.innerHTML='';return;}
+  var warnings=[];
+  // Check if date is in original DATES array
+  if(DATES.indexOf(newFecha)<0){
+    var dd=new Date(newFecha+'T12:00:00');
+    var dayNames=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    var dayN=dayNames[dd.getDay()];
+    warnings.push('&#128197; La fecha seleccionada (<b>'+dayN+'</b>) no está en el calendario original del torneo.');
+  }
+  // Check Regla LJ: if original was Mon or Thu, moving to another day may break equity
+  var origDd=new Date(origFecha+'T12:00:00');
+  var origDay=origDd.getDay(); // 1=Mon, 4=Thu, 6=Sat
+  var newDd=new Date(newFecha+'T12:00:00');
+  var newDay=newDd.getDay();
+  var lunes=[1],jueves=[4],sabado=[6];
+  if((origDay===1||origDay===4)&&(newDay!==1&&newDay!==4)){
+    warnings.push('&#9888;&#65039; <b>Regla Lunes+Jueves:</b> Este partido era Lunes o Jueves. Moverlo a otro día puede afectar la equidad de días por equipo.');
+  }
+  if(warnings.length===0){warn.innerHTML='<div style="font-size:9.5px;color:#34d399;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:6px 10px">&#9989; Fecha dentro del calendario estándar</div>';return;}
+  var html='<div style="font-size:9.5px;color:#fbbf24;background:rgba(245,159,11,.1);border:1px solid rgba(245,159,11,.3);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:4px">';
+  html+='<div style="font-weight:900;color:#f59e0b;margin-bottom:2px">&#9888;&#65039; Reajuste fuera del calendario &mdash; se permite guardar</div>';
+  warnings.forEach(function(w){html+='<div style="color:rgba(255,220,100,.8)">'+w+'</div>';});
+  html+='</div>';
+  warn.innerHTML=html;
 }
 async function saveReprog(mid){
   if(!cEd()||!fbR||!db)return;
