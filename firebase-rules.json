@@ -1,0 +1,46 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "socios": {
+      ".read": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Financiero')",
+      "$cedula": {
+        ".read": "auth != null",
+        ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+      }
+    },
+
+    "sociosWrites": {
+      "$cedula": {
+        ".read": "auth != null && root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador'",
+        ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+      }
+    },
+
+    "auditSocios": {
+      "$cedula": {
+        ".read": "auth != null && root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador'",
+        ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+      }
+    },
+
+    "horariosSwap": {
+      ".read": "auth != null",
+      "$mid": {
+        ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+      }
+    },
+
+    "auditHorarios": {
+      ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+    },
+
+    "resultados": {
+      ".read": "auth != null",
+      "$mid": {
+        ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+      }
+    }
+  }
+}

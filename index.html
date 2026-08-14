@@ -2361,6 +2361,25 @@ function onIn(){
   document.getElementById("btnPn").style.display="flex";
   document.getElementById("invBanner").style.display="none";
   var isAdm=cr==="Administrador"||cr==="Coordinador Financiero";
+  // Admin: auto-apply pending socio writes from coordinador (who lacks /socios write permission)
+  if(cr==='Administrador'&&fbR&&db){
+    db.ref('/sociosWrites').on('value',function(sw){
+      var writes=sw.val();
+      if(!writes)return;
+      Object.keys(writes).forEach(function(cedula){
+        var w=writes[cedula];
+        if(!w)return;
+        var op=w._op;
+        var clean={};
+        Object.keys(w).forEach(function(k){if(k[0]!=='_')clean[k]=w[k];});
+        var applyFn=op==='create'?db.ref('/socios/'+cedula).set(clean):db.ref('/socios/'+cedula).update(clean);
+        applyFn.then(function(){
+          db.ref('/sociosWrites/'+cedula).remove();
+          db.ref('/auditSocios/'+cedula).push({ts:Date.now(),cambios:clean,por:w._por||'coordinador',nombre:w._nombre||'Coordinador',autoAplicado:true});
+        }).catch(function(){});
+      });
+    });
+  }
   document.getElementById("admBk").style.display=(isAdm||cEd())?"block":"none";
   document.getElementById("sortBk").style.display=isAdm?"block":"none";
   document.getElementById("admRlTg").textContent=cr;
@@ -7297,8 +7316,23 @@ function checkMatchDayReminder(){
 var _sociosMap={};
 async function shSociosEq(){
   if(!cEd()||!fbR||!db){adCnt('<div class="es"><p>Sin acceso</p></div>');return;}
-  var s=await db.ref('/socios').get();
-  var so=s.val()||{};
+  adCnt('<div style="padding:20px;text-align:center;color:var(--m);font-size:13px">&#9203; Cargando socios…</div>');
+  var so={};
+  try{
+    var s=await db.ref('/socios').get();
+    so=s.val()||{};
+  }catch(permErr){
+    // Coordinador no tiene permiso de lectura de lista — cargar por cédulas de equipos
+    var cedulas=new Set();
+    Object.keys(teamInfo||{}).forEach(function(tid){
+      var jugs=teamInfo[tid]&&teamInfo[tid].jugadores;
+      if(jugs)Object.keys(jugs).forEach(function(k){cedulas.add(k);});
+    });
+    var reads=Array.from(cedulas).map(function(c){
+      return db.ref('/socios/'+c).get().then(function(sn){if(sn.exists())so[c]=sn.val();}).catch(function(){});
+    });
+    await Promise.all(reads);
+  }
   _sociosMap=so;
   var isAdmin=cr==='Administrador';
   // Search bar
@@ -7499,10 +7533,20 @@ async function saveSocioFull(ced,isNew){
       if(email)partialData.email=email;
       if(camiseta)partialData.camiseta=camiseta;
       if(eqVal)partialData.equipo=parseInt(eqVal);
-      await db.ref('/socios/'+cedFinal).update(partialData);
-      await db.ref('/auditSocios/'+cedFinal).push({ts:Date.now(),cambios:partialData,por:cu,nombre:pf.nombre||cu});
+      try{
+        await db.ref('/socios/'+cedFinal).update(partialData);
+      }catch(permErr){
+        // Fallback: Coordinador no tiene permiso directo — guardar en cola de escrituras
+        await db.ref('/sociosWrites/'+cedFinal).set(Object.assign({},partialData,{_op:'update',_por:cu,_nombre:pf.nombre||cu,_ts:Date.now()}));
+      }
+      try{await db.ref('/auditSocios/'+cedFinal).push({ts:Date.now(),cambios:partialData,por:cu,nombre:pf.nombre||cu});}catch(e2){}
     }else{
-      await db.ref('/socios/'+cedFinal).set(data);
+      try{
+        await db.ref('/socios/'+cedFinal).set(data);
+      }catch(permErr){
+        // Fallback: guardar en cola para que el admin aplique
+        await db.ref('/sociosWrites/'+cedFinal).set(Object.assign({},data,{_op:'create',_por:cu,_nombre:pf.nombre||cu,_ts:Date.now()}));
+      }
     }
     cM('mDlg');
     showToast('info','&#9989; '+(isNew?'Socio creado':'Datos actualizados'),nombre+' '+apellidos+(isNew?' — clave: '+cedFinal+'_AN26':''),4000,'#10b981');
