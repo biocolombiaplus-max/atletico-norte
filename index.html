@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.28';
+var APP_VER='9.29';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1926,6 +1926,22 @@ function setupFirebaseListeners(){
   }catch(e){}},function(){});
   db.ref("/sorteo").on("value",function(s){try{sortAssign=s.val()||{};rSortGrd();}catch(e){}},function(){});
   db.ref("/delegados").on("value",function(s){try{rDlg(s.val()?Object.values(s.val()):DLG_DEF);}catch(e){}},function(){try{rDlg(DLG_DEF);}catch(e){}});
+  // Live sync of /socios → EQ_LOADED so goal/card picker always has fresh rosters
+  db.ref("/socios").on("value",function(s){try{
+    var so=s.val()||{};
+    var byT={};
+    Object.keys(so).forEach(function(c){
+      var sc=so[c];var eq=parseInt(sc.equipo)||0;
+      if(eq>=1){if(!byT[eq])byT[eq]=[];byT[eq].push(Object.assign({},sc,{cedula:c}));}
+    });
+    Object.keys(byT).forEach(function(tid){
+      byT[tid].sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||(a.nombre||'').localeCompare(b.nombre||'');});
+    });
+    EQ_LOADED=byT;
+    _sociosMap=so;
+  }catch(e){}},function(){
+    // permission denied — silently ignore, EQ_LOADED populated at login or from teamInfo
+  });
   db.ref("/teamBadges").on("value",function(s){try{
     var v=s.val();
     if(v!==null){custBadges=v;safeSet("an_badges",JSON.stringify(v));}
@@ -3830,7 +3846,10 @@ function oRs(id){
     return pl;
   }
   function _buildRosterFromSocios(list,tid){
-    var pl=list.map(function(sc){return{name:sc.nombre||sc.cedula||'',corto:toCorto(sc.nombre||sc.cedula||''),teamId:tid,camiseta:sc.num||sc.camiseta||''};});
+    var pl=list.map(function(sc){
+      var fullName=((sc.nombre||'')+(sc.apellidos?' '+sc.apellidos:'')).trim()||sc.cedula||'';
+      return{name:fullName,corto:toCorto(fullName),teamId:tid,camiseta:sc.num||sc.camiseta||'',cedula:sc.cedula||''};
+    });
     pl.sort(function(a,b){return (parseInt(a.camiseta)||999)-(parseInt(b.camiseta)||999)||a.corto.localeCompare(b.corto);});
     return pl;
   }
@@ -7546,6 +7565,29 @@ async function saveSocioFull(ced,isNew){
       }catch(permErr){
         // Fallback: guardar en cola para que el admin aplique
         await db.ref('/sociosWrites/'+cedFinal).set(Object.assign({},data,{_op:'create',_por:cu,_nombre:pf.nombre||cu,_ts:Date.now()}));
+      }
+    }
+    // Update in-memory maps immediately so picker works without reload
+    var socioObj={cedula:cedFinal,nombre:nombre,apellidos:apellidos,rol:rol,ts:Date.now()};
+    if(tel)socioObj.telefono=tel;
+    if(email)socioObj.email=email;
+    if(camiseta)socioObj.camiseta=camiseta;
+    if(eqVal)socioObj.equipo=parseInt(eqVal);
+    _sociosMap[cedFinal]=socioObj;
+    // Rebuild EQ_LOADED for the affected team so goal/card picker sees new player instantly
+    var eqId=parseInt(eqVal)||0;
+    if(eqId>=1){
+      if(!EQ_LOADED[eqId])EQ_LOADED[eqId]=[];
+      // Remove old entry for this cedula (edit case) and add updated
+      EQ_LOADED[eqId]=EQ_LOADED[eqId].filter(function(x){return x.cedula!==cedFinal;});
+      EQ_LOADED[eqId].push({cedula:cedFinal,nombre:nombre,apellidos:apellidos,num:camiseta,camiseta:camiseta,equipo:eqId});
+      EQ_LOADED[eqId].sort(function(a,b){return (parseInt(a.num)||999)-(parseInt(b.num)||999)||(a.nombre||'').localeCompare(b.nombre||'');});
+    }
+    // If team changed on edit, remove from old team roster in memory
+    if(!isNew){
+      var oldEq=parseInt((_sociosMap[cedFinal]||{}).equipo)||0;
+      if(oldEq>=1&&oldEq!==eqId&&EQ_LOADED[oldEq]){
+        EQ_LOADED[oldEq]=EQ_LOADED[oldEq].filter(function(x){return x.cedula!==cedFinal;});
       }
     }
     cM('mDlg');
