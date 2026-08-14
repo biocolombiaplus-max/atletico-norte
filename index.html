@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.27';
+var APP_VER='9.28';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -5564,8 +5564,9 @@ async function genMatchCard(mid){
   ctx.font="600 32px Arial,sans-serif";ctx.fillStyle="rgba(255,255,255,.75)";ctx.fillText("LIGA INTERNA  ·  S2 2026",TX,104);
   ctx.font="500 22px Arial,sans-serif";ctx.fillStyle="rgba(255,255,255,.45)";ctx.fillText("fixture.cesarcreps.com",TX,150);
 
-  // ── DATE — fixed Y anchors, NO overlap possible ──
-  var dt=new Date(m.fecha+"T12:00:00");
+  // ── DATE — use reprog overrides if present ──
+  var _fecha=getFecha(m), _hora=getHora(m), _cancha=getCancha(m);
+  var dt=new Date(_fecha+"T12:00:00");
   var DAYS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   var MONTHS=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
   var dayName=DAYS[dt.getDay()].toUpperCase();
@@ -5593,12 +5594,12 @@ async function genMatchCard(mid){
   // ── INFO PILLS (Y: 664–772 = 108px tall) ──
   // Starts at 664 — safely below month text (which ends ~632)
   var PW=304,PH=108,PG=28,PY=664;
-  var canchaCol=m.cancha==="Coveadse"?{bg:"rgba(14,165,233,.22)",border:"rgba(14,165,233,.50)",text:"#38bdf8"}
-    :m.cancha==="Comfanorte"?{bg:"rgba(16,185,129,.22)",border:"rgba(16,185,129,.50)",text:"#34d399"}
+  var canchaCol=_cancha==="Coveadse"?{bg:"rgba(14,165,233,.22)",border:"rgba(14,165,233,.50)",text:"#38bdf8"}
+    :_cancha==="Comfanorte"?{bg:"rgba(16,185,129,.22)",border:"rgba(16,185,129,.50)",text:"#34d399"}
     :{bg:"rgba(245,159,11,.22)",border:"rgba(245,159,11,.50)",text:"#fbbf24"};
   var pillDefs=[
-    {label:"⏰  "+m.hora,       bg:"rgba(14,165,233,.18)",border:"rgba(14,165,233,.45)",color:"#38bdf8"},
-    {label:"📍  "+(m.cancha==="Villa Silvania"?"Villa S.":m.cancha),bg:canchaCol.bg,border:canchaCol.border,color:canchaCol.text},
+    {label:"⏰  "+_hora,       bg:"rgba(14,165,233,.18)",border:"rgba(14,165,233,.45)",color:"#38bdf8"},
+    {label:"📍  "+(_cancha==="Villa Silvania"?"Villa S.":_cancha),bg:canchaCol.bg,border:canchaCol.border,color:canchaCol.text},
     {label:"🔄  VUELTA "+m.vu,  bg:"rgba(139,92,246,.18)",border:"rgba(139,92,246,.45)",color:"#a78bfa"}
   ];
   var totalPW=3*PW+2*PG, pillStartX=(W-totalPW)/2;
@@ -6022,11 +6023,12 @@ async function genWkImg(week){
   var ms=MF.filter(function(m){return m.week===week;});
   if(!ms.length)return;
 
-  function getDayN(fecha){var w=new Date(fecha+"T12:00:00").getDay();return w===1?"Lunes":w===4?"Jueves":"Sábado";}
-  var dayOrd={"Lunes":0,"Jueves":1,"Sábado":2};
+  // Use getFecha/getHora/getCancha so reprogramaciones are reflected in the image
+  function getDayN(fecha){var w=new Date(fecha+"T12:00:00").getDay();var ns=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];return ns[w]||"Sábado";}
+  var dayOrd={"Lunes":0,"Martes":1,"Miércoles":2,"Jueves":3,"Viernes":4,"Sábado":5,"Domingo":6};
   var days={};
-  ms.forEach(function(m){var d=getDayN(m.fecha);if(!days[d])days[d]=[];days[d].push(m);});
-  var sortedDays=Object.keys(days).sort(function(a,b){return (dayOrd[a]||0)-(dayOrd[b]||0);});
+  ms.forEach(function(m){var d=getDayN(getFecha(m));if(!days[d])days[d]=[];days[d].push(m);});
+  var sortedDays=Object.keys(days).sort(function(a,b){return (dayOrd[a]||99)-(dayOrd[b]||99);});
 
   // Row sizes — big enough to be readable at 1/3 scale on mobile
   var W=1080,HDR=250,DAY_H=96,MH=160,FOOT=96,PAD=40;
@@ -6074,7 +6076,7 @@ async function genWkImg(week){
   for(var di=0;di<sortedDays.length;di++){
     var day=sortedDays[di];
     var dayMs=days[day];
-    var dayDt=dayMs[0].fecha;
+    var dayDt=getFecha(dayMs[0]); // use reprog override if present
     var dt=new Date(dayDt+"T12:00:00");
     var MONTHS=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
     var dayFmt=dt.getDate()+" "+MONTHS[dt.getMonth()];
@@ -6128,7 +6130,8 @@ async function genWkImg(week){
       ctx.font="600 24px Arial,sans-serif";ctx.fillStyle="rgba(160,180,200,.7)";
       ctx.fillText("VISIT.",vBX-16,MY+18);
 
-      // Center: result or time+cancha pills
+      // Center: result or time+cancha pills (use reprog overrides)
+      var mHora=getHora(m), mCancha=getCancha(m);
       var midX=W/2;
       if(r&&r.l!==undefined){
         // Score box
@@ -6139,18 +6142,18 @@ async function genWkImg(week){
         ctx.fillText(r.l+"-"+r.v,midX,MY);
       } else {
         // Time pill
-        var canchaC=m.cancha==="Coveadse"?"#38bdf8":m.cancha==="Comfanorte"?"#34d399":"#fbbf24";
-        var canchaBg=m.cancha==="Coveadse"?"rgba(14,165,233,.20)":m.cancha==="Comfanorte"?"rgba(16,185,129,.20)":"rgba(245,159,11,.20)";
+        var canchaC=mCancha==="Coveadse"?"#38bdf8":mCancha==="Comfanorte"?"#34d399":"#fbbf24";
+        var canchaBg=mCancha==="Coveadse"?"rgba(14,165,233,.20)":mCancha==="Comfanorte"?"rgba(16,185,129,.20)":"rgba(245,159,11,.20)";
         _rrFill(ctx,midX-100,MY-46,200,52,12,"rgba(14,165,233,.18)");
         _rrStroke(ctx,midX-100,MY-46,200,52,12,"rgba(14,165,233,.40)",1.5);
         ctx.textAlign="center";ctx.textBaseline="middle";
         ctx.font="900 34px Arial,sans-serif";ctx.fillStyle="#38bdf8";
-        ctx.fillText(m.hora,midX,MY-20);
+        ctx.fillText(mHora,midX,MY-20);
         // Cancha pill
         _rrFill(ctx,midX-110,MY+6,220,46,12,canchaBg);
-        _rrStroke(ctx,midX-110,MY+6,220,46,12,m.cancha==="Coveadse"?"rgba(14,165,233,.40)":m.cancha==="Comfanorte"?"rgba(16,185,129,.40)":"rgba(245,159,11,.40)",1.5);
+        _rrStroke(ctx,midX-110,MY+6,220,46,12,mCancha==="Coveadse"?"rgba(14,165,233,.40)":mCancha==="Comfanorte"?"rgba(16,185,129,.40)":"rgba(245,159,11,.40)",1.5);
         ctx.font="700 26px Arial,sans-serif";ctx.fillStyle=canchaC;
-        var cn=m.cancha==="Villa Silvania"?"Villa S.":m.cancha;
+        var cn=mCancha==="Villa Silvania"?"Villa S.":mCancha;
         ctx.fillText(cn,midX,MY+29);
       }
       // Vuelta mini badge top-right
