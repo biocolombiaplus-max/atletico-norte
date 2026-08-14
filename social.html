@@ -405,16 +405,26 @@ function startApp(){
   let _urlInit=false;
   db.ref('/resultados').on('value',s=>{
     results=s.val()||{};
-    // Always rebuild MVP cards so data is ready when panel opens
     mvpBuildCards();
     if(!_urlInit){_urlInit=true;setTimeout(applyUrlParams,120);}
+  });
+
+  db.ref('/horariosSwap').on('value',s=>{
+    const d=s.val()||{};
+    horaOverrides={};reprog={};
+    Object.keys(d).forEach(k=>{
+      const id=parseInt(k);
+      if(d[k]&&d[k].hora)horaOverrides[id]=d[k].hora;
+      if(d[k]&&d[k].motivo)reprog[id]=d[k];
+    });
+    loadMs(); // rebuild match list to reflect changes
   });
 
   // Init week selector
   const weeks=[...new Set(ALL.map(m=>m.week))].sort((a,b)=>a-b);
   const s=document.getElementById('selW');
   s.innerHTML='<option value="all">Todas</option>'+weeks.map(w=>`<option value="${w}">Semana ${w}</option>`).join('');
-  const up=ALL.filter(m=>new Date(m.fecha+'T12:00:00')>=new Date());
+  const up=ALL.filter(m=>new Date(getFecha(m)+'T12:00:00')>=new Date());
   if(up.length)s.value=up[0].week;
   loadMs();
 }
@@ -431,6 +441,10 @@ const ALL=RC.map(r=>({id:r[0],fecha:DATES[r[1]],hora:HOURS[r[2]],cancha:CANCHAS[
 let custBadges={},clubLogoSrc=null,results={},curTpl='jornada',bgType='cinematic',customBgImg=null,_equiposData={};
 let selMs=new Set();
 let IC={}; // key → {img, src}
+let reprog={},horaOverrides={};
+function getFecha(m){return (reprog[m.id]&&reprog[m.id].fecha)?reprog[m.id].fecha:m.fecha;}
+function getHora(m){return (reprog[m.id]&&reprog[m.id].hora)?reprog[m.id].hora:(horaOverrides[m.id]||m.hora);}
+function getCancha(m){return (reprog[m.id]&&reprog[m.id].cancha)?reprog[m.id].cancha:m.cancha;}
 
 // ─── IMAGE LOADER ───────────────────────────────────
 function loadImg(src,key){
@@ -529,19 +543,20 @@ function renderMs(ms){
   if(!ms.length){el.innerHTML='<div class="no-ms">Sin partidos</div>';return;}
   let h='';
   if(single)h+='<div style="font-size:10px;color:var(--gl);font-weight:800;letter-spacing:1px;padding:4px 0 10px;text-align:center">TAP PARA SELECCIONAR UN PARTIDO</div>';
-  const byD={};ms.forEach(m=>{if(!byD[m.fecha])byD[m.fecha]=[];byD[m.fecha].push(m);});
-  // Sort days ASC, and within each day sort matches by time ASC
-  Object.keys(byD).forEach(dt=>byD[dt].sort((a,b)=>a.hora.localeCompare(b.hora)));
+  // Group by effective fecha (after reprog overrides)
+  const byD={};ms.forEach(m=>{const f=getFecha(m);if(!byD[f])byD[f]=[];byD[f].push(m);});
+  Object.keys(byD).forEach(dt=>byD[dt].sort((a,b)=>getHora(a).localeCompare(getHora(b))));
   const DN=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],MN=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
   Object.keys(byD).sort().forEach(dt=>{
     const d=new Date(dt+'T12:00:00');
     h+=`<div class="date-h">${DN[d.getDay()]} ${d.getDate()} ${MN[d.getMonth()]}</div>`;
     byD[dt].forEach(m=>{
       const on=selMs.has(m.id),r=results[m.id],sc=r&&r.l!==undefined;
+      const mH=getHora(m),mC=getCancha(m),hasRp=!!reprog[m.id];
       h+=`<div class="mi${on?' on':''}" onclick="togM(${m.id},this)">
         <div class="mi-chk">${on?'✓':''}</div>
-        <div style="flex:1"><div class="mi-t">${tn(m.l)} <span style="color:var(--m);font-weight:400">vs</span> ${tn(m.v)}</div>
-        <div class="mi-m">${m.hora} · ${m.cancha} · V${m.vu}${sc?` · <span style="color:var(--gn)">${r.l}-${r.v}</span>`:''}</div></div>
+        <div style="flex:1"><div class="mi-t">${tn(m.l)} <span style="color:var(--m);font-weight:400">vs</span> ${tn(m.v)}${hasRp?` <span style="font-size:9px;color:#fbbf24;font-weight:800">📅 Reaj.</span>`:''}</div>
+        <div class="mi-m">${mH} · ${mC} · V${m.vu}${sc?` · <span style="color:var(--gn)">${r.l}-${r.v}</span>`:''}</div></div>
       </div>`;
     });
   });
@@ -1317,7 +1332,7 @@ async function tMVP(ctx){
       ctx.fillText('VS',W/2,SBY+SBH*.76);
       // Fecha
       ctx.font='600 21px sans-serif';ctx.fillStyle='rgba(140,170,215,.60)';ctx.letterSpacing='.5px';
-      ctx.fillText(fD(mm.fecha,false)+'  ·  '+mm.hora+'  ·  Semana '+mm.week,W/2,SBY+SBH*.92);
+      ctx.fillText(fD(getFecha(mm),false)+'  ·  '+getHora(mm)+'  ·  Semana '+mm.week,W/2,SBY+SBH*.92);
       ctx.letterSpacing='0';
     }
   }else{
@@ -1356,10 +1371,10 @@ async function tJornada(ctx,ms){
   const tg=lGrad(ctx,W/2-200,0,W/2+200,0,[0,'#ffd700'],[.5,'#fff'],[1,'#ffd700']);
   ctx.fillStyle=tg;ctx.font='900 30px sans-serif';ctx.textAlign='center';ctx.letterSpacing='5px';ctx.fillText(wkLbl,W/2,pY+pH*.68);
 
-  // Group all matches by day — sorted by date then by time within each day
-  const byD={};ms.forEach(m=>{if(!byD[m.fecha])byD[m.fecha]=[];byD[m.fecha].push(m);});
+  // Group all matches by effective day (reprog overrides applied)
+  const byD={};ms.forEach(m=>{const f=getFecha(m);if(!byD[f])byD[f]=[];byD[f].push(m);});
   const days=Object.keys(byD).sort();
-  days.forEach(dt=>byD[dt].sort((a,b)=>a.hora.localeCompare(b.hora)));
+  days.forEach(dt=>byD[dt].sort((a,b)=>getHora(a).localeCompare(getHora(b))));
   const grps=days.map(dt=>({dt,ms:byD[dt]}));
   const nCards=ms.length,nGrps=grps.length;
   // Fit all cards in available space
@@ -1510,14 +1525,14 @@ async function jorCard(ctx,m,y,h){
   // Línea 1: fecha completa en dorado
   const dateY=metaTop+META_PAD+DATE_FS;
   const DOT='rgba(255,255,255,.28)';
-  drawRow([{text:fD(m.fecha,false).toUpperCase(),color:'rgba(255,215,0,.95)'}],dateY,DATE_FS);
+  drawRow([{text:fD(getFecha(m),false).toUpperCase(),color:'rgba(255,215,0,.95)'}],dateY,DATE_FS);
 
   // Línea 2: hora · cancha · vuelta — cada dato con su color
   const infoY=dateY+META_PAD+INFO_FS;
   const segs2=[
-    {text:`🕐 ${m.hora}`,color:'rgba(120,180,255,1)'},
+    {text:`🕐 ${getHora(m)}`,color:'rgba(120,180,255,1)'},
     {text:'   ·   ',color:DOT},
-    {text:`📍 ${m.cancha}`,color:'rgba(80,210,140,1)'},
+    {text:`📍 ${getCancha(m)}`,color:'rgba(80,210,140,1)'},
     {text:'   ·   ',color:DOT},
     {text:`V${m.vu}`,color:'rgba(255,160,60,1)'},
   ];
@@ -1538,7 +1553,7 @@ async function tPartido(ctx,m){
   rGlow(ctx,W*.83,H*.5,580,'rgba(0,100,210,.2)');
   clubHeader(ctx,50);
 
-  const d=new Date(m.fecha+'T12:00:00');
+  const d=new Date(getFecha(m)+'T12:00:00');
   const dayName=DL[d.getDay()].toUpperCase();
   const dateNum=d.getDate();
   const monName=ML[d.getMonth()].toUpperCase();
@@ -1576,12 +1591,12 @@ async function tPartido(ctx,m){
   // ── TIME — large and clear for all ages ──
   ctx.textAlign='center';ctx.font='800 58px sans-serif';ctx.letterSpacing='2px';
   ctx.fillStyle='rgba(255,255,255,.96)';
-  ctx.fillText(`🕐  ${m.hora}`,W/2,866);
+  ctx.fillText(`🕐  ${getHora(m)}`,W/2,866);
 
   // ── VENUE + VUELTA ──
   ctx.font='800 54px sans-serif';ctx.letterSpacing='1px';
   ctx.fillStyle='rgba(255,255,255,.88)';
-  ctx.fillText(`📍  ${m.cancha}`,W/2,942);
+  ctx.fillText(`📍  ${getCancha(m)}`,W/2,942);
 
   ctx.font='700 38px sans-serif';ctx.letterSpacing='2px';
   ctx.fillStyle='rgba(255,215,0,.75)';
@@ -1701,13 +1716,13 @@ async function tResultado(ctx,m){
   ctx.fillText('⚽  RESULTADO FINAL',W/2,bY+bH*.68);}
 
   // ── FECHA + META ──
-  const d2=new Date(m.fecha+'T12:00:00');
+  const d2=new Date(getFecha(m)+'T12:00:00');
   const fechaLarga=`${DL[d2.getDay()].toUpperCase()} ${d2.getDate()} DE ${ML[d2.getMonth()].toUpperCase()}`;
   ctx.save();ctx.shadowColor='rgba(255,210,0,.3)';ctx.shadowBlur=18;
   ctx.font='900 52px Arial Black,sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.letterSpacing='-1px';
   ctx.fillText(fechaLarga,W/2,540);ctx.restore();
   ctx.font='600 28px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,215,0,.80)';ctx.textAlign='center';
-  ctx.fillText(`${m.hora}  ·  ${m.cancha}  ·  Vuelta ${m.vu}`,W/2,580);
+  ctx.fillText(`${getHora(m)}  ·  ${getCancha(m)}  ·  Vuelta ${m.vu}`,W/2,580);
 
   // ── REGLA ──
   goldRule(ctx,614);
@@ -2218,7 +2233,7 @@ const FRASES_FUTBOL=[
 async function tPartidosHoy(ctx){
   // Today's matches Colombia timezone
   const todayStr=new Date(Date.now()-5*3600000).toISOString().split('T')[0];
-  const todayMs=ALL.filter(m=>m.fecha===todayStr).sort((a,b)=>a.hora.localeCompare(b.hora));
+  const todayMs=ALL.filter(m=>getFecha(m)===todayStr).sort((a,b)=>getHora(a).localeCompare(getHora(b)));
 
   // Preload badges for today's teams
   const teamIds=[...new Set(todayMs.flatMap(m=>[m.l,m.v]))];
@@ -2346,7 +2361,7 @@ async function tPartidosHoy(ctx){
       // ── TIME (left) — big, clean, readable ──
       const timeX=mx+105;
       ctx.textAlign='center';
-      const hParts=m.hora.split(':');
+      const hParts=getHora(m).split(':');
       // "HORA" label
       ctx.letterSpacing='4px';ctx.font='600 20px sans-serif';ctx.fillStyle='rgba(255,215,0,.55)';
       ctx.fillText('HORA',timeX,midY-68);
@@ -2413,7 +2428,7 @@ async function tPartidosHoy(ctx){
       // ── VENUE pill at bottom of card ──
       ctx.letterSpacing='1px';ctx.font='700 28px sans-serif';ctx.fillStyle='rgba(34,211,238,.85)';
       ctx.textAlign='center';
-      ctx.fillText('📍 '+m.cancha,mx+mw/2,cy+cH-26);
+      ctx.fillText('📍 '+getCancha(m),mx+mw/2,cy+cH-26);
     }
   }
 
@@ -2577,7 +2592,7 @@ async function tLluvia(ctx,m){
   ctx.fillText('🌧️  SUSPENDIDO POR LLUVIA',W/2,lY+lH*.69);}
 
   // ── Fecha ──
-  const d=new Date(m.fecha+'T12:00:00');
+  const d=new Date(getFecha(m)+'T12:00:00');
   ctx.font='700 29px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(147,210,255,.72)';ctx.textAlign='center';
   ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · SEMANA ${m.week}`,W/2,CY+100);
 
@@ -2657,7 +2672,7 @@ async function tSuspendido(ctx,m){
   goldRule(ctx,760);
 
   // Team names
-  const d=new Date(m.fecha+'T12:00:00');
+  const d=new Date(getFecha(m)+'T12:00:00');
   ctx.font='900 52px Arial Black,sans-serif';ctx.letterSpacing='0px';ctx.textAlign='center';
   const ng=lGrad(ctx,W/2-300,0,W/2+300,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
   ctx.fillStyle=ng;
@@ -2668,9 +2683,9 @@ async function tSuspendido(ctx,m){
 
   ctx.font='700 36px sans-serif';ctx.letterSpacing='2px';
   ctx.fillStyle='rgba(255,215,0,.75)';ctx.textAlign='center';
-  ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · ${m.hora}`,W/2,898);
+  ctx.fillText(`${DL[d.getDay()].toUpperCase()} ${d.getDate()} ${ML[d.getMonth()].toUpperCase()} · ${getHora(m)}`,W/2,898);
   ctx.font='700 32px sans-serif';ctx.fillStyle='rgba(255,255,255,.5)';ctx.letterSpacing='1px';
-  ctx.fillText(m.cancha,W/2,946);
+  ctx.fillText(getCancha(m),W/2,946);
 
   rule(ctx,982,.35);
 
@@ -3234,10 +3249,10 @@ async function tAliado(ctx,cW,cH){
 
 function cpCaption(){
   const ms=ALL.filter(m=>selMs.has(m.id));const hash=document.getElementById('hash').value;let txt='';
-  if(curTpl==='resultado'){const m=ms[0],r=results[m?.id];if(m&&r)txt=`⚽ RESULTADO FINAL\n${tn(m.l)} ${r.l} - ${r.v} ${tn(m.v)}\n📅 ${fD(m.fecha,false)} · ${m.hora}\n\n`;}
-  else if(curTpl==='partido'){const m=ms[0];if(m)txt=`⚽ PRÓXIMO PARTIDO\n${tn(m.l)} vs ${tn(m.v)}\n📅 ${fD(m.fecha,true)}\n🕐 ${m.hora} · ${m.cancha}\n\n`;}
+  if(curTpl==='resultado'){const m=ms[0],r=results[m?.id];if(m&&r)txt=`⚽ RESULTADO FINAL\n${tn(m.l)} ${r.l} - ${r.v} ${tn(m.v)}\n📅 ${fD(getFecha(m),false)} · ${getHora(m)}\n\n`;}
+  else if(curTpl==='partido'){const m=ms[0];if(m)txt=`⚽ PRÓXIMO PARTIDO\n${tn(m.l)} vs ${tn(m.v)}\n📅 ${fD(getFecha(m),true)}\n🕐 ${getHora(m)} · ${getCancha(m)}\n\n`;}
   else if(curTpl==='tabla'){txt='📊 TABLA DE POSICIONES\nAtlético Norte F.C. · Liga Interna S2 2026\n\n';}
-  else{const w=[...new Set(ms.map(m=>m.week))];txt=`🔥 ${w.length===1?`JORNADA ${w[0]}`:'PRÓXIMAS JORNADAS'} — LIGA INTERNA S2 2026\n🏟️ Atlético Norte F.C.\n\n`;ms.slice(0,5).forEach(m=>{txt+=`⚽ ${tn(m.l)} vs ${tn(m.v)}\n📅 ${fD(m.fecha,false)} · ${m.hora} · ${m.cancha}\n\n`;});}
+  else{const w=[...new Set(ms.map(m=>m.week))];txt=`🔥 ${w.length===1?`JORNADA ${w[0]}`:'PRÓXIMAS JORNADAS'} — LIGA INTERNA S2 2026\n🏟️ Atlético Norte F.C.\n\n`;ms.slice(0,5).forEach(m=>{txt+=`⚽ ${tn(m.l)} vs ${tn(m.v)}\n📅 ${fD(getFecha(m),false)} · ${getHora(m)} · ${getCancha(m)}\n\n`;});}
   txt+=hash;
   navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById('btnCp');b.textContent='✅ ¡Copiado!';setTimeout(()=>b.textContent='📋 Copiar Caption',2000);}).catch(()=>prompt('Caption:',txt));
 }
