@@ -636,7 +636,7 @@ function mvpPickCard(mid,el){
     el.style.borderColor='rgba(245,159,11,.7)';el.style.background='rgba(245,159,11,.1)';
     const ck=document.getElementById('mvpCk'+mid);
     if(ck){ck.textContent='✓';ck.style.background='rgba(245,159,11,.85)';ck.style.borderColor='rgba(245,159,11,.85)';}
-    const m=ALL.find(x=>x.id===mid),r=results[mid];
+    const m=findMatchSoc(mid),r=results[mid];
     if(m){
       const sc=r?(r.wo?'W/O':`${r.l}–${r.v}`):'–';
       infoEl.textContent=`${tn(m.l)} ${sc} ${tn(m.v)} · S${m.week}`;
@@ -714,7 +714,7 @@ async function gen(){
   } else {
     if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
   }
-  const ms=ALL.filter(m=>selMs.has(m.id)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
+  const ms=ALL.concat(PO_MATCHES_SOC).filter(m=>selMs.has(m.id)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
   const noMatchTpl=curTpl==='tabla'||curTpl==='mvp'||curTpl==='goleadores'||curTpl==='menosvencida'||curTpl==='partidoshoy'||isAliado;
   if(!ms.length&&!noMatchTpl){alert('Selecciona al menos un partido');return;}
   const ids=noMatchTpl?[1,2,3,4,5,6,7,8,9,10]:[...new Set(ms.flatMap(m=>[m.l,m.v]))];
@@ -1327,7 +1327,7 @@ async function tMVP(ctx){
 
   ctx.textBaseline='middle';ctx.textAlign='center';
   if(mvpSelectedMid){
-    const mm=ALL.find(x=>x.id===mvpSelectedMid),rr=results[mvpSelectedMid];
+    const mm=findMatchSoc(mvpSelectedMid),rr=results[mvpSelectedMid];
     if(mm&&rr){
       const sc=rr.wo?'W / O':`${rr.l}  –  ${rr.v}`+(rr.retiro?' 🏃':'');
       // Marcador grande
@@ -3265,7 +3265,7 @@ async function tAliado(ctx,cW,cH){
 }
 
 function cpCaption(){
-  const ms=ALL.filter(m=>selMs.has(m.id));const hash=document.getElementById('hash').value;let txt='';
+  const ms=ALL.concat(PO_MATCHES_SOC).filter(m=>selMs.has(m.id));const hash=document.getElementById('hash').value;let txt='';
   if(curTpl==='resultado'){const m=ms[0],r=results[m?.id];if(m&&r)txt=`⚽ RESULTADO FINAL\n${tn(m.l)} ${r.l} - ${r.v} ${tn(m.v)}\n📅 ${fD(getFecha(m),false)} · ${getHora(m)}\n\n`;}
   else if(curTpl==='partido'){const m=ms[0];if(m)txt=`⚽ PRÓXIMO PARTIDO\n${tn(m.l)} vs ${tn(m.v)}\n📅 ${fD(getFecha(m),true)}\n🕐 ${getHora(m)} · ${getCancha(m)}\n\n`;}
   else if(curTpl==='tabla'){txt='📊 TABLA DE POSICIONES\nAtlético Norte F.C. · Liga Interna S2 2026\n\n';}
