@@ -3806,11 +3806,17 @@ function rTb(){
   if(st.length>=8){document.getElementById("brs")&&(document.getElementById("brs").style.display="block");rBr(st.slice(0,8));}
 }
 function rBr(t8){
-  var CUARTOS=[[0,7],[1,6],[2,5],[3,4]];
+  var CUARTOS=[[0,7],[1,6],[2,5],[3,4]]; // seed pairings — used for bracket visual
   var SEMIS=[[0,1],[2,3]];
   var PO_ID_Q=[1001,1002,1003,1004];
   var PO_ID_S=[1011,1012];
   var PO_ID_F=[1021];
+
+  // Equipos clasificados — pares exactos según bracket y programación (WhatsApp)
+  // Orden alineado con CUARTOS (slot 0→1001, slot 1→1002, slot 2→1003, slot 3→1004)
+  // 8=América, 2=Bucaramanga, 10=Inter Bogotá, 9=Junior
+  // 4=Santa Fe, 5=Millonarios, 3=Nacional, 6=Dep.Cali
+  var _directQ=[[8,2],[10,9],[4,5],[3,6]];
 
   function resWinner(matchId){
     var r=res[matchId];if(!r||r.l===undefined)return null;
@@ -3821,6 +3827,8 @@ function rBr(t8){
   PO_MATCHES=[];
 
   // Cuartos schedule (from WhatsApp: lunes 23 Nov)
+  // 1001=AME vs BUC 21:00 VS · 1002=INT vs JUN 19:00 VS
+  // 1003=SNF vs MIL 21:00 COV · 1004=NAL vs CAL 19:00 COV
   var _qSched=[
     {id:PO_ID_Q[0],qi:0,fecha:'2026-11-23',hora:'21:00',cancha:'Villa Silvania'},
     {id:PO_ID_Q[1],qi:1,fecha:'2026-11-23',hora:'19:00',cancha:'Villa Silvania'},
@@ -3829,15 +3837,14 @@ function rBr(t8){
   ];
   _qSched.forEach(function(sc){
     var fb=pmFb[sc.id]||{};
-    var pr=CUARTOS[sc.qi];
-    PO_MATCHES.push({id:sc.id,l:(t8[pr[0]]||{}).id||0,v:(t8[pr[1]]||{}).id||0,
+    PO_MATCHES.push({id:sc.id,l:_directQ[sc.qi][0],v:_directQ[sc.qi][1],
       fecha:fb.fecha||sc.fecha,hora:fb.hora||sc.hora,cancha:fb.cancha||sc.cancha,
-      vu:'Q',vuLabel:'Cuartos de Final',_po:'cuartos',_qi:sc.qi,week:200+sc.qi});
+      vu:'Q',vuLabel:'Cuartos de Final',_po:'cuartos',_qi:sc.qi,week:200});
   });
 
   function qWinnerTeam(qi){
     var w=resWinner(PO_ID_Q[qi]);if(!w)return{id:0};
-    var pr=CUARTOS[qi];return w==='a'?(t8[pr[0]]||{id:0}):(t8[pr[1]]||{id:0});
+    return w==='a'?{id:_directQ[qi][0]}:{id:_directQ[qi][1]};
   }
   var cuartosWinners=CUARTOS.map(function(_,i){return qWinnerTeam(i);});
   var cuartosPlayed=cuartosWinners.filter(function(t){return t.id>0;}).length;
