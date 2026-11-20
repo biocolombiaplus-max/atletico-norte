@@ -596,18 +596,34 @@ tbody td:nth-child(2){text-align:left}
 @keyframes brPulse{0%,100%{opacity:1}50%{opacity:.6}}
 
 /* ── SPONSOR BIOMARKETING ── */
-.bm-card{margin:16px 16px 4px;border-radius:16px;overflow:hidden;position:relative;background:linear-gradient(135deg,#0d0620 0%,#160a35 50%,#0d0620 100%);border:1px solid rgba(167,139,250,.2);box-shadow:0 4px 24px rgba(100,0,255,.12)}
-.bm-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(100,20,255,.06),rgba(255,100,0,.04));pointer-events:none}
-.bm-badge{font-size:7.5px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);text-align:center;padding:8px 16px 0}
-.bm-inner{display:flex;align-items:center;gap:14px;padding:12px 16px}
-.bm-logo{width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(167,139,250,.3);box-shadow:0 0 16px rgba(130,60,255,.25)}
-.bm-text{flex:1;min-width:0}
-.bm-name{font-size:15px;font-weight:900;letter-spacing:-.3px;background:linear-gradient(90deg,#a855f7,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
-.bm-tagline{font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin:3px 0 5px}
-.bm-services{display:flex;flex-wrap:wrap;gap:4px}
-.bm-pill{font-size:8.5px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid rgba(167,139,250,.3);color:rgba(200,160,255,.85);background:rgba(100,20,255,.1);white-space:nowrap}
-.bm-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 16px 14px;background:linear-gradient(135deg,#7c3aed,#c2410c);border:none;border-radius:12px;padding:11px 16px;cursor:pointer;text-decoration:none;color:#fff;font-size:12px;font-weight:900;letter-spacing:.3px;box-shadow:0 3px 12px rgba(124,58,237,.35)}
-.bm-cta svg{width:18px;height:18px;fill:#fff;flex-shrink:0}
+.bm-card{margin:20px 14px 8px;border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(160deg,#0a0118 0%,#130630 40%,#1a0840 70%,#0d0325 100%);border:1px solid rgba(167,139,250,.25);box-shadow:0 8px 32px rgba(80,0,200,.18),0 2px 8px rgba(0,0,0,.4)}
+.bm-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(168,85,247,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(249,115,22,.08) 0%,transparent 50%);pointer-events:none}
+.bm-top-bar{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px 0;position:relative}
+.bm-top-label{font-size:7px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.bm-top-dot{width:4px;height:4px;border-radius:50%;background:rgba(167,139,250,.5)}
+.bm-divider{height:1px;margin:0 16px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.2),rgba(249,115,22,.15),transparent)}
+.bm-header{display:flex;align-items:center;gap:16px;padding:14px 16px 12px}
+.bm-logo-wrap{position:relative;flex-shrink:0}
+.bm-logo{width:68px;height:68px;border-radius:18px;object-fit:cover;border:2px solid rgba(167,139,250,.35);box-shadow:0 0 20px rgba(130,60,255,.3),0 4px 12px rgba(0,0,0,.4)}
+.bm-logo-ring{position:absolute;inset:-4px;border-radius:22px;border:1px solid rgba(167,139,250,.15);pointer-events:none}
+.bm-info{flex:1;min-width:0}
+.bm-name{font-size:19px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(90deg,#c084fc,#e879f9,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:3px}
+.bm-sub{font-size:9.5px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.bm-rating{display:flex;align-items:center;gap:5px}
+.bm-stars{color:#f59e0b;font-size:9px;letter-spacing:1px}
+.bm-rating-txt{font-size:8.5px;color:rgba(255,255,255,.4);font-weight:700}
+.bm-services-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 14px 14px}
+.bm-svc{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(167,139,250,.15);border-radius:12px;padding:9px 11px}
+.bm-svc-icon{font-size:17px;flex-shrink:0;line-height:1}
+.bm-svc-text{flex:1;min-width:0}
+.bm-svc-name{font-size:10px;font-weight:800;color:rgba(255,255,255,.85);line-height:1.2}
+.bm-svc-desc{font-size:8px;color:rgba(255,255,255,.35);font-weight:600;margin-top:1px}
+.bm-cta{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 14px 16px;background:linear-gradient(135deg,#16a34a,#15803d);border:none;border-radius:14px;padding:13px 16px;cursor:pointer;text-decoration:none;color:#fff;font-size:13px;font-weight:900;letter-spacing:.2px;box-shadow:0 4px 16px rgba(22,163,74,.35),0 1px 3px rgba(0,0,0,.3);position:relative;overflow:hidden}
+.bm-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);pointer-events:none}
+.bm-cta svg{width:20px;height:20px;fill:#fff;flex-shrink:0}
+.bm-cta-txt{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.bm-cta-main{font-size:12.5px;font-weight:900;line-height:1}
+.bm-cta-sub{font-size:9px;font-weight:700;opacity:.7;line-height:1}
 
 /* ── PANEL ── */
 .pph{background:linear-gradient(180deg,rgba(200,16,46,.2) 0%,var(--bg) 100%);padding:24px 16px 16px;text-align:center;border-bottom:1px solid var(--bd)}
@@ -1928,7 +1944,29 @@ var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido
 var horaOverrides={}; // matchId → "HH:MM" from /horariosSwap
 var reprog={};        // matchId → {fecha,hora,cancha,motivo,autorizadoPor,editadoPor,editadoNombre,ts}
 function getFecha(m){return (reprog[m.id]&&reprog[m.id].fecha)?reprog[m.id].fecha:m.fecha;}
-function bmCard(){return '<div class="bm-card"><div class="bm-badge">&#128247; APLICACIÓN DESARROLLADA Y PATROCINADA POR</div><div class="bm-inner"><img class="bm-logo" src="'+BM_LOGO+'" alt="BioMarketing"><div class="bm-text"><div class="bm-name">BIOMarketing</div><div class="bm-tagline">Innovación Digital</div><div class="bm-services"><span class="bm-pill">&#127760; Páginas Web</span><span class="bm-pill">&#128242; Aplicaciones</span><span class="bm-pill">&#129302; IA &amp; Sistematización</span></div></div></div><a class="bm-cta" href="https://wa.me/573505457420" target="_blank" rel="noopener"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.268 2 2 8.268 2 16c0 2.457.631 4.766 1.738 6.775L2 30l7.395-1.713A13.934 13.934 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.5a11.44 11.44 0 01-5.834-1.602l-.418-.248-4.387 1.016 1.047-4.277-.273-.44A11.455 11.455 0 014.5 16C4.5 9.596 9.596 4.5 16 4.5S27.5 9.596 27.5 16 22.404 27.5 16 27.5zm6.291-8.633c-.346-.172-2.043-1.006-2.359-1.121-.316-.115-.547-.172-.777.172-.23.344-.895 1.121-1.098 1.352-.201.23-.402.258-.748.086-.346-.172-1.459-.537-2.779-1.713-1.027-.916-1.721-2.047-1.922-2.393-.201-.346-.021-.533.151-.705.154-.154.346-.402.518-.604.172-.201.23-.344.344-.574.115-.23.057-.432-.029-.604-.086-.172-.777-1.869-1.064-2.561-.279-.672-.562-.58-.777-.591-.201-.01-.432-.012-.662-.012-.23 0-.604.086-.92.432-.316.346-1.207 1.178-1.207 2.873s1.236 3.332 1.408 3.562c.172.23 2.432 3.711 5.891 5.205.822.355 1.465.566 1.965.725.826.263 1.578.225 2.172.137.662-.1 2.043-.834 2.332-1.639.287-.805.287-1.496.201-1.639-.086-.143-.316-.229-.662-.402z"/></svg>Contactar BioMarketing</a></div>';}
+function bmCard(){
+  var waMsg=encodeURIComponent('¡Hola BioMarketing! 👋\n\nVi la aplicación de Atlético Norte FC y me interesa conocer más sobre sus servicios.\n\n¿Podemos hablar sobre lo que necesito?');
+  var waUrl='https://wa.me/573505457420?text='+waMsg;
+  var waSvg='<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.268 2 2 8.268 2 16c0 2.457.631 4.766 1.738 6.775L2 30l7.395-1.713A13.934 13.934 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.5a11.44 11.44 0 01-5.834-1.602l-.418-.248-4.387 1.016 1.047-4.277-.273-.44A11.455 11.455 0 014.5 16C4.5 9.596 9.596 4.5 16 4.5S27.5 9.596 27.5 16 22.404 27.5 16 27.5zm6.291-8.633c-.346-.172-2.043-1.006-2.359-1.121-.316-.115-.547-.172-.777.172-.23.344-.895 1.121-1.098 1.352-.201.23-.402.258-.748.086-.346-.172-1.459-.537-2.779-1.713-1.027-.916-1.721-2.047-1.922-2.393-.201-.346-.021-.533.151-.705.154-.154.346-.402.518-.604.172-.201.23-.344.344-.574.115-.23.057-.432-.029-.604-.086-.172-.777-1.869-1.064-2.561-.279-.672-.562-.58-.777-.591-.201-.01-.432-.012-.662-.012-.23 0-.604.086-.92.432-.316.346-1.207 1.178-1.207 2.873s1.236 3.332 1.408 3.562c.172.23 2.432 3.711 5.891 5.205.822.355 1.465.566 1.965.725.826.263 1.578.225 2.172.137.662-.1 2.043-.834 2.332-1.639.287-.805.287-1.496.201-1.639-.086-.143-.316-.229-.662-.402z"/></svg>';
+  return '<div class="bm-card">'
+    +'<div class="bm-top-bar"><div class="bm-top-dot"></div><div class="bm-top-label">Aplicación patrocinada y desarrollada por</div><div class="bm-top-dot"></div></div>'
+    +'<div class="bm-header">'
+    +'<div class="bm-logo-wrap"><img class="bm-logo" src="'+BM_LOGO+'" alt="BioMarketing"><div class="bm-logo-ring"></div></div>'
+    +'<div class="bm-info">'
+    +'<div class="bm-name">BIOMarketing</div>'
+    +'<div class="bm-sub">Innovación Digital</div>'
+    +'<div class="bm-rating"><span class="bm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="bm-rating-txt">Agencia Digital</span></div>'
+    +'</div></div>'
+    +'<div class="bm-divider"></div>'
+    +'<div class="bm-services-grid" style="margin-top:12px">'
+    +'<div class="bm-svc"><div class="bm-svc-icon">&#127760;</div><div class="bm-svc-text"><div class="bm-svc-name">Páginas Web</div><div class="bm-svc-desc">Diseño &amp; Desarrollo</div></div></div>'
+    +'<div class="bm-svc"><div class="bm-svc-icon">&#128242;</div><div class="bm-svc-text"><div class="bm-svc-name">Aplicaciones</div><div class="bm-svc-desc">iOS &amp; Android</div></div></div>'
+    +'<div class="bm-svc"><div class="bm-svc-icon">&#129302;</div><div class="bm-svc-text"><div class="bm-svc-name">IA &amp; Sistematización</div><div class="bm-svc-desc">Automatización de procesos</div></div></div>'
+    +'<div class="bm-svc"><div class="bm-svc-icon">&#128248;</div><div class="bm-svc-text"><div class="bm-svc-name">Redes Sociales</div><div class="bm-svc-desc">Estrategia &amp; Contenido</div></div></div>'
+    +'</div>'
+    +'<a class="bm-cta" href="'+waUrl+'" target="_blank" rel="noopener">'+waSvg+'<div class="bm-cta-txt"><div class="bm-cta-main">Contactar por WhatsApp</div><div class="bm-cta-sub">Respuesta inmediata &middot; Sin costo</div></div></a>'
+    +'</div>';
+}
 
 function getHora(m){return (reprog[m.id]&&reprog[m.id].hora)?reprog[m.id].hora:(horaOverrides[m.id]||m.hora);}
 function getCancha(m){return (reprog[m.id]&&reprog[m.id].cancha)?reprog[m.id].cancha:m.cancha;}
