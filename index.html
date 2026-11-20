@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.31';
+var APP_VER='9.32';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -563,19 +563,37 @@ tbody td:nth-child(2){text-align:left}
 .rt{font-size:9.5px;color:var(--m);margin-top:2px}
 .rv{font-size:24px;font-weight:900;color:var(--ac);flex-shrink:0;min-width:30px;text-align:right}
 
-/* ── BRACKET ── */
-.brkw{display:flex;gap:10px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none}
+/* ── BRACKET PLAYOFFS ── */
+.brkw{display:flex;gap:12px;overflow-x:auto;padding:0 14px 20px;scrollbar-width:none;align-items:flex-start}
 .brkw::-webkit-scrollbar{display:none}
-.brd{flex:0 0 150px}
-.brt{font-size:8.5px;font-weight:800;color:var(--gl);text-transform:uppercase;text-align:center;margin-bottom:8px;letter-spacing:1px;padding:4px 8px;background:rgba(245,159,11,.08);border-radius:6px}
-.brm{background:var(--cd);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:8px;transition:.15s}
-.brm:active{border-color:var(--ac)}
-.brl{padding:8px 10px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700}
-.brl:first-child{border-bottom:1px solid var(--bd)}
-.brl .bsd{width:16px;height:16px;background:var(--anr);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0;font-weight:900}
-.brl .bbn{flex:1;font-size:10px}
-.brl .bsc{font-size:12px;color:var(--ac);font-weight:900;min-width:20px;text-align:right}
-.bbw{width:18px;height:21px;flex-shrink:0}
+.brd{flex:0 0 168px}
+.brt{font-size:7.5px;font-weight:900;color:#f59e0b;text-transform:uppercase;text-align:center;margin-bottom:10px;letter-spacing:1.5px;padding:5px 10px;background:rgba(245,159,11,.1);border:1px solid rgba(245,159,11,.2);border-radius:8px}
+.brt.semi{color:#a78bfa;background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2)}
+.brt.final{color:#ffd700;background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.25)}
+.brt.locked{color:var(--m);background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);opacity:.5}
+.brm{background:linear-gradient(135deg,rgba(255,255,255,.045) 0%,rgba(255,255,255,.018) 100%);border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;margin-bottom:10px;position:relative}
+.brm.brm-live{border-color:#ef4444;box-shadow:0 0 0 1px rgba(239,68,68,.3)}
+.brm.brm-done .brl-win{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.15)}
+.brm.brm-locked{opacity:.45;filter:grayscale(.6)}
+.brl{padding:9px 10px;display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;position:relative}
+.brl:first-child{border-bottom:1px solid rgba(255,255,255,.07)}
+.brl .bsd{width:17px;height:17px;background:var(--anr);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:7.5px;color:#fff;flex-shrink:0;font-weight:900}
+.brl .bbn{flex:1;font-size:10px;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brl .bsc{font-size:13px;color:var(--ac);font-weight:900;min-width:18px;text-align:right}
+.brl .bsc.bsc-win{color:#10b981;font-size:14px}
+.bbw{width:20px;height:22px;flex-shrink:0;border-radius:3px;overflow:hidden}
+.brlock{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px 10px;text-align:center;opacity:.5}
+.brlock-ico{font-size:22px}
+.brlock-txt{font-size:9px;color:var(--m);font-weight:700;letter-spacing:.5px;text-transform:uppercase;line-height:1.5}
+/* Phase header */
+.brph{padding:0 16px 4px}
+.brph-title{font-size:18px;font-weight:900;color:var(--t);letter-spacing:-.3px}
+.brph-sub{font-size:11px;color:var(--m);margin-top:2px}
+.brph-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(245,159,11,.12);border:1px solid rgba(245,159,11,.25);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#f59e0b;margin-top:8px;letter-spacing:.5px}
+.brph-badge.live{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#ef4444;animation:brPulse 1.6s infinite}
+.brph-badge.semi{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.25);color:#a78bfa}
+.brph-badge.final{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.3);color:#ffd700}
+@keyframes brPulse{0%,100%{opacity:1}50%{opacity:.6}}
 
 /* ── PANEL ── */
 .pph{background:linear-gradient(180deg,rgba(200,16,46,.2) 0%,var(--bg) 100%);padding:24px 16px 16px;text-align:center;border-bottom:1px solid var(--bd)}
@@ -1340,10 +1358,14 @@ tbody td:nth-child(2){text-align:left}
 
 <!-- ═══ LLAVE ═══ -->
 <div class="pg" id="pg-llave">
-  <div class="stl">&#127942; Bracket Playoffs</div>
-  <div id="llaveMsg" style="margin:0 16px 14px;background:var(--b3);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;font-size:11px;color:var(--m);line-height:1.6">
-    &#128336; Disponible al completar los 135 partidos de las 3 vueltas.<br>
-    Clasifican los <strong style="color:var(--anr)">Top 8</strong> &mdash; 1&deg;vs8&deg; &middot; 2&deg;vs7&deg; &middot; 3&deg;vs6&deg; &middot; 4&deg;vs5&deg; &rarr; Semis &rarr; Gran Final
+  <div class="brph">
+    <div class="brph-title">&#127942; Playoffs S2 2026</div>
+    <div class="brph-sub">Top 8 equipos &mdash; Eliminación directa</div>
+    <div id="brphBadge" class="brph-badge" style="display:none"></div>
+  </div>
+  <div id="llaveMsg" style="margin:14px 16px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--m);line-height:1.6">
+    &#128336; Disponible al finalizar la fase todos contra todos.<br>
+    Clasifican los <strong style="color:#f59e0b">Top 8</strong> &mdash; 1&deg;vs8&deg; &middot; 2&deg;vs7&deg; &middot; 3&deg;vs6&deg; &middot; 4&deg;vs5&deg;
   </div>
   <div class="brkw" id="brc2"></div>
 </div>
@@ -1924,6 +1946,7 @@ function setupFirebaseListeners(){
     });
     rFx();updHdr();
   }catch(e){}},function(){});
+  db.ref("/playoff").on("value",function(s){try{window._playoffRes=s.val()||{};rTb();}catch(e){}},function(){});
   db.ref("/sorteo").on("value",function(s){try{sortAssign=s.val()||{};rSortGrd();}catch(e){}},function(){});
   db.ref("/delegados").on("value",function(s){try{rDlg(s.val()?Object.values(s.val()):DLG_DEF);}catch(e){}},function(){try{rDlg(DLG_DEF);}catch(e){}});
   // Live sync of /socios → EQ_LOADED so goal/card picker always has fresh rosters
@@ -3635,25 +3658,122 @@ function rTb(){
   });
   document.getElementById("tb").innerHTML=h;
   var done=MF.filter(function(m){return res[m.id]&&res[m.id].l!==undefined;}).length;
-  if(done===MF.length&&MF.length>0){document.getElementById("brs").style.display="block";rBr(st.slice(0,8));}
+  // Activate bracket as soon as standings exist (phase complete or admin forced)
+  if(st.length>=8){document.getElementById("brs")&&(document.getElementById("brs").style.display="block");rBr(st.slice(0,8));}
 }
 function rBr(t8){
-  var rds=[{t:"Cuartos de Final",p:[[0,7],[1,6],[2,5],[3,4]]},{t:"Semifinales",p:[[0,1],[2,3]]},{t:"Gran Final",p:[[0,1]]}];
-  function mk(el){
-    var h="";
-    rds.forEach(function(rd){
-      h+='<div class="brd"><div class="brt">'+rd.t+"</div>";
-      rd.p.forEach(function(pr){
-        var ta=t8[pr[0]]||{id:0},tb=t8[pr[1]]||{id:0};
-        h+='<div class="brm"><div class="brl"><div class="bsd">'+(pr[0]+1)+"</div>"+bdg(ta.id,"bbw")+'<div class="bbn">'+(ta.id?ts(ta.id):"?")+'</div><div class="bsc">-</div></div>';
-        h+='<div class="brl"><div class="bsd">'+(pr[1]+1)+"</div>"+bdg(tb.id,"bbw")+'<div class="bbn">'+(tb.id?ts(tb.id):"?")+'</div><div class="bsc">-</div></div></div>';
-      });
-      h+="</div>";
-    });
-    document.getElementById(el).innerHTML=h;
+  // playoff bracket data stored in Firebase at /playoff/{phase}/{matchKey}
+  // For now we read from res using matchId ranges or a dedicated bracket store
+  // Phase definitions: matchups [seedA, seedB] (0-indexed)
+  var CUARTOS=[[0,7],[1,6],[2,5],[3,4]]; // 1v8, 2v7, 3v6, 4v5
+  var SEMIS=[[0,1],[2,3]];               // winners Q1&Q2, Q3&Q4
+  var FINAL=[[0,1]];                     // winners S1&S2
+
+  // Read playoff results from /playoff node (separate from regular fixture)
+  var po=window._playoffRes||{};
+
+  // Determine winners per phase
+  function getWinner(phKey,matchIdx){
+    var d=po[phKey];if(!d)return null;
+    var m=d['m'+matchIdx];if(!m)return null;
+    if(m.wa!==undefined)return m.wa?'a':'b';
+    return null;
   }
-  mk("brc");mk("brc2");
-  document.getElementById("llaveMsg").style.display="none";
+
+  // Build a match card HTML
+  function mkCard(ta,tb,phKey,matchIdx,locked){
+    var w=getWinner(phKey,matchIdx);
+    var wA=w==='a',wB=w==='b';
+    var cls='brm'+(locked?' brm-locked':'')+(w?' brm-done':'');
+    var scA='-',scB='-';
+    var d=po[phKey]&&po[phKey]['m'+matchIdx];
+    if(d&&d.ga!==undefined){scA=d.ga;scB=d.gb;}
+    var nameA=ta.id?ts(ta.id):'?', nameB=tb.id?ts(tb.id):'?';
+    var seedA=ta._seed!==undefined?ta._seed+1:'?', seedB=tb._seed!==undefined?tb._seed+1:'?';
+    var h='<div class="'+cls+'">';
+    h+='<div class="brl'+(wA?' brl-win':'')+'"><div class="bsd">'+seedA+'</div>'+bdg(ta.id||0,'bbw')+'<div class="bbn">'+escHtml(nameA)+'</div><div class="bsc'+(wA?' bsc-win':'')+'">'+scA+'</div></div>';
+    h+='<div class="brl'+(wB?' brl-win':'')+'"><div class="bsd">'+seedB+'</div>'+bdg(tb.id||0,'bbw')+'<div class="bbn">'+escHtml(nameB)+'</div><div class="bsc'+(wB?' bsc-win':'')+'">'+scB+'</div></div>';
+    h+='</div>';
+    return h;
+  }
+
+  // Resolve Cuartos teams (from standings top 8)
+  var qTeams=CUARTOS.map(function(pr,i){
+    var a=Object.assign({},t8[pr[0]]||{id:0},{_seed:pr[0]});
+    var b=Object.assign({},t8[pr[1]]||{id:0},{_seed:pr[1]});
+    return{a:a,b:b};
+  });
+
+  // Resolve Semis teams (winners of Cuartos, or ? if not played)
+  function qWinner(qi){
+    var w=getWinner('cuartos',qi);
+    if(!w)return{id:0,_seed:undefined};
+    var pr=CUARTOS[qi],team=w==='a'?(t8[pr[0]]||{id:0}):(t8[pr[1]]||{id:0});
+    return Object.assign({},team,{_seed:undefined});
+  }
+  var sTeams=SEMIS.map(function(pr,i){
+    return{a:qWinner(pr[0]),b:qWinner(pr[1])};
+  });
+
+  // Resolve Final teams (winners of Semis)
+  function sWinner(si){
+    var w=getWinner('semis',si);
+    if(!w)return{id:0,_seed:undefined};
+    var pr=SEMIS[si];
+    var ta=qWinner(pr[0]),tb=qWinner(pr[1]);
+    return w==='a'?ta:tb;
+  }
+  var fTeams=FINAL.map(function(pr){
+    return{a:sWinner(pr[0]),b:sWinner(pr[1])};
+  });
+
+  // Decide which phases are visible (progressive unlock)
+  var cuartosPlayed=CUARTOS.filter(function(_,i){return getWinner('cuartos',i)!==null;}).length;
+  var semisVisible=cuartosPlayed>=4; // all cuartos decided
+  var semisPlayed=SEMIS.filter(function(_,i){return getWinner('semis',i)!==null;}).length;
+  var finalVisible=semisPlayed>=2;
+
+  function mkPhase(el){
+    var h='';
+
+    // ── CUARTOS ──
+    h+='<div class="brd"><div class="brt">Cuartos de Final</div>';
+    qTeams.forEach(function(m,i){h+=mkCard(m.a,m.b,'cuartos',i,false);});
+    h+='</div>';
+
+    // ── SEMIS ──
+    h+='<div class="brd"><div class="brt semi">'+(semisVisible?'Semifinales':'Semifinales')+'</div>';
+    if(semisVisible){
+      sTeams.forEach(function(m,i){h+=mkCard(m.a,m.b,'semis',i,false);});
+    }else{
+      h+='<div class="brlock"><div class="brlock-ico">&#128274;</div><div class="brlock-txt">Se define al terminar<br>Cuartos de Final</div></div>';
+    }
+    h+='</div>';
+
+    // ── FINAL ──
+    h+='<div class="brd"><div class="brt final">'+(finalVisible?'&#127942; Gran Final':'&#127942; Gran Final')+'</div>';
+    if(finalVisible){
+      fTeams.forEach(function(m,i){h+=mkCard(m.a,m.b,'final',i,false);});
+    }else{
+      h+='<div class="brlock"><div class="brlock-ico">&#127942;</div><div class="brlock-txt">Se define al terminar<br>Semifinales</div></div>';
+    }
+    h+='</div>';
+
+    var el2=document.getElementById(el);if(el2)el2.innerHTML=h;
+  }
+
+  mkPhase('brc');mkPhase('brc2');
+
+  // Update badge
+  var badge=document.getElementById('brphBadge');
+  if(badge){
+    if(cuartosPlayed===0){badge.innerHTML='&#9917; Cuartos de Final en curso';badge.className='brph-badge live';badge.style.display='inline-flex';}
+    else if(cuartosPlayed<4){badge.innerHTML='&#9917; '+cuartosPlayed+'/4 definidos';badge.className='brph-badge live';badge.style.display='inline-flex';}
+    else if(!finalVisible){badge.innerHTML='&#127939; Semifinales en curso';badge.className='brph-badge semi';badge.style.display='inline-flex';}
+    else{badge.innerHTML='&#127942; Gran Final';badge.className='brph-badge final';badge.style.display='inline-flex';}
+  }
+
+  var msg=document.getElementById("llaveMsg");if(msg)msg.style.display="none";
 }
 
 // ── SCORERS ──
