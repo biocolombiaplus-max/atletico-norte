@@ -41,6 +41,13 @@
       "$mid": {
         ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
       }
+    },
+
+    "playoffMatches": {
+      ".read": "auth != null",
+      "$mid": {
+        ".write": "auth != null && (root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Administrador' || root.child('socios/' + auth.token.email.split('@')[0] + '/rol').val() === 'Coordinador Deportivo')"
+      }
     }
   }
 }
