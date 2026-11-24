@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.40';
+var APP_VER='9.41';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -1393,7 +1393,7 @@ tbody td:nth-child(2){text-align:left}
     <div class="brph-sub">Top 8 equipos &mdash; Eliminación directa</div>
     <div id="brphBadge" class="brph-badge" style="display:none"></div>
   </div>
-  <div id="llaveMsg" style="margin:14px 16px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--m);line-height:1.6">
+  <div id="llaveMsg" style="display:none;margin:14px 16px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--m);line-height:1.6">
     &#128336; Disponible al finalizar la fase todos contra todos.<br>
     Clasifican los <strong style="color:#f59e0b">Top 8</strong> &mdash; 1&deg;vs8&deg; &middot; 2&deg;vs7&deg; &middot; 3&deg;vs6&deg; &middot; 4&deg;vs5&deg;
   </div>
@@ -1937,7 +1937,7 @@ const FB={
 
 let fbR=false,db=null,au=null,cu=null,cr=null,pf={},res={},gm={},cf="all",cri=null,cfe=0;
 var PO_MATCHES=[]; // playoff match objects, built by rBr()
-var _playoffMode=false;
+var _playoffMode=true;
 function findMatch(id){return MF.find(function(x){return x.id===id;})||PO_MATCHES.find(function(x){return x.id===id;});}
 var _toastTimers={};
 var _toastLabels={goal:'Gol',info:'Info',warn:'Aviso',red:'Alerta',kick:'Partido',yellow:'Tarjeta',expulsion:'Expulsión'};
@@ -2213,6 +2213,7 @@ function showTab(t){
   if(t==="fixture"){var _pgFx=document.getElementById('pg-fixture');if(_pgFx)_pgFx.scrollTop=0;rFx();}
   if(t==="tabla"){rCards();rTb();rEqd();rDisc();}
   if(t==="goles"){rGl();rGo();rVl();}
+  if(t==="llave"){rBr();}
 }
 
 // ── HEADER ──
