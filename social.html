@@ -1397,15 +1397,17 @@ async function tJornada(ctx,ms){
   const nCards=ms.length,nGrps=grps.length;
   // Fit all cards in available space
   const isPlayoff=ms.some(m=>m.id>=1000);
-  const dhH=62,cardGap=isPlayoff?22:7,grpGap=isPlayoff?28:14,hcGap=isPlayoff?10:6;
-  const startY=pY+pH+18,endY=H-160;
+  const dhH=62,cardGap=isPlayoff?30:7,grpGap=isPlayoff?36:14,hcGap=isPlayoff?12:6;
+  const startY=pY+pH+24,endY=H-120;
   const available=endY-startY;
   const overhead=nGrps*(dhH+hcGap)+(nGrps-1)*grpGap+(nCards-nGrps)*cardGap;
   const rawCH=Math.floor((available-overhead)/Math.max(nCards,1));
-  const cH=Math.min(220,Math.max(170,rawCH));
+  // Playoff cards: much taller (up to 380px), top-aligned with small offset
+  const cH=isPlayoff?Math.min(380,Math.max(240,rawCH)):Math.min(220,Math.max(170,rawCH));
   const totalContent=nCards*cH+overhead;
   const extraSpace=Math.max(0,available-totalContent);
-  let curY=startY+Math.floor(extraSpace/2);
+  // Playoff: top-align (small top margin), regular: center
+  let curY=startY+(isPlayoff?Math.min(extraSpace/2,40):Math.floor(extraSpace/2));
   for(let gi=0;gi<grps.length;gi++){
     const{dt,ms:gms}=grps[gi];
     jorDayHeader(ctx,dt,curY,dhH);
