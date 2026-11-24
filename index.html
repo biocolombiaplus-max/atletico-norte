@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.35';
+var APP_VER='9.36';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -3557,7 +3557,12 @@ function rFx(){
     h+='<div style="margin:14px 16px 0;padding:12px 16px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.25);border-radius:14px">';
     h+='<div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">&#127942;</span><div><div style="font-size:14px;font-weight:900;color:#f59e0b;letter-spacing:-.2px">PLAYOFFS S2 2026</div><div style="font-size:11px;color:var(--m);margin-top:1px">Eliminaci&#243;n directa &mdash; pierde y sale</div></div></div>';
     h+='</div>';
-    Object.keys(bd).sort().forEach(function(dt){
+    // Upcoming dates first, past dates below
+    Object.keys(bd).sort(function(a,b){
+      var af=a>=todayStr,bf=b>=todayStr;
+      if(af&&!bf)return -1;if(!af&&bf)return 1;
+      return af?a.localeCompare(b):b.localeCompare(a);
+    }).forEach(function(dt){
       var dm=bd[dt].slice().sort(function(a,b){return getHora(a).localeCompare(getHora(b));});
       var dayFull=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"][new Date(dt+"T12:00:00").getDay()];
       var isToday=(dt===todayStr);
@@ -3807,7 +3812,9 @@ function rTb(){
 }
 function rBr(t8){
   var CUARTOS=[[0,7],[1,6],[2,5],[3,4]]; // seed pairings — used for bracket visual
-  var SEMIS=[[0,1],[2,3]];
+  // SEMIS: [slot_local, slot_visita] en cuartosWinners
+  // SNF(slot2) vs JUN(slot1) · AME(slot0) vs NAL(slot3)
+  var SEMIS=[[2,1],[0,3]];
   var PO_ID_Q=[1001,1002,1003,1004];
   var PO_ID_S=[1011,1012];
   var PO_ID_F=[1021];
@@ -3851,8 +3858,10 @@ function rBr(t8){
   var semisVisible=cuartosPlayed>=4;
 
   if(semisVisible){
-    [[PO_ID_S[0],0,SEMIS[0],'2026-11-30','19:00','Villa Silvania'],
-     [PO_ID_S[1],1,SEMIS[1],'2026-11-30','21:00','Coveadse']].forEach(function(sc){
+    // Semis: jueves 27 Nov · Villa Silvania ambos
+    // 1011=SNF vs JUN 19:00 · 1012=AME vs NAL 21:00
+    [[PO_ID_S[0],0,SEMIS[0],'2026-11-27','19:00','Villa Silvania'],
+     [PO_ID_S[1],1,SEMIS[1],'2026-11-27','21:00','Villa Silvania']].forEach(function(sc){
       var fb=pmFb[sc[0]]||{};
       PO_MATCHES.push({id:sc[0],l:(cuartosWinners[sc[2][0]]||{}).id||0,v:(cuartosWinners[sc[2][1]]||{}).id||0,
         fecha:fb.fecha||sc[3],hora:fb.hora||sc[4],cancha:fb.cancha||sc[5],
