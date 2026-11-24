@@ -2086,7 +2086,7 @@ async function tGoleadores(ctx){
 
   // Aggregate goals by player — with dedup for same player typed differently across jornadas
   const goals={};
-  ALL.forEach(m=>{
+  getAllMatches().forEach(m=>{
     const r=results[m.id];if(!r||!r.scorers)return;
     r.scorers.forEach(s=>{
       if(s.autogol)return;
@@ -2181,7 +2181,7 @@ async function tMenosVencida(ctx){
   // Aggregate goals conceded per team
   const teams={};
   for(let i=1;i<=10;i++)teams[i]={id:i,pj:0,gc:0,promedio:0};
-  ALL.forEach(m=>{
+  getAllMatches().forEach(m=>{
     const r=results[m.id];if(!r||r.l===undefined)return;
     if(!teams[m.l]||!teams[m.v])return;
     teams[m.l].pj++;teams[m.v].pj++;
