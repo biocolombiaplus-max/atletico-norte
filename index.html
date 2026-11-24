@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.36';
+var APP_VER='9.37';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -3854,24 +3854,24 @@ function rBr(t8){
     return w==='a'?{id:_directQ[qi][0]}:{id:_directQ[qi][1]};
   }
   var cuartosWinners=CUARTOS.map(function(_,i){return qWinnerTeam(i);});
-  var cuartosPlayed=cuartosWinners.filter(function(t){return t.id>0;}).length;
-  var semisVisible=cuartosPlayed>=4;
 
-  if(semisVisible){
-    // Semis: jueves 27 Nov · Villa Silvania ambos
-    // 1011=SNF vs JUN 19:00 · 1012=AME vs NAL 21:00
-    [[PO_ID_S[0],0,SEMIS[0],'2026-11-27','19:00','Villa Silvania'],
-     [PO_ID_S[1],1,SEMIS[1],'2026-11-27','21:00','Villa Silvania']].forEach(function(sc){
-      var fb=pmFb[sc[0]]||{};
-      PO_MATCHES.push({id:sc[0],l:(cuartosWinners[sc[2][0]]||{}).id||0,v:(cuartosWinners[sc[2][1]]||{}).id||0,
-        fecha:fb.fecha||sc[3],hora:fb.hora||sc[4],cancha:fb.cancha||sc[5],
-        vu:'S',vuLabel:'Semifinales',_po:'semis',_si:sc[1],week:210+sc[1]});
-    });
-  }
+  // Semis: equipos confirmados (hardcoded como cuartos)
+  // 1011=SNF(4) vs JUN(9) 19:00 · 1012=AME(8) vs NAL(3) 21:00
+  var _directS=[[4,9],[8,3]];
+  var _sSched=[
+    {id:PO_ID_S[0],si:0,fecha:'2026-11-27',hora:'19:00',cancha:'Villa Silvania'},
+    {id:PO_ID_S[1],si:1,fecha:'2026-11-27',hora:'21:00',cancha:'Villa Silvania'},
+  ];
+  _sSched.forEach(function(sc){
+    var fb=pmFb[sc.id]||{};
+    PO_MATCHES.push({id:sc.id,l:_directS[sc.si][0],v:_directS[sc.si][1],
+      fecha:fb.fecha||sc.fecha,hora:fb.hora||sc.hora,cancha:fb.cancha||sc.cancha,
+      vu:'S',vuLabel:'Semifinales',_po:'semis',_si:sc.si,week:201});
+  });
 
   function sWinnerTeam(si){
     var w=resWinner(PO_ID_S[si]);if(!w)return{id:0};
-    var pr=SEMIS[si];return w==='a'?(cuartosWinners[pr[0]]||{id:0}):(cuartosWinners[pr[1]]||{id:0});
+    return w==='a'?{id:_directS[si][0]}:{id:_directS[si][1]};
   }
   var semisWinners=SEMIS.map(function(_,i){return sWinnerTeam(i);});
   var semisPlayed=semisWinners.filter(function(t){return t.id>0;}).length;
