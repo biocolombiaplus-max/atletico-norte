@@ -1378,104 +1378,123 @@ async function tMVP(ctx){
 async function tGranFinal(ctx,m){
   if(!m)return;
   await drawBg(ctx);topStripe(ctx);
-  // Extra glow for gran final
-  rGlow(ctx,W/2,H*.38,1000,'rgba(255,215,0,.10)');
-  rGlow(ctx,W/2,0,750,'rgba(200,16,46,.42)');
-  rGlow(ctx,W*.18,H*.55,580,'rgba(200,16,46,.22)');
-  rGlow(ctx,W*.82,H*.55,540,'rgba(0,120,50,.18)');
+  // Atmospheric glows
+  rGlow(ctx,W/2,H*.3,1100,'rgba(255,215,0,.09)');
+  rGlow(ctx,W/2,0,800,'rgba(200,16,46,.4)');
+  rGlow(ctx,W*.15,H*.6,600,'rgba(200,16,46,.18)');
+  rGlow(ctx,W*.85,H*.6,560,'rgba(0,110,45,.16)');
 
-  clubHeader(ctx,52);
+  // ── COMPACT HEADER: logo + club name (no subtitle duplication) ──
+  const hImg=getImg('club');
+  const hSz=108,hx=W/2-hSz/2,hy=38;
+  rGlow(ctx,W/2,hy+hSz*.5,300,'rgba(200,16,46,.28)');
+  if(hImg){ctx.save();ctx.shadowColor='rgba(200,16,46,.55)';ctx.shadowBlur=44;ctx.drawImage(hImg,hx,hy,hSz,hSz*1.19);ctx.restore();}
+  else{ctx.fillStyle='#c8102e';ctx.beginPath();ctx.roundRect(hx,hy,hSz,hSz,16);ctx.fill();ctx.font='900 44px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('AN',W/2,hy+hSz/2);ctx.textBaseline='alphabetic';}
+  ctx.letterSpacing='5px';ctx.font='900 48px -apple-system,sans-serif';
+  ctx.fillStyle=lGrad(ctx,W/2-260,0,W/2+260,0,[0,'#b0bcd4'],[.5,'#fff'],[1,'#b0bcd4']);
+  ctx.textAlign='center';ctx.fillText('ATLÉTICO NORTE F.C.',W/2,hy+hSz*1.19+56);
+  goldRule(ctx,hy+hSz*1.19+72);
 
-  // ── GRAN FINAL title pill ──
-  const lW=680,lH=82,lX=W/2-lW/2,lY=372;
-  // Dark gold bg
-  ctx.fillStyle=lGrad(ctx,lX,lY,lX+lW,lY+lH,[0,'rgba(100,70,0,.55)'],[.5,'rgba(160,110,0,.7)'],[1,'rgba(100,70,0,.55)']);
-  ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
-  // Shine top
-  ctx.save();ctx.globalAlpha=.12;ctx.fillStyle='#fff';
-  ctx.beginPath();ctx.roundRect(lX+8,lY+4,lW-16,lH*.42,lH*.42);ctx.fill();ctx.restore();
-  // Gold border
-  ctx.strokeStyle=lGrad(ctx,lX,lY,lX+lW,lY,[0,'rgba(255,215,0,.35)'],[.5,'rgba(255,215,0,.95)'],[1,'rgba(255,215,0,.35)']);
-  ctx.lineWidth=2.5;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
-  // Text
-  ctx.fillStyle=lGrad(ctx,W/2-300,0,W/2+300,0,[0,'#c89000'],[.4,'#ffd700'],[.6,'#fff'],[1,'#ffd700']);
-  ctx.font='900 36px sans-serif';ctx.textAlign='center';ctx.letterSpacing='6px';
-  ctx.save();ctx.shadowColor='rgba(255,215,0,.5)';ctx.shadowBlur=20;
-  ctx.fillText('🏆  GRAN FINAL  🏆',W/2,lY+lH*.67);ctx.restore();
+  // ── GRAN FINAL — big dramatic title ──
+  const gfY=312;
+  // Soft glow behind text
+  rGlow(ctx,W/2,gfY,520,'rgba(255,215,0,.18)');
+  // Trophy left
+  ctx.font='82px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
+  ctx.fillText('🏆',W/2-320,gfY+10);ctx.fillText('🏆',W/2+320,gfY+10);
+  // "GRAN FINAL" text
+  ctx.font='900 116px Arial Black,sans-serif';ctx.letterSpacing='4px';
+  const gfg=lGrad(ctx,W/2-440,0,W/2+440,0,[0,'#9a6a00'],[.2,'#daa520'],[.5,'#fff700'],[.8,'#daa520'],[1,'#9a6a00']);
+  ctx.fillStyle=gfg;ctx.textAlign='center';
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.8)';ctx.shadowBlur=60;
+  ctx.fillText('GRAN FINAL',W/2,gfY+8);ctx.restore();
+  // "S2 2026" small label below
+  ctx.font='600 28px sans-serif';ctx.letterSpacing='6px';ctx.fillStyle='rgba(255,215,0,.55)';
+  ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+56);
 
-  // ── Subtitle: S2 2026 ──
-  ctx.font='700 26px sans-serif';ctx.letterSpacing='5px';ctx.fillStyle='rgba(255,255,255,.45)';
-  ctx.textAlign='center';ctx.fillText('LIGA INTERNA · S2 2026',W/2,lY+lH+36);
-
-  // ── Date section ──
+  // ── DATE SECTION ──
   const d=new Date(getFecha(m)+'T12:00:00');
   const dayName=DL[d.getDay()].toUpperCase();
   const dateNum=d.getDate();
   const monName=ML[d.getMonth()].toUpperCase();
-  // Day chip
-  const cY=510,cW=380,cH=62,cX=W/2-cW/2;
-  ctx.fillStyle=lGrad(ctx,cX,cY,cX+cW,cY+cH,[0,'rgba(200,16,46,.4)'],[1,'rgba(200,16,46,.2)']);
+  // Day pill (small, red)
+  const cY=430,cW=320,cH=56,cX=W/2-cW/2;
+  ctx.fillStyle=lGrad(ctx,cX,cY,cX+cW,cY+cH,[0,'rgba(180,10,30,.6)'],[1,'rgba(200,16,46,.4)']);
   ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.fill();
-  ctx.strokeStyle='rgba(200,16,46,.55)';ctx.lineWidth=1.5;
+  ctx.strokeStyle='rgba(200,16,46,.65)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.stroke();
-  ctx.font='800 34px sans-serif';ctx.fillStyle='#ff9090';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.font='800 30px sans-serif';ctx.fillStyle='#ffaaaa';ctx.textAlign='center';ctx.letterSpacing='4px';
   ctx.fillText(dayName,W/2,cY+cH*.7);
-  // Big date number
-  ctx.font='900 150px sans-serif';ctx.letterSpacing='-3px';
-  ctx.fillStyle=lGrad(ctx,W/2-240,0,W/2+240,0,[0,'#d0dcff'],[.5,'#ffffff'],[1,'#d0dcff']);
+  // "28 DE NOVIEMBRE" on one line, clean
+  ctx.font='900 96px Arial Black,sans-serif';ctx.letterSpacing='-2px';
+  ctx.fillStyle=lGrad(ctx,W/2-260,0,W/2+260,0,[0,'#dce8ff'],[.5,'#fff'],[1,'#dce8ff']);
   ctx.textAlign='center';
-  ctx.save();ctx.shadowColor='rgba(200,16,46,.3)';ctx.shadowBlur=40;
-  ctx.fillText(dateNum,W/2,718);ctx.restore();
-  // Month
-  ctx.font='700 60px sans-serif';ctx.letterSpacing='8px';
-  ctx.fillStyle='rgba(255,255,255,.65)';ctx.textAlign='center';
-  ctx.fillText(monName,W/2,804);
-  goldRule(ctx,836);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=20;
+  ctx.fillText(dateNum,W/2-120,564);ctx.restore();
+  ctx.font='700 50px sans-serif';ctx.letterSpacing='4px';
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.fillText('DE '+monName,W/2+100,564);
 
-  // ── Time + Venue ──
-  ctx.textAlign='center';ctx.font='800 60px sans-serif';ctx.letterSpacing='2px';
-  ctx.fillStyle='rgba(255,255,255,.97)';ctx.fillText('🕐  '+getHora(m),W/2,916);
-  ctx.font='800 56px sans-serif';ctx.letterSpacing='1px';
-  ctx.fillStyle='rgba(255,255,255,.88)';ctx.fillText('📍  '+getCancha(m),W/2,994);
-  rule(ctx,1026,.42);
+  goldRule(ctx,598);
 
-  // ── Team badges ──
-  const midY=1190,tlx=W*.23,trx=W*.77,tSz=390;
+  // ── TIME + VENUE — single clean row ──
+  // Build segments: hora · cancha
+  const seg1='🕐  '+getHora(m)+'    ·    📍  '+getCancha(m);
+  ctx.font='700 46px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.92)';ctx.textAlign='center';
+  ctx.fillText(seg1,W/2,668);
+  // "Gran Final" label
+  ctx.font='700 32px sans-serif';ctx.letterSpacing='4px';
+  ctx.fillStyle=lGrad(ctx,W/2-180,0,W/2+180,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+  ctx.fillText('GRAN FINAL',W/2,718);
+
+  // Thin divider
+  const dl1=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.7)'],[.9,'rgba(255,215,0,.7)'],[1,'transparent']);
+  ctx.fillStyle=dl1;ctx.fillRect(80,748,W-160,2);
+
+  // ── TEAM BADGES (HERO) ──
+  const midY=1050,tlx=W*.24,trx=W*.76,tSz=440;
+  // Team color glows
+  rGlow(ctx,tlx,midY,420,'rgba(200,16,46,.22)');
+  rGlow(ctx,trx,midY,420,'rgba(0,120,50,.22)');
   await drawBadge(ctx,m.l,tlx,midY,tSz);
   await drawBadge(ctx,m.v,trx,midY,tSz);
 
-  // VS / Score central
+  // VS / Score circle
   const r=results[m.id],sc=r&&r.l!==undefined;
-  const vsR=82;
-  ctx.save();ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=60;
-  const vg=ctx.createRadialGradient(W/2,midY,0,W/2,midY,vsR);
-  vg.addColorStop(0,'rgba(255,215,0,.18)');vg.addColorStop(.6,'rgba(255,215,0,.07)');vg.addColorStop(1,'transparent');
-  ctx.fillStyle=vg;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
-  ctx.save();ctx.fillStyle='rgba(8,10,22,.88)';ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
-  const vrg=lGrad(ctx,W/2-vsR,midY,W/2+vsR,midY,[0,'rgba(255,215,0,.5)'],[.5,'rgba(255,215,0,.97)'],[1,'rgba(255,215,0,.5)']);
-  ctx.strokeStyle=vrg;ctx.lineWidth=3;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.stroke();
+  const vsR=88;
+  // Outer glow ring
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.8)';ctx.shadowBlur=70;
+  const vgOuter=ctx.createRadialGradient(W/2,midY,vsR*.5,W/2,midY,vsR*1.6);
+  vgOuter.addColorStop(0,'rgba(255,215,0,.12)');vgOuter.addColorStop(1,'transparent');
+  ctx.fillStyle=vgOuter;ctx.fillRect(0,0,W,H);ctx.restore();
+  // Dark circle bg
+  ctx.fillStyle='rgba(6,8,20,.92)';ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();
+  // Gold ring
+  const vrg=lGrad(ctx,W/2-vsR,midY,W/2+vsR,midY,[0,'rgba(200,160,0,.7)'],[.5,'rgba(255,215,0,1)'],[1,'rgba(200,160,0,.7)']);
+  ctx.strokeStyle=vrg;ctx.lineWidth=3.5;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.stroke();
+  // VS or score
   if(sc){
-    ctx.save();ctx.shadowColor='rgba(255,255,255,.4)';ctx.shadowBlur=24;
-    ctx.font='900 72px Arial Black,sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
+    ctx.save();ctx.shadowColor='rgba(255,255,255,.4)';ctx.shadowBlur=20;
+    ctx.font='900 68px Arial Black,sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
     ctx.fillText(r.l+'-'+r.v,W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
   }else{
-    ctx.save();ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=24;
-    ctx.font='900 66px Arial Black,sans-serif';ctx.fillStyle='#ffe033';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='4px';
+    ctx.save();ctx.shadowColor='rgba(255,215,0,.8)';ctx.shadowBlur=28;
+    ctx.font='900 72px Arial Black,sans-serif';ctx.fillStyle='#ffe030';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='5px';
     ctx.fillText('VS',W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
   }
 
-  // Team names
-  const ny=midY+tSz*.52+22,maxNameW=430;
+  // ── TEAM NAMES ──
+  const ny=midY+tSz*.52+28,maxNW=420;
   function teamLbl(x,id){
     let nm=tn(id).toUpperCase(),fs=46;
     ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0px';
-    while(ctx.measureText(nm).width>maxNameW&&fs>26){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
-    ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=14;
-    ctx.fillStyle=lGrad(ctx,x-maxNameW/2,0,x+maxNameW/2,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
+    while(ctx.measureText(nm).width>maxNW&&fs>26){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=16;
+    ctx.fillStyle=lGrad(ctx,x-maxNW/2,0,x+maxNW/2,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
     ctx.textAlign='center';ctx.fillText(nm,x,ny);ctx.restore();
-    ctx.font='700 30px sans-serif';ctx.letterSpacing='3px';
-    ctx.fillStyle=lGrad(ctx,x-70,0,x+70,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-    ctx.textAlign='center';ctx.fillText(ts(id),x,ny+50);ctx.letterSpacing='0';
+    ctx.font='600 28px sans-serif';ctx.letterSpacing='4px';
+    ctx.fillStyle=lGrad(ctx,x-60,0,x+60,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+    ctx.textAlign='center';ctx.fillText(ts(id),x,ny+48);ctx.letterSpacing='0';
   }
   teamLbl(tlx,m.l);teamLbl(trx,m.v);
 
@@ -1483,44 +1502,55 @@ async function tGranFinal(ctx,m){
   if(sc){
     const champId=r.l>r.v?m.l:(r.v>r.l?m.v:0);
     if(champId){
-      const cbW=800,cbH=96,cbX=W/2-cbW/2,cbY=ny+100;
-      ctx.fillStyle=lGrad(ctx,cbX,cbY,cbX+cbW,cbY+cbH,[0,'rgba(255,215,0,.12)'],[.5,'rgba(255,215,0,.32)'],[1,'rgba(255,215,0,.12)']);
+      const cbW=820,cbH=90,cbX=W/2-cbW/2,cbY=ny+76;
+      ctx.fillStyle=lGrad(ctx,cbX,cbY,cbX+cbW,cbY+cbH,[0,'rgba(255,215,0,.12)'],[.5,'rgba(255,215,0,.34)'],[1,'rgba(255,215,0,.12)']);
       ctx.beginPath();ctx.roundRect(cbX,cbY,cbW,cbH,cbH/2);ctx.fill();
-      ctx.strokeStyle='rgba(255,215,0,.7)';ctx.lineWidth=2;
+      ctx.strokeStyle='rgba(255,215,0,.72)';ctx.lineWidth=2;
       ctx.beginPath();ctx.roundRect(cbX,cbY,cbW,cbH,cbH/2);ctx.stroke();
       ctx.font='900 40px sans-serif';ctx.fillStyle='#ffd700';ctx.textAlign='center';ctx.letterSpacing='3px';
-      ctx.fillText('🏆 CAMPEÓN: '+ts(champId).toUpperCase(),W/2,cbY+cbH*.66);
+      ctx.fillText('🏆  CAMPEÓN:  '+ts(champId).toUpperCase(),W/2,cbY+cbH*.66);
     }
   }
 
-  // ── BioMarketing sponsor ──
-  goldRule(ctx,1510);
-  ctx.textAlign='center';ctx.font='500 24px sans-serif';ctx.letterSpacing='3px';
-  ctx.fillStyle='rgba(255,255,255,.32)';ctx.fillText('PATROCINADO POR',W/2,1558);
-  // Load BM logo
+  // ── BIOMARKETING SPONSOR (bottom, clean) ──
+  const spStart=1600;
+  // Thin gold divider
+  const dl2=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.5)'],[.9,'rgba(255,215,0,.5)'],[1,'transparent']);
+  ctx.fillStyle=dl2;ctx.fillRect(80,spStart,W-160,1.5);
+  // Sponsor label
+  ctx.textAlign='center';ctx.font='500 23px sans-serif';ctx.letterSpacing='4px';
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.fillText('PATROCINADO POR',W/2,spStart+44);
+  // BM logo + name side by side
   let bmImg=getImg('bm_gf');
   if(!bmImg){try{bmImg=await loadImg(BM_LOGO,'bm_gf');}catch(e){}}
+  const bmH=68,bmY=spStart+60;
   if(bmImg){
-    const bmH=76,bmW=Math.round(bmImg.width/bmImg.height*bmH);
-    ctx.save();ctx.shadowColor='rgba(255,215,0,.35)';ctx.shadowBlur=18;
-    ctx.drawImage(bmImg,W/2-bmW/2,1572,bmW,bmH);ctx.restore();
+    const bmW=Math.round(bmImg.width/bmImg.height*bmH);
+    // Center logo+text as a unit
+    ctx.font='800 56px sans-serif';ctx.letterSpacing='4px';
+    const textW=ctx.measureText('BIOMarketing').width;
+    const gap=20,unitW=bmW+gap+textW,ux=W/2-unitW/2;
+    ctx.save();ctx.shadowColor='rgba(255,215,0,.3)';ctx.shadowBlur=16;
+    ctx.drawImage(bmImg,ux,bmY+(56-bmH)/2,bmW,bmH);ctx.restore();
+    ctx.fillStyle=lGrad(ctx,ux+bmW+gap,0,ux+bmW+gap+textW,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+    ctx.textAlign='left';
+    ctx.save();ctx.shadowColor='rgba(255,215,0,.5)';ctx.shadowBlur=18;
+    ctx.fillText('BIOMarketing',ux+bmW+gap,bmY+48);ctx.restore();
+  }else{
+    ctx.font='800 56px sans-serif';ctx.letterSpacing='4px';
+    ctx.fillStyle=lGrad(ctx,W/2-230,0,W/2+230,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+    ctx.textAlign='center';ctx.fillText('BIOMarketing',W/2,bmY+48);
   }
-  ctx.font='800 50px sans-serif';ctx.letterSpacing='4px';
-  ctx.fillStyle=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-  ctx.textAlign='center';
-  ctx.save();ctx.shadowColor='rgba(255,215,0,.4)';ctx.shadowBlur=16;
-  ctx.fillText('BIOMarketing',W/2,1700);ctx.restore();
-  ctx.font='500 25px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,255,255,.38)';
-  ctx.fillText('Innovación Digital',W/2,1744);
+  ctx.font='500 24px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='center';
+  ctx.fillText('Innovación Digital',W/2,spStart+156);
 
   // ── CTA ──
-  rule(ctx,1778,.35);
-  const ctaW=580,ctaH=76,ctaX=W/2-ctaW/2,ctaY=1808;
-  ctx.fillStyle=lGrad(ctx,ctaX,ctaY,ctaX+ctaW,ctaY,[0,'rgba(200,16,46,.0)'],[.3,'rgba(200,16,46,.26)'],[.7,'rgba(200,16,46,.26)'],[1,'rgba(200,16,46,.0)']);
+  const ctaY=spStart+200,ctaW=580,ctaH=72,ctaX=W/2-ctaW/2;
+  ctx.fillStyle=lGrad(ctx,ctaX,ctaY,ctaX+ctaW,ctaY,[0,'rgba(200,16,46,.0)'],[.3,'rgba(200,16,46,.28)'],[.7,'rgba(200,16,46,.28)'],[1,'rgba(200,16,46,.0)']);
   ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.fill();
   ctx.strokeStyle='rgba(200,16,46,.44)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.stroke();
-  ctx.font='900 36px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.letterSpacing='2px';
+  ctx.font='900 34px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.letterSpacing='2px';
   ctx.fillText('¡NO TE LO PIERDAS!  🔥',W/2,ctaY+ctaH*.68);
   footer(ctx);
 }
