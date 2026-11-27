@@ -1395,40 +1395,32 @@ async function tGranFinal(ctx,m){
   ctx.textAlign='center';ctx.fillText('ATLÉTICO NORTE F.C.',W/2,hy+hSz*1.19+56);
   goldRule(ctx,hy+hSz*1.19+72);
 
-  // ── GRAN FINAL — premium metallic title ──
-  const gfY=320;
-  // Deep glow halo behind text
-  rGlow(ctx,W/2,gfY-20,560,'rgba(255,185,0,.22)');
-  rGlow(ctx,W/2,gfY-20,300,'rgba(255,215,0,.14)');
-  // Decorative thin lines flanking title
-  const lnY=gfY-70,lnW=200;
-  [W/2-lnW-180,W/2+180].forEach(lx=>{
-    const lg=lGrad(ctx,lx,lnY,lx+lnW,lnY,[0,'transparent'],[1,'rgba(255,215,0,.55)']);
-    ctx.fillStyle=lg;ctx.fillRect(lx,lnY,lnW,1.5);
+  // ── GRAN FINAL — clean, bold, impactful ──
+  const gfY=326;
+  // Warm glow halo
+  rGlow(ctx,W/2,gfY,500,'rgba(255,190,0,.26)');
+  // Thin gold decorative lines
+  const lnY=gfY-66,lnW=210;
+  [[W/2-lnW-170,1],[W/2+170,-1]].forEach(([lx,dir])=>{
+    const lg=lGrad(ctx,lx,0,lx+lnW*dir,0,[0,dir>0?'rgba(255,215,0,.7)':'transparent'],[1,dir>0?'transparent':'rgba(255,215,0,.7)']);
+    ctx.fillStyle=lg;ctx.fillRect(Math.min(lx,lx+lnW*dir),lnY,lnW,1.5);
   });
-  // Trophy emojis (larger, higher)
-  ctx.font='74px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
-  ctx.fillText('🏆',W/2-328,gfY-28);ctx.fillText('🏆',W/2+328,gfY-28);
-  // "GRAN FINAL" — pure metallic gold, no white (stays crisp)
-  ctx.font='900 122px Arial Black,sans-serif';ctx.letterSpacing='5px';
+  ctx.font='68px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
+  ctx.fillText('🏆',W/2-310,gfY-20);ctx.fillText('🏆',W/2+310,gfY-20);
+  // Bold stroke outline for crispness
+  ctx.font='900 128px Impact,"Arial Black",sans-serif';ctx.letterSpacing='6px';ctx.textAlign='center';
+  ctx.strokeStyle='rgba(90,40,0,.95)';ctx.lineWidth=8;ctx.lineJoin='round';
+  ctx.strokeText('GRAN FINAL',W/2,gfY+10);
+  // Gold fill — saturated, no white
   const gfg=lGrad(ctx,W/2-460,0,W/2+460,0,
-    [0,'#4a2a00'],[.1,'#b06000'],[.28,'#e8a800'],[.42,'#ffd040'],
-    [.5,'#ffe566'],[.58,'#ffd040'],[.72,'#e8a800'],[.9,'#b06000'],[1,'#4a2a00']);
-  // Shadow layer 1 — depth
-  ctx.save();ctx.shadowColor='rgba(80,30,0,.9)';ctx.shadowBlur=0;ctx.shadowOffsetY=5;
-  ctx.fillStyle='rgba(60,20,0,.7)';ctx.textAlign='center';
-  ctx.fillText('GRAN FINAL',W/2,gfY+8);ctx.restore();
-  // Shadow layer 2 — glow
-  ctx.save();ctx.shadowColor='rgba(255,200,0,.9)';ctx.shadowBlur=70;ctx.shadowOffsetY=0;
-  ctx.fillStyle=gfg;ctx.textAlign='center';
-  ctx.fillText('GRAN FINAL',W/2,gfY+8);ctx.restore();
-  // Top highlight pass (bright center, no glow)
-  const gfH=lGrad(ctx,W/2-460,0,W/2+460,0,[0,'transparent'],[.35,'transparent'],[.5,'rgba(255,255,220,.22)'],[.65,'transparent'],[1,'transparent']);
-  ctx.fillStyle=gfH;ctx.textAlign='center';
-  ctx.fillText('GRAN FINAL',W/2,gfY+8);
-  // "LIGA INTERNA · S2 2026" label
-  ctx.font='600 26px sans-serif';ctx.letterSpacing='7px';ctx.fillStyle='rgba(255,215,0,.5)';
-  ctx.textAlign='center';ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+58);
+    [0,'#7a4800'],[.18,'#c97d00'],[.38,'#f5b800'],[.5,'#ffd700'],
+    [.62,'#f5b800'],[.82,'#c97d00'],[1,'#7a4800']);
+  ctx.fillStyle=gfg;
+  ctx.save();ctx.shadowColor='rgba(255,195,0,.85)';ctx.shadowBlur=55;
+  ctx.fillText('GRAN FINAL',W/2,gfY+10);ctx.restore();
+  // "LIGA INTERNA · S2 2026"
+  ctx.font='600 26px sans-serif';ctx.letterSpacing='7px';ctx.fillStyle='rgba(255,215,0,.52)';
+  ctx.textAlign='center';ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+62);
 
   // ── DATE SECTION ──
   const d=new Date(getFecha(m)+'T12:00:00');
@@ -1536,12 +1528,15 @@ async function tGranFinal(ctx,m){
 
   // ── BIOMARKETING SPONSOR (bottom, clean) ──
   const spStart=1480;
-  // Thin gold divider
-  const dl2=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.5)'],[.9,'rgba(255,215,0,.5)'],[1,'transparent']);
-  ctx.fillStyle=dl2;ctx.fillRect(80,spStart,W-160,1.5);
-  // Sponsor label
-  ctx.textAlign='center';ctx.font='500 23px sans-serif';ctx.letterSpacing='4px';
-  ctx.fillStyle='rgba(255,255,255,.28)';ctx.fillText('PATROCINADO POR',W/2,spStart+44);
+  // Sponsor section — subtle card bg
+  ctx.fillStyle=lGrad(ctx,W/2,spStart-10,W/2,spStart+200,[0,'rgba(255,215,0,.07)'],[1,'rgba(255,215,0,.02)']);
+  ctx.beginPath();ctx.roundRect(60,spStart-10,W-120,210,24);ctx.fill();
+  // Gold divider
+  const dl2=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.7)'],[.9,'rgba(255,215,0,.7)'],[1,'transparent']);
+  ctx.fillStyle=dl2;ctx.fillRect(80,spStart,W-160,2);
+  // Sponsor label — clearly visible
+  ctx.textAlign='center';ctx.font='600 24px sans-serif';ctx.letterSpacing='5px';
+  ctx.fillStyle='rgba(255,255,255,.68)';ctx.fillText('PATROCINADO POR',W/2,spStart+46);
   // BM logo + name side by side
   let bmImg=getImg('bm_gf');
   if(!bmImg){try{bmImg=await loadImg(BM_LOGO,'bm_gf');}catch(e){}}
