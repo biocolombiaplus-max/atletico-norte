@@ -1425,31 +1425,30 @@ async function tGranFinal(ctx,m){
   ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.stroke();
   ctx.font='800 30px sans-serif';ctx.fillStyle='#ffaaaa';ctx.textAlign='center';ctx.letterSpacing='4px';
   ctx.fillText(dayName,W/2,cY+cH*.7);
-  // "28 DE NOVIEMBRE" on one line, clean
-  ctx.font='900 96px Arial Black,sans-serif';ctx.letterSpacing='-2px';
-  ctx.fillStyle=lGrad(ctx,W/2-260,0,W/2+260,0,[0,'#dce8ff'],[.5,'#fff'],[1,'#dce8ff']);
+  // Date: two clean lines (no overlap)
+  ctx.font='900 110px Arial Black,sans-serif';ctx.letterSpacing='-2px';
+  ctx.fillStyle=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#dce8ff'],[.5,'#fff'],[1,'#dce8ff']);
   ctx.textAlign='center';
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=20;
-  ctx.fillText(dateNum,W/2-120,564);ctx.restore();
-  ctx.font='700 50px sans-serif';ctx.letterSpacing='4px';
-  ctx.fillStyle='rgba(255,255,255,.75)';
-  ctx.fillText('DE '+monName,W/2+100,564);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=24;
+  ctx.fillText(dateNum,W/2,558);ctx.restore();
+  ctx.font='700 46px sans-serif';ctx.letterSpacing='6px';
+  ctx.fillStyle='rgba(255,255,255,.72)';
+  ctx.fillText('DE '+monName,W/2,618);
 
-  goldRule(ctx,598);
+  goldRule(ctx,650);
 
   // ── TIME + VENUE — single clean row ──
-  // Build segments: hora · cancha
   const seg1='🕐  '+getHora(m)+'    ·    📍  '+getCancha(m);
   ctx.font='700 46px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.92)';ctx.textAlign='center';
-  ctx.fillText(seg1,W/2,668);
+  ctx.fillText(seg1,W/2,718);
   // "Gran Final" label
   ctx.font='700 32px sans-serif';ctx.letterSpacing='4px';
   ctx.fillStyle=lGrad(ctx,W/2-180,0,W/2+180,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-  ctx.fillText('GRAN FINAL',W/2,718);
+  ctx.fillText('GRAN FINAL',W/2,768);
 
   // Thin divider
   const dl1=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.7)'],[.9,'rgba(255,215,0,.7)'],[1,'transparent']);
-  ctx.fillStyle=dl1;ctx.fillRect(80,748,W-160,2);
+  ctx.fillStyle=dl1;ctx.fillRect(80,798,W-160,2);
 
   // ── TEAM BADGES (HERO) ──
   const midY=1050,tlx=W*.24,trx=W*.76,tSz=440;
@@ -1513,7 +1512,7 @@ async function tGranFinal(ctx,m){
   }
 
   // ── BIOMARKETING SPONSOR (bottom, clean) ──
-  const spStart=1600;
+  const spStart=1480;
   // Thin gold divider
   const dl2=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.5)'],[.9,'rgba(255,215,0,.5)'],[1,'transparent']);
   ctx.fillStyle=dl2;ctx.fillRect(80,spStart,W-160,1.5);
