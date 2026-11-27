@@ -20,7 +20,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-var APP_VER='9.41';
+var APP_VER='9.42';
 // ── Version-check: bypasses Cloudflare CDN cache via unique timestamp URL ──
 // Works even when the SW is unregistered (e.g. users stuck on v8.98).
 // /version.json?_t=TIMESTAMP is always a CDN cache-miss → fetches live file.
@@ -3586,6 +3586,71 @@ function rFx(){
         var r=res[m.id],ip=!!r;
         var mst=_matchStatus(m);
         var effCancha=getCancha(m);var cc=effCancha==="Coveadse"?"cov":effCancha==="Comfanorte"?"cnf":"vls";
+        var isFinal=(m._po==='final');
+
+        // ── GRAN FINAL: tarjeta especial ──
+        if(isFinal){
+          var wonL=ip&&r&&r.l!==undefined&&r.l>r.v,wonV=ip&&r&&r.l!==undefined&&r.v>r.l;
+          var champId=wonL?m.l:(wonV?m.v:0);
+          h+='<div style="margin:12px 0 4px;border-radius:20px;overflow:hidden;border:2px solid #f59e0b;box-shadow:0 0 28px rgba(245,158,11,.35),0 4px 24px rgba(0,0,0,.5);background:linear-gradient(160deg,#1c1100,#2a1800,#1c1100)">';
+          // Top gold bar
+          h+='<div style="background:linear-gradient(90deg,#78350f,#d97706,#fbbf24,#ffd700,#fbbf24,#d97706,#78350f);padding:9px 16px;text-align:center">';
+          h+='<div style="font-size:11.5px;font-weight:900;color:#1a0800;letter-spacing:2.5px;text-shadow:none">&#127942; GRAN FINAL &nbsp;&middot;&nbsp; S2 2026 &#127942;</div>';
+          h+='</div>';
+          // Match body
+          h+='<div style="padding:14px 16px 10px">';
+          if(champId){
+            h+='<div style="text-align:center;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#064e3b,#10b981,#064e3b);color:#fff;border-radius:20px;padding:5px 14px;font-size:10px;font-weight:900;letter-spacing:1px">&#127942; CAMPE&#211;N S2 2026 &middot; '+ts(champId)+'</span></div>';
+          }
+          h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+          // Local
+          h+='<div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0">';
+          h+=bdg(m.l,'bw');
+          h+='<div style="font-size:12px;font-weight:900;color:#fbbf24;text-align:center;line-height:1.2">'+tn(m.l)+'</div>';
+          h+='<div style="font-size:10px;color:rgba(255,255,255,.55)">'+ts(m.l)+'</div>';
+          h+='</div>';
+          // Score / VS
+          h+='<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;padding:0 4px">';
+          if(ip&&r&&r.l!==undefined){
+            h+='<div style="display:flex;align-items:center;gap:10px">';
+            h+='<span style="font-size:34px;font-weight:900;color:'+(wonL?'#10b981':'#fff')+'">'+r.l+'</span>';
+            h+='<span style="font-size:18px;color:rgba(255,255,255,.4)">–</span>';
+            h+='<span style="font-size:34px;font-weight:900;color:'+(wonV?'#10b981':'#fff')+'">'+r.v+'</span>';
+            h+='</div>';
+          }else{
+            h+='<div style="font-size:11px;font-weight:900;color:#fbbf24;letter-spacing:3px;padding:4px 0">VS</div>';
+            h+='<div style="font-size:17px;font-weight:900;color:#ffd700">'+getHora(m)+'</div>';
+          }
+          h+='<div style="font-size:9.5px;font-weight:700;color:rgba(245,158,11,.8);letter-spacing:.4px;margin-top:2px">'+effCancha+'</div>';
+          h+='</div>';
+          // Visitante
+          h+='<div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0">';
+          h+=bdg(m.v,'bw');
+          h+='<div style="font-size:12px;font-weight:900;color:#fbbf24;text-align:center;line-height:1.2">'+tn(m.v)+'</div>';
+          h+='<div style="font-size:10px;color:rgba(255,255,255,.55)">'+ts(m.v)+'</div>';
+          h+='</div>';
+          h+='</div>'; // flex row
+          // Admin actions
+          if(cEd()){
+            h+='<div style="display:flex;justify-content:center;gap:14px;margin-top:10px">';
+            h+='<span class="ec" data-mid="'+m.id+'" onclick="oRsEl(this)" title="Ingresar resultado" style="font-size:18px;cursor:pointer">&#9999;&#65039;</span>';
+            h+='<span class="mc-reprog-btn no-print" onclick="event.stopPropagation();openReprogModal('+m.id+')" title="Reajustar" style="font-size:18px;cursor:pointer">&#128197;</span>';
+            if(ip)h+='<a class="mc-img-lnk no-print" href="social.html?match='+m.id+'&tpl=resultado" onclick="event.stopPropagation()" title="Imagen resultado" style="font-size:18px">&#128202;</a>';
+            h+='</div>';
+          }
+          h+='</div>'; // padding
+          // BioMarketing sponsor strip
+          h+='<div style="background:rgba(0,0,0,.35);border-top:1px solid rgba(245,158,11,.2);padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:8px">';
+          h+='<img src="'+BM_LOGO+'" alt="BioMarketing" style="height:22px;width:auto;border-radius:4px;opacity:.9">';
+          h+='<div style="display:flex;flex-direction:column;line-height:1.1">';
+          h+='<span style="font-size:9px;color:rgba(255,255,255,.45);letter-spacing:.3px">Patrocinado por</span>';
+          h+='<span style="font-size:10.5px;font-weight:900;color:#fbbf24;letter-spacing:.5px">BIOMarketing</span>';
+          h+='</div></div>';
+          h+='</div>'; // card outer
+          return;
+        }
+
+        // ── Tarjeta normal de playoff ──
         var bdgHtml='',extraCls='';
         if(!ip){
           if(mst==='live'){bdgHtml='<div class="mc-badge-wrap"><span class="mc-badge live"><span class="dot"></span>EN VIVO · SE ESTÁ JUGANDO</span></div>';extraCls=' live-match has-badge';}
@@ -3879,12 +3944,12 @@ function rBr(t8){
   var semisPlayed=semisWinners.filter(function(t){return t.id>0;}).length;
   var finalVisible=semisPlayed>=2;
 
-  if(finalVisible){
-    var fb=pmFb[PO_ID_F[0]]||{};
-    PO_MATCHES.push({id:PO_ID_F[0],l:semisWinners[0].id||0,v:semisWinners[1].id||0,
-      fecha:fb.fecha||'2026-12-07',hora:fb.hora||'19:00',cancha:fb.cancha||'Villa Silvania',
-      vu:'F',vuLabel:'Gran Final',_po:'final',week:220});
-  }
+  // Gran Final confirmada: Santa Fe (4) vs Atlético Nacional (3) · Sáb 28 Nov · 18:30 · Villa Silvania
+  var _directF=[4,3];
+  var fb=pmFb[PO_ID_F[0]]||{};
+  PO_MATCHES.push({id:PO_ID_F[0],l:_directF[0],v:_directF[1],
+    fecha:fb.fecha||'2026-11-28',hora:fb.hora||'18:30',cancha:fb.cancha||'Villa Silvania',
+    vu:'F',vuLabel:'Gran Final',_po:'final',week:220});
 
   _playoffMode=true;
   // Persist playoff mode in Firebase so all users see it on next load
