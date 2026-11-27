@@ -1395,60 +1395,83 @@ async function tGranFinal(ctx,m){
   ctx.textAlign='center';ctx.fillText('ATLÉTICO NORTE F.C.',W/2,hy+hSz*1.19+56);
   goldRule(ctx,hy+hSz*1.19+72);
 
-  // ── GRAN FINAL — big dramatic title ──
-  const gfY=312;
-  // Soft glow behind text
-  rGlow(ctx,W/2,gfY,520,'rgba(255,215,0,.18)');
-  // Trophy left
-  ctx.font='82px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
-  ctx.fillText('🏆',W/2-320,gfY+10);ctx.fillText('🏆',W/2+320,gfY+10);
-  // "GRAN FINAL" text
-  ctx.font='900 116px Arial Black,sans-serif';ctx.letterSpacing='4px';
-  const gfg=lGrad(ctx,W/2-440,0,W/2+440,0,[0,'#9a6a00'],[.2,'#daa520'],[.5,'#fff700'],[.8,'#daa520'],[1,'#9a6a00']);
-  ctx.fillStyle=gfg;ctx.textAlign='center';
-  ctx.save();ctx.shadowColor='rgba(255,215,0,.8)';ctx.shadowBlur=60;
+  // ── GRAN FINAL — premium metallic title ──
+  const gfY=320;
+  // Deep glow halo behind text
+  rGlow(ctx,W/2,gfY-20,560,'rgba(255,185,0,.22)');
+  rGlow(ctx,W/2,gfY-20,300,'rgba(255,215,0,.14)');
+  // Decorative thin lines flanking title
+  const lnY=gfY-70,lnW=200;
+  [W/2-lnW-180,W/2+180].forEach(lx=>{
+    const lg=lGrad(ctx,lx,lnY,lx+lnW,lnY,[0,'transparent'],[1,'rgba(255,215,0,.55)']);
+    ctx.fillStyle=lg;ctx.fillRect(lx,lnY,lnW,1.5);
+  });
+  // Trophy emojis (larger, higher)
+  ctx.font='74px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
+  ctx.fillText('🏆',W/2-328,gfY-28);ctx.fillText('🏆',W/2+328,gfY-28);
+  // "GRAN FINAL" — pure metallic gold, no white (stays crisp)
+  ctx.font='900 122px Arial Black,sans-serif';ctx.letterSpacing='5px';
+  const gfg=lGrad(ctx,W/2-460,0,W/2+460,0,
+    [0,'#4a2a00'],[.1,'#b06000'],[.28,'#e8a800'],[.42,'#ffd040'],
+    [.5,'#ffe566'],[.58,'#ffd040'],[.72,'#e8a800'],[.9,'#b06000'],[1,'#4a2a00']);
+  // Shadow layer 1 — depth
+  ctx.save();ctx.shadowColor='rgba(80,30,0,.9)';ctx.shadowBlur=0;ctx.shadowOffsetY=5;
+  ctx.fillStyle='rgba(60,20,0,.7)';ctx.textAlign='center';
   ctx.fillText('GRAN FINAL',W/2,gfY+8);ctx.restore();
-  // "S2 2026" small label below
-  ctx.font='600 28px sans-serif';ctx.letterSpacing='6px';ctx.fillStyle='rgba(255,215,0,.55)';
-  ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+56);
+  // Shadow layer 2 — glow
+  ctx.save();ctx.shadowColor='rgba(255,200,0,.9)';ctx.shadowBlur=70;ctx.shadowOffsetY=0;
+  ctx.fillStyle=gfg;ctx.textAlign='center';
+  ctx.fillText('GRAN FINAL',W/2,gfY+8);ctx.restore();
+  // Top highlight pass (bright center, no glow)
+  const gfH=lGrad(ctx,W/2-460,0,W/2+460,0,[0,'transparent'],[.35,'transparent'],[.5,'rgba(255,255,220,.22)'],[.65,'transparent'],[1,'transparent']);
+  ctx.fillStyle=gfH;ctx.textAlign='center';
+  ctx.fillText('GRAN FINAL',W/2,gfY+8);
+  // "LIGA INTERNA · S2 2026" label
+  ctx.font='600 26px sans-serif';ctx.letterSpacing='7px';ctx.fillStyle='rgba(255,215,0,.5)';
+  ctx.textAlign='center';ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+58);
 
   // ── DATE SECTION ──
   const d=new Date(getFecha(m)+'T12:00:00');
   const dayName=DL[d.getDay()].toUpperCase();
   const dateNum=d.getDate();
   const monName=ML[d.getMonth()].toUpperCase();
-  // Day pill (small, red)
-  const cY=430,cW=320,cH=56,cX=W/2-cW/2;
-  ctx.fillStyle=lGrad(ctx,cX,cY,cX+cW,cY+cH,[0,'rgba(180,10,30,.6)'],[1,'rgba(200,16,46,.4)']);
+  // Day pill — refined, more space below
+  const cY=440,cW=300,cH=52,cX=W/2-cW/2;
+  // Pill background with subtle gradient
+  ctx.fillStyle=lGrad(ctx,cX,cY,cX+cW,cY+cH,[0,'rgba(160,8,24,.75)'],[.5,'rgba(200,16,46,.65)'],[1,'rgba(160,8,24,.75)']);
   ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.fill();
-  ctx.strokeStyle='rgba(200,16,46,.65)';ctx.lineWidth=1.5;
+  // Top shine
+  ctx.save();ctx.globalAlpha=.18;ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.roundRect(cX+6,cY+4,cW-12,cH*.4,cH*.4);ctx.fill();ctx.restore();
+  ctx.strokeStyle='rgba(255,80,80,.5)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.stroke();
-  ctx.font='800 30px sans-serif';ctx.fillStyle='#ffaaaa';ctx.textAlign='center';ctx.letterSpacing='4px';
-  ctx.fillText(dayName,W/2,cY+cH*.7);
-  // Date: two clean lines (no overlap)
-  ctx.font='900 110px Arial Black,sans-serif';ctx.letterSpacing='-2px';
-  ctx.fillStyle=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#dce8ff'],[.5,'#fff'],[1,'#dce8ff']);
+  ctx.font='800 28px sans-serif';ctx.fillStyle='#ffbbbb';ctx.textAlign='center';ctx.letterSpacing='5px';
+  ctx.fillText(dayName,W/2,cY+cH*.71);
+  // Date number — big, with air below pill
+  ctx.font='900 130px Arial Black,sans-serif';ctx.letterSpacing='-3px';
+  ctx.fillStyle=lGrad(ctx,W/2-180,0,W/2+180,0,[0,'#d8e8ff'],[.5,'#ffffff'],[1,'#d8e8ff']);
   ctx.textAlign='center';
-  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=24;
-  ctx.fillText(dateNum,W/2,558);ctx.restore();
-  ctx.font='700 46px sans-serif';ctx.letterSpacing='6px';
-  ctx.fillStyle='rgba(255,255,255,.72)';
-  ctx.fillText('DE '+monName,W/2,618);
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.2)';ctx.shadowBlur=30;ctx.shadowOffsetY=4;
+  ctx.fillText(dateNum,W/2,590);ctx.restore();
+  // Month line — elegant spacing
+  ctx.font='600 42px sans-serif';ctx.letterSpacing='8px';
+  ctx.fillStyle='rgba(220,232,255,.7)';
+  ctx.fillText('DE '+monName,W/2,648);
 
-  goldRule(ctx,650);
+  goldRule(ctx,682);
 
-  // ── TIME + VENUE — single clean row ──
+  // ── TIME + VENUE ──
   const seg1='🕐  '+getHora(m)+'    ·    📍  '+getCancha(m);
   ctx.font='700 46px sans-serif';ctx.letterSpacing='1px';ctx.fillStyle='rgba(255,255,255,.92)';ctx.textAlign='center';
-  ctx.fillText(seg1,W/2,718);
+  ctx.fillText(seg1,W/2,752);
   // "Gran Final" label
-  ctx.font='700 32px sans-serif';ctx.letterSpacing='4px';
+  ctx.font='700 30px sans-serif';ctx.letterSpacing='5px';
   ctx.fillStyle=lGrad(ctx,W/2-180,0,W/2+180,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
-  ctx.fillText('GRAN FINAL',W/2,768);
+  ctx.fillText('GRAN FINAL',W/2,800);
 
   // Thin divider
   const dl1=lGrad(ctx,0,0,W,0,[0,'transparent'],[.1,'rgba(255,215,0,.7)'],[.9,'rgba(255,215,0,.7)'],[1,'transparent']);
-  ctx.fillStyle=dl1;ctx.fillRect(80,798,W-160,2);
+  ctx.fillStyle=dl1;ctx.fillRect(80,828,W-160,2);
 
   // ── TEAM BADGES (HERO) ──
   const midY=1050,tlx=W*.24,trx=W*.76,tSz=440;
