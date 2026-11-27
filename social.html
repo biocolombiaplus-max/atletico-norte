@@ -1374,7 +1374,160 @@ async function tMVP(ctx){
 }
 
 // ═══ JORNADA ════════════════════════════════════════
+// ═══ GRAN FINAL ════════════════════════════════════
+async function tGranFinal(ctx,m){
+  if(!m)return;
+  await drawBg(ctx);topStripe(ctx);
+  // Extra glow for gran final
+  rGlow(ctx,W/2,H*.38,1000,'rgba(255,215,0,.10)');
+  rGlow(ctx,W/2,0,750,'rgba(200,16,46,.42)');
+  rGlow(ctx,W*.18,H*.55,580,'rgba(200,16,46,.22)');
+  rGlow(ctx,W*.82,H*.55,540,'rgba(0,120,50,.18)');
+
+  clubHeader(ctx,52);
+
+  // ── GRAN FINAL title pill ──
+  const lW=680,lH=82,lX=W/2-lW/2,lY=372;
+  // Dark gold bg
+  ctx.fillStyle=lGrad(ctx,lX,lY,lX+lW,lY+lH,[0,'rgba(100,70,0,.55)'],[.5,'rgba(160,110,0,.7)'],[1,'rgba(100,70,0,.55)']);
+  ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.fill();
+  // Shine top
+  ctx.save();ctx.globalAlpha=.12;ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.roundRect(lX+8,lY+4,lW-16,lH*.42,lH*.42);ctx.fill();ctx.restore();
+  // Gold border
+  ctx.strokeStyle=lGrad(ctx,lX,lY,lX+lW,lY,[0,'rgba(255,215,0,.35)'],[.5,'rgba(255,215,0,.95)'],[1,'rgba(255,215,0,.35)']);
+  ctx.lineWidth=2.5;ctx.beginPath();ctx.roundRect(lX,lY,lW,lH,lH/2);ctx.stroke();
+  // Text
+  ctx.fillStyle=lGrad(ctx,W/2-300,0,W/2+300,0,[0,'#c89000'],[.4,'#ffd700'],[.6,'#fff'],[1,'#ffd700']);
+  ctx.font='900 36px sans-serif';ctx.textAlign='center';ctx.letterSpacing='6px';
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.5)';ctx.shadowBlur=20;
+  ctx.fillText('🏆  GRAN FINAL  🏆',W/2,lY+lH*.67);ctx.restore();
+
+  // ── Subtitle: S2 2026 ──
+  ctx.font='700 26px sans-serif';ctx.letterSpacing='5px';ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.textAlign='center';ctx.fillText('LIGA INTERNA · S2 2026',W/2,lY+lH+36);
+
+  // ── Date section ──
+  const d=new Date(getFecha(m)+'T12:00:00');
+  const dayName=DL[d.getDay()].toUpperCase();
+  const dateNum=d.getDate();
+  const monName=ML[d.getMonth()].toUpperCase();
+  // Day chip
+  const cY=510,cW=380,cH=62,cX=W/2-cW/2;
+  ctx.fillStyle=lGrad(ctx,cX,cY,cX+cW,cY+cH,[0,'rgba(200,16,46,.4)'],[1,'rgba(200,16,46,.2)']);
+  ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.fill();
+  ctx.strokeStyle='rgba(200,16,46,.55)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(cX,cY,cW,cH,cH/2);ctx.stroke();
+  ctx.font='800 34px sans-serif';ctx.fillStyle='#ff9090';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.fillText(dayName,W/2,cY+cH*.7);
+  // Big date number
+  ctx.font='900 150px sans-serif';ctx.letterSpacing='-3px';
+  ctx.fillStyle=lGrad(ctx,W/2-240,0,W/2+240,0,[0,'#d0dcff'],[.5,'#ffffff'],[1,'#d0dcff']);
+  ctx.textAlign='center';
+  ctx.save();ctx.shadowColor='rgba(200,16,46,.3)';ctx.shadowBlur=40;
+  ctx.fillText(dateNum,W/2,718);ctx.restore();
+  // Month
+  ctx.font='700 60px sans-serif';ctx.letterSpacing='8px';
+  ctx.fillStyle='rgba(255,255,255,.65)';ctx.textAlign='center';
+  ctx.fillText(monName,W/2,804);
+  goldRule(ctx,836);
+
+  // ── Time + Venue ──
+  ctx.textAlign='center';ctx.font='800 60px sans-serif';ctx.letterSpacing='2px';
+  ctx.fillStyle='rgba(255,255,255,.97)';ctx.fillText('🕐  '+getHora(m),W/2,916);
+  ctx.font='800 56px sans-serif';ctx.letterSpacing='1px';
+  ctx.fillStyle='rgba(255,255,255,.88)';ctx.fillText('📍  '+getCancha(m),W/2,994);
+  rule(ctx,1026,.42);
+
+  // ── Team badges ──
+  const midY=1190,tlx=W*.23,trx=W*.77,tSz=390;
+  await drawBadge(ctx,m.l,tlx,midY,tSz);
+  await drawBadge(ctx,m.v,trx,midY,tSz);
+
+  // VS / Score central
+  const r=results[m.id],sc=r&&r.l!==undefined;
+  const vsR=82;
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=60;
+  const vg=ctx.createRadialGradient(W/2,midY,0,W/2,midY,vsR);
+  vg.addColorStop(0,'rgba(255,215,0,.18)');vg.addColorStop(.6,'rgba(255,215,0,.07)');vg.addColorStop(1,'transparent');
+  ctx.fillStyle=vg;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
+  ctx.save();ctx.fillStyle='rgba(8,10,22,.88)';ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.fill();ctx.restore();
+  const vrg=lGrad(ctx,W/2-vsR,midY,W/2+vsR,midY,[0,'rgba(255,215,0,.5)'],[.5,'rgba(255,215,0,.97)'],[1,'rgba(255,215,0,.5)']);
+  ctx.strokeStyle=vrg;ctx.lineWidth=3;ctx.beginPath();ctx.arc(W/2,midY,vsR,0,Math.PI*2);ctx.stroke();
+  if(sc){
+    ctx.save();ctx.shadowColor='rgba(255,255,255,.4)';ctx.shadowBlur=24;
+    ctx.font='900 72px Arial Black,sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='-2px';
+    ctx.fillText(r.l+'-'+r.v,W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
+  }else{
+    ctx.save();ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=24;
+    ctx.font='900 66px Arial Black,sans-serif';ctx.fillStyle='#ffe033';ctx.textAlign='center';ctx.textBaseline='middle';ctx.letterSpacing='4px';
+    ctx.fillText('VS',W/2,midY);ctx.restore();ctx.textBaseline='alphabetic';
+  }
+
+  // Team names
+  const ny=midY+tSz*.52+22,maxNameW=430;
+  function teamLbl(x,id){
+    let nm=tn(id).toUpperCase(),fs=46;
+    ctx.font=`900 ${fs}px Arial Black,sans-serif`;ctx.letterSpacing='0px';
+    while(ctx.measureText(nm).width>maxNameW&&fs>26){fs-=2;ctx.font=`900 ${fs}px Arial Black,sans-serif`;}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=14;
+    ctx.fillStyle=lGrad(ctx,x-maxNameW/2,0,x+maxNameW/2,0,[0,'#c0cce0'],[.5,'#fff'],[1,'#c0cce0']);
+    ctx.textAlign='center';ctx.fillText(nm,x,ny);ctx.restore();
+    ctx.font='700 30px sans-serif';ctx.letterSpacing='3px';
+    ctx.fillStyle=lGrad(ctx,x-70,0,x+70,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+    ctx.textAlign='center';ctx.fillText(ts(id),x,ny+50);ctx.letterSpacing='0';
+  }
+  teamLbl(tlx,m.l);teamLbl(trx,m.v);
+
+  // Champion badge if result
+  if(sc){
+    const champId=r.l>r.v?m.l:(r.v>r.l?m.v:0);
+    if(champId){
+      const cbW=800,cbH=96,cbX=W/2-cbW/2,cbY=ny+100;
+      ctx.fillStyle=lGrad(ctx,cbX,cbY,cbX+cbW,cbY+cbH,[0,'rgba(255,215,0,.12)'],[.5,'rgba(255,215,0,.32)'],[1,'rgba(255,215,0,.12)']);
+      ctx.beginPath();ctx.roundRect(cbX,cbY,cbW,cbH,cbH/2);ctx.fill();
+      ctx.strokeStyle='rgba(255,215,0,.7)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.roundRect(cbX,cbY,cbW,cbH,cbH/2);ctx.stroke();
+      ctx.font='900 40px sans-serif';ctx.fillStyle='#ffd700';ctx.textAlign='center';ctx.letterSpacing='3px';
+      ctx.fillText('🏆 CAMPEÓN: '+ts(champId).toUpperCase(),W/2,cbY+cbH*.66);
+    }
+  }
+
+  // ── BioMarketing sponsor ──
+  goldRule(ctx,1510);
+  ctx.textAlign='center';ctx.font='500 24px sans-serif';ctx.letterSpacing='3px';
+  ctx.fillStyle='rgba(255,255,255,.32)';ctx.fillText('PATROCINADO POR',W/2,1558);
+  // Load BM logo
+  let bmImg=getImg('bm_gf');
+  if(!bmImg){try{bmImg=await loadImg(BM_LOGO,'bm_gf');}catch(e){}}
+  if(bmImg){
+    const bmH=76,bmW=Math.round(bmImg.width/bmImg.height*bmH);
+    ctx.save();ctx.shadowColor='rgba(255,215,0,.35)';ctx.shadowBlur=18;
+    ctx.drawImage(bmImg,W/2-bmW/2,1572,bmW,bmH);ctx.restore();
+  }
+  ctx.font='800 50px sans-serif';ctx.letterSpacing='4px';
+  ctx.fillStyle=lGrad(ctx,W/2-220,0,W/2+220,0,[0,'#c8a000'],[.5,'#ffd700'],[1,'#c8a000']);
+  ctx.textAlign='center';
+  ctx.save();ctx.shadowColor='rgba(255,215,0,.4)';ctx.shadowBlur=16;
+  ctx.fillText('BIOMarketing',W/2,1700);ctx.restore();
+  ctx.font='500 25px sans-serif';ctx.letterSpacing='2px';ctx.fillStyle='rgba(255,255,255,.38)';
+  ctx.fillText('Innovación Digital',W/2,1744);
+
+  // ── CTA ──
+  rule(ctx,1778,.35);
+  const ctaW=580,ctaH=76,ctaX=W/2-ctaW/2,ctaY=1808;
+  ctx.fillStyle=lGrad(ctx,ctaX,ctaY,ctaX+ctaW,ctaY,[0,'rgba(200,16,46,.0)'],[.3,'rgba(200,16,46,.26)'],[.7,'rgba(200,16,46,.26)'],[1,'rgba(200,16,46,.0)']);
+  ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.fill();
+  ctx.strokeStyle='rgba(200,16,46,.44)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(ctaX,ctaY,ctaW,ctaH,ctaH/2);ctx.stroke();
+  ctx.font='900 36px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.letterSpacing='2px';
+  ctx.fillText('¡NO TE LO PIERDAS!  🔥',W/2,ctaY+ctaH*.68);
+  footer(ctx);
+}
+
 async function tJornada(ctx,ms){
+  // Redirect Gran Final to dedicated premium template
+  if(ms.length===1&&ms[0].vu==='F')return tGranFinal(ctx,ms[0]);
   await drawBg(ctx);topStripe(ctx);clubHeader(ctx,52);
   const weeks=[...new Set(ms.map(m=>m.week))];
   const poLabels={200:'CUARTOS DE FINAL',201:'SEMIFINALES',202:'GRAN FINAL'};
