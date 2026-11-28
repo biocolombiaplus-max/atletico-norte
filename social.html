@@ -1395,32 +1395,27 @@ async function tGranFinal(ctx,m){
   ctx.textAlign='center';ctx.fillText('ATLÉTICO NORTE F.C.',W/2,hy+hSz*1.19+56);
   goldRule(ctx,hy+hSz*1.19+72);
 
-  // ── GRAN FINAL — clean, bold, impactful ──
-  const gfY=326;
-  // Warm glow halo
-  rGlow(ctx,W/2,gfY,500,'rgba(255,190,0,.26)');
-  // Thin gold decorative lines
-  const lnY=gfY-66,lnW=210;
-  [[W/2-lnW-170,1],[W/2+170,-1]].forEach(([lx,dir])=>{
-    const lg=lGrad(ctx,lx,0,lx+lnW*dir,0,[0,dir>0?'rgba(255,215,0,.7)':'transparent'],[1,dir>0?'transparent':'rgba(255,215,0,.7)']);
-    ctx.fillStyle=lg;ctx.fillRect(Math.min(lx,lx+lnW*dir),lnY,lnW,1.5);
-  });
-  ctx.font='68px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
-  ctx.fillText('🏆',W/2-310,gfY-20);ctx.fillText('🏆',W/2+310,gfY-20);
-  // Bold stroke outline for crispness
-  ctx.font='900 128px Impact,"Arial Black",sans-serif';ctx.letterSpacing='6px';ctx.textAlign='center';
-  ctx.strokeStyle='rgba(90,40,0,.95)';ctx.lineWidth=8;ctx.lineJoin='round';
-  ctx.strokeText('GRAN FINAL',W/2,gfY+10);
-  // Gold fill — saturated, no white
-  const gfg=lGrad(ctx,W/2-460,0,W/2+460,0,
-    [0,'#7a4800'],[.18,'#c97d00'],[.38,'#f5b800'],[.5,'#ffd700'],
-    [.62,'#f5b800'],[.82,'#c97d00'],[1,'#7a4800']);
+  // ── GRAN FINAL ──
+  const gfY=330;
+  rGlow(ctx,W/2,gfY-20,480,'rgba(255,185,0,.20)');
+  // Decorative lines each side (clear of text)
+  ctx.fillStyle=lGrad(ctx,W/2-410,0,W/2-170,0,[0,'transparent'],[1,'rgba(255,215,0,.65)']);
+  ctx.fillRect(W/2-410,gfY-78,240,2);
+  ctx.fillStyle=lGrad(ctx,W/2+170,0,W/2+410,0,[0,'rgba(255,215,0,.65)'],[1,'transparent']);
+  ctx.fillRect(W/2+170,gfY-78,240,2);
+  // Trophy above, not overlapping text
+  ctx.font='58px sans-serif';ctx.textAlign='center';ctx.letterSpacing='0';
+  ctx.fillText('🏆  🏆',W/2,gfY-30);
+  // "GRAN FINAL" — gold fill only, clean shadow glow
+  ctx.font='900 124px "Arial Black",Impact,sans-serif';ctx.letterSpacing='3px';ctx.textAlign='center';
+  const gfg=lGrad(ctx,W/2-440,0,W/2+440,0,
+    [0,'#7a4a00'],[.2,'#d49200'],[.42,'#f8c000'],[.5,'#FFD700'],[.58,'#f8c000'],[.8,'#d49200'],[1,'#7a4a00']);
   ctx.fillStyle=gfg;
-  ctx.save();ctx.shadowColor='rgba(255,195,0,.85)';ctx.shadowBlur=55;
-  ctx.fillText('GRAN FINAL',W/2,gfY+10);ctx.restore();
+  ctx.save();ctx.shadowColor='rgba(255,185,0,.85)';ctx.shadowBlur=42;ctx.shadowOffsetY=0;
+  ctx.fillText('GRAN FINAL',W/2,gfY+8);ctx.restore();
   // "LIGA INTERNA · S2 2026"
-  ctx.font='600 26px sans-serif';ctx.letterSpacing='7px';ctx.fillStyle='rgba(255,215,0,.52)';
-  ctx.textAlign='center';ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+62);
+  ctx.font='500 25px sans-serif';ctx.letterSpacing='7px';ctx.fillStyle='rgba(255,215,0,.5)';
+  ctx.textAlign='center';ctx.fillText('LIGA INTERNA  ·  S2 2026',W/2,gfY+58);
 
   // ── DATE SECTION ──
   const d=new Date(getFecha(m)+'T12:00:00');
